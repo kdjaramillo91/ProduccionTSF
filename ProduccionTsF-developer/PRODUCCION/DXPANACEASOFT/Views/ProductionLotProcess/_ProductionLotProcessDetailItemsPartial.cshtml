@@ -1,0 +1,313 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.ProductionLotDetail>
+@{
+	var loteMarcado = DataProviderSetting.ValueSetting("LMMASTER"); 
+}
+@{
+	var grid = Html.DevExpress().GridView<ProductionLotDetail>(settings =>
+	{
+		settings.Name = "gvProductionLotProcessDetailItems" + ViewData["id_productionLot"];
+		settings.CallbackRouteValues = new { Controller = "ProductionLotProcess", Action = "ProductionLotProcessDetailItemsPartial" };
+
+		settings.ClientSideEvents.BeginCallback = "ProductionLotProcessDetailItems_BeginCallback";
+
+		settings.CommandColumn.Visible = false;
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id"; //"id_originLot;id_item";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null)
+			{
+				e.Properties["cpIdProductionLot"] = 0;
+			}
+			e.Properties["cpIdProductionLot"] = ViewData["id_productionLot"];
+		};
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		#region ColumnsAdd
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_originLot";
+			column.Caption = "Lote Origen";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_originLot = (int?)DataBinder.Eval(c.DataItem, "id_originLot");
+
+				Lot _lot = DataProviderProductionLot.LotById(id_originLot);
+
+				string text = string.Empty;
+
+				if (_lot != null && _lot.internalNumber != null)
+				{
+					text = _lot.internalNumber;
+				}
+				else if (_lot.ProductionLot != null && _lot.ProductionLot.internalNumber != null)
+				{
+					text = _lot.ProductionLot.internalNumber;
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		if(loteMarcado == "SI")
+		{
+			settings.Columns.Add(column =>
+			{
+				column.FieldName = "lotMarked";
+				column.Caption = "Lote Marcado";
+				column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					string lotMarked = (string)DataBinder.Eval(c.DataItem, "lotMarked");
+					string text = string.Empty;
+					text = lotMarked;
+					ViewContext.Writer.Write(text);
+				});
+			});
+		}
+		
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_item";
+			column.Caption = "Producto";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = string.Empty;
+
+				if (item != null)
+				{
+					text = item.name;
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "warehouse";
+			column.PropertiesEdit.ClientInstanceName = "warehouse";
+			column.Caption = "Bodega";
+			column.Width = Unit.Percentage(10);
+			column.UnboundType = UnboundColumnType.String;
+			column.ReadOnly = true;
+
+			/*column.SetDataItemTemplateContent(c =>
+			{
+
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_originLot");
+				Warehouse warehouse = DataProviderProductionLot.WarehouseByProductionLotAndItem(id_productionLot, id_item);
+
+				string text = string.Empty;
+
+				if (warehouse != null)
+				{
+					text = (warehouse.name);
+				}
+
+				ViewContext.Writer.Write(text);
+			});*/
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+				Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+				string text = (warehouse != null) ? warehouse.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "warehouseLocation";
+			column.PropertiesEdit.ClientInstanceName = "warehouseLocation";
+			column.Caption = "Ubicación";
+			column.Width = Unit.Percentage(10);
+			column.UnboundType = UnboundColumnType.String;
+			column.ReadOnly = true;
+
+			//column.SetDataItemTemplateContent(c =>
+			//{
+
+			//    int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+			//    int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_originLot");
+			//    WarehouseLocation warehouseLocation = DataProviderProductionLot.WarehouseLocationByProductionLotAndItem(id_productionLot, id_item);
+
+			//    string text = string.Empty;
+
+			//    if (warehouseLocation != null)
+			//    {
+			//        text = (warehouseLocation.name);
+			//    }
+
+			//    ViewContext.Writer.Write(text);
+			//});
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocation");
+				WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocation);
+
+				string text = (warehouseLocation != null) ? warehouseLocation.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+
+			column.Name = "currentStock";
+			column.PropertiesEdit.ClientInstanceName = "currentStock";
+			column.Caption = "Existencia";
+			column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Width = Unit.Percentage(10);
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_originLot");
+				int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+				int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocation");
+				decimal? quantityRecived = DataProviderProductionLot.ExistingAmount(id_productionLot, id_item, id_warehouse, id_warehouseLocation);
+
+				decimal currentStock = 0.0M;
+
+				if (quantityRecived != null)
+				{
+					currentStock = quantityRecived.Value;
+				}
+
+				ViewContext.Writer.Write(currentStock.ToString("N2"));
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "quantityRecived";
+			column.Name = "quantityRecived";
+			column.Caption = "Cantidad";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal quantityRecived = (decimal)DataBinder.Eval(c.DataItem, "quantityRecived");
+				ViewContext.Writer.Write(quantityRecived.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "metricUnit";
+			column.PropertiesEdit.ClientInstanceName = "metricUnit";
+			column.Caption = "UM";
+			column.Width = Unit.Percentage(5);
+			column.UnboundType = UnboundColumnType.String;
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+				Item item = DataProviderItem.Item(id);
+				string metricUnit = (item != null && item.ItemInventory != null) ? item.ItemInventory.MetricUnit.code : "";
+				ViewContext.Writer.Write(metricUnit);
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+
+			column.Name = "totalQuantityItem";
+			//column.PropertiesEdit.ClientInstanceName = "currentStock";
+			column.Caption = "Cantidad Total";
+			//column.UnboundType = UnboundColumnType.Decimal;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			//column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Width = Unit.Percentage(10);
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				//var item = DataProviderItem.Item(id_item);
+				var _minumum = DataProviderItem.GetMinimoProductionProcessWMasterCalc(id_item);
+				decimal? quantityRecived = (decimal?)DataBinder.Eval(c.DataItem, "quantityRecived");
+
+				//var minimo = item != null && item.id_presentation != null ? item.Presentation.minimum : 1;
+				//decimal totalQuantityItem = minimo * (quantityRecived == null ? 0 : quantityRecived.Value);
+				decimal totalQuantityItem = _minumum * (quantityRecived == null ? 0 : quantityRecived.Value);
+
+				ViewContext.Writer.Write(totalQuantityItem.ToString("N2"));
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "metricUnitPresentation";
+			column.PropertiesEdit.ClientInstanceName = "metricUnitPresentation";
+			column.Caption = "UM";
+			column.Width = Unit.Percentage(5);
+			column.UnboundType = UnboundColumnType.String;
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+				Item item = DataProviderItem.Item(id);
+				string metricUnit = (item != null && item.ItemInventory != null) ? item.ItemInventory.MetricUnit.code : "";
+				string metricUnitPresentation = (item != null && item.id_presentation != null) ? item.Presentation.MetricUnit.code : metricUnit;
+				ViewContext.Writer.Write(metricUnitPresentation);
+			});
+
+		});
+
+		#endregion
+	});
+
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()

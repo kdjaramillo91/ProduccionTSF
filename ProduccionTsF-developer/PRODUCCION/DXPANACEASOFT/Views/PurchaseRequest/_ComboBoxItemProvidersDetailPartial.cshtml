@@ -1,0 +1,22 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.CallbackRouteValues = new { Controller = "PurchaseRequest", Action = "ComboBoxItemProvidersDetailPartial" };
+    settings.Name = "id_proposedProvider";
+    settings.Properties.ClientInstanceName = "id_proposedProvider";
+
+    settings.Properties.TextField = "fullname_businessName";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Properties.ClientSideEvents.BeginCallback = "ItemProvidersCombo_BeginCallback";
+
+}).BindList(Model).Bind(ViewData["id_proposedProvider"]).GetHtml()

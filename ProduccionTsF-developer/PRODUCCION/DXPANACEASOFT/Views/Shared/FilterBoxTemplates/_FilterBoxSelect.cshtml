@@ -1,0 +1,63 @@
+﻿@using DXPANACEASOFT.Models.Filter
+
+@model List<FilterType>
+
+<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="3">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Selecciones</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 30%">
+            @{
+                Html.RenderPartial("FilterBoxTemplates/_FilterBoxSelectGridViewLeft", Model);
+            }
+        </td>
+        <td style="width: 10%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnToRightSelect";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = ">>>";
+                                settings.Images.Image.IconID = IconID.ActionsRight16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnToRightSelect_click";
+                            }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnToLeftSelect";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "<<<";
+                                settings.Images.Image.IconID = IconID.ActionsLeft16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnToLeftSelect_click";
+                            }).GetHtml()
+                    </td>
+                </tr>
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 60%">
+            @{
+                Html.RenderPartial("FilterBoxTemplates/_FilterBoxSelectGridViewRight", new List<FilterTypeWithCondition>());
+            }
+        </td>
+    </tr>
+</table>

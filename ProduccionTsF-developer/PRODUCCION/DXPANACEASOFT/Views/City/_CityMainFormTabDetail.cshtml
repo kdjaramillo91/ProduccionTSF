@@ -1,0 +1,155 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using  DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.City
+@using System.Drawing
+
+
+<div id="GridMessageError" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageError";
+           settings.Properties.ClientInstanceName = "gridMessageError";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+
+    <!--Fila 1 Fecha Inicio y fin -->
+    <tr>
+        <!--FECHA Inicio-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Name = "codeLabel";
+                settings.Text = "Codigo:";
+                settings.AssociatedControlName = "code";
+            }).GetHtml()
+
+           
+        </td>
+        <td >
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+       {
+           settings.Name = "code";
+           settings.Properties.ClientInstanceName = "code";
+
+           settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 20;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           //settings.Width = Unit.Percentage(50);
+           //settings.Height = Unit.Percentage(50);
+       }).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+            {
+                settings.Name = "nameLabel";
+                settings.Text = " Nombre:";
+                settings.AssociatedControlName = "name";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "name";
+           settings.Properties.ClientInstanceName = "name";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+       }).GetHtml()
+           </td>
+       
+    </tr>
+
+ 
+    <!--Fila 3 Tipo de Calendario -->
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_country, settings =>
+            {
+                settings.Name = "id_countryLabel";
+                settings.Text = "Pais:";
+                settings.AssociatedControlName = "id_country";
+            }).GetHtml()
+        </td>
+        <td >
+            @{
+                int? id_country = (Model != null && Model.id_country != 0) ? (int?)Model.id_country : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_country, settings =>
+       {
+           settings.Name = "id_country";
+           settings.Properties.ClientInstanceName = "id_country";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Columns.Add("name", "Nombre", 200);
+           //settings.Width = Unit.Percentage(50);
+           //settings.Height = Unit.Percentage(50);
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "Combocountry_SelectedIndexChanged";
+           settings.Properties.EnableClientSideAPI = true;
+           settings.Properties.CallbackPageSize = 20;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPais";
+           settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { id_StateOfContry.PerformCallback();     }";
+
+       }).BindList(DataProviderCountry.AllContries((int)ViewData["id_company"])).Bind(id_country).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+       {
+           settings.Name = "isActive";
+           settings.Properties.ClientInstanceName = "isActive";
+           settings.Text = "Activo";
+       }).GetHtml()
+        </td>
+        <td colspan="3">
+      
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_stateOfContry, settings =>
+            {
+                settings.Name = "EstadoLabel";
+                settings.Text = "Estado:";
+                settings.AssociatedControlName = "id_country";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                Html.RenderPartial("comboboxcascading/_cmbsateof", Model);
+            }
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isCapital, settings =>
+       {
+           settings.Name = "isCapital";
+           settings.Properties.ClientInstanceName = "isCapital";
+           settings.Text = "Capital";
+       }).GetHtml()
+        </td>
+        <td colspan="3"></td>
+    </tr>
+    <tr></tr>
+
+    </table>
+
+    
+
+

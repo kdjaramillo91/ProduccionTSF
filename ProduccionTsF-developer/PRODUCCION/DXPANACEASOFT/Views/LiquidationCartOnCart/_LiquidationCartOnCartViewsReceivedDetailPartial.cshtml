@@ -1,0 +1,394 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.InventoryMovePlantTransferDetail>
+
+@{
+    var grid = Html.DevExpress().GridView<InventoryMovePlantTransferDetail>(settings =>
+    {
+        settings.Name = "gvLiquidationCartOnCartReceivedDetailEditForm";// + ViewData["id_liquidationCartOnCart"];
+        settings.CallbackRouteValues = new { Controller = "LiquidationCartOnCart", Action = "LiquidationCartOnCartReceivedDetailPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "LiquidationCartOnCartDetails_BeginCallback";
+
+
+        settings.CommandColumn.Visible = false;
+        //settings.CommandColumn.ShowSelectCheckbox = true;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        //settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        //settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        //settings.CommandColumn.ShowSelectCheckbox = true;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        ////Eventos
+        //settings.ClientSideEvents.Init = "OnGridViewInitDetail";
+        //settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedDetail";
+        //settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackDetail";
+        //settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackDetail";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<InventoryMovePlantTransferDetail> rows = (Model as List<InventoryMovePlantTransferDetail>);
+            rows = (rows != null) ? rows.ToList() : new List<InventoryMovePlantTransferDetail>();
+
+            e.Properties["cpIdLiquidationCartOnCart"] = ViewData["id_liquidationCartOnCart"];
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        //settings.SetFooterRowTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblInfoDetails""></span>");
+        //    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+        //    {
+        //        ViewContext.Writer.Write(
+        //            @"<a id=""lnkSelectAllRowsDetails"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRowsDetail()"">Seleccionar Todos</a>
+        //              <a id=""lnkClearSelectionDetails"" style=""cursor: pointer;"" onclick=""gvEditClearSelectionDetail()"">Anular Selección</a>"
+        //        );
+        //    }
+        //});
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        //settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        //settings.InitNewRow = (s, e) =>
+        //{
+        //    e.NewValues["quantity"] = 0.00M;
+        //};
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //Pie de tabla
+        //settings.Settings.ShowFooter = true;
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "boxesToReceive").DisplayFormat = "<b>{0:n2}</b>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quantityKgs").DisplayFormat = "<b>{0:n2}</b>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quantityPounds").DisplayFormat = "<b>{0:n2}</b>";
+
+        #region ColumnsAdd
+
+        //id_ProductionCart 10
+        settings.Columns.Add(m => m.LiquidationCartOnCartDetail.ProductionCart.name, column =>
+        {
+            column.Caption = "Carro";
+            column.Width = Unit.Percentage(10);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        if (this.ViewBag.IsCopaking)
+        {
+            settings.Columns.Add(column =>
+            {
+                //column.FieldName = "id_Client";
+                column.Caption = "Cliente Local";
+                column.Width = Unit.Percentage(10);
+                column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+                column.SetDataItemTemplateContent(c =>
+                {
+                    LiquidationCartOnCartDetail liquidationCartOnCartDetail = (LiquidationCartOnCartDetail)DataBinder.Eval(c.DataItem, "LiquidationCartOnCartDetail");
+                    Person person = DataProviderPerson.PersonById(liquidationCartOnCartDetail.id_Client);
+                    ViewContext.Writer.Write(person != null ? person.fullname_businessName : "SIN CLIENTE");
+                });
+
+            });
+        }
+        else
+        {
+            settings.Columns.Add(column =>
+            {
+                //column.FieldName = "id_Client";
+                column.Caption = "Cliente Exterior";
+                column.Width = Unit.Percentage(10);
+                column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+                column.SetDataItemTemplateContent(c =>
+                {
+                    LiquidationCartOnCartDetail liquidationCartOnCartDetail = (LiquidationCartOnCartDetail)DataBinder.Eval(c.DataItem, "LiquidationCartOnCartDetail");
+                    Person person = DataProviderPerson.PersonById(liquidationCartOnCartDetail.id_Client);
+                    ViewContext.Writer.Write(person != null ? person.fullname_businessName : "SIN CLIENTE");
+                });
+            });
+        }
+
+        //id_ItemToWarehouse 20
+        settings.Columns.Add(m => m.LiquidationCartOnCartDetail.Item1.name, column =>
+        {
+            column.Caption = "Producto a Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+
+        });
+
+        //boxesToReceive 10
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "boxesToReceive";
+            column.Name = "boxesToReceive";
+            column.Caption = "Cajas Recibidas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal boxesToReceive = (decimal?)DataBinder.Eval(c.DataItem, "boxesToReceive") ?? 0;
+                ViewContext.Writer.Write(boxesToReceive.ToString("N2"));
+            });
+
+        });
+
+        //quantityKgs 10
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityKgs";
+            column.Name = "quantityKgs";
+            column.Caption = "KG";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityKgs = (decimal?)DataBinder.Eval(c.DataItem, "quantityKgs") ?? 0;
+                ViewContext.Writer.Write(quantityKgs.ToString("N2"));
+            });
+
+        });
+
+        //quantityPounds 10
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityPounds";
+            column.Name = "quantityPounds";
+            column.Caption = "LBS";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityPounds = (decimal?)DataBinder.Eval(c.DataItem, "quantityPounds") ?? 0;
+                ViewContext.Writer.Write(quantityPounds.ToString("N2"));
+            });
+
+        });
+
+        //No. Ingreso Por Transferencia : id_inventoryMoveEntry 5
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_inventoryMoveEntry";
+            column.Caption = "No. Ingreso Por Transferencia";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(5);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                InventoryMovePlantTransfer inventoryMovePlantTransfer = (InventoryMovePlantTransfer)DataBinder.Eval(c.DataItem, "InventoryMovePlantTransfer");
+
+                string text = string.Empty;
+
+                if (inventoryMovePlantTransfer != null)
+                {
+                    Document document = DataProviderDocument.GetDocumentSourcePenOApro(inventoryMovePlantTransfer.id, "136");
+                    text = (document != null /*&& document.InventoryMove != null*/) ? document.number: string.Empty;
+
+                    if (document != null && document.DocumentState.code == "03")//03 APROBADA
+                    {
+                        text = "<font color='green'>" + text + "</font>";
+                    }
+                    if (document != null && document.DocumentState.code == "01")//01 APROBADA
+                    {
+                        text = "<font color='blue'>" + text + "</font>";
+                    }
+                }
+
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        //Bodega Ingreso : id_warehouseEntry 10
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_warehouseEntry";
+            column.Caption = "Bodega Ingreso";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                InventoryMovePlantTransfer inventoryMovePlantTransfer = (InventoryMovePlantTransfer)DataBinder.Eval(c.DataItem, "InventoryMovePlantTransfer");
+                LiquidationCartOnCart liquidationCartOnCart = (LiquidationCartOnCart)DataBinder.Eval(c.DataItem, "LiquidationCartOnCart");
+
+                string text = string.Empty;
+
+                if (inventoryMovePlantTransfer != null)
+                {
+                    bool isCopackingLot = liquidationCartOnCart.ProductionLot.isCopackingLot ?? false;
+
+                    var id_warehouseEntryAux = (isCopackingLot ? inventoryMovePlantTransfer.MachineProdOpeningDetail.MachineForProd.id_materialthirdWarehouse : inventoryMovePlantTransfer.MachineProdOpeningDetail.MachineForProd.id_materialWarehouse);
+
+                    Document document = DataProviderDocument.GetDocumentSourcePenOApro(inventoryMovePlantTransfer.id, "136");
+                    text = (id_warehouseEntryAux != null) ? DataProviderWarehouse.WarehouseById(id_warehouseEntryAux).name : string.Empty;
+
+                    if (document != null && document.DocumentState.code == "03")//03 APROBADA
+                    {
+                        text = "<font color='green'>" + text + "</font>";
+                    }
+                    if (document != null && document.DocumentState.code == "01")//01 APROBADA
+                    {
+                        text = "<font color='blue'>" + text + "</font>";
+                    }
+                }
+
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        //Ubicación Ingreso : id_warehouseLocationEntry 10
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_warehouseLocationEntry";
+            column.Caption = "Ubicación Ingreso";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                InventoryMovePlantTransfer inventoryMovePlantTransfer = (InventoryMovePlantTransfer)DataBinder.Eval(c.DataItem, "InventoryMovePlantTransfer");
+                LiquidationCartOnCart liquidationCartOnCart = (LiquidationCartOnCart)DataBinder.Eval(c.DataItem, "LiquidationCartOnCart");
+
+                string text = string.Empty;
+
+                if (inventoryMovePlantTransfer != null)
+                {
+                    bool isCopackingLot = liquidationCartOnCart.ProductionLot.isCopackingLot ?? false;
+
+                    var id_warehouseLocationEntryAux = (isCopackingLot ? inventoryMovePlantTransfer.MachineProdOpeningDetail.MachineForProd.id_materialthirdWarehouseLocation : inventoryMovePlantTransfer.MachineProdOpeningDetail.MachineForProd.id_materialWarehouseLocation);
+
+                    Document document = DataProviderDocument.GetDocumentSourcePenOApro(inventoryMovePlantTransfer.id, "136");
+                    text = (id_warehouseLocationEntryAux != null) ? DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocationEntryAux).name : string.Empty;
+
+                    if (document != null && document.DocumentState.code == "03")//03 APROBADA
+                    {
+                        text = "<font color='green'>" + text + "</font>";
+                    }
+                    if (document != null && document.DocumentState.code == "01")//01 APROBADA
+                    {
+                        text = "<font color='blue'>" + text + "</font>";
+                    }
+                }
+
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        //Fecha Ingreso : dateEntry 5
+        settings.Columns.Add(column =>
+        {
+            column.Name = "dateEntry";
+            column.Caption = "Fecha Ingreso";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(5);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                InventoryMovePlantTransfer inventoryMovePlantTransfer = (InventoryMovePlantTransfer)DataBinder.Eval(c.DataItem, "InventoryMovePlantTransfer");
+
+                string text = string.Empty;
+
+                if (inventoryMovePlantTransfer != null)
+                {
+
+                    Document document = DataProviderDocument.GetDocumentSourcePenOApro(inventoryMovePlantTransfer.id, "136");
+                    text = inventoryMovePlantTransfer.dateTimeEntry.ToString("dd-MM-yyyy HH:mm");
+
+                    if (document != null && document.DocumentState.code == "03")//03 APROBADA
+                    {
+                        text = "<font color='green'>" + text + "</font>";
+                    }
+                    if (document != null && document.DocumentState.code == "01")//01 APROBADA
+                    {
+                        text = "<font color='blue'>" + text + "</font>";
+                    }
+                }
+
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+
+}
+
+@*<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingDetailsEditForm.js"></script>*@

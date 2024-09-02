@@ -1,0 +1,44 @@
+﻿@Html.DevExpress().PopupControl(settings =>
+{
+    settings.Name = "confirmDialog";
+    settings.PopupElementID = "maincontent";
+    settings.AllowDragging = true;
+    settings.ShowOnPageLoad = false;
+    settings.PopupAction = PopupAction.None;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.MinWidth = Unit.Pixel(400);
+    settings.MinHeight = Unit.Pixel(100);
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.Center;
+    settings.PopupVerticalAlign = PopupVerticalAlign.TopSides;
+    settings.HeaderText = "Panaceasoft";
+    settings.SetContent(() =>
+    {
+
+        ViewContext.Writer.Write(Html.Partial("DialogTemplates/_ConfirmationMessage"));
+        //ViewContext.Writer.Write(@"<hr style=""margin-bottom: 2px;"" />");
+        
+    });
+
+    settings.ShowFooter = true;
+    settings.SetFooterContentTemplateContent(c =>
+    {
+        ViewContext.Writer.Write(@"<div style=""float: right; width: 100; padding-top: 10px; padding-bottom: 10px;"">");
+
+        Html.DevExpress().Button(btnOk =>
+        {
+            btnOk.Name = "btnConfirmOk";
+            btnOk.Text = "Ok";
+            btnOk.Style.Add("margin-right", "4px");
+        }).Render();
+
+        Html.DevExpress().Button(btnOk =>
+        {
+            btnOk.Name = "btnConfirmCancel";
+            btnOk.Text = "Cancel";
+            btnOk.ClientSideEvents.Click = "ConfirmationDialogButtonCancel_Click";
+        }).Render();
+
+        ViewContext.Writer.Write("</div>");
+    });
+}).GetHtml()
+

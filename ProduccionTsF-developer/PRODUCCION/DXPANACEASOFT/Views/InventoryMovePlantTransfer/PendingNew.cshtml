@@ -1,0 +1,71 @@
+﻿@model List<DXPANACEASOFT.Models.DTOModel.InventoryMovePlantTransferPendingNewDTO>
+
+@{
+    Layout = null;
+}
+
+<h3>Transferencia a Placas - T&uacute;neles</h3>
+<div id="search_option" class="widget-box">
+    <div class="widget-header">
+        <h6 class="widget-title">Criterios de B&uacute;squeda</h6>
+        <span class="widget-toolbar">
+            @*<a href="#" data-action="reload">*@
+            <a href="#" id="btnAdvancedFilter">
+                @*<i class="ace-icon fa fa-refresh"></i>*@
+                <i class="ace-icon fa fa-filter"></i>
+            </a>
+            <a href="#" id="btnCollapsePendiente" data-action="collapse">
+                <i id="filterFormIcon" class="ace-icon fa fa-chevron-up"></i>
+            </a>
+        </span>
+    </div>
+</div>
+<h4>Listado de Carros</h4>
+
+<div class="MyContainer">
+    <div class="row">
+        <div class="col-sm-2">
+            @Html.DevExpress().Button(settings =>
+             {
+                 settings.Name = "btnGenerateMoveTransfer";
+                 settings.Text = "Generar Ingreso";
+                 settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+                 settings.ClientEnabled = true;
+                 settings.UseSubmitBehavior = false;
+                 settings.EnableClientSideAPI = true;
+                 settings.ClientSideEvents.Click = "GenerateInventoryMoveTransfer";
+             }).GetHtml()
+        </div>
+        <div class="col-sm-6">
+            
+        </div>
+        <div class="col-sm-3">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Text = "Total Cajas Seleccionadas";
+                settings.RightToLeft = DefaultBoolean.True;
+            }).GetHtml()
+        </div>
+        <div class="col-sm-1">
+            @Html.DevExpress().SpinEdit(
+            settings =>
+            {
+                settings.Name = "totalSelectedBoxes";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                settings.Properties.DisplayFormatString = "N2";
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+            }).GetHtml()
+        </div>
+    </div>
+</div>
+
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+@Html.Partial("_GridViewPendingNew", Model)
+
+<script src="~/Scripts/inventorymoveplanttransfer/pending_new.js"></script>

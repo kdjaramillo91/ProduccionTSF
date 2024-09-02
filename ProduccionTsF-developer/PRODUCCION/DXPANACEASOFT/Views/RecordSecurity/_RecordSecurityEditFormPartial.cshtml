@@ -1,0 +1,125 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.tbsysUserRecordSecurity
+
+@{ 
+	if (this.Model != null && this.Model.id == 0)
+	{
+		this.Model.isActive = true;
+	}
+}
+<table class="table table-condensed">
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.id_user, settings =>
+			{
+				settings.Text = "Usuario:*";
+				settings.AssociatedControlName = "id_user";
+			}).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_user = (Model != null && Model.id_user != 0) ? (int?)Model.id_user : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_user, settings =>
+			{
+				settings.Properties.ClientInstanceName = "id_user";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "username";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione un usuario";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnUserlidation";
+			}).BindList(DataProviderUser.Users()).Bind(id_user).GetHtml()
+		</td>
+
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.id_SecurityRecord, settings =>
+			{
+				settings.Text = "Registro de Seguridad:*";
+				settings.AssociatedControlName = "id_SecurityRecord";
+			}).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_SecurityRecord = (Model != null && Model.id_SecurityRecord != 0) ? (int?)Model.id_SecurityRecord : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_SecurityRecord, settings =>
+			{
+				settings.Properties.ClientInstanceName = "id_SecurityRecord";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione un registro de seguridad";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnObjRecordSecurityValidation";
+			}).BindList(DataProviderRecordSecurity.AllObjRecordSecurity()).Bind(id_SecurityRecord).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+			{
+				settings.Text = "¿Activo?:";
+				settings.AssociatedControlName = "isActive";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			{
+				settings.Properties.ClientInstanceName = "isActive";
+				settings.Properties.ClientSideEvents.Init = "isActiveInit";
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6" style="text-align: right;">
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnUpdate";
+				settings.Text = "Actualizar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+			}).GetHtml()
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnCancel";
+				settings.Text = "Cancelar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonCancel_Click";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr id="recordSecurityAlertRow" style="display: none;">
+		<td colspan="6">
+			<div class="alert alert-danger fade in" style="margin-top:18px;">
+				<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+				<span id="recordSecurityErrorMessage"></span>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<script src="~/Scripts/recordSecurity/editform.js"></script>

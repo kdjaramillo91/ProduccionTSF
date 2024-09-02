@@ -1,0 +1,139 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.PriceList
+@{
+    string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+<table class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.PriceList2.name, settings =>
+            {
+                settings.Name = "priceListBasePurchaseLabel";
+                settings.Text = "Lista de Precio Base:";
+                settings.AssociatedControlName = "id_priceListBase";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_priceListBase = (Model != null && Model.id_priceListBase != 0) ? (int?)Model.id_priceListBase : null;
+                int? id_documentType = (Model != null && Model.Document.id_documentType != 0) ? (int?)Model.Document.id_documentType : null;
+            }
+            @Html.DevExpress().ComboBox(/*m => m.id_priceListBase, */settings =>
+           {
+               settings.Name = "id_priceListBasePurchase";
+               settings.Properties.ClientInstanceName = "id_priceListBasePurchase";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               //settings.Enabled = codeState == "01";
+               settings.ReadOnly = codeState != "01"; //(@Model.id != 0);
+               //settings.ReadOnly = id_priceListBase != 0;
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnPriceListPriceListBasePurchaseValidation";
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboPriceListBasePurchase_SelectedIndexChanged";
+
+           }).BindList(DataProviderPriceList.PriceListBasesByCompanyDocumentTypeWithCurrent((int?)ViewData["id_company"], id_documentType, id_priceListBase)).Bind(id_priceListBase).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.Provider.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "fullname_businessName";
+                settings.Text = "Proveedor:";
+                settings.AssociatedControlName = "id_provider";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+                bool? byGroup = (Model != null) ? (bool?)Model.byGroup : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_provider, settings =>
+       {
+           settings.Name = "id_provider";
+           settings.Properties.ClientInstanceName = "id_provider";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           //settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           //settings.Enabled = codeState == "01";
+           settings.ReadOnly = codeState != "01"; //(@Model.id != 0);
+                                                  //settings.ReadOnly = id_priceListBase != 0;
+           settings.ClientEnabled = (byGroup != true);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = (byGroup == true ? "OnValidation" : "OnPriceListProviderValidation");
+
+       }).BindList(DataProviderPerson.ProviderByCompanyAndCurrent((int?)ViewData["id_company"], id_provider)).Bind(id_provider).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.byGroup, settings =>
+                            {
+                                settings.Name = "byGroupProviderLabel";
+                                settings.Text = "Por Grupo:";
+                                settings.AssociatedControlName = "byGroup";
+                            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.byGroup, settings =>
+       {
+           settings.Name = "byGroupProvider";
+           settings.Properties.ClientInstanceName = "byGroupProvider";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";
+           settings.Properties.ClientSideEvents.CheckedChanged = "PriceListByGroupProvider_CheckedChanged";
+           //settings.Checked = true;
+           //settings.Properties.DropDownButton.Visible = false;
+       }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.id_groupPersonByRol, settings =>
+            {
+                settings.Name = "id_groupPersonByRolProviderLabel";
+                settings.Text = "Grupo:";
+                settings.AssociatedControlName = "id_groupPersonByRol";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_groupPersonByRol = (Model != null && Model.id_groupPersonByRol != 0) ? (int?)Model.id_groupPersonByRol : null;
+                var rols = new List<string>() { "Proveedor"};
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_customer, settings =>
+       {
+           settings.Name = "id_groupPersonByRolProvider";
+           settings.Properties.ClientInstanceName = "id_groupPersonByRolProvider";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           //settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           //settings.Enabled = codeState == "01";
+           settings.ReadOnly = codeState != "01"; //(@Model.id != 0);
+                                                  //settings.ReadOnly = id_priceListBase != 0;
+           settings.ClientEnabled = (byGroup == true);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = byGroup != true ? "OnValidation" : "OnPriceListGroupProviderValidation";
+
+       }).BindList(DataProviderGroupPersonByRol.GroupPersonByRolByCompanyCurrentAndRols((int?)ViewData["id_company"], id_groupPersonByRol, rols)).Bind(id_groupPersonByRol).GetHtml()
+        </td>
+    </tr>
+</table>
+
+<script src="~/Scripts/pricelist/_priceListTabPurchaseEditForm.js"></script>

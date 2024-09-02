@@ -1,0 +1,39 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryMove
+
+
+@{ 
+
+    int? _idLoteCurrent = null;
+    if(Model != null)
+    {
+        _idLoteCurrent = Model.idLotePackagingMaterials;
+    }
+
+}
+@Html.DevExpress().ComboBox(settings =>
+{
+
+    settings.Name = "idLoteFilter";
+    settings.Width = Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "GetLoteFilter" };
+    settings.Properties.ClientInstanceName = "idLoteFilter";
+    settings.Properties.ValueField = "idProductionLotSingleModelP";
+    //settings.Properties.TextField = "name";
+    settings.Properties.Columns.Add("numberProductionLotSingleModelP", "Sec. Transaccional", 70);
+    settings.Properties.Columns.Add("internalNumberProductionLotSingleModelP", "No. Lote", 70);
+    settings.Properties.Columns.Add("nameProviderProductionLotSingleModelP", "", 0);
+    settings.Properties.Columns.Add("nameUnitProviderProductionLotSingleModelP", "", 0);
+    settings.Properties.TextFormatString = "{0} | {1}";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.Width = Unit.Percentage(100);
+    settings.Properties.CallbackPageSize = 10;
+
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "LoteFilter_OnSelectedIndexChanged";
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+ }).BindList( DataProviderProductionLot.GetProductionLotSingleWithDays(30) ).Bind(_idLoteCurrent).GetHtml()

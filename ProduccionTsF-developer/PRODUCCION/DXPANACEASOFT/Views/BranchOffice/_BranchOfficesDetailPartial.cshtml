@@ -1,0 +1,100 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    BranchOffice branchoffice = Model ?? new BranchOffice();
+}
+
+@Html.Hidden("id_branchOffice", branchoffice.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                Email:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(branchoffice.email)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Direcci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">@Html.Raw(branchoffice.address)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Tel&eacute;fono:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(branchoffice.phoneNumber)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(branchoffice.description)    
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(branchoffice.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(branchoffice.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(branchoffice.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(branchoffice.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br/>
+
+@Html.Partial("_BranchOfficeDetailEmissionPointsPartial", branchoffice.EmissionPoint.ToList())
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

@@ -1,0 +1,103 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.Document
+@{
+    string codeState = (Model != null && Model.DocumentState != null && Model.DocumentState.code != "") ? Model.DocumentState.code : "";
+
+    bool isReadOnly = false;
+    if (Model != null && Model.DocumentType != null && Model.DocumentType.code == "02")
+    {
+        isReadOnly = true;
+    }
+    string numberSequential = ViewData["numberSeqWarehouse"] != null ? (string)ViewData["numberSeqWarehouse"] : "";
+    var fechaMinima = (DateTime?)this.ViewBag.FechaMinima;
+}
+<table id="documentCut" class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emissionDate, settings =>
+            {
+                settings.Name = "emissionDateLabel";
+                settings.Text = "Fecha de Emisión:";
+                settings.AssociatedControlName = "emissionDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.emissionDate, settings =>
+       {
+           settings.Name = "emissionDate";
+           settings.Properties.ClientInstanceName = "emissionDate";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";//Codigo de Estado Pendiente
+           settings.Properties.EditFormat = EditFormat.Custom;
+           settings.Properties.EditFormatString = "dd/MM/yyyy HH:mm";
+           settings.Properties.DisplayFormatString = "dd/MM/yyyy HH:mm";
+           settings.Properties.TimeSectionProperties.Visible = true;
+           settings.Properties.TimeSectionProperties.Adaptive = true;
+           settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+           settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "HH:mm";
+           settings.Properties.ClientSideEvents.ValueChanged = "OnEmissionDateValueChanged";
+           //settings.Properties.DropDownButton.Visible = false;
+           if (fechaMinima.HasValue)
+           {
+               settings.Properties.MinDate = fechaMinima.Value.AddDays(-1);
+           }
+       }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "numberLabel";
+                settings.Text = "No. Documento:";
+                settings.AssociatedControlName = "number";
+
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = "number";
+                settings.Properties.ClientInstanceName = "number";
+                settings.Text = numberSequential;
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.DocumentState.name, settings =>
+            {
+                settings.Name = "documentStateLabel";
+                settings.Text = "Estado:";
+                settings.AssociatedControlName = "documentState";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.HiddenFor(m => m.id_documentState, new { @id = "id_documentState" })
+            @Html.DevExpress().TextBoxFor(m => m.DocumentState.name, settings =>
+            {
+                settings.Name = "documentState";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Name = "descriptionLabel";
+                settings.Text = "Descripción:";
+                settings.AssociatedControlName = "description";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().MemoFor(m => m.description, settings =>
+            {
+                settings.Name = "description";
+                settings.Properties.ClientInstanceName = "description";
+                settings.ReadOnly = codeState != "01" || isReadOnly;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

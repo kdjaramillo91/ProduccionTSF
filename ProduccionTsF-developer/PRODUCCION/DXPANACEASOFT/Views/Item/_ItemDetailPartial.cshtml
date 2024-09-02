@@ -1,0 +1,162 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.Item
+
+@{
+    ViewData["id_item"] = Model.id;
+}
+
+<table class="table table-condensed">
+    <tr>
+        <td rowspan="7" style="width: 10%;">
+            @{
+                if (Model != null && Model.photo != null)
+                {
+                    ViewContext.Writer.Write(Html.Partial("_Logo", Model.photo));
+                }
+            }
+        </td>
+        <td style="width: 10%;">
+            <strong>Tipo:</strong>
+        </td>
+        <td style="width: 15%;">
+            @{
+                if (Model != null && Model.ItemType != null)
+                {
+                    ViewContext.Writer.Write(Model.ItemType.name);
+                }
+            }
+        </td>
+        <td style="width: 10%;">
+            <strong>Fabricante:</strong>
+        </td>
+        <td>
+            @{
+                if (Model != null && Model.ItemGeneral != null)
+                {
+                    ViewContext.Writer.Write(Model.ItemGeneral.manufacturer);
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>Categor&iacute;a:</strong>
+        </td>
+        <td>
+            @{
+                if (Model != null && Model.ItemTypeCategory != null)
+                {
+                    ViewContext.Writer.Write(Model.ItemTypeCategory.name);
+                }
+            }
+        </td>
+        <td colspan="2">
+            <strong>Proveedores:</strong>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>Grupo:</strong>
+        </td>
+        <td>
+            @{
+                if (Model != null && Model.ItemGeneral != null && Model.ItemGeneral.ItemGroup != null)
+                {
+                    ViewContext.Writer.Write(Model.ItemGeneral.ItemGroup.name);
+                }
+            }
+        </td>
+        <td colspan="2" rowspan="3">
+            @{
+                if (Model != null && Model.ItemProvider != null)
+                {
+                    ViewContext.Writer.Write(Html.Partial("_ItemProvidersDetailPartial", Model.ItemProvider));
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>Subgrupo:</strong>
+        </td>
+        <td>
+            @{
+                if (Model != null && Model.ItemGeneral != null && Model.ItemGeneral.ItemGroup1 != null)
+                {
+                    ViewContext.Writer.Write(Model.ItemGeneral.ItemGroup1.name);
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>Categor&iacute;a de Grupo:</strong>
+        </td>
+        <td>
+            @{
+                if (Model != null && Model.ItemGeneral != null && Model.ItemGeneral.ItemGroupCategory != null)
+                {
+                    ViewContext.Writer.Write(Model.ItemGeneral.ItemGroupCategory.name);
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>Creador por:</strong>
+        </td>
+        <td style="width: 15%;">
+            @{
+                if (Model != null)
+                {
+                    string username = GetUserName(Model.id_userCreate);
+                    ViewContext.Writer.Write(username);
+                }
+            }
+        </td>
+        <td >
+            <strong>Fecha de Creaci&oacute;n:</strong>
+        </td>
+        <td>
+            @{
+                if (Model != null)
+                {
+                    ViewContext.Writer.Write(Model.dateCreate);
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>Actualizado por:</strong>
+        </td>
+        <td style="width: 15%;">
+            @{
+                if (Model != null)
+                {
+                    string username = GetUserName(Model.id_userUpdate);
+                    ViewContext.Writer.Write(username);
+                }
+            }
+        </td>
+        <td>
+            <strong>Fecha de Creaci&oacute;n:</strong>
+        </td>
+        <td>
+            @{
+                if (Model != null)
+                {
+                    ViewContext.Writer.Write(Model.dateUpdate);
+                }
+            }
+        </td>
+    </tr>
+</table>
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}

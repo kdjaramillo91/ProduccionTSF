@@ -1,0 +1,165 @@
+﻿@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+
+
+@model DXPANACEASOFT.Models.QualityControl
+@{
+    int id_qualityControl = (Model != null) ? Model.id : 0;
+    //var codeBusinessOportunityDocumentType = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+
+    //var endDateCurrent = (Model != null) ? Model.endDate : null;
+    string isConformsSTR = (Model != null && Model.isConforms) ? "True" : "False";
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) ? Model.Document.DocumentState.code : "";
+    //string codeBusinessOportunityResultsState = (Model != null && Model.BusinessOportunityResults != null && Model.BusinessOportunityResults.BusinessOportunityState != null) ? Model.BusinessOportunityResults.BusinessOportunityState.code : "";
+    bool isConformityOnHeader = (Model.id == 0) ? (Model.isConformityOnHeader != null ? (bool)Model.isConformityOnHeader : false) : (bool)Model.QualityControlConfiguration.QualityControlConfigurationConformity.isConformityOnHeader;
+    Model.hasUpd = Model.hasUpd != null ? (bool)Model.hasUpd : true;
+
+    var aSettingTPC = DataProviderSetting.SettingByCode("TPC");
+    var aQualityControlConfiguration = DataProviderQualityControl.QualityControlConfiguration(Model.id_qualityControlConfiguration);
+    var codeQualityControlConfiguration = aQualityControlConfiguration != null ? aQualityControlConfiguration.code : "";
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditQualityControl", name = "formEditQualityControl" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("isConformityOnHeader", isConformityOnHeader)
+    @Html.Hidden("id_qualityControl", id_qualityControl)
+    @Html.Hidden("isConformsSTR", isConformsSTR)
+    @Html.Hidden("codeState", codeState)
+    @Html.Hidden("aSettingTPC", aSettingTPC != null ? aSettingTPC.value : "NO")
+    @Html.Hidden("codeQualityControlConfiguration", codeQualityControlConfiguration)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabQualityControl";
+        tab.Text = "Análisis    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_QualityControlMainFormTabQualityControl");
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDetail";
+        tab.Text = "Detalle del Análisis    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_QualityControlMainFormTabDetail");
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabSupplierTraceability";
+        tab.Text = "Trazabilidad del Proveedor    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+        tab.Visible = aSettingTPC != null && aSettingTPC.value == "SI" && Model.QualityControlConfiguration != null && Model.QualityControlConfiguration.code == "QARMP";
+
+        tab.SetContent(() =>
+        {
+            if (Model.ShrimpSupplierTraceability == null) {
+                Model.ShrimpSupplierTraceability = new ShrimpSupplierTraceability();
+                Model.ShrimpSupplierTraceability.QualityControl = Model;
+            }
+            Html.RenderPartial("_QualityControlMainFormTabSupplierTraceability", Model.ShrimpSupplierTraceability);
+        });
+    });
+
+}).GetHtml()
+
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdateFoot";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ClientVisible = IsEnabled(11) && (bool)Model.hasUpd;
+                        button.ClientEnabled = codeState == "01" || (!Model.isConforms && codeState != "05");//01: PENDIENTE y "05": ANULADO
+                            button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnCancelFoot";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/qualitycontrol/editform.js"></script>
+
+@functions{
+
+    bool IsEnabled(int id_permission)
+    {
+        int id_user = (int)ViewData["id_user"];
+        int id_menu = (int)ViewData["id_menu"];
+
+        User user = DataProviderUser.UserById(id_user);
+
+        if (user == null)
+            return false;
+
+        UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+        if (userMenu == null)
+            return false;
+
+        Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+        return (permission != null);
+    }
+
+}

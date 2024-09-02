@@ -1,0 +1,38 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.PurchaseOrder
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "01";
+    int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+    bool? pricePerList = (Model != null) ? (bool?)Model.pricePerList : null;
+    int? id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+    DateTime dt = (Model != null && Model.Document != null) ? Model.Document.emissionDate : DateTime.Now;
+
+    //DateTime? dt = Model.Document.emissionDate;
+}
+@Html.DevExpress().ComboBoxFor(m => m.id_priceList, settings =>
+{
+    settings.Properties.ClientInstanceName = "id_priceList";
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.CallbackRouteValues = new { Controller = "PurchaseOrder", Action = "GetPriceListsByProvider"};
+    settings.Properties.CallbackPageSize = 10;
+
+    settings.ReadOnly = codeState != "01";
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.ShowModelErrors = true;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_provider'] = id_provider.GetValue(); e.customArgs['emissionDate'] = emissionDate.GetDate();}";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) {if(id_priceList.GetValue() !== null){id_certification.PerformCallback();}}";
+    //settings.Properties.ClientSideEvents.SelectedIndexChanged = "PriceList_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.Init = "OnInitPriceList";
+    settings.Properties.ClientSideEvents.Validation = "OnPriceListValidation";
+
+}).BindList(DataProviderPriceList.PriceListByCompanyWithCurrentAndProviderAndCommercialDate((int?)ViewData["id_company"], id_priceList, id_provider, dt)).Bind(id_priceList).GetHtml()

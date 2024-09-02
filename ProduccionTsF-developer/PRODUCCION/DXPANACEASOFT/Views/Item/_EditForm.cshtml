@@ -1,0 +1,67 @@
+﻿@model Item
+<h2>Productos</h2>
+<div id="notification"></div>
+@Html.Partial("_ToolbarPartial", this.Model)
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditItem", name = "formEditItem" }))
+{
+	<div class="row">
+		@Html.DevExpress().PageControl(
+			pageControl =>
+			{
+				pageControl.Name = "tpEdit";
+				pageControl.Width = Unit.Percentage(100);
+				pageControl.Height = Unit.Pixel(450);
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "DatosGeneralesTabPage";
+					tabPage.Text = "Generales";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_ItemFormEdit", this.Model);
+					});
+				});
+
+				pageControl.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpEditMessage"] = (string)this.ViewBag.EditMessage;
+					e.Properties["cpEditError"] = (string)this.ViewBag.EditError;
+				};
+
+				pageControl.ClientSideEvents.Init = "OnTabPageControlInit";
+			}).GetHtml()
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<table class="table table-condensed">
+				<tr style="border-top: 1px solid #c0c0c0;">
+					<td style="text-align: right; margin-top: 5px">
+						@Html.DevExpress().Button(settings =>
+						{
+							settings.Name = "btnUpdate";
+							settings.Text = "Actualizar";
+							settings.RenderMode = ButtonRenderMode.Button;
+							settings.UseSubmitBehavior = false;
+							settings.ImagePosition = ImagePosition.Left;
+							settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+
+								 settings.ValidateInvisibleEditors = true;
+							settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+						}).GetHtml()
+						@Html.DevExpress().Button(settings =>
+						{
+							settings.Name = "btnCancel";
+							settings.Text = "Cancelar";
+							settings.RenderMode = ButtonRenderMode.Button;
+							settings.UseSubmitBehavior = false;
+							settings.ImagePosition = ImagePosition.Left;
+							settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+							settings.ClientSideEvents.Click = "BtnCancel_Click";
+						}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+}

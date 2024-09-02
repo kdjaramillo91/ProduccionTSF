@@ -1,0 +1,122 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.BusinessOportunityPhaseActivity>
+
+@{
+    var grid = Html.DevExpress().GridView<BusinessOportunityPhaseActivity>(settings =>
+    {
+        settings.Name = "gvBusinessOportunityPhaseActivities" + ViewData["id_businessOportunityPhaseView"];
+
+
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessOportunityPhaseViewActivitiesPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "BusinessOportunityPhaseView_OnBeginCallback";
+
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdBusinessOportunityPhaseView"] = 0;
+            }
+            e.Properties["cpIdBusinessOportunityPhaseView"] = ViewData["id_businessOportunityPhaseView"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_businessOportunityActivity";
+            column.Caption = "Actividad";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_businessOportunityActivity = (int?)DataBinder.Eval(c.DataItem, "id_businessOportunityActivity");
+                var businessOportunityActivity = DataProviderBusinessOportunity.BusinessOportunityActivity(id_businessOportunityActivity);
+                //BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+                string text = (businessOportunityActivity != null ? businessOportunityActivity.name : "");
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_state";
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_state = (int?)DataBinder.Eval(c.DataItem, "id_state");
+                var state = DataProviderBusinessOportunity.BusinessOportunityActivityState(id_state);
+                //BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+                string text = (state != null ? state.name : "");
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "referencePhaseActivity";
+            column.Caption = "Referencia";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string referencePhaseActivity = (string)DataBinder.Eval(c.DataItem, "referencePhaseActivity");
+
+                ViewContext.Writer.Write(referencePhaseActivity);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "descriptionPhaseActivity";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string descriptionPhaseActivity = (string)DataBinder.Eval(c.DataItem, "descriptionPhaseActivity");
+
+                ViewContext.Writer.Write(descriptionPhaseActivity);
+            });
+        });
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,111 @@
+@{
+	var treeList = Html.DevExpress().TreeList(settings => {
+        settings.Name = "Accounts";
+        settings.CallbackRouteValues = new { Controller = "AccountPlan", Action = "AccountsTreeListPartial" };
+
+				settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "AccountPlan", Action = "AccountsTreeListPartialAddNew" };
+        settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "AccountPlan", Action = "AccountsTreeListPartialUpdate" };
+        settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "AccountPlan", Action = "AccountsTreeListPartialDelete" };
+				settings.SettingsEditing.NodeDragDropRouteValues = new { Controller = "AccountPlan", Action = "AccountsTreeListPartialMove" };
+
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.DeleteButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = true;
+
+				settings.KeyFieldName = "id";
+		settings.ParentFieldName = "id_parentAccount";
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "id";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "id_parentAccount";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "number";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "formatted_number";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "name";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "alias";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "mnemonic";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "id_account_plan";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "description";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "isActive";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "id_userCreate";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "dateCreate";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "id_userUpdate";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "dateUpdate";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "Account1";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "Account2";
+            }
+        );
+				settings.Columns.Add(
+            column => {
+                column.FieldName = "AccountPlan";
+            }
+        );
+
+		settings.SettingsPager.Visible = true;
+		settings.SettingsSelection.Enabled = true;
+	});
+		if (ViewData["EditError"] != null){
+        treeList.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@treeList.Bind(Model).GetHtml()

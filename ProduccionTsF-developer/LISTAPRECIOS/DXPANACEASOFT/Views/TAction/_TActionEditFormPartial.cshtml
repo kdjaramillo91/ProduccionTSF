@@ -1,0 +1,161 @@
+﻿@model  DXPANACEASOFT.Models.TAction
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+   @*@using (Html.BeginForm("", "", FormMethod.Post, new {id = "formEditTAction", name = "formEditTAction" }))*@
+  
+@{
+    String ActionName = (Model.id == 0) ? "TActionPartialAddNew" : "TActionPartialUpdate";
+}
+
+
+@using (Ajax.BeginForm(ActionName, "TAction",
+                                    new AjaxOptions
+                                    {
+                                        HttpMethod = "post",
+                                        OnBegin = "showLoading();",
+                                        OnComplete = "hideLoading();",
+                                        UpdateTargetId = "result",
+                                        InsertionMode = InsertionMode.ReplaceWith
+                                    },
+                                    new
+                                    {
+                                        id = "formEditTAction",
+                                        name = "formEditTAction"
+                                    }))
+{
+
+
+    @Html.Hidden("id_taction", Model.id)
+
+    <table class="table table-condensed">
+        
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.id_controller, settings =>
+                {
+                    settings.Text = "Cotrolador:*";
+                    settings.AssociatedControlName = "id_controller";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_controller = (Model != null && Model.id_controller != 0) ? (int?)Model.id_controller : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_controller, settings =>
+           {
+               settings.Properties.ClientInstanceName = "id_controller";
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.NullText = "Seleccione Controlador";
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxController_SelectedIndexChanged";
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnTActionValidation";
+           }).BindList(DataProviderTController.Tcontroller()).Bind(id_controller).GetHtml()
+            </td>
+            <td style="width: 5%;">
+                @Html.DevExpress().LabelFor(m => m.name, settings =>
+                {
+                    settings.Text = "Nombre:*";
+                    settings.AssociatedControlName = "name";
+
+                }).GetHtml()
+            </td>
+
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+           {
+               settings.Properties.ClientInstanceName = "name";
+               settings.Properties.ClientInstanceName = "tactionName";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.NullText = "Nombre";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnTActionNameValidation";
+
+           }).GetHtml()
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.description, settings =>
+                {
+                    settings.Text = "Descripción:";
+                    settings.AssociatedControlName = "description";
+
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().MemoFor(m => m.description, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "description";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "";
+                    settings.ShowModelErrors = true;
+
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+                {
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "isActive";
+
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "isActive";
+                    settings.Width = Unit.Percentage(100);
+
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr id="tactionAlertRow" style="display: none;">
+            <td colspan="6">
+                <div class="alert alert-danger fade in" style="margin-top: 18px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                    <span id="tactionErrorMessage"></span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+ }
+                    
+
+<script src="~/Scripts/taction/editform.js"></script>

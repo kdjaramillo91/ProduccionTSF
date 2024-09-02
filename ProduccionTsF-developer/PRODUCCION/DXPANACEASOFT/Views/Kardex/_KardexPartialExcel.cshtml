@@ -1,0 +1,272 @@
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+@*@{
+	var entityObjectPermissions = (EntityObjectPermissions)ViewData["entityObjectPermissions"];
+	var showCost = true;
+	var loteMarcado = DataProviderSetting.ValueSetting("LMMASTER");
+	if (entityObjectPermissions != null)
+	{
+		var objectPermissions = entityObjectPermissions.listObjectPermissions.FirstOrDefault(fod => fod.codeObject == "COS");
+		showCost = objectPermissions == null;
+	}
+}*@
+
+
+@{
+	var grid = Html.DevExpress().GridView<ResultKardex>(settings =>
+	{
+		settings.Name = "gvKardexExcelDetails";
+		settings.CallbackRouteValues = new { Controller = "Kardex", Action = "KardexPartialExcel" };
+
+		settings.Width = Unit.Percentage(100);
+
+		//settings.SettingsBehavior.AllowFixedGroups = true;
+
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowFilterRow = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		//settings.SettingsExport.EnableClientSideExportAPI = true;
+		//settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+		//settings.SettingsExport.FileName = "Kardex_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+		//settings.Toolbars.Add(t =>
+		//{
+		//	t.EnableAdaptivity = true;
+		//	t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+		//});
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.ClientSideEvents.BeginCallback = "OnGridViewKardexExcel_BeginCallback";
+
+		#region SearchPanel
+
+		//Panel de Busqueda
+		//settings.SettingsSearchPanel.Visible = true;
+		//settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		#endregion
+
+		settings.Settings.ShowFooter = true;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView detailsGrid = s as MVCxGridView;
+			if (detailsGrid == null) return;
+
+			e.Properties["cpSettingKardex"] = null;
+
+		};
+
+		settings.Columns.Add(m => m.emissionDate, column =>
+		{
+			column.Name = "emissionDate";
+			column.Caption = "Fecha Proceso";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.name_productionProcess, column =>
+		{
+			column.Name = "name_productionProcess";
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.number, column =>
+		{
+			column.Name = "number";
+			column.Caption = "Sec. Transaccional";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+
+
+		settings.Columns.Add(m => m.internalNumber, column =>
+		{
+			column.Name = "internalNumber";
+			column.Caption = "Lote";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.Provider_name, column =>
+		{
+			column.Name = "Provider_name";
+			column.Caption = "Proveedor";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.inventoryReason, column =>
+		{
+			column.Name = "inventoryReason";
+			column.Caption = "Motivo de Inventario";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.warehouse, column =>
+		{
+			column.Name = "warehouse";
+			column.Caption = "Bodega";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.warehouseLocation, column =>
+		{
+			column.Name = "warehouseLocation";
+			column.Caption = "Ubicación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.document, column =>
+		{
+			column.Name = "document";
+			column.Caption = "Ref";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.codigo_producto, column =>
+		{
+			column.Name = "descripcion_producto";
+			column.Caption = "Cód Producto";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.descripcion_producto, column =>
+		{
+			column.Name = "descripcion_producto";
+			column.Caption = "Desc Producto";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.itemSize, column =>
+		{
+			column.Name = "itemSize";
+			column.Caption = "Talla";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.ItemMetricUnit, column =>
+		{
+			column.Name = "ItemMetricUnit";
+			column.Caption = "Und Prest";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.entry, column =>
+		{
+			column.Name = "entryAmount";
+			column.Caption = "Ingreso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+			column.Width = Unit.Percentage(3);
+
+		});
+
+		settings.Columns.Add(m => m.exit, column =>
+		{
+			column.Name = "exitAmount";
+			column.Caption = "Egreso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+			column.Width = Unit.Percentage(3);
+
+		});
+
+		settings.Columns.Add(m => m.LB, column =>
+		{
+			column.Name = "LB";
+			column.Caption = "Libras";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+			column.Width = Unit.Percentage(3);
+
+		});
+
+		settings.Columns.Add(m => m.KG, column =>
+		{
+			column.Name = "KG";
+			column.Caption = "KG";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+			column.Width = Unit.Percentage(3);
+
+		});
+
+		settings.Columns.Add(m => m.usuario, column =>
+		{
+			column.Name = "usuario";
+			column.Caption = "Usuario";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.costo_promedio, column =>
+		{
+			column.Name = "costo_promedio";
+			column.Caption = "Costo Promedio";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.nameDocumentState, column =>
+		{
+			column.Name = "nameDocumentState";
+			column.Caption = "Estado";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+	});
+}
+
+@grid.Bind(Model).GetHtml()

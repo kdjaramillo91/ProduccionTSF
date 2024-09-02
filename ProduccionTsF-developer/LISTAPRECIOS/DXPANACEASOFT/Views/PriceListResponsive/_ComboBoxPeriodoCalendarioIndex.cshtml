@@ -1,0 +1,20 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComboBoxPeriodoCalendario";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Seleccionar...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "PriceListResponsive",
+        Action = "ComboBoxPeriodoCalendario",
+        From = "Index"
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxPeriodoCalendario_Change";
+}
+).BindList(ViewData["PeriodoCalendario"]).GetHtml()
+

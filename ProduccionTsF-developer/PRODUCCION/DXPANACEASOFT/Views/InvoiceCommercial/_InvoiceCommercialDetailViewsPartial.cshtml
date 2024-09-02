@@ -1,0 +1,214 @@
+﻿@using System.Globalization;
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+	var grid = Html.DevExpress().GridView<InvoiceCommercialDetail>(settings =>
+	{
+		settings.Name = "gvInvoiceCommercialDetails" + ViewData["id_invoiceCommercial"];
+		settings.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "InvoiceCommercialDetailPartial" };
+
+		settings.ClientSideEvents.BeginCallback = "InvoiceCommercialDetails_BeginCallback";
+
+
+		settings.CommandColumn.Visible = false;
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null)
+			{
+				e.Properties["cpIdInvoiceCommercial"] = 0;
+			}
+			e.Properties["cpIdInvoiceCommercial"] = ViewData["id_invoiceCommercial"];
+		};
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		//Pie de tabla
+		settings.Settings.ShowFooter = true;
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "numBoxes").DisplayFormat = "<b>{0:#,##0}</b>";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountInvoice").DisplayFormat = "<b>{0:n2}</b>";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>{0:c2}</b>";
+
+		#region ColumnsAdd
+
+		//itemDetailName 25
+		settings.Columns.Add(m => m.Item.name, column =>
+		{
+			column.Name = "itemDetailName";
+			column.Caption = "Nombre del Producto";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(25);
+		});
+
+		settings.Columns.Add(m => m.Item.foreignName, column =>
+		{
+			column.Name = "foreignName";
+			column.Caption = "Nombre Extranjero";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(15);
+		});
+
+		//itemDetailAuxCode 15
+		settings.Columns.Add(m => m.Item.auxCode, column =>
+		{
+			column.Name = "itemDetailAuxCode";
+			column.Caption = "Código Aux.";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(15);
+		});
+
+		//itemDetailMasterCode 10
+		settings.Columns.Add(m => m.Item.masterCode, column =>
+		{
+			column.Name = "itemDetailMasterCode";
+			column.Caption = "Código";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		//itemDetailNumBoxes 10
+		settings.Columns.Add(m => m.numBoxes, column =>
+		{
+			column.FieldName = "numBoxes";
+			column.Name = "itemDetailNumBoxes";
+			column.Caption = "Cartones";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? numBoxesAux = (int?)DataBinder.Eval(c.DataItem, "numBoxes");
+
+				string text = (numBoxesAux != null) ? numBoxesAux.Value.ToString("#,##0") : "0";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		//itemDetailAmount 10
+		settings.Columns.Add(m => m.amountInvoice, column =>
+		{
+			column.FieldName = "amountInvoice";
+			column.Name = "itemDetailAmount";
+			column.Caption = "Cantidad";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? amountAux = (decimal?)DataBinder.Eval(c.DataItem, "amountInvoice");
+
+				string text = (amountAux != null) ? amountAux.Value.ToString("#,##0.00") : "0.00";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		//itemDetailMetricUnit  5
+		settings.Columns.Add(column =>
+		{
+			//column.FieldName = "id_metricUnit";
+			column.Name = "itemDetailMetricUnit";
+			column.Caption = "UM";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_metricUnitAux = (int?)DataBinder.Eval(c.DataItem, "id_metricUnit");
+				MetricUnit metricUnitAux = DataProviderMetricUnit.MetricUnitById(id_metricUnitAux);
+
+				string text = (metricUnitAux != null) ? metricUnitAux.code : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+
+		//itemDetailUnitPrice 10
+		settings.Columns.Add(m => m.unitPrice, column =>
+		{
+			//column.FieldName = "unitPrice";
+			column.Name = "itemDetailUnitPrice";
+			column.Caption = "Precio";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? unitPriceAux = (decimal?)DataBinder.Eval(c.DataItem, "unitPrice");
+
+				string text = (unitPriceAux != null) ? unitPriceAux.Value.ToString("$#,##0.00") : "$0.00";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(m => m.discount, column =>
+		{
+			column.Name = "discount";
+			column.Caption = "discount";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? discountAux = (decimal?)DataBinder.Eval(c.DataItem, "discount");
+
+				string text = (discountAux != null) ? discountAux.Value.ToString("$#,##0.00") : "$0.00";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		//itemDetailTotal 15
+		settings.Columns.Add(m => m.total, column =>
+		{
+			column.FieldName = "total";
+			column.Name = "itemDetailTotal";
+			column.Caption = "Total";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(15);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? totalAux = (decimal?)DataBinder.Eval(c.DataItem, "total");
+
+				string text = (totalAux != null) ? totalAux.Value.ToString("$#,##0.00") : "$0.00";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		#endregion
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()

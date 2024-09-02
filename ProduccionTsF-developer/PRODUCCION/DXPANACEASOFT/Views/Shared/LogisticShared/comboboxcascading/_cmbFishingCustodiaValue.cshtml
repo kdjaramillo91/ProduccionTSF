@@ -1,0 +1,35 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.Dto.FishingCustodianValueDto
+@{
+    string codeValue = (Model != null && !string.IsNullOrEmpty(Model.CodeValue)) ? (string)Model.CodeValue : null;
+    string controlName = (Model != null && !string.IsNullOrEmpty(Model.ControlName)) ? (string)Model.ControlName : "";
+    string controlDependName = (Model != null && !string.IsNullOrEmpty(Model.ControlDependName)) ? (string)Model.ControlDependName : "";
+    int fishingCustodianId = (Model != null ? Model.FishingCustodianId : 0);
+    
+}
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = controlName;
+    settings.Properties.ClientInstanceName = controlName;
+
+    settings.Properties.ValueField = "CodeValue";
+    settings.Properties.TextField = "NameValue";
+    settings.Properties.ValueType = typeof(string);
+
+    settings.Width = Unit.Percentage(100);
+
+    settings.CallbackRouteValues = new { Controller = "CustodianIncome", Action = "FishingCustodianValues" };
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) {  e.customArgs['id_FishingCustodian'] = " + controlDependName + ".GetValue(); e.customArgs['controlName'] = '"+controlName+ "'; e.customArgs['controlDependName']='" + controlDependName + "' }";
+
+    settings.Properties.NullText = "Seleccione tipo valor custodia";
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    //settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.ShowModelErrors = true;
+    settings.Properties.CallbackPageSize = 20;
+
+
+    //settings.Properties.ClientSideEvents.Validation = "On"+controlName+"Validation";
+    //}).BindList(DataProviderFishingCustodian.FishingCustodianValuesCodes(fishingCustodiaId)).Bind(codeValue).GetHtml()
+}).BindList(TempData["FishingCustodianValues_"+ fishingCustodianId+"_" + controlName]).Bind(codeValue).GetHtml()

@@ -1,0 +1,113 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<SalesQuotationExterior>(settings =>
+    {
+        settings.Name = "gvSalesQuotation";
+        settings.CallbackRouteValues = new { Controller = "InvoiceExterior", Action = "SalesQuotationList" };
+        settings.ClientSideEvents.BeginCallback = "gvSalesQuotationBeginCallback";
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Proformas del Exterior</span>");
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(m => m.Invoice.Document.number, column =>
+        {
+            column.Name = "number";
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.Invoice.Document.emissionDate, column =>
+        {
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.EditorProperties().DateEdit(editorDate =>
+            {
+                editorDate.DisplayFormatInEditMode = true;
+                editorDate.DisplayFormatString = "dd/MM/yyyy";
+                editorDate.EditFormat = EditFormat.Custom;
+                editorDate.EditFormatString = "dd/MM/yyyy";
+            });
+        });
+
+        settings.Columns.Add(m => m.Invoice.Person.fullname_businessName, column =>
+        {
+            column.Name = "customerSalesQuotationExterior";
+            column.Caption = "Cliente";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+        });
+
+        settings.Columns.Add(m => m.totalBoxes, column =>
+        {
+            column.Caption = "Cartones Proforma";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+        });
+
+        settings.Columns.Add(m => m.numBoxesPlusMinus, column =>
+        {
+            column.Caption = "Cartones Variación";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+        });
+
+        settings.Columns.Add(m => m.usedBoxes, column =>
+        {
+            column.Caption = "Cartones Facturados";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+        });
+
+        settings.Columns.Add(m => m.pendingBoxes, column =>
+        {
+            column.Caption = "Cartones Pendientes";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+        });
+
+        settings.Columns.Add(m => m.Invoice.Document.DocumentState.name, column =>
+        {
+            column.Caption = "Estado Proforma";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        });
+
+        settings.Columns.Add(m => m.Invoice.Document.DocumentTransactionState.name, column =>
+        {
+            column.Caption = "Estado Factura";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        });
+    }
+);
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+
+}@grid.Bind(Model).GetHtml()

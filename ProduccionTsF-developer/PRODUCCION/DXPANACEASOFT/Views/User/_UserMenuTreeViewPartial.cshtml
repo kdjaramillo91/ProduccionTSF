@@ -1,0 +1,304 @@
+﻿
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.AssignedMenu>
+
+@{
+    var treeList = Html.DevExpress().TreeList<AssignedMenu>(settings =>
+    {
+        settings.Name = "tvMenu";
+        settings.CallbackRouteValues = new { Controller = "User", Action = "UserMenuTreeViewPartial" };
+
+        settings.SettingsEditing.Mode = TreeListEditMode.Inline;
+
+        settings.Width = Unit.Percentage(100);
+
+        #region COMMAND COLUMN
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Caption = "Acciones";
+        settings.CommandColumn.NewButton.Visible = false;
+        settings.CommandColumn.DeleteButton.Visible = false;
+        settings.CommandColumn.EditButton.Visible = true;
+        settings.CommandColumn.UpdateButton.Visible = false;
+        settings.CommandColumn.CancelButton.Visible = false;
+
+        settings.CommandColumn.CustomButtons.Add(new TreeListCommandColumnCustomButton
+        {
+            ID = "btnUpdateEdit",
+            Text = "Actualizar",
+            Visibility = TreeListCustomButtonVisibility.EditableNode
+        });
+
+        settings.CommandColumn.CustomButtons.Add(new TreeListCommandColumnCustomButton
+        {
+            ID = "btnCancelEdit",
+            Text = "Cancelar",
+            Visibility = TreeListCustomButtonVisibility.EditableNode
+        });
+
+        settings.ClientSideEvents.CustomButtonClick = "UserTreeView_CustomButtonClick";
+
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.VisibleIndex = 10;
+
+        #endregion
+
+        settings.SettingsPager.Visible = true;
+
+        settings.Settings.GridLines = System.Web.UI.WebControls.GridLines.Both;
+
+        settings.KeyFieldName = "id";
+        settings.ParentFieldName = "id_parent";
+        settings.RootValue = null;
+
+        #region CLIENT SIDE EVENTES
+
+        settings.ClientSideEvents.SelectionChanged = "UserTreeMenu_SelectionChanged";
+
+        #endregion
+
+        #region SELECTION
+
+        settings.SettingsSelection.Enabled = true;
+        settings.SettingsSelection.Recursive = true;
+        settings.SettingsSelection.AllowSelectAll = true;
+
+        #endregion
+
+        settings.Columns.Add(
+                column =>
+                {
+                    column.FieldName = "title";
+                    column.Name = "title";
+                    column.Caption = "Título";
+                    column.ReadOnly = true;
+                }
+            );
+
+        settings.Columns.Add(m => m.Permissions, column =>
+        {
+            //column.FieldName = "Permissions";
+            //column.Name = "Permissions";
+            column.Caption = "Permisos";
+
+            column.Width = Unit.Percentage(40);
+
+            //column.ColumnType = MVCxTreeListColumnType.TokenBox;
+
+            column.SetDataCellTemplateContent(c =>
+            {
+                List<Permission> permissions = (List<Permission>)DataBinder.Eval(c.DataItem, "Permissions");
+
+                if (permissions != null && permissions.Count > 0)
+                {
+                    ViewContext.Writer.Write(string.Join(",", permissions.Select(x => x.name).ToArray()));
+                }
+                else
+                {
+                    ViewContext.Writer.Write("");
+                }
+            });
+            column.SetEditCellTemplateContent(c =>
+            {
+                List<Permission> permissions = (List<Permission>)c.Value;
+
+                var data = DataProviderPermission.Permissions().Select(d => new
+                {
+                    id = d.id.ToString(),
+                    name = d.name
+                });
+
+                Html.DevExpress().TokenBox(p =>
+                {
+                    p.Name = "permissions";
+                    p.Properties.ClientInstanceName = "permissions";
+
+                    p.Width = Unit.Percentage(100);
+
+                    p.Properties.ValueField = "id";
+                    p.Properties.TextField = "name";
+
+                    p.Properties.AllowCustomTokens = false;
+
+                    foreach (var perm in permissions)
+                    {
+                        p.Properties.Tokens.Add(perm.name);
+                    }
+
+                    p.ShowModelErrors = true;
+
+                }).BindList(DataProviderPermission.Permissions()).Render();
+            });
+
+        });
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "id_controller";
+                column.Name = "id_controller";
+                column.Caption = "Módulo";
+
+                column.ColumnType = MVCxTreeListColumnType.ComboBox;
+
+                column.Width = Unit.Percentage(5);
+
+                column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+                column.ReadOnly = true;
+
+                column.SetDataCellTemplateContent(c =>
+                {
+                    int? id_controller = (int?)DataBinder.Eval(c.DataItem, "id_controller");
+                    TController controller = DataProviderController.Controller(id_controller);
+
+                    string text = string.Empty;
+                    if (controller != null)
+                    {
+                        text = controller.name;
+                    }
+
+                    ViewContext.Writer.Write(text);
+                });
+
+                column.EditorProperties().ComboBox(p =>
+                {
+                    p.DataSource = DataProviderController.Controllers();
+
+                    p.ValueField = "id";
+                    p.TextField = "name";
+                    p.ValueType = typeof(int);
+
+                    p.DropDownButton.Visible = false;
+
+                    p.ClientSideEvents.Validation = "OnControllerValidation";
+                });
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "id_action";
+                column.Name = "id_action";
+                column.Caption = "Opción";
+
+                column.ColumnType = MVCxTreeListColumnType.ComboBox;
+
+                column.Width = Unit.Percentage(5);
+
+                column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+                column.ReadOnly = true;
+
+                column.SetDataCellTemplateContent(c =>
+                {
+                    int? id_action = (int?)DataBinder.Eval(c.DataItem, "id_action");
+                    TAction action = DataProviderAction.Action(id_action);
+
+                    string text = string.Empty;
+                    if (action != null)
+                    {
+                        text = action.name;
+                    }
+
+                    ViewContext.Writer.Write(text);
+                });
+
+                column.EditorProperties().ComboBox(p =>
+                {
+                    p.DataSource = DataProviderAction.Actions();
+
+                    p.ValueField = "id";
+                    p.TextField = "name";
+                    p.ValueType = typeof(int);
+
+                    p.DropDownButton.Visible = false;
+
+                    p.ClientSideEvents.Validation = "OnActionValidation";
+                });
+            }
+        );
+
+        //settings.Columns.Add(
+        //    column =>
+        //    {
+        //        column.FieldName = "isAssigned";
+        //        column.Name = "isAssigned";
+        //        column.Caption = "Asignado";
+
+        //        column.Width = Unit.Percentage(5);
+
+        //        column.ColumnType = MVCxTreeListColumnType.CheckBox;
+
+        //        column.ReadOnly = true;
+
+        //        column.EditorProperties().CheckBox(p =>
+        //        {
+        //            p.ClientSideEvents.Validation = "OnAssignedValidation";
+        //        });
+        //    }
+        //);
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxTreeList treeView = (s as MVCxTreeList);
+            List<AssignedMenu> menues = (List<AssignedMenu>)Model;
+
+            if (treeView != null && menues != null)
+            {
+                foreach (var menu in menues)
+                {
+                    TreeListNode node = treeView.FindNodesByFieldValue("id", menu.id).First();
+                    if (!node.HasChildren)
+                    {
+                        node.Selected = menu.isAssigned;
+                    }
+                }
+            }
+        };
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        treeList.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@treeList.Bind(Model).GetHtml()
+
+@functions
+{
+    bool GetCheckedNodes(TreeListNode node, ref List<int> selectedNodes)
+    {
+        if (node.HasChildren)
+        {
+            foreach (TreeListNode n in node.ChildNodes)
+            {
+                bool result = GetCheckedNodes(n, ref selectedNodes);
+                if (result)
+                {
+                    AssignedMenu m = (AssignedMenu)node.DataItem;
+                    m.isAssigned = true;
+
+                    if (!selectedNodes.Contains(m.id))
+                    {
+                        selectedNodes.Add(m.id);
+                    }
+                }
+            }
+        }
+
+        AssignedMenu menu = (AssignedMenu)node.DataItem;
+
+        if (menu.isAssigned && !selectedNodes.Contains(menu.id))
+        {
+            selectedNodes.Add(menu.id);
+        }
+
+        return menu.isAssigned;
+    }
+}
+

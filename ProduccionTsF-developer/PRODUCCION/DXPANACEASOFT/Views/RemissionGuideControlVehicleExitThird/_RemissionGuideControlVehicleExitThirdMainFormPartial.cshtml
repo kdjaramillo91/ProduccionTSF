@@ -1,0 +1,107 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.DTOModel.RemissionGuideControlVehicleDto
+
+@{
+    int id_remissionGuide = (Model != null) ? Model.RemissionGuideControlVehicle.id_remissionGuide: 0;
+    TempData.Keep("remissionGuideForControlVehicleExitThird");
+    string codeDocumentState = (Model.Document != null) ?  (Model.Document.DocumentState != null ? Model.Document.DocumentState.code : "") :  "";
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditRemissionGuideControlVehicleExitThird", name = "formEditRemissionGuideControlVehicleExitThird" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+        @Html.Hidden("id_remissionGuide", id_remissionGuide)
+        @Html.Hidden("codeDocumentState", codeDocumentState)
+
+        @Html.DevExpress().PageControl(tabs =>
+   {
+       tabs.Name = "tabControl";
+       tabs.Width = Unit.Percentage(100);
+       tabs.EnableClientSideAPI = true;
+
+
+       tabs.TabPages.Add(tab =>
+       {
+           tab.Name = "tabDocumentControlEntrance";
+           tab.Text = "Documento    ";
+           tab.TabStyle.Width = Unit.Percentage(100);
+
+           tab.TabImage.Width = Unit.Pixel(16);
+           tab.TabImage.Height = Unit.Pixel(16);
+           tab.TabImage.Align = ImageAlign.Right;
+           tab.TabImage.Url = "/Content/image/noimage.png";
+           tab.ActiveTabImage.Align = ImageAlign.Right;
+           tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+           tab.SetContent(() =>
+           {
+               var document = (Model != null && Model.Document != null ) ? Model.Document : new Document();
+               Html.RenderPartial("DocumentTemplates/_DocumentFormEdit", document);
+           });
+       });
+       tabs.TabPages.Add(tab =>
+       {
+           tab.Name = "tabRemissionGuideControlEntrance";
+           tab.Text = "Control Salida de Vehículos    ";
+
+           tab.TabStyle.Width = Unit.Percentage(100);
+
+           tab.TabImage.Width = Unit.Pixel(16);
+           tab.TabImage.Height = Unit.Pixel(16);
+           tab.TabImage.Align = ImageAlign.Right;
+           tab.TabImage.Url = "/Content/image/noimage.png";
+           tab.ActiveTabImage.Align = ImageAlign.Right;
+           tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+           tab.SetContent(() =>
+           {
+               Html.RenderPartial("_RemissionGuideControlVehicleExitThirdMainFormTab", Model.RemissionGuideControlVehicle);
+
+           });
+       });
+
+   }).GetHtml()
+
+    
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+<script src="~/Scripts/remissionguidecontrolvehicleexitthird/editform.js"></script>

@@ -1,0 +1,1886 @@
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Controllers;
+@using InvoiceDetailValid = DXPANACEASOFT.Controllers.InventoryMoveController.InvoiceDetailValid;
+@model List<DXPANACEASOFT.Models.InventoryMoveDetail>
+
+@{
+	string code = (ViewData["code"] != null) ? (string)ViewData["code"] : "";
+	DateTime? fechaEmision = (ViewData["fechaEmision"] != null) ? (DateTime?)ViewData["fechaEmision"] : null;
+	string valorization = (ViewData["valorization"] != null) ? (string)ViewData["valorization"] : "";
+	var loteMarcado = DataProviderSetting.ValueSetting("LMMASTER");
+	var lotReceptionDatePar = DataProviderSetting.ValueSetting("VALLOT");
+	var valInvFact = DataProviderSetting.ValueSetting("INVFACT");
+	bool IngresoPorTransferencia = (code == "34" || code == "130" || code == "136" || code == "143");
+	bool IngresoPorTransferenciaAutomatica = (code == "130" || code == "136" || code == "143");
+	bool EgresoPorTransferencia = (code == "32" || code == "129" || code == "135" || code == "142");
+	bool EgresoPorTransferenciaAutomatica = (code == "129" || code == "135" || code == "142");
+
+	int idWarehouseLocation = (int?)ViewData["id_WarehouseLocation"] ?? 0;
+	int id_inventoryMove = (int?)ViewData["id_inventoryMove"] ?? 0;
+	var entityObjectPermissions = (EntityObjectPermissions)ViewData["entityObjectPermissions"];
+	var showCost = true;
+	if (entityObjectPermissions != null)
+	{
+		var objectPermissions = entityObjectPermissions.listObjectPermissions.FirstOrDefault(fod => fod.codeObject == "COS");
+		showCost = objectPermissions == null;
+	}
+
+	string customParamOP = (string)ViewData["_customParamOP"];
+	string natureMovePar = (string)ViewData["_natureMove"];
+
+	Boolean enabledOptions = ViewData["readOnlyCode"] == null ? true : !(bool)ViewData["readOnlyCode"];
+	if (customParamOP == "IPXM" && enabledOptions)
+	{
+		enabledOptions = false;
+	}
+	bool aMostrarOP = ViewData["mostrarOP"] == null ? false : (bool)ViewData["mostrarOP"];
+	var invoiceDetailValid = (InvoiceDetailValid[])this.ViewBag.InvoiceDetailValid;
+}
+@{
+	var grid = Html.DevExpress().GridView<InventoryMoveDetail>(settings =>
+	{
+		settings.Name = "gridViewMoveDetails";
+		settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "InventoryMoveDetailsEditFormPartial" };
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMoveDetailsEditFormPartialAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMoveDetailsEditFormPartialUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMoveDetailsEditFormPartialDelete" };
+
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+		settings.Width = Unit.Percentage(100);
+		settings.CommandColumn.Visible = enabledOptions;
+		settings.CommandColumn.ShowSelectCheckbox = enabledOptions;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+		settings.Enabled = enabledOptions;
+
+		settings.SettingsPager.Visible = enabledOptions;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowGroup = false;
+		settings.SettingsBehavior.AllowSort = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+		settings.SettingsBehavior.ConfirmDelete = false;
+
+		settings.KeyFieldName = "id";
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+		settings.Settings.ShowFooter = true;
+
+		if (!enabledOptions)
+		{
+
+			System.Drawing.Color colorOrange = System.Drawing.ColorTranslator.FromHtml("#ff8800");
+
+			settings.Styles.Header.BackColor = colorOrange;
+			settings.Styles.Header.ForeColor = System.Drawing.Color.White;
+
+		}
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView detailsGrid = s as MVCxGridView;
+			if (detailsGrid == null) return;
+
+			e.Properties["cpVisibleRowCount"] = detailsGrid.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(detailsGrid);
+			e.Properties["cpIsParLotMarked"] = (loteMarcado == "SI");
+			e.Properties["cpVerCosto"] = IsEnabled("VerCosto");
+			e.Properties["cpExistenRegistros"] = this.Model != null ? this.Model.Any() : false;
+			e.Properties["cpIdWarehouseLocation"] = idWarehouseLocation;
+			e.Properties["cpInvoiceDetailValid"] = invoiceDetailValid;
+
+			int index = detailsGrid.EditingRowVisibleIndex >= 0 ? detailsGrid.EditingRowVisibleIndex : -1;
+			e.Properties["cpRowIndex"] = index;
+			if (detailsGrid.EditingRowVisibleIndex >= 0)
+			{
+				e.Properties["cpRowKey"] = detailsGrid.GetRowValues(index, "id");
+				e.Properties["cpRowIdLot"] = detailsGrid.GetRowValues(index, "id_lot");
+				e.Properties["cpRowGenSecTrans"] = detailsGrid.GetRowValues(index, "genSecTrans");
+				e.Properties["cpIsParLotMarked"] = (loteMarcado == "SI");
+				e.Properties["cpVerCosto"] = IsEnabled("VerCosto");
+
+			}
+			else
+			{
+				e.Properties["cpRowKey"] = 0;
+				e.Properties["cpRowIdLot"] = 0;
+				e.Properties["cpRowGenSecTrans"] = false;
+			}
+
+			if (detailsGrid.IsEditing)
+			{
+				List<InventoryMoveDetailPurchaseOrder> purchaseOrderDetails = null;
+				try
+				{
+					purchaseOrderDetails = (List<InventoryMoveDetailPurchaseOrder>)detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "InventoryMoveDetailPurchaseOrder");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "InventoryMoveDetailPurchaseOrder");
+						purchaseOrderDetails = temp.ToList();
+					}
+					catch (Exception)
+					{
+						purchaseOrderDetails = null;
+					}
+				}
+
+				if (purchaseOrderDetails != null && purchaseOrderDetails.Count > 0)
+				{
+					e.Properties["cpEditingRowPurchaseOrderDetail"] = purchaseOrderDetails[0].id_purchaseOrderDetail;
+				}
+				else
+				{
+					e.Properties["cpEditingRowPurchaseOrderDetail"] = 0;
+				}
+				List<InventoryMoveDetailTransfer> inventoryMoveExits = null;
+				try
+				{
+					inventoryMoveExits = (List<InventoryMoveDetailTransfer>)detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "InventoryMoveDetailTransfer1");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "InventoryMoveDetailTransfer1");
+						inventoryMoveExits = temp.ToList();
+					}
+					catch (Exception)
+					{
+						inventoryMoveExits = null;
+					}
+				}
+
+				if (inventoryMoveExits != null && inventoryMoveExits.Count > 0)
+				{
+					e.Properties["cpEditingRowInventoryMoveExit"] = inventoryMoveExits[0].id_inventoryMoveExit;
+					e.Properties["cpEditingRowIdWarehouseLocationExit"] = inventoryMoveExits[0].id_warehouseLocationExit;
+					e.Properties["cpEditingRowIdWarehouseExit"] = inventoryMoveExits[0].id_warehouseExit;
+				}
+				else
+				{
+					e.Properties["cpEditingRowInventoryMoveExit"] = 0;
+					e.Properties["cpEditingRowIdWarehouseLocationExit"] = 0;
+					e.Properties["cpEditingRowIdWarehouseExit"] = 0;
+				}
+
+			}
+
+			var unitPriceMoveAux = (detailsGrid.IsEditing && detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "unitPriceMove") != null) ? (decimal)detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "unitPriceMove") : ((decimal)0);
+			e.Properties["cpEditingRowUnitPriceMove"] = unitPriceMoveAux;
+			var amountMoveAux = (detailsGrid.IsEditing && detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "amountMove") != null) ? (decimal)detailsGrid.GetRowValues(detailsGrid.EditingRowVisibleIndex, "amountMove") : ((decimal)0);
+			e.Properties["cpEditingRowBalanceCost"] = (unitPriceMoveAux * amountMoveAux);
+			e.Properties["cpEditingVerCosto"] = IsEnabled("VerCosto");
+
+			List<InventoryMoveDetail> rows = (Model as List<InventoryMoveDetail>);
+			rows = (rows != null) ? rows.ToList() : new List<InventoryMoveDetail>();
+
+			e.Properties["cpRowsCount"] = rows.Count;
+		};
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountMove").DisplayFormat = "<b>{0:N2}</b>";
+
+		settings.CommandColumn.ShowNewButton = false;
+		settings.CommandColumn.ShowDeleteButton = false;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_inventoryMoveExit";
+			column.Caption = "No. Egreso Por Transferencia";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailTransfer> inventoryMoveExits = null;
+
+				try
+				{
+					inventoryMoveExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+						inventoryMoveExits = temp.ToList();
+					}
+					catch (Exception)
+					{
+						inventoryMoveExits = null;
+					}
+				}
+
+				string text = string.Empty;
+
+				if (inventoryMoveExits != null && inventoryMoveExits.Count > 0)
+				{
+					int id_inventoryMoveExit = inventoryMoveExits[0].id_inventoryMoveExit;
+					InventoryMove inventoryMove = DataProviderInventoryMove.InventoryMove(id_inventoryMoveExit);
+
+					text += inventoryMove.Document.number;
+
+					if (inventoryMoveExits[0].id_inventoryMoveDetailExit == null || inventoryMove.Document.DocumentState.code != "03")
+					{
+						text = "<font color='red'>" + text + "</font>";
+					}
+				}
+
+				ViewContext.Writer.Write(text);
+
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<InventoryMoveDetailTransfer> inventoryMoveExits = null;
+
+					try
+					{
+						inventoryMoveExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+							inventoryMoveExits = temp.ToList();
+						}
+						catch (Exception)
+						{
+							inventoryMoveExits = null;
+						}
+					}
+
+					string text = string.Empty;
+
+					if (inventoryMoveExits != null && inventoryMoveExits.Count > 0)
+					{
+						int id_inventoryMoveExit = inventoryMoveExits[0].id_inventoryMoveExit;
+						InventoryMove inventoryMove = DataProviderInventoryMove.InventoryMove(id_inventoryMoveExit);
+
+						text += inventoryMove.Document.number;
+
+						if (inventoryMoveExits[0].id_inventoryMoveDetailExit == null || inventoryMove.Document.DocumentState.code != "03")
+						{
+							text = "<font color='red'>" + text + "</font>";
+						}
+
+					}
+
+					Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "id_inventoryMoveExit";
+						textBox.Properties.ClientInstanceName = "id_inventoryMoveExit";
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						textBox.ReadOnly = true;
+						textBox.Width = Unit.Percentage(100);
+
+					}).Bind(text).GetHtml();
+				});
+			});
+			column.Visible = (ViewData["code"] != null && (IngresoPorTransferencia));
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_purchaseOrder";
+			column.Caption = "No. Orden de Compra";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+				try
+				{
+					purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+						purchaseOrders = temp.ToList();
+					}
+					catch (Exception)
+					{
+						purchaseOrders = null;
+					}
+				}
+
+				string text = string.Empty;
+
+				if (purchaseOrders != null && purchaseOrders.Count > 0)
+				{
+					int id_purchaseOrder = purchaseOrders[0].id_purchaseOrder;
+					PurchaseOrder order = DataProviderPurchaseOrder.PurchaseOrder(id_purchaseOrder);
+
+					text += order.Document.number;
+
+					text += (purchaseOrders.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseOrders.Count - 1).ToString() + "</a>" : "";
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+					try
+					{
+						purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+							purchaseOrders = temp.ToList();
+						}
+						catch (Exception)
+						{
+							purchaseOrders = null;
+						}
+					}
+
+					string text = string.Empty;
+
+					if (purchaseOrders != null && purchaseOrders.Count > 0)
+					{
+						int id_purchaseOrder = purchaseOrders[0].id_purchaseOrder;
+						PurchaseOrder order = DataProviderPurchaseOrder.PurchaseOrder(id_purchaseOrder);
+
+						text += order.Document.number;
+
+						text += (purchaseOrders.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseOrders.Count - 1).ToString() + "</a>" : "";
+					}
+
+					Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "id_purchaseOrder";
+						textBox.Properties.ClientInstanceName = "id_purchaseOrder";
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						textBox.ReadOnly = true;
+						textBox.Width = Unit.Percentage(100);
+
+					}).Bind(text).GetHtml();
+				});
+			});
+
+			column.Visible = (ViewData["code"] != null && ViewData["code"].Equals("04"));
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_warehouseExit";
+			column.Caption = "Bodega Egreso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = (code != null && IngresoPorTransferencia);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailTransfer> warehouseExits = null;
+
+				try
+				{
+					warehouseExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+						warehouseExits = temp.ToList();
+					}
+					catch (Exception)
+					{
+						warehouseExits = null;
+					}
+				}
+
+				string text = string.Empty;
+
+				if (warehouseExits != null && warehouseExits.Count > 0)
+				{
+					int id_warehouseExit = warehouseExits[0].id_warehouseExit;
+					Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouseExit);
+
+					text = warehouse.name;
+
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<InventoryMoveDetailTransfer> warehouseExits = null;
+
+					try
+					{
+						warehouseExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+							warehouseExits = temp.ToList();
+						}
+						catch (Exception)
+						{
+							warehouseExits = null;
+						}
+					}
+
+					string text = string.Empty;
+
+					if (warehouseExits != null && warehouseExits.Count > 0)
+					{
+						int id_warehouseExit = warehouseExits[0].id_warehouseExit;
+						Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouseExit);
+
+						text = warehouse.name;
+
+					}
+
+					Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "id_warehouseExit";
+						textBox.Properties.ClientInstanceName = "id_warehouseExit";
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						textBox.ReadOnly = true;
+						textBox.Width = Unit.Percentage(100);
+
+					}).Bind(text).GetHtml();
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_warehouseLocationExit";
+			column.Caption = "Ubicación Egreso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = (code != null && IngresoPorTransferencia);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailTransfer> warehouseLocationExits = null;
+
+				try
+				{
+					warehouseLocationExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+						warehouseLocationExits = temp.ToList();
+					}
+					catch (Exception)
+					{
+						warehouseLocationExits = null;
+					}
+				}
+
+				string text = string.Empty;
+
+				if (warehouseLocationExits != null && warehouseLocationExits.Count > 0)
+				{
+					int id_warehouseLocationExit = warehouseLocationExits[0].id_warehouseLocationExit;
+					WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocationExit);
+
+					text = warehouseLocation.name;
+
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailTransfer> warehouseLocationExits = null;
+
+				try
+				{
+					warehouseLocationExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+						warehouseLocationExits = temp.ToList();
+					}
+					catch (Exception)
+					{
+						warehouseLocationExits = null;
+					}
+				}
+
+				string text = string.Empty;
+
+				if (warehouseLocationExits != null && warehouseLocationExits.Count > 0)
+				{
+					int id_warehouseLocationExit = warehouseLocationExits[0].id_warehouseLocationExit;
+					WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocationExit);
+
+					text = warehouseLocation.name;
+
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<InventoryMoveDetailTransfer> warehouseLocationExits = null;
+
+					try
+					{
+						warehouseLocationExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+							warehouseLocationExits = temp.ToList();
+						}
+						catch (Exception)
+						{
+							warehouseLocationExits = null;
+						}
+					}
+
+					string text = string.Empty;
+
+					if (warehouseLocationExits != null && warehouseLocationExits.Count > 0)
+					{
+						int id_warehouseLocationExit = warehouseLocationExits[0].id_warehouseLocationExit;
+						WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocationExit);
+
+						text = warehouseLocation.name;
+
+					}
+
+					Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "id_warehouseLocationExit";
+						textBox.Properties.ClientInstanceName = "id_warehouseLocationExit";
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						textBox.ReadOnly = true;
+						textBox.Width = Unit.Percentage(100);
+
+					}).Bind(text).GetHtml();
+				});
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_warehouseDetail";
+			column.Caption = (code != null && IngresoPorTransferencia) ? "Bodega Ingreso" : ((code != null && EgresoPorTransferencia) ? "Bodega Egreso" : ("Bodega"));
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int id_warehouse = (int)DataBinder.Eval(c.DataItem, "id_warehouse");
+				Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+				string text = (warehouse != null) ? warehouse.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "id_warehouseDetail";
+				p.Width = Unit.Percentage(100);
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_warehouseLocation";
+			column.Name = "id_warehouseLocationDetail";
+			column.Caption = (code != null && IngresoPorTransferencia)
+				? "Ubicación Ingreso" : ((code != null && EgresoPorTransferenciaAutomatica) ? "Ubicación Egreso" : "Ubicación");
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocation");
+				WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocation);
+
+				string text = (warehouseLocation != null) ? warehouseLocation.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_warehouseLocationAux = detIM.id_warehouseLocation == 0 ? (int?)null : detIM.id_warehouseLocation;
+					var warehouseLocations = DataProviderWarehouseLocation.WarehouseLocationsByWarehouse((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"], (int?)ViewBag.idWarehouse, id_warehouseLocationAux);
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_warehouseLocationDetail";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ReadOnly = false;// (valInvFact == "SI" && code == "05" && aMostrarOP) ? true : false;
+						var prop = comboBox.Properties;
+						prop.ClientInstanceName = "id_warehouseLocationDetail";
+
+						prop.ValueField = "id";
+						prop.TextField = "name";
+						prop.ValueType = typeof(int);
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						prop.ClientSideEvents.Validation = "OnWarehouseLocationDetailValidation";
+						prop.ClientSideEvents.SelectedIndexChanged = (code != null && (code.Equals("05") || EgresoPorTransferencia)) ? "OnWarehouseLocationCombo_SelectedIndexChanged" : "";
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).BindList(warehouseLocations).Bind(id_warehouseLocationAux).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_warehouseEntry";
+			column.Caption = "Bodega Ingreso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = (code != null && EgresoPorTransferencia);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouseEntry");
+				Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+				string text = (warehouse != null) ? warehouse.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "id_warehouseEntry";
+				p.Width = Unit.Percentage(100);
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_warehouseLocationEntry";
+			column.Name = "id_warehouseLocationEntryDetail";
+			column.Caption = "Ubicación Ingreso";
+			column.Visible = (code != null && EgresoPorTransferenciaAutomatica);
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocationEntry");
+				WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocation);
+
+				string text = (warehouseLocation != null) ? warehouseLocation.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_warehouseLocationAux = detIM.id_warehouseLocationEntry == 0 ? (int?)null : detIM.id_warehouseLocationEntry;
+					var warehouseLocations = DataProviderWarehouseLocation.WarehouseLocationsByWarehouse((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"], (int?)ViewBag.idWarehouseEntry, id_warehouseLocationAux);
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_warehouseLocationEntryDetail";
+						comboBox.Width = Unit.Percentage(100);
+						var prop = comboBox.Properties;
+						prop.ClientInstanceName = "id_warehouseLocationEntryDetail";
+
+						prop.ValueField = "id";
+						prop.TextField = "name";
+						prop.ValueType = typeof(int);
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						prop.ClientSideEvents.Validation = "OnWarehouseLocationEntryDetailValidation";
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).BindList(warehouseLocations).Bind(id_warehouseLocationAux).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "masterCode";
+			column.Caption = String.Format("Código");
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int id_item = (int)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) ? item.masterCode : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					string masterCode = "";
+					if (c.ItemIndex >= 0)
+					{
+						int id_item = (int)DataBinder.Eval(c.DataItem, "id_item");
+						Item item = DataProviderItem.Item(id_item);
+
+						masterCode = (item != null) ? item.masterCode : "";
+					}
+					Html.DevExpress().TextBox(
+					textBox =>
+					{
+						textBox.ReadOnly = true;
+						textBox.Name = "masterCode";
+						textBox.Width = Unit.Percentage(100);
+						var prop = textBox.Properties;
+						prop.ClientInstanceName = "masterCode";
+
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).Bind(masterCode).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_item";
+			column.Name = "id_item";
+			column.Caption = String.Format("Nombre del Producto");
+
+			column.EditFormCaptionStyle.Font.Size = 10;
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.Width = Unit.Percentage(50);
+			column.ReadOnly = IngresoPorTransferencia;
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					Html.RenderPartial("ComponentsDetail/_ComboBoxItems", detIM);
+				});
+			});
+
+			column.SetDataItemTemplateContent(c =>
+			{
+
+				var cellText = DataProviderItem.Item((int?)DataBinder.Eval(c.DataItem, "id_item"));
+				string nombreProducto = "";
+				if (cellText != null)
+				{
+					nombreProducto = cellText.name;
+				}
+				ViewContext.Writer.Write(string.Format("{0}", nombreProducto));
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "metricUnitInventoryPurchase";
+			column.Caption = (code != null && code.Equals("04")) ? "UM Compra" : ((code != null && IngresoPorTransferencia) ? "UM Mov.Egr." : "UM Inv.");
+
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.PropertiesEdit.ClientInstanceName = "metricUnitInventoryPurchase";
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				var item = DataProviderItem.Item(id_item);
+				string metricUnitPurchase = (item != null && item.ItemPurchaseInformation != null && item.ItemPurchaseInformation.MetricUnit != null) ? item.ItemPurchaseInformation.MetricUnit.code : "";
+				string metricUnitInventory = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+
+				List<InventoryMoveDetailTransfer> inventoryMoveDetailExits = null;
+
+				try
+				{
+					inventoryMoveDetailExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer");
+						inventoryMoveDetailExits = temp.ToList();
+					}
+					catch (Exception)
+					{
+						inventoryMoveDetailExits = null;
+					}
+				}
+
+				string metricUnitMovExit = metricUnitInventory;
+
+				if (inventoryMoveDetailExits != null && inventoryMoveDetailExits.Count > 0)
+				{
+					int? id_inventoryMoveDetailExit = inventoryMoveDetailExits[0].id_inventoryMoveDetailExit;
+					InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetail(id_inventoryMoveDetailExit);
+
+					metricUnitMovExit = (inventoryMoveDetail != null && inventoryMoveDetail.MetricUnit1 != null) ? inventoryMoveDetail.MetricUnit1.code : metricUnitInventory;
+
+				}
+
+				ViewContext.Writer.Write((code != null && code.Equals("04")) ? metricUnitPurchase : ((code != null && IngresoPorTransferencia) ? metricUnitMovExit : metricUnitInventory));
+			});
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				var item = DataProviderItem.Item(id_item);
+				string metricUnitPurchase = (item != null && item.ItemPurchaseInformation != null && item.ItemPurchaseInformation.MetricUnit != null) ? item.ItemPurchaseInformation.MetricUnit.code : "";
+				string metricUnitInventory = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+
+				List<InventoryMoveDetailTransfer> inventoryMoveDetailExits = null;
+
+				try
+				{
+					inventoryMoveDetailExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer");
+						inventoryMoveDetailExits = temp.ToList();
+					}
+					catch (Exception)
+					{
+						inventoryMoveDetailExits = null;
+					}
+				}
+
+				string metricUnitMovExit = metricUnitInventory;
+
+				if (inventoryMoveDetailExits != null && inventoryMoveDetailExits.Count > 0)
+				{
+					int? id_inventoryMoveDetailExit = inventoryMoveDetailExits[0].id_inventoryMoveDetailExit;
+					InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetail(id_inventoryMoveDetailExit);
+
+					metricUnitMovExit = (inventoryMoveDetail != null && inventoryMoveDetail.MetricUnit1 != null) ? inventoryMoveDetail.MetricUnit1.code : metricUnitInventory;
+
+				}
+
+				var metricUnit = ((code != null && code.Equals("04")) ? metricUnitPurchase : ((code != null && IngresoPorTransferencia) ? metricUnitMovExit : metricUnitInventory));
+
+				Html.DevExpress().TextBox(textBox =>
+				{
+					textBox.Name = "metricUnitInventoryPurchase";
+					textBox.Properties.ClientInstanceName = "metricUnitInventoryPurchase";
+					textBox.Width = Unit.Percentage(100);
+					textBox.ReadOnly = true;
+					textBox.ShowModelErrors = false;
+
+				}).Bind(metricUnit).GetHtml();
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_costCenter";
+			column.Name = "id_costCenterDetail";
+			column.Caption = "C. Costo";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_costCenter = (int?)DataBinder.Eval(c.DataItem, "id_costCenter");
+				CostCenter costCenter = DataProviderCostCenter.CostCenterById(id_costCenter);
+				InventoryMoveDetail i = new InventoryMoveDetail();
+				string text = (costCenter != null) ? costCenter.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(comboBox =>
+			{
+				comboBox.ClientInstanceName = "id_costCenterDetail";
+				comboBox.DataSource = DataProviderCostCenter.AllCostCenters();
+				comboBox.ValueField = "id";
+				comboBox.TextField = "name";
+				comboBox.ValueType = typeof(int);
+
+				comboBox.DropDownStyle = DropDownStyle.DropDownList;
+				comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				comboBox.ClientSideEvents.Init = "OnInitCostCenterCombo";
+				comboBox.ClientSideEvents.Validation = "OnCostCenterDetailValidation";
+				comboBox.ClientSideEvents.SelectedIndexChanged = "OnCostCenterCombo_SelectedIndexChanged";
+				comboBox.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_subCostCenter";
+			column.Name = "id_subCostCenterDetail";
+			column.Caption = "Sub. C.Costo";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_subCostCenter = (int?)DataBinder.Eval(c.DataItem, "id_subCostCenter");
+				CostCenter costCenter = DataProviderCostCenter.CostCenterById(id_subCostCenter);
+				string text = (costCenter != null) ? costCenter.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_costCenterAux = detIM.id_costCenter == 0 ? (int?)null : detIM.id_costCenter;
+					var id_subCostCenterAux = detIM.id_costCenter == 0 ? (int?)null : detIM.id_subCostCenter;
+					var costCenters = DataProviderCostCenter.SubCostCentersByCostCenterAndCurrent(id_costCenterAux, id_subCostCenterAux);
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_subCostCenterDetail";
+						comboBox.Width = Unit.Percentage(100);
+						var prop = comboBox.Properties;
+						prop.ClientInstanceName = "id_subCostCenterDetail";
+
+						prop.ValueField = "id";
+						prop.TextField = "name";
+						prop.ValueType = typeof(int);
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.CallbackRouteValues = new { Controller = "InventoryMove", Action = "GetSubCostCenter" };
+						prop.ClientSideEvents.BeginCallback = "InventoryMoveSubCostCenter_BeginCallback";
+						prop.ClientSideEvents.EndCallback = "InventoryMoveSubCostCenter_EndCallback";
+						prop.ClientSideEvents.Validation = "OnSubCostCenterDetailValidation";
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).BindList(costCenters).Bind(id_subCostCenterAux).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "amountMove";
+			column.Name = "amountMove";
+			column.Caption = ((code != null && (code.Equals("03") || code.Equals("04") || IngresoPorTransferencia)) || customParamOP == "IPXM") ? (id_inventoryMove == 0) ? "Cantidad a Ingresar" : "Cantidad Ingresada" :
+							 ((code != null && (code.Equals("05") || code.Equals("32"))) ? ((id_inventoryMove == 0) ? "Cantidad a Egresar" : "Cantidad Egresada") :
+							 ((code != null && EgresoPorTransferenciaAutomatica) ? ((id_inventoryMove == 0) ? "Cantidad a Transferir" : "Cantidad Transferida") : ""));
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+			column.EditorProperties().SpinEdit(spinEdit =>
+			{
+				spinEdit.ClientInstanceName = "amountMove";
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+				spinEdit.DisplayFormatString = "N2";
+				spinEdit.DisplayFormatInEditMode = true;
+				spinEdit.DecimalPlaces = 2;
+				spinEdit.NumberType = SpinEditNumberType.Float;
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+
+				spinEdit.ClientSideEvents.Validation = "OnAmountValidation";
+				spinEdit.ClientSideEvents.ValueChanged = "OnAmountValueChanged";
+				spinEdit.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_metricUnitMove";
+			column.Name = "id_metricUnitMove";
+			column.PropertiesEdit.ClientInstanceName = "id_metricUnitMove";
+			column.Caption = "UM Mov.";
+			column.Width = Unit.Percentage(5);
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_metricUnitMove = (int?)DataBinder.Eval(c.DataItem, "id_metricUnitMove");
+				var metricUnit = DataProviderMetricUnit.MetricUnit(id_metricUnitMove);
+
+				string text = (metricUnit != null) ? metricUnit.code : "";
+
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				var item = DataProviderItem.Item(id_item);
+				string metricUnitPurchase = (item != null && item.ItemPurchaseInformation != null && item.ItemPurchaseInformation.MetricUnit != null) ? item.ItemPurchaseInformation.MetricUnit.code : "";
+				string metricUnitInventory = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+				ViewContext.Writer.Write((text != "" ? text : (code != null && code.Equals("04")) ? metricUnitPurchase : metricUnitInventory));
+
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_metricUnitMoveAux = detIM.id_metricUnitMove == 0 ? (int?)null : detIM.id_metricUnitMove;
+
+					var ums = DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int)ViewData["id_company"], id_metricUnitMoveAux);
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_metricUnitMove";
+						comboBox.Width = Unit.Percentage(100);
+						var prop = comboBox.Properties;
+						prop.ClientInstanceName = "id_metricUnitMove";
+
+						prop.ValueField = "id";
+						prop.TextField = "name";
+						prop.ValueType = typeof(int);
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						prop.ClientSideEvents.SelectedIndexChanged = "MetricUnitMoveCombo_SelectedIndexChanged";
+						prop.ClientSideEvents.Validation = "OnMetricUnitMoveValidation";
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).BindList(ums).Bind(id_metricUnitMoveAux).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "unitPriceMove";
+			column.Name = "unitPriceMove";
+			column.Caption = "Costo";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = !(code != null && code.Equals("03")) || valorization == "Automático";
+
+			column.Visible = IsEnabled("VerCosto");
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? unitPriceMove = (decimal?)DataBinder.Eval(c.DataItem, "unitPriceMove");
+
+				decimal cost = (unitPriceMove == null ? 0 : unitPriceMove.Value);
+
+				string text = cost.ToString("C6");
+
+				ViewContext.Writer.Write(text);
+			});
+			column.EditorProperties().SpinEdit(spinEdit =>
+			{
+				spinEdit.ClientInstanceName = "unitPriceMove";
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+				spinEdit.DisplayFormatString = "C6";
+				spinEdit.DisplayFormatInEditMode = true;
+				spinEdit.DecimalPlaces = 6;
+				spinEdit.NumberType = SpinEditNumberType.Float;
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+
+				spinEdit.ClientSideEvents.ValueChanged = "OnUnitPriceMoveValueChanged";
+				if (valorization == "Manual") spinEdit.ClientSideEvents.Validation = "OnUnitPriceMoveDetailValidation";
+				spinEdit.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "balanceCost";
+			column.Name = "balanceCost";
+			column.Caption = "Total";
+
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			column.Visible = IsEnabled("VerCosto");
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? unitPriceMove = (decimal?)DataBinder.Eval(c.DataItem, "unitPriceMove");
+				decimal? amountMove = (decimal?)DataBinder.Eval(c.DataItem, "amountMove");
+
+				decimal balanceCost = (unitPriceMove == null ? 0 : unitPriceMove.Value) * (amountMove == null ? 0 : amountMove.Value);
+
+				string text = balanceCost.ToString("C2");
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().SpinEdit(spinEdit =>
+			{
+				spinEdit.ClientInstanceName = "balanceCost";
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+				spinEdit.DisplayFormatString = "C2";
+				spinEdit.DisplayFormatInEditMode = true;
+				spinEdit.DecimalPlaces = 2;
+				spinEdit.NumberType = SpinEditNumberType.Float;
+				spinEdit.SpinButtons.ShowIncrementButtons = false;
+				spinEdit.SpinButtons.ShowLargeIncrementButtons = false;
+
+				spinEdit.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+
+			column.FieldName = "id_lot";
+			column.Name = "id_lot";
+			column.Caption = "Lote";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? false :
+							 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? true : false);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_lot = (int?)DataBinder.Eval(c.DataItem, "id_lot");
+				Lot lot = DataProviderProductionLot.LotById(id_lot);
+				ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_lot);
+				string internalNumberAux = (lot != null && lot.internalNumber != "" && lot.internalNumber != null) ? lot.internalNumber : (productionLot != null ? productionLot.internalNumber : "");
+				string text = (lot != null) ? ((lot.number ?? "") + ((lot.number != "" && lot.number != null && internalNumberAux != "" && internalNumberAux != null) ? "-" : "") + (internalNumberAux ?? "")) : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+
+					Html.RenderPartial("ComponentsDetail/_ComboBoxProductionLot", detIM);
+				});
+			});
+		});
+
+		settings.Columns.Add(model => model.Lot.number, column =>
+		{
+			column.Name = "lotNumber";
+			column.Caption = "Sec. Transacc";
+			column.EditFormCaptionStyle.Font.Size = 10;
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? true :
+							 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? false : true);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_lot = (int?)DataBinder.Eval(c.DataItem, "id_lot");
+				Lot lot = DataProviderProductionLot.LotById(id_lot);
+
+				string text = (lot != null) ? lot.number : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "lotNumber";
+				p.Width = Unit.Percentage(100);
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				p.ClientSideEvents.Validation = "OnLotNumberValidation";
+			});
+		});
+
+		settings.Columns.Add(model => model.Lot.internalNumber, column =>
+		{
+			column.Name = "lotInternalNumber";
+			column.Caption = "Lote";
+			column.EditFormCaptionStyle.Font.Size = 11;
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? true :
+											 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? false : true);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_lot = (int?)DataBinder.Eval(c.DataItem, "id_lot");
+				Lot lot = DataProviderProductionLot.LotById(id_lot);
+				string internalNumberAux = (lot != null ? lot.internalNumber : "");
+				string text = (internalNumberAux != "" && internalNumberAux != null) ? internalNumberAux : (lot != null && lot.ProductionLot != null ? lot.ProductionLot.internalNumber : "");
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "lotInternalNumber";
+				p.Width = Unit.Percentage(100);
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				p.ClientSideEvents.Validation = "OnLotInternalNumberValidation";
+			});
+		});
+
+		settings.Columns.Add(model => model.genSecTrans, column =>
+		{
+			column.Name = "genSecTransCheck";
+			column.Caption = "Gen.Sec.Trans.";
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			column.EditFormCaptionStyle.Font.Size = 5;
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? true :
+											 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? false : true);
+			column.EditorProperties().CheckBox(checkbox =>
+			{
+				checkbox.ClientInstanceName = "genSecTransCheck";
+				checkbox.ValueType = typeof(bool);
+				checkbox.ClientSideEvents.CheckedChanged = "OnCheckedGenSecTransChanged";
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "quantityApproved";
+			column.Caption = "Compra Aprobada";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+				try
+				{
+					purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+						purchaseOrders = temp.ToList();
+					}
+					catch (Exception)
+					{
+						purchaseOrders = null;
+					}
+				}
+
+				decimal quantityApproved = 0.0M;
+
+				if (purchaseOrders != null && purchaseOrders.Count > 0)
+				{
+					quantityApproved = purchaseOrders.FirstOrDefault().PurchaseOrderDetail.quantityApproved;
+				}
+
+				ViewContext.Writer.Write(quantityApproved.ToString("N2"));
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+					try
+					{
+						purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+							purchaseOrders = temp.ToList();
+						}
+						catch (Exception)
+						{
+							purchaseOrders = null;
+						}
+					}
+
+					decimal quantityApproved = 0.0M;
+
+					if (purchaseOrders != null && purchaseOrders.Count > 0)
+					{
+						quantityApproved = purchaseOrders.FirstOrDefault().PurchaseOrderDetail.quantityApproved;
+					}
+
+					string text = quantityApproved.ToString("N2");
+
+					Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "quantityApproved";
+						textBox.Properties.ClientInstanceName = "quantityApproved";
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						textBox.ReadOnly = true;
+						textBox.Width = Unit.Percentage(100);
+
+					}).Bind(text).GetHtml();
+				});
+			});
+
+			column.Visible = (ViewData["code"] != null && ViewData["code"].Equals("04"));
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "quantityReceived";
+			column.Caption = "Cantidad Recibida";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+				try
+				{
+					purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+						purchaseOrders = temp.ToList();
+					}
+					catch (Exception)
+					{
+						purchaseOrders = null;
+					}
+				}
+
+				decimal quantityReceived = 0.0M;
+
+				if (purchaseOrders != null && purchaseOrders.Count > 0)
+				{
+					foreach (var purchaseOrder in purchaseOrders)
+					{
+						quantityReceived = purchaseOrders.FirstOrDefault().PurchaseOrderDetail.quantityReceived;
+					}
+
+					ViewContext.Writer.Write(quantityReceived.ToString("N2"));
+				}
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+					try
+					{
+						purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+							purchaseOrders = temp.ToList();
+						}
+						catch (Exception)
+						{
+							purchaseOrders = null;
+						}
+					}
+
+					decimal quantityReceived = 0.0M;
+
+					if (purchaseOrders != null && purchaseOrders.Count > 0)
+					{
+						foreach (var purchaseOrder in purchaseOrders)
+						{
+							quantityReceived = purchaseOrders.FirstOrDefault().PurchaseOrderDetail.quantityReceived;
+						}
+					}
+
+					string text = quantityReceived.ToString("N2");
+
+					Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "quantityReceived";
+						textBox.Properties.ClientInstanceName = "quantityReceived";
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						textBox.ReadOnly = true;
+						textBox.Width = Unit.Percentage(100);
+
+					}).Bind(text).GetHtml();
+				});
+			});
+
+			column.Visible = (ViewData["code"] != null && ViewData["code"].Equals("04"));
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "remainingQuantity";
+			column.Caption = "Pendiente";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+				try
+				{
+					purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+				}
+				catch (Exception)
+				{
+					try
+					{
+						HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+						purchaseOrders = temp.ToList();
+					}
+					catch (Exception)
+					{
+						purchaseOrders = null;
+					}
+				}
+
+				decimal remainingQuantity = 0.0M;
+
+				if (purchaseOrders != null && purchaseOrders.Count > 0)
+				{
+					var purchaseOrder = purchaseOrders.FirstOrDefault().PurchaseOrderDetail;
+					remainingQuantity = purchaseOrder.quantityApproved - purchaseOrder.quantityReceived;
+					remainingQuantity = remainingQuantity < 0 ? 0.0M : remainingQuantity;
+				}
+				else
+				{
+					List<InventoryMoveDetailTransfer> inventoryMoveDetailExits = null;
+
+					try
+					{
+						inventoryMoveDetailExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+							inventoryMoveDetailExits = temp.ToList();
+						}
+						catch (Exception)
+						{
+							inventoryMoveDetailExits = null;
+						}
+					}
+
+					if (inventoryMoveDetailExits != null && inventoryMoveDetailExits.Count > 0)
+					{
+						int? id_inventoryMoveDetailExit = inventoryMoveDetailExits[0].id_inventoryMoveDetailExit;
+						InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetail(id_inventoryMoveDetailExit);
+
+						var quantityMove = (inventoryMoveDetail != null && inventoryMoveDetail.amountMove != null) ? inventoryMoveDetail.amountMove.Value : 0;
+						var quantityReceived = (inventoryMoveDetail != null &&
+												inventoryMoveDetail.InventoryMoveDetailTransfer != null &&
+												inventoryMoveDetail.InventoryMoveDetailTransfer.Where(w => w.InventoryMoveDetail1.InventoryMove.Document.DocumentState.code.Equals("03")).Count() > 0) ?
+												inventoryMoveDetail.InventoryMoveDetailTransfer.Where(w => w.InventoryMoveDetail1.InventoryMove.Document.DocumentState.code.Equals("03")).Sum(s => s.quantity) :
+												0;
+						remainingQuantity = quantityMove - quantityReceived;
+						remainingQuantity = remainingQuantity < 0 ? 0.0M : remainingQuantity;
+					}
+				}
+
+				ViewContext.Writer.Write(remainingQuantity.ToString("N2"));
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<InventoryMoveDetailPurchaseOrder> purchaseOrders = null;
+
+					try
+					{
+						purchaseOrders = (List<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+					}
+					catch (Exception)
+					{
+						try
+						{
+							HashSet<InventoryMoveDetailPurchaseOrder> temp = (HashSet<InventoryMoveDetailPurchaseOrder>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailPurchaseOrder");
+							purchaseOrders = temp.ToList();
+						}
+						catch (Exception)
+						{
+							purchaseOrders = null;
+						}
+					}
+
+					decimal remainingQuantity = 0.0M;
+
+					if (purchaseOrders != null && purchaseOrders.Count > 0)
+					{
+						var purchaseOrder = purchaseOrders.FirstOrDefault().PurchaseOrderDetail;
+						remainingQuantity = purchaseOrder.quantityApproved - purchaseOrder.quantityReceived;
+						remainingQuantity = remainingQuantity < 0 ? 0.0M : remainingQuantity;
+					}
+					else
+					{
+						List<InventoryMoveDetailTransfer> inventoryMoveDetailExits = null;
+
+						try
+						{
+							inventoryMoveDetailExits = (List<InventoryMoveDetailTransfer>)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+						}
+						catch (Exception)
+						{
+							try
+							{
+								HashSet<InventoryMoveDetailTransfer> temp = (HashSet<InventoryMoveDetailTransfer>
+	)DataBinder.Eval(c.DataItem, "InventoryMoveDetailTransfer1");
+								inventoryMoveDetailExits = temp.ToList();
+							}
+							catch (Exception)
+							{
+								inventoryMoveDetailExits = null;
+							}
+						}
+
+						if (inventoryMoveDetailExits != null && inventoryMoveDetailExits.Count > 0)
+						{
+							int? id_inventoryMoveDetailExit = inventoryMoveDetailExits[0].id_inventoryMoveDetailExit;
+							InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetail(id_inventoryMoveDetailExit);
+
+							var quantityMove = (inventoryMoveDetail != null && inventoryMoveDetail.amountMove != null) ? inventoryMoveDetail.amountMove.Value : 0;
+							var quantityReceived = (inventoryMoveDetail != null &&
+							inventoryMoveDetail.InventoryMoveDetailTransfer != null &&
+							inventoryMoveDetail.InventoryMoveDetailTransfer.Where(w => w.InventoryMoveDetail1.InventoryMove.Document.DocumentState.code.Equals("03")).Count() > 0) ?
+							inventoryMoveDetail.InventoryMoveDetailTransfer.Where(w => w.InventoryMoveDetail1.InventoryMove.Document.DocumentState.code.Equals("03")).Sum(s => s.quantity) :
+							0;
+							remainingQuantity = quantityMove - quantityReceived;
+							remainingQuantity = remainingQuantity < 0 ? 0.0M : remainingQuantity;
+						}
+					}
+
+					Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "remainingQuantity";
+						textBox.Properties.ClientInstanceName = "remainingQuantity";
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						textBox.ReadOnly = true;
+						textBox.Width = Unit.Percentage(100);
+
+					}).Bind(remainingQuantity).GetHtml();
+				});
+
+			});
+
+			column.Visible = (ViewData["code"] != null && (ViewData["code"].Equals("04") || IngresoPorTransferencia));
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "remainingBalance";
+			column.Caption = "Saldo Producto";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			column.Visible = (code != null && (code.Equals("05") || EgresoPorTransferencia));
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+				int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocation");
+				int? id_lot = (int?)DataBinder.Eval(c.DataItem, "id_lot");
+				string lotMarked = (string)DataBinder.Eval(c.DataItem, "lotMarked");
+
+				decimal remainingBalance = DataProviderInventoryMove
+													.GetRemainingBalance(   (int)ViewData["id_company"],
+																			id_item,
+																			id_warehouse,
+																			id_warehouseLocation,
+																			id_lot,
+																			lotMarked,
+																			fechaEmision);
+
+				string text = remainingBalance.ToString("N2");
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new InventoryMoveDetail();
+					decimal remainingBalance = 0;
+					if (c.ItemIndex >= 0)
+					{
+						int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+						int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+						int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocation");
+						int? id_lot = (int?)DataBinder.Eval(c.DataItem, "id_lot");
+						string lotMarked = (string)DataBinder.Eval(c.DataItem, "lotMarked");
+
+						remainingBalance = DataProviderInventoryMove.GetRemainingBalance(   (int)ViewData["id_company"],
+																							id_item,
+																							id_warehouse,
+																							id_warehouseLocation,
+																							id_lot,
+																							lotMarked,
+																							fechaEmision);
+
+					}
+					Html.DevExpress().SpinEdit(
+					spinEdit =>
+					{
+						spinEdit.ReadOnly = true;
+						spinEdit.Name = "remainingBalance";
+						spinEdit.Width = Unit.Percentage(100);
+						var prop = spinEdit.Properties;
+						prop.ClientInstanceName = "remainingBalance";
+						prop.NumberFormat = SpinEditNumberFormat.Custom;
+						prop.DisplayFormatString = "N2";
+						prop.DisplayFormatInEditMode = true;
+						prop.DecimalPlaces = 2;
+						prop.NumberType = SpinEditNumberType.Float;
+						prop.NumberFormat = SpinEditNumberFormat.Custom;
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).Bind(remainingBalance).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(model => model.ordenProduccion, column =>
+		{
+			column.Name = "ordenProduccion";
+			column.Caption = "OP";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = aMostrarOP;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				string tempOP = (string)DataBinder.Eval(c.DataItem, "ordenProduccion");
+
+				ViewContext.Writer.Write(tempOP);
+			});
+
+			column.EditorProperties().TextBox(textBox =>
+			{
+				textBox.ClientInstanceName = "ordenProduccion";
+				textBox.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				textBox.Width = Unit.Percentage(100);
+			});
+
+		});
+
+		settings.Columns.Add(model => model.lotMarked, column =>
+		{
+			column.FieldName = "lotMarked";
+			column.Name = "lotMarked";
+			column.PropertiesEdit.ClientInstanceName = "lotMarked";
+			column.Caption = "Lote Marcado";
+			column.Width = Unit.Percentage(15);
+			column.UnboundType = UnboundColumnType.String;
+			column.ReadOnly = true;
+			column.Visible = (loteMarcado == "SI") ? true : false;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var lotMarked = DataBinder.Eval(c.DataItem, "lotMarked");
+
+				ViewContext.Writer.Write(lotMarked);
+			});
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "lotMarked";
+				p.Width = Unit.Percentage(100);
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_personProcessPlant";
+			column.Name = "id_personProcessPlantDetail";
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_personProcessPlant = (int?)DataBinder.Eval(c.DataItem, "id_personProcessPlant");
+				Person personProcessPlant = DataProviderPerson.PersonById(id_personProcessPlant);
+				InventoryMoveDetail i = new InventoryMoveDetail();
+				string text = (personProcessPlant != null) ? personProcessPlant.processPlant : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(comboBox =>
+			{
+				comboBox.ClientInstanceName = "id_personProcessPlantDetail";
+				comboBox.DataSource = DataProviderPerson.GetPersonProcesPlant();
+				comboBox.ValueField = "id";
+				comboBox.TextField = "processPlant";
+				comboBox.ValueType = typeof(int);
+
+				comboBox.DropDownStyle = DropDownStyle.DropDownList;
+				comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				comboBox.ClientSideEvents.Validation = "OnPersonProcessPlantDetailValidation";
+				comboBox.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+			});
+
+		});
+
+		if (enabledOptions)
+		{
+			MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+			{
+				ShowEditButton = true,
+				ShowDeleteButton = ((code != null && (code.Equals("03") || code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) || customParamOP == "IPXM"),
+				ShowCancelButton = true,
+				ShowUpdateButton = true,
+				Visible = true,
+				VisibleIndex = showCost ? (((code != null && (code.Equals("03") || code.Equals("32"))) || customParamOP == "IPXM") ? (aMostrarOP ? 18 : 17) : ((code != null && IngresoPorTransferencia) ? (aMostrarOP ? 20 : 19) : ((code != null && (code.Equals("04"))) ? (aMostrarOP ? 22 : 21) : ((code != null && EgresoPorTransferenciaAutomatica) ? (aMostrarOP ? 17 : 18) : (aMostrarOP ? 17 : 16)))))
+			: (((code != null && (code.Equals("03") || code.Equals("32"))) || customParamOP == "IPXM") ? (aMostrarOP ? 16 : 15) : ((code != null && IngresoPorTransferencia) ? (aMostrarOP ? 18 : 17) : ((code != null && (code.Equals("04"))) ? (aMostrarOP ? 20 : 19) : ((code != null && EgresoPorTransferenciaAutomatica) ? (aMostrarOP ? 17 : 16) : (aMostrarOP ? 15 : 14))))),
+				Caption = "Acciones",
+				Width = Unit.Percentage(5)
+			};
+			settings.Columns.Add(commandColumn);
+			if (enabledOptions)
+			{
+				settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+			}
+		}
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+
+	bool IsEnabled(string namePermission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.name.Equals(namePermission));
+
+		return (permission != null);
+	}
+}
+
+<script src="~/Scripts/inventorymove/_inventoryMoveDetailEditFormPartial.js"></script>

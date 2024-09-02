@@ -1,0 +1,87 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    ItemSize itemSize = Model ?? new ItemSize();
+}
+
+@Html.Hidden("id_itemSize", itemSize.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(itemSize.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td>     
+           @Html.Raw(itemSize.name)       
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(itemSize.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(itemSize.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(itemSize.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(itemSize.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(itemSize.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

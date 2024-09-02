@@ -1,0 +1,20 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.HeadlessDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.id_turn, settings =>
+{
+    settings.Name = "ComboBoxTurn";
+    settings.Width = Unit.Percentage(100);
+    //settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Headless",
+        Action = "ComboBoxTurn",
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxTurn_SelectedIndexChanged";
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["Turn"]).GetHtml()

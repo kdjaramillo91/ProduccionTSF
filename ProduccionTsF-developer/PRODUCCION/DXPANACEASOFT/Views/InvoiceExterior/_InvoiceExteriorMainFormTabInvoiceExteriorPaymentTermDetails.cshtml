@@ -1,0 +1,134 @@
+﻿@model IEnumerable<DXPANACEASOFT.Models.InvoiceExteriorPaymentTerm>
+@Html.DevExpress().GridView(
+	gridView =>
+	{
+		gridView.Name = "gvInvoiceExteriorPaymentTermDetailView";
+		gridView.Width = Unit.Percentage(100);
+		gridView.KeyFieldName = "orderPayment";
+
+		gridView.CallbackRouteValues = new { Controller = "InvoiceExterior", Action = "InvoiceExteriorPaymentTermViewDetailsPartial" };
+		gridView.ClientSideEvents.BeginCallback = "InvoiceExteriorPaymentTermDetailView_BeginCallback";
+		if (this.ViewBag.CanEditPaymentTerm)
+		{
+			gridView.ClientSideEvents.Init = "InvoiceExteriorPaymentTermDetailView_InitEdit";
+		}
+
+		gridView.Settings.ShowTitlePanel = false;
+		gridView.Settings.ShowGroupPanel = false;
+		gridView.Settings.ShowFilterRow = false;
+		gridView.Settings.ShowFooter = false;
+		gridView.SettingsBehavior.AllowDragDrop = false;
+		gridView.SettingsBehavior.AllowSort = false;
+		gridView.SettingsBehavior.AllowSelectByRowClick = true;
+		gridView.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+		gridView.SettingsPager.Visible = false;
+
+		gridView.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		gridView.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		gridView.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		gridView.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		gridView.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		gridView.Styles.Header.BackColor = System.Drawing.Color.FromArgb(255, 255, 191, 102);
+		gridView.Styles.Header.Font.Bold = true;
+
+		gridView.CustomJSProperties = (s, e) =>
+		{
+			e.Properties["cpCanEditPaymentTerm"] = this.ViewBag.CanEditPaymentTerm;
+			e.Properties["cpCurrentPaymentTermDetails"] = this.Model
+				.Select(d => new
+				{
+					d.orderPayment,
+					dueDate = d.dueDate.ToString("yyyy-MM-dd"),
+					d.porcentaje,
+					d.valuePayment,
+				})
+				.ToArray();
+		};
+
+		// Orden de pago
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "orderPayment";
+			column.Caption = "Orden";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(50);
+			column.ReadOnly = true;
+		});
+
+
+		// Fecha de Vencimiento
+		gridView.Columns.Add(column =>
+		{
+			column.Caption = "Fecha de Vencimiento";
+			column.Width = Unit.Pixel(90);
+			column.ReadOnly = true;
+
+			if (this.ViewBag.CanEditPaymentTerm)
+			{
+				column.Name = "fechaVencimientoPago";
+				column.SetDataItemTemplateContent(content =>
+				{
+					Html.DevExpress().DateEdit(dateEdit =>
+					{
+						var orderPayment = this.Model.ElementAt(content.VisibleIndex).orderPayment;
+						var dateEditName = String.Concat("FechaVencimiento_", orderPayment);
+						dateEdit.Name = dateEditName;
+						dateEdit.Width = Unit.Percentage(100);
+
+						if (orderPayment == 0)
+						{
+							dateEdit.ReadOnly = true;
+						}
+
+						var p = dateEdit.Properties;
+						p.ClientInstanceName = dateEditName;
+						p.UseMaskBehavior = true;
+						p.DisplayFormatInEditMode = true;
+						p.DisplayFormatString = "dd/MM/yyyy";
+						p.EditFormatString = "dd/MM/yyyy";
+						p.EditFormat = EditFormat.Custom;
+
+						p.ClientSideEvents.DateChanged = "OnFechaVencimientoDateChanged";
+						p.ClientSideEvents.Validation = "OnFechaVencimientoValidate";
+
+						dateEdit.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpOrderPayment"] = orderPayment;
+						};
+
+					}).Bind(this.Model.ElementAt(content.VisibleIndex).dueDate).Render();
+				});
+			}
+			else
+			{
+				column.FieldName = "dueDate";
+				column.ColumnType = MVCxGridViewColumnType.DateEdit;
+				column.EditorProperties().DateEdit(
+					dateEdit =>
+					{
+						dateEdit.DisplayFormatInEditMode = true;
+						dateEdit.DisplayFormatString = "dd/MM/yyyy";
+						dateEdit.EditFormat = EditFormat.Custom;
+						dateEdit.EditFormatString = "dd/MM/yyyy";
+					});
+			}
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.Name = "ValorPagar";
+			column.Caption = "Valor a Pagar";
+			column.Width = Unit.Pixel(110);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+		
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var valuePayment = (decimal)DataBinder.Eval(c.DataItem, "valuePayment");
+				ViewContext.Writer.Write(valuePayment.ToString("C2"));
+			});
+		});
+
+	}).Bind(this.Model).GetHtml()

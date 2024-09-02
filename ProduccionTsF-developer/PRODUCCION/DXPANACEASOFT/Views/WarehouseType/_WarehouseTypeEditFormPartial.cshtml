@@ -1,0 +1,313 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.WarehouseType
+
+@{ 
+	ListaTipoLibrasCosteoProducion lsTipoLibraCosteoProduccion = new ListaTipoLibrasCosteoProducion();
+	string poundTypeDefault = lsTipoLibraCosteoProduccion.LsTipoLibraCosteoProduccion.FirstOrDefault(fod => fod.IsDefault).Codigo;
+
+}
+
+<table class="table table-condensed">
+
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Text = "Código:*";
+				settings.AssociatedControlName = "code";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+			{
+				settings.Properties.ClientInstanceName = "code";
+
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.NullText = "Código";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnWarehousesTypesCodeValidation";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Text = "Nombre:*";
+				settings.AssociatedControlName = "warehouseTypeName";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().TextBoxFor(m => m.name, settings =>
+			{
+				settings.Properties.ClientInstanceName = "warehouseTypeName";
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Nombre del Tipo de Bodega";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnWarehousesTypesNameValidation";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.description, settings =>
+			{
+				settings.Text = "Descripción:";
+				settings.AssociatedControlName = "description";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().MemoFor(m => m.description, settings =>
+			{
+				settings.Properties.ClientInstanceName = "description";
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "";
+				settings.ShowModelErrors = true;
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.productionCosting, settings =>
+			{
+				settings.Text = "Costeo de Producción:";
+				settings.AssociatedControlName = "productionCosting";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@{
+				string id_prodCost = (Model != null && Model.productionCosting != null) ? Model.productionCosting : "NO";
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.productionCosting, settings =>
+			{
+				settings.Properties.ClientInstanceName = "productionCosting";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(string);
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione el Costeo de Producción";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ShowModelErrors = true;
+
+				settings.Properties.ClientSideEvents.Init = "OnProductionCostInit";
+				settings.Properties.ClientSideEvents.Validation = "OnProductionCostValidation";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnProductionCost_SelectedIndexChanged";
+			}).BindList(DataProviderWarehouseType.ProductionCostings()).Bind(id_prodCost).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.poundsType, settings =>
+			{
+				settings.Text = "Tipo de Libras:";
+				settings.AssociatedControlName = "poundsType";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@{
+				string id_poundType = (Model != null && Model.poundsType != null) ? Model.poundsType : poundTypeDefault;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.poundsType, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "poundsType";
+
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(string);
+
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.NullText = "Seleccione el Tipo de Libras";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.ClientEnabled = true;
+		   //settings.re = id_prodCost != "SI";
+
+		   settings.ShowModelErrors = true;
+
+		   settings.Properties.ClientSideEvents.Validation = "OnPoundTypeValidation";
+		   settings.Properties.ClientSideEvents.Init = "OnPoundType_Init";
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnPoundType_SelectedIndexChanged";
+	   }).BindList(DataProviderWarehouseType.PoundsTypes()).Bind(id_poundType).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.idProcessedPoundsSimpleFormula, settings =>
+			{
+				settings.Text = "Fórmula Libras Procesadas:";
+				settings.AssociatedControlName = "idProcessedPoundsSimpleFormula";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@{
+				int? id_ProcessedPoundsSimpleFormula = (Model != null && Model.idProcessedPoundsSimpleFormula != null) ? Model.idProcessedPoundsSimpleFormula : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.idProcessedPoundsSimpleFormula, settings =>
+			{
+				settings.Properties.ClientInstanceName = "idProcessedPoundsSimpleFormula";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "formula";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione la Fórmula de Libras Procesadas";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ShowModelErrors = true;
+
+				settings.Properties.ClientSideEvents.Validation = "OnFormulaPoundsProcessedValidation";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnFormulaPoundsProcessed_SelectedIndexChanged";
+			}).BindList(DataProviderSimpleFormula.GetSimpleFormulaByType("TIPOBODEGA")).Bind(id_ProcessedPoundsSimpleFormula).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.idFinishedPoundsSimpleFormula, settings =>
+			{
+				settings.Text = "Fórmula Libras Terminadas:";
+				settings.AssociatedControlName = "idFinishedPoundsSimpleFormula";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@{
+				int? id_FinishedPoundsSimpleFormula = (Model != null && Model.idFinishedPoundsSimpleFormula != null) ? Model.idFinishedPoundsSimpleFormula : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.idFinishedPoundsSimpleFormula, settings =>
+			{
+				settings.Properties.ClientInstanceName = "idFinishedPoundsSimpleFormula";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "formula";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione la Fórmula de Libras Terminadas";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ShowModelErrors = true;
+
+				settings.Properties.ClientSideEvents.Validation = "OnFormulaPoundsFinishedValidation";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnFormulaPoundsFinished_SelectedIndexChanged";
+			}).BindList(DataProviderSimpleFormula.GetSimpleFormulaByType("TIPOBODEGA")).Bind(id_FinishedPoundsSimpleFormula).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.reasonCosts, settings =>
+			{
+				settings.Text = "Motivo Costos:";
+				settings.AssociatedControlName = "reasonCosts";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@{
+				string id_reasonCosts = (Model != null && Model.reasonCosts != null) ? Model.reasonCosts : "";
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.reasonCosts, settings =>
+			{
+				settings.Properties.ClientInstanceName = "reasonCosts";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(string);
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione el Motivo Costos";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ShowModelErrors = true;
+
+				settings.Properties.ClientSideEvents.Validation = "OnReasonCostsValidation";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnReasonCosts_SelectedIndexChanged";
+			}).BindList(DataProviderInventoryReason.GetAll()).Bind(id_reasonCosts).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.excludeClosure, settings =>
+			{
+				settings.Text = "¿Excluir de Cierre Lote?:";
+				settings.AssociatedControlName = "excludeClosure";
+			}).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().CheckBoxFor(m => m.excludeClosure, settings =>
+			{
+				settings.Properties.ClientInstanceName = "excludeClosure";
+
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+			{
+				settings.Text = "¿Activo?:";
+				settings.AssociatedControlName = "isActive";
+			}).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			{
+				settings.Properties.ClientInstanceName = "isActive";
+
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6" style="text-align: right;">
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnUpdate";
+				settings.Text = "Actualizar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+			}).GetHtml()
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnCancel";
+				settings.Text = "Cancelar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonCancel_Click";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr id="warehouseTypeAlertRow" style="display: none;">
+		<td colspan="6">
+			<div class="alert alert-danger fade in" style="margin-top:18px;">
+				<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+				<span id="warehouseTypeErrorMessage"></span>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<script src="~/Scripts/warehousetype/editform.js"></script>

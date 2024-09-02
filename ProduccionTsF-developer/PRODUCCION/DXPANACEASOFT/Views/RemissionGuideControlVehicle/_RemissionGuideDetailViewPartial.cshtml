@@ -1,0 +1,92 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuide
+
+@{
+    int id_remissionGuide = (Model != null) ? Model.id : 0;
+    Document document = (Model != null) ? Model.Document : new Document();
+}
+
+@Html.Hidden("id_remissionGuide", id_remissionGuide)
+
+<table style="width: 100%">
+    <tr>
+        <td>Clave de Acceso:</td>
+        <td colspan="4">@Html.Raw(document.accessKey)</td>
+    </tr>
+    <tr>
+        <td style="width: 8%;">No. Autorización:</td>
+        <td>@Html.Raw(document.authorizationNumber)</td>
+        <td style="width: 8%;">Fecha Autorización:</td>
+        <td>@Html.Raw(document.authorizationDate)</td>
+    </tr>
+    <tr>
+        <td>Referencia:</td>
+        <td>@Html.Raw(document.reference)</td>
+        <td>Descripción:</td>
+        <td>@Html.Raw(document.description)</td>
+    </tr>
+    <tr>
+        <td>Creado por:</td>
+        <td>@Html.Raw(GetUserName(document.id_userCreate))</td>
+        <td>Fecha de Creación:</td>
+        <td>@Html.Raw(document.dateCreate)</td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>@Html.Raw(GetUserName(document.id_userUpdate))</td>
+        <td>Fecha de Modificación:</td>
+        <td>@Html.Raw(document.dateUpdate)</td>
+    </tr>
+</table>
+
+<br />
+
+@{
+    Html.DevExpress().PageControl(tabs =>
+    {
+        tabs.Name = "tabControl";
+
+        tabs.Width = Unit.Percentage(100);
+        tabs.Height = Unit.Pixel(200);
+        tabs.EnableClientSideAPI = true;
+
+        tabs.TabPages.Add(tab =>
+        {
+            tab.Name = "tabDetails";
+            tab.Text = "Materia Prima";
+            tab.TabStyle.Width = Unit.Percentage(100);
+            tab.SetContent(() =>
+            {
+                var remissionGuideDetails = (Model != null && Model.RemissionGuideDetail != null) ? Model.RemissionGuideDetail.Where(d => d.isActive).ToList() : new List<RemissionGuideDetail>();
+                Html.RenderPartial("_RemissionGuideDetailViewDetailsPartial", remissionGuideDetails);
+            });
+        });
+        tabs.TabPages.Add(tab =>
+        {
+            tab.Name = "tabDispatchMaterials";
+            tab.Text = "Materiales de Despacho";
+            tab.TabStyle.Width = Unit.Percentage(100);
+            tab.SetContent(() =>
+            {
+                var remissionGuideDispatchMaterials = (Model != null && Model.RemissionGuideDispatchMaterial != null) ? Model.RemissionGuideDispatchMaterial.Where(d => d.isActive).ToList() : new List<RemissionGuideDispatchMaterial>();
+                Html.RenderPartial("_RemissionGuideDetailViewDispatchMaterialsPartial", remissionGuideDispatchMaterials);
+            });
+
+        });
+
+    }).Render();
+}
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+
+        if (user == null)
+            return string.Empty;
+
+        return user.username;
+    }
+}

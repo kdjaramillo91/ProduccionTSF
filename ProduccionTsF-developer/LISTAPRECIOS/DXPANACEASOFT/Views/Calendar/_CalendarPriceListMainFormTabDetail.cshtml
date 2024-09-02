@@ -1,0 +1,178 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using  DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.CalendarPriceList
+@using System.Drawing
+
+@{
+    Setting wsSenting = DataProviderSettings.Setting("CLAUTO");
+    String codeAuto = "0";
+
+    if (wsSenting !=null)
+    {
+        if (wsSenting.value == "AUTO")
+        { codeAuto = "1"; }
+
+    }
+
+}
+<div id="GridMessageError" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageError";
+           settings.Properties.ClientInstanceName = "gridMessageError";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+
+    <!--Fila 1 Fecha Inicio y fin -->
+    <tr>
+        <!--FECHA Inicio-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.startDate, settings =>
+            {
+                settings.Name = "startDateLabel";
+                settings.Text = "Fecha Inicio:";
+                settings.AssociatedControlName = "startDate";
+            }).GetHtml()
+
+           
+        </td>
+        <td >
+    @Html.DevExpress().DateEditFor(m => m.startDate, settings =>
+               {
+                   settings.Name = "startDate";
+                   settings.Properties.ClientInstanceName = "startDate";
+                   settings.Properties.UseMaskBehavior = true;
+                   settings.Properties.EditFormat = EditFormat.Custom;
+                   settings.Properties.EditFormatString = "dd/MM/yyyy";
+                   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+                   settings.ShowModelErrors = true;
+                   settings.Properties.ClientSideEvents.Validation = "OnstartDateValidation";
+                   settings.Properties.DisplayFormatInEditMode = true;
+                   settings.Properties.CalendarProperties.Columns = 2;
+                   settings.Properties.DateRangeSettings.MinDayCount = 1;
+                   settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                   settings.ReadOnly= true;
+               }).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.endDate, settings =>
+            {
+                settings.Name = "endDateLabel";
+                settings.Text = "Fecha Fin:";
+                settings.AssociatedControlName = "endDate";
+            }).GetHtml()
+        </td>
+        <td >
+            @Html.DevExpress().DateEditFor(m => m.endDate, settings =>
+         {
+             settings.Name = "endDate";
+             settings.Properties.ClientInstanceName = "endDate";
+             settings.Properties.UseMaskBehavior = true;
+             settings.Properties.EditFormat = EditFormat.Custom;
+             settings.Properties.EditFormatString = "dd/MM/yyyy";
+             settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+             settings.Width = Unit.Percentage(100);
+             settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+             settings.ShowModelErrors = true;
+             settings.Properties.CalendarProperties.Columns = 2;
+             settings.Properties.DateRangeSettings.StartDateEditID = "startDate";
+             settings.Properties.DateRangeSettings.MinDayCount = 1;
+             settings.Properties.DateRangeSettings.MaxDayCount = 90;
+             settings.Properties.ClientSideEvents.Validation = "OnendDateValidation";
+
+         }).GetHtml()
+           </td>
+        <td colspan="2"></td>
+    </tr>
+    <!--Fila 2 Nombre -->
+    <tr>
+        <!--Nombre-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+        {
+            settings.Name = "namelabel";
+            settings.Text = "Nombre:";
+            settings.AssociatedControlName = "name";
+        }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "name";
+           settings.Properties.ClientInstanceName = "name";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeAuto != "0";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+       }).GetHtml()
+         
+        </td>
+    </tr>
+    <!--Fila 3 Tipo de Calendario -->
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_calendarPriceListType, settings =>
+            {
+                settings.Name = "calendarPriceListTypeLabel";
+                settings.Text = "Tipo Calendario:";
+                settings.AssociatedControlName = "id_calendarPriceListType";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_calendarPriceListType = (Model != null && Model.id_calendarPriceListType != 0) ? (int?)Model.id_calendarPriceListType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_calendarPriceListType, settings =>
+            {
+                settings.Name = "id_calendarPriceListType";
+                settings.Properties.ClientInstanceName = "id_calendarPriceListType";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Columns.Add("name", "Nombre", 200);
+                settings.Width = Unit.Percentage(50);
+                settings.Height = Unit.Percentage(50);
+                settings.Properties.EnableClientSideAPI = true;
+                settings.Properties.CallbackPageSize = 20;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCalendarPriceListType";
+
+            }).BindList(DataProviderCalendarPriceListType.CalendarPriceListByCompany((int?)ViewData["id_company"])).Bind(id_calendarPriceListType).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+       {
+           settings.Name = "isActive";
+           settings.Properties.ClientInstanceName = "isActive";
+           settings.Text = "Activo";
+       }).GetHtml()
+        </td>
+        <td colspan="2">
+      
+        </td>
+    </tr>
+    
+    <tr></tr>
+
+    </table>
+
+    
+
+

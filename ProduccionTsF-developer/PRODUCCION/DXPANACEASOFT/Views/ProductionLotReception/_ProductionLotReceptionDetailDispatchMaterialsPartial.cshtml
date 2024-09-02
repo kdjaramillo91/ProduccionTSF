@@ -1,0 +1,294 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProductionLotDispatchMaterial>
+
+@{
+    var grid = Html.DevExpress().GridView<ProductionLotDispatchMaterial>(settings =>
+    {
+        settings.Name = "gvProductionLotReceptionDetailDispatchMaterials" + ViewData["id_productionLot"];
+        settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionDetailDispatchMaterialsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "ProductionLotReceptionDetail_OnBeginCallback";//"ProductionLotReceptionDetailDispatchMaterials_BeginCallback";
+
+        settings.CommandColumn.Visible = false;
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id_item";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdProductionLot"] = 0;
+            }
+            e.Properties["cpIdProductionLot"] = ViewData["id_productionLot"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        #region ColumnsAdd
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "remissionGuidesDispatchMaterial";
+            column.Caption = "Guía de Remisión";
+            column.Width = Unit.Percentage(10);
+            column.UnboundType = UnboundColumnType.String;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+
+                List<ProductionLotDispatchMaterialRemissionDetail> remissionMaterials = null;
+
+                try
+                {
+                    remissionMaterials = (List<ProductionLotDispatchMaterialRemissionDetail>)DataBinder.Eval(c.DataItem, "ProductionLotDispatchMaterialRemissionDetail");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        HashSet<ProductionLotDispatchMaterialRemissionDetail> temp = (HashSet<ProductionLotDispatchMaterialRemissionDetail>)DataBinder.Eval(c.DataItem, "ProductionLotDispatchMaterialRemissionDetail");
+                        remissionMaterials = temp.ToList();
+                    }
+                    catch (Exception)
+                    {
+                        remissionMaterials = null;
+                    }
+                }
+
+
+                string text = string.Empty;
+
+                if (remissionMaterials != null && remissionMaterials.Count > 0)
+                {
+                    int? id_remissionGuideDispatchMaterial = remissionMaterials[0].id_remissionGuideDispatchMaterial;
+                    RemissionGuideDispatchMaterial remissionGuideDispatchMaterial = DataProviderRemissionGuide.RemissionGuideDispatchMaterial(id_remissionGuideDispatchMaterial);
+
+                    text += remissionGuideDispatchMaterial.RemissionGuide.Document.number;
+
+                    text += (remissionMaterials.Count > 1) ? @"&nbsp<a href=""#"">+" + (remissionMaterials.Count - 1).ToString() + "</a>" : "";
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(17);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id_item);
+
+                string text = string.Empty;
+
+                if (item != null)
+                {
+                    text = item.name;
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_metricUnitPurchase";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(4);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "metricUnit";
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.ItemPurchaseInformation != null && item.ItemPurchaseInformation.MetricUnit != null) ? item.ItemPurchaseInformation.MetricUnit.code : "Lbs";
+                ViewContext.Writer.Write(metricUnit);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_warehouse";
+            column.Caption = "Bodega";
+            column.Width = Unit.Percentage(6);
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+
+                Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+                string text = string.Empty;
+
+                if (warehouse != null)
+                {
+                    text = warehouse.name;
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_warehouseLocation";
+            column.Caption = "Ubicación";
+            column.Width = Unit.Percentage(6);
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocation");
+
+                WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocation);
+
+                string text = string.Empty;
+
+                if (warehouseLocation != null)
+                {
+                    text = warehouseLocation.name;
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "sourceExitQuantity";
+            column.Name = "sourceExitQuantity";
+            column.Caption = "Cantidad Salida Origen";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sourceExitQuantity = (decimal)DataBinder.Eval(c.DataItem, "sourceExitQuantity");
+                ViewContext.Writer.Write(sourceExitQuantity.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "sendedDestinationQuantity";
+            column.Name = "sendedDestinationQuantity";
+            column.Caption = "Cantidad Despachada Destino";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity");
+                ViewContext.Writer.Write(sendedDestinationQuantity.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalDestinationQuantity";
+            column.Name = "arrivalDestinationQuantity";
+            column.Caption = "Cantidad Recibida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+                ViewContext.Writer.Write(arrivalDestinationQuantity.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalGoodCondition";
+            column.Name = "arrivalGoodCondition";
+            column.Caption = "Buen Estado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalGoodCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalGoodCondition");
+                ViewContext.Writer.Write(arrivalGoodCondition.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalBadCondition";
+            column.Name = "arrivalBadCondition";
+            column.Caption = "Mal Estado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalBadCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalBadCondition");
+                ViewContext.Writer.Write(arrivalBadCondition.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "sourceExitQuantity";
+            column.Name = "notReceivedQuantity";
+            column.Caption = "Cantidad No Recibida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sourceExitQuantity = (decimal)DataBinder.Eval(c.DataItem, "sourceExitQuantity");
+                decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+                decimal notReceivedQuantity = sourceExitQuantity - arrivalDestinationQuantity;
+                ViewContext.Writer.Write(notReceivedQuantity.ToString("N2"));
+            });
+
+        });
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

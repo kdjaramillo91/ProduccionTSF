@@ -1,0 +1,636 @@
+﻿@using DevExpress.Data
+@using System.Drawing
+
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProductionLotPayment>
+@{
+	string valueDistribution = DataProviderSetting.ValueSetting("DIST");
+	string modificarPrecio = DataProviderSetting.ValueSetting("MODPREC");
+	decimal totalToPay = ViewBag.totalToPay != null ? (decimal)ViewBag.totalToPay : 0;// $("#totalQuantityLiquidation").val();
+	decimal totalToPayEq = ViewBag.totalToPayEq != null ? (decimal)ViewBag.totalToPayEq : 0;
+	decimal totalPriceDis = ViewBag.totalPriceDistribuido != null ? (decimal)ViewBag.totalPriceDistribuido : 0;
+	decimal differencia = ViewBag.diferencia != null ? (decimal)ViewBag.diferencia : 0;
+	bool mostrarDistibuir = ViewBag.ShowActionDis;
+	bool modfPrecio = ViewBag.ShowModifPrecio;
+	bool modfDetalle = ViewBag.ShowModifDetalle;
+	string stateProductionLot = "";
+	var frst_ProductionLotPayment = Model.FirstOrDefault();
+	if(frst_ProductionLotPayment != null && frst_ProductionLotPayment.ProductionLot != null)
+	{
+		stateProductionLot = frst_ProductionLotPayment.ProductionLot.ProductionLotState.code;
+	}
+
+	bool canEdit = false;
+	if(stateProductionLot == "07")
+	{
+		canEdit = true;
+
+	}
+}
+@{
+	var grid = Html.DevExpress().GridView<ProductionLotPayment>(settings =>
+	{
+		settings.Name = "gvProductionLotReceptionEditFormPaymentsDetail";
+		settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionEditFormPaymentsDetailPartial" };
+
+		if (canEdit)
+		{
+			settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionLotReception", Action = "GridViewDetailsPagoUpdate" };
+			settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+
+			var formLayout = settings.EditFormLayoutProperties;
+			formLayout.AlignItemCaptionsInAllGroups = true;
+			formLayout.UseDefaultPaddings = true;
+			formLayout.RequiredMarkDisplayMode = RequiredMarkMode.None;
+			LayoutItemStyle layoutItem = formLayout.Styles.LayoutItem;
+			layoutItem.Caption.CssClass = "dxeBase_Metropolis";
+			layoutItem.CaptionCell.Paddings.PaddingRight = Unit.Pixel(25);
+
+			settings.EditFormLayoutProperties.Items.AddGroupItem(group =>
+			{
+				//group.SetDefaultSettings();
+				group.Items.Add("price");
+
+				group.Items.AddCommandItem(item =>
+				{
+					item.HorizontalAlign = FormLayoutHorizontalAlign.Right;
+				});
+			});
+		}
+
+		settings.Width = Unit.Percentage(100);
+
+		//settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		settings.SettingsBehavior.ConfirmDelete = false;
+		//settings.CommandColumn.Width = Unit.Percentage(2);
+
+
+		//settings.KeyFieldName = "id_originLot;id_item";
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		//settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		//Checkbox de registros de tabla
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		settings.ClientSideEvents.Init = "OnGridViewPaymentDetailsInit";
+		settings.ClientSideEvents.EndCallback = "OnGridViewPaymentDetailsEndCallback";
+
+		//Pie de tabla
+		settings.Settings.ShowFooter = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalToPay").DisplayFormat = "<b>{0:c2}</b>";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalToPayEq").DisplayFormat = "<b>{0:c2}</b>";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalPriceDis").DisplayFormat = "<b>{0:c2}</b>";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "differencia").DisplayFormat = "<b>{0:c2}</b>";
+
+		#region ColumnsAdd
+		settings.Columns.Add(e => e.Item.masterCode, column =>
+		{
+			column.Name = "masterCode";
+			column.Caption = "Codigo";
+			column.FieldName = "Item.masterCode";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.PropertiesEdit.ClientInstanceName = "masterCode";
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(5);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) ? item.masterCode : "";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		//id_item
+		settings.Columns.Add(e => e.id_item, column =>
+		{
+			column.Name = "id_item";
+			column.Caption = "Producto Liquidación";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.PropertiesEdit.ClientInstanceName = "id_item";
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(25);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) ? item.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+		if (modificarPrecio == "SI")
+		{
+			settings.Columns.Add(e => e.Item.masterCode, column =>
+			{
+				column.Name = "masterCodeEq";
+				column.Caption = "Codigo";
+				column.ColumnType = MVCxGridViewColumnType.ComboBox;
+				column.PropertiesEdit.ClientInstanceName = "masterCodeEq";
+				column.ReadOnly = true;
+				column.Width = Unit.Percentage(5);
+				column.SetDataItemTemplateContent(c =>
+				{
+					int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+					Item item = DataProviderItem.ItemEquivalence(id_item);
+
+					string text = (item != null) ? item.masterCode : "";
+
+					ViewContext.Writer.Write(text);
+				});
+			});
+
+			//id_item
+			settings.Columns.Add(e => e.id_item, column =>
+			{
+				column.Name = "id_itemEq";
+				column.Caption = "Producto a Congelación";
+				column.FieldName = "id_item";
+				column.ColumnType = MVCxGridViewColumnType.ComboBox;
+				column.PropertiesEdit.ClientInstanceName = "id_itemEq";
+				column.ReadOnly = true;
+				column.Width = Unit.Percentage(25);
+				column.SetDataItemTemplateContent(c =>
+				{
+					int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+					Item item = DataProviderItem.ItemEquivalence(id_item);
+
+					string text = (item != null) ? item.name : "";
+
+					ViewContext.Writer.Write(text);
+				});
+			});
+		}
+		//Clase
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Clase";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(10);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) && (item.ItemTypeCategory != null) ? item.ItemTypeCategory.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+		//Talla
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Talla";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(5);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) && (item.ItemGeneral != null) && (item.ItemGeneral.ItemSize != null) ? item.ItemGeneral.ItemSize.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+		//Proceso
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				//string text = (item != null) && (item.ItemTypeCategory != null) ? (item.ItemTypeCategory.code == "ENT" ? "ENTERO" : "COLA") : "";
+				var itemProcessTypeAux = (item != null) && (item.ItemType != null) ? item.ItemType : null;
+				var codeAux = itemProcessTypeAux != null && itemProcessTypeAux.ProcessType  != null? itemProcessTypeAux.ProcessType.code : "";
+				//if (codeAux == "ENT")
+				string text = (codeAux == "ENT") ? "ENTERO" : ((codeAux != "") ? "COLA" : "");
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+		//totalProcessMetricUnit
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalProcessMetricUnit";
+			column.Caption = "Rendimiento Total";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.EditorProperties().SpinEdit(spinEdit =>
+			{
+				spinEdit.DecimalPlaces = 2;
+				spinEdit.DisplayFormatInEditMode = true;
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+				spinEdit.DisplayFormatString = "N2";
+			});
+
+		});
+
+		if (modificarPrecio == "SI")
+		{
+			settings.Columns.Add(column =>
+			{
+				column.FieldName = "totalProcessMetricUnitEq";
+				column.Caption = "Rendimiento Total Congelación";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.Width = Unit.Percentage(10);
+
+				column.EditorProperties().SpinEdit(spinEdit =>
+				{
+					spinEdit.DecimalPlaces = 2;
+					spinEdit.DisplayFormatInEditMode = true;
+					spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+					spinEdit.DisplayFormatString = "N2";
+				});
+
+			});
+		}
+		//id_metricUnitProcess
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_metricUnitProcess";
+			column.Name = "metricUnitProcess";
+			column.PropertiesEdit.ClientInstanceName = "id_metricUnitProcess";
+			column.Caption = "UM";
+			column.Width = Unit.Percentage(5);
+			column.UnboundType = UnboundColumnType.String;
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_metricUnitProcess = (int?)DataBinder.Eval(c.DataItem, "id_metricUnitProcess");
+				MetricUnit metricUnit = DataProviderMetricUnit.MetricUnitById(id_metricUnitProcess);
+
+				string text = string.Empty;
+
+				if (metricUnit != null)
+				{
+					text = metricUnit.code;
+				}
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+		//price
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "price";
+			column.Caption = "Precio LP";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(8);
+
+			column.EditorProperties().SpinEdit(spinEdit =>
+			{
+				spinEdit.DecimalPlaces = 6;
+				spinEdit.DisplayFormatInEditMode = true;
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+				spinEdit.DisplayFormatString = "C6";
+			});
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal priceEdition = (decimal)DataBinder.Eval(c.DataItem, "priceEdition");
+				decimal price = (decimal?)DataBinder.Eval(c.DataItem, "price") ?? 0;
+
+				if (price > priceEdition)
+				{
+					ViewContext.Writer.Write("<FONT COLOR='#FF0000'><B>" + price.ToString("N6") + "</B></FONT>");
+				}
+				else if (price < priceEdition)
+				{
+					ViewContext.Writer.Write("<FONT COLOR='#2DC836'><B>" + price.ToString("N6") + "</B></FONT>");
+				}
+				else
+				{
+					ViewContext.Writer.Write(price.ToString("N6"));
+				}
+			});
+
+
+		});
+		//price
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "priceEdition";
+			column.Caption = "Precio LP";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(8);
+			column.Visible = false;
+
+			column.EditorProperties().SpinEdit(spinEdit =>
+			{
+				spinEdit.DecimalPlaces = 6;
+				spinEdit.DisplayFormatInEditMode = true;
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+				spinEdit.DisplayFormatString = "C6";
+			});
+		});
+
+		//totalToPay
+		settings.Columns.Add(m => m.totalToPay, column =>
+		{
+			column.FieldName = "totalToPay";
+			column.Caption = "Total a Pagar LP";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.EditorProperties().SpinEdit(spinEdit =>
+			{
+				spinEdit.DecimalPlaces = 2;
+				spinEdit.DisplayFormatInEditMode = true;
+				spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+				spinEdit.DisplayFormatString = "C2";
+			});
+		});
+
+		if (modificarPrecio == "SI")
+		{
+			settings.Columns.Add(m => m.totalToPayEq, column =>
+			{
+				column.FieldName = "totalToPayEq";
+				column.Caption = "Total a Pagar Congelación";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.Width = Unit.Percentage(10);
+
+				column.EditorProperties().SpinEdit(spinEdit =>
+				{
+					spinEdit.DecimalPlaces = 2;
+					spinEdit.DisplayFormatInEditMode = true;
+					spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+					spinEdit.DisplayFormatString = "C2";
+				});
+			});
+		}
+
+		//percentPerformancePounds
+		settings.Columns.Add(column =>
+		{
+			column.Name = "percentPerformanceTotalToPay";
+			column.Caption = "% Rendimiento";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal totalToPayAux = (decimal)DataBinder.Eval(c.DataItem, "totalToPay");
+
+				decimal percent = totalToPay > 0 ? decimal.Round((totalToPayAux / totalToPay) * 100, 2) : 0;
+				ViewContext.Writer.Write(percent.ToString("N2") + "%");
+			});
+		});
+
+		if (modificarPrecio == "SI")
+		{
+			settings.Columns.Add(column =>
+			{
+				column.Name = "percentPerformanceTotalToPayEq";
+				column.Caption = "% Rendimiento Congelación";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.Width = Unit.Percentage(5);
+				column.ReadOnly = true;
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					decimal totalToPayEqAux = (decimal)DataBinder.Eval(c.DataItem, "totalToPayEq");
+
+					decimal percent = totalToPayEq > 0 ? decimal.Round((totalToPayEqAux / totalToPayEq) * 100, 2) : 0;
+					ViewContext.Writer.Write(percent.ToString("N2") + "%");
+				});
+			});
+		}
+		//Check Distribucion
+		if (valueDistribution == "SI" && mostrarDistibuir)
+		{
+			settings.Columns.Add(e => e.distributedd, column =>
+			{
+				column.FieldName = "distributedd";
+				column.Name = "distribucion";
+				column.Caption = "Distribución";
+				column.Width = Unit.Percentage(6);
+				column.PropertiesEdit.EnableClientSideAPI = true;
+				column.ColumnType = MVCxGridViewColumnType.CheckBox;
+
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.Settings.AllowAutoFilter = DefaultBoolean.False;
+				column.ReadOnly = true;
+
+				column.EditorProperties().CheckBox(p =>
+				{
+					p.ClientInstanceName = "distribucion";
+
+				});
+			});
+		}
+
+
+		//precio Distribuido
+		if(valueDistribution == "SI" && mostrarDistibuir)
+		{
+			settings.Columns.Add(e => e.precioDisF, column =>
+			{
+				column.FieldName = "precioDisF";
+				column.Caption = "Precio Dist.";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.Width = Unit.Percentage(10);
+
+				column.EditorProperties().SpinEdit(spinEdit =>
+				{
+					spinEdit.DecimalPlaces = 2;
+					spinEdit.DisplayFormatInEditMode = true;
+					spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+					spinEdit.DisplayFormatString = "C2";
+				});
+			});
+		}
+
+
+		//total a Pagar Distribuido
+		if(valueDistribution == "SI" && mostrarDistibuir)
+		{
+			settings.Columns.Add(m => m.totalPriceDis, column =>
+			{
+				column.FieldName = "totalPriceDis";
+				column.Caption = "Total a Pagar";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.Width = Unit.Percentage(10);
+
+				column.EditorProperties().SpinEdit(spinEdit =>
+				{
+					spinEdit.DecimalPlaces = 2;
+					spinEdit.DisplayFormatInEditMode = true;
+					spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+					spinEdit.DisplayFormatString = "C2";
+				});
+			});
+		}
+
+
+		//Diferencia
+		if(valueDistribution == "SI" && mostrarDistibuir)
+		{
+			settings.Columns.Add(m => m.differencia, column =>
+			{
+				column.FieldName = "differencia";
+				column.Caption = "Diferencia";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.Width = Unit.Percentage(9);
+
+				column.EditorProperties().SpinEdit(spinEdit =>
+				{
+					spinEdit.DecimalPlaces = 2;
+					spinEdit.DisplayFormatInEditMode = true;
+					spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+					spinEdit.DisplayFormatString = "C2";
+				});
+			});
+		}
+
+
+		//porcentaje Rendimiento
+		if(valueDistribution == "SI" && mostrarDistibuir)
+		{
+			settings.Columns.Add(column =>
+			{
+				column.Name = "percentPerformanceTotalToPay2";
+				column.Caption = "% Rendimiento";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.Width = Unit.Percentage(5);
+				column.ReadOnly = true;
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					decimal totalToPayAux2 = (decimal)DataBinder.Eval(c.DataItem, "totalToPay");
+
+					decimal percent = totalPriceDis > 0 ? decimal.Round((totalToPayAux2 / totalPriceDis) * 100, 2) : 0;
+					ViewContext.Writer.Write(percent.ToString("N2") + "%");
+				});
+
+			});
+		}
+
+		//COMMAND COLUMN ACCIONES DISTRIBUIDO
+
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+		commandColumn.ShowEditButton = true;
+		commandColumn.ShowDeleteButton = false;
+		commandColumn.ShowCancelButton = true;
+		commandColumn.ShowUpdateButton = true;
+		commandColumn.Visible = true;
+		commandColumn.VisibleIndex = 21;
+		commandColumn.Caption = "Acciones";
+		commandColumn.Width = Unit.Percentage(3);
+
+		//if (valueDistribution == "SI" && mostrarDistibuir)
+		//{
+		//	commandColumn.CustomButtons.Add(
+		//		new GridViewCommandColumnCustomButton
+		//		{
+		//			ID = "btnDistributedRow",
+		//			Text = "Distribuir"
+		//		}
+		//	);
+		//	settings.ClientSideEvents.CustomButtonClick = "onGridViewgvDistributedCustomCommandButton_Click";
+		//}
+
+
+		if (valueDistribution == "SI" && mostrarDistibuir)
+		{
+			settings.Columns.Add(commandColumn);
+		}
+
+		//if (modificarPrecio == "SI" && modfPrecio)
+		//{
+		//	commandColumn.CustomButtons.Add(
+		//		new GridViewCommandColumnCustomButton
+		//		{
+		//			ID = "editRowButton",
+		//			Text = "Editar"
+		//		}
+		//	);
+
+		//}
+
+
+		if (modificarPrecio == "SI" && modfPrecio && modfDetalle)
+		{
+			settings.Columns.Add(commandColumn);
+		}
+		if (canEdit)
+		{
+			settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+		}
+
+		#endregion
+		//Price
+		var settingsPrice = settings.FormatConditions.AddHighlight("price", "[price] == 0", GridConditionHighlightFormat.Custom);//.ApplyToRow = true;
+		settingsPrice.ApplyToRow = false;
+		settingsPrice.CellStyle.BackColor = System.Drawing.Color.OrangeRed;
+		settingsPrice.CellStyle.ForeColor = System.Drawing.Color.DarkRed;
+
+		#region ColumnsEdit
+
+
+		#endregion
+
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model.OrderBy(a => a.Item.masterCode)).GetHtml()
+
+@*@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        //foreach (var key in grid.GetCurrentPageRowValues("id_originLot;id_item"))
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}*@
+
+<script src="~/Scripts/productionlotreception/_productionLotReceptionPaymentDetailsEditForm.js"></script>

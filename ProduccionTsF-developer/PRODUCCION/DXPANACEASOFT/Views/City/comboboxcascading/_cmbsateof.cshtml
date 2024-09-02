@@ -1,0 +1,30 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.City
+@{
+
+    int? id_StateOfContry = (Model != null && Model.id_stateOfContry != 0) ? (int?)Model.id_stateOfContry : null;
+    int? id_country = (Model != null && Model.id_country != 0) ? (int?)Model.id_country : null;
+
+    //TempData["StateOfContryall"] = DataProviderStateOfContry.StateOfContryByCountryAndCurrent( id_country,null);
+    //TempData.Keep("StateOfContryall");
+}
+
+
+@Html.DevExpress().ComboBoxFor(m => m.id_stateOfContry, settings =>
+{
+    settings.Name = "id_StateOfContry";
+    settings.Properties.ClientInstanceName = "id_StateOfContry";
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.Columns.Add("name", "Nombre", 200);
+    // settings.Width = Unit.Percentage(100);
+
+    settings.ShowModelErrors = true;
+    settings.CallbackRouteValues = new { Controller = "City", Action = "StateOfContryall" };
+
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_country'] = id_country.GetValue();  }";
+    settings.Properties.CallbackPageSize = 20;
+
+
+}).BindList(TempData["StateOfContryall"]).Bind(id_StateOfContry).GetHtml()

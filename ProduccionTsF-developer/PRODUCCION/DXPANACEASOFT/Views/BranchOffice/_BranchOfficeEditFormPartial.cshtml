@@ -1,0 +1,232 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.BranchOffice
+
+<table class="table table-condensed">
+    <tr>
+        <td style="width: 8%;">
+            @Html.DevExpress().LabelFor(m => m.id_division, settings =>
+            {
+                settings.Text = "División:*";
+                settings.AssociatedControlName = "id_company";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_division = (Model != null && Model.id_division != 0) ? (int?) Model.id_division : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_division, settings =>
+            {
+                settings.Properties.ClientInstanceName = "id_division";
+
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Seleccione División";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxDivisions_SelectedIndexChanged";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnBranchOfficesDivisionValidation";
+            }).BindList(DataProviderDivision.DivisionsByCompany((int)ViewData["id_company"])).Bind(id_division).GetHtml()
+        </td>
+        <td style="width: 5%;">
+            @Html.DevExpress().LabelFor(m => m.ruc, settings =>
+            {
+                settings.Text = "RUC:*";
+                settings.AssociatedControlName = "ruc";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ruc, settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "Registro Unico de Contribuyente";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnBranchOfficesRucValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Nombre:*";
+                settings.AssociatedControlName = "name";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+            {
+                settings.Properties.ClientInstanceName = "nameBranchOffice";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Nombre de la División";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnBranchOfficesNameValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Text = "Código:*";
+                settings.AssociatedControlName = "code";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @{
+                string code = (Model == null || Model.code == 0) ? "" : Model.code.ToString().PadLeft(3, '0');
+            }
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+            {
+                settings.Properties.ClientInstanceName = "code";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Ej: 001";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCodeBranchOfficesValidation";
+            }).Bind(code).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.email, settings =>
+            {
+                settings.Text = "Correo Electrónico:*";
+                settings.AssociatedControlName = "email";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.email, settings =>
+            {
+                settings.Properties.ClientInstanceName = "email";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "correo.electronico@miservidor.com";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnBranchOfficesEmailValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.phoneNumber, settings =>
+            {
+                settings.Text = "Teléfono:*";
+                settings.AssociatedControlName = "phoneNumber";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.phoneNumber, settings =>
+            {
+                settings.Properties.ClientInstanceName = "phoneNumber";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "No. de Telfono";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnBranchOfficesPhoneValidation";
+            }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.address, settings =>
+            {
+                settings.Text = "Dirección:*";
+                settings.AssociatedControlName = "address";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().MemoFor(m => m.address, settings =>
+            {
+                settings.Properties.ClientInstanceName = "address";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Dirección postal";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnBranchOfficesAddressValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Text = "Descripción:";
+                settings.AssociatedControlName = "description";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().MemoFor(m => m.description, settings =>
+            {
+                settings.Properties.ClientInstanceName = "description";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "";
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+            {
+                settings.Text = "¿Activo?:";
+                settings.AssociatedControlName = "isActive";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+            {
+                settings.Properties.ClientInstanceName = "isActive";
+
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6" style="text-align: right;">
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnUpdate";
+                settings.Text = "Actualizar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+            }).GetHtml()
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnCancel";
+                settings.Text = "Cancelar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonCancel_Click";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr id="branchOfficeAlertRow" style="display: none;">
+        <td colspan="6">
+            <div class="alert alert-danger fade in" style="margin-top:18px;">
+                <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                <span id="branchOfficeErrorMessage"></span>
+            </div>
+        </td>
+    </tr>
+</table>
+
+
+<script src="~/Scripts/branchoffice/editform.js"></script>

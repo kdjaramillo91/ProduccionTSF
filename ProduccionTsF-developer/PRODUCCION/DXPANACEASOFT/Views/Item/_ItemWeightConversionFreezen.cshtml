@@ -1,0 +1,243 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ItemWeightConversionFreezen
+
+@{
+    bool usedItem = (Model != null && Model.Item != null && Model.Item.InvoiceDetail != null) ? Model.Item.InvoiceDetail.FirstOrDefault(fod=> fod.Invoice.Document.DocumentState.code != "05" && fod.isActive == true) != null : false;
+
+    //bool usedInInvoiceDetail = ViewBag.bloquearPeso == "" || ViewBag.bloquearPeso == null ? false : true;
+    bool usedInInvoiceDetail = ViewBag.bloquearPeso == null ? false : ViewBag.bloquearPeso;
+
+}
+<div style="width: 100%; overflow: auto;">
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Text = "Tipo de Peso:*";
+               settings.AssociatedControlName = "itemWeightType";
+           }).GetHtml()
+            </td>
+
+            <td>
+                @{
+                    int? id_metricUnitWeight = (Model != null && Model.id_MetricUnit != 0) ? (int?)Model.id_MetricUnit : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_MetricUnit, settings =>
+           {
+               settings.Name = "weightType";
+               settings.Properties.ClientInstanceName = "weightType";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueField = "id";
+               settings.Properties.ValueType = typeof(int);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.ShowModelErrors = true;
+               settings.ReadOnly = (usedInInvoiceDetail && usedItem);
+
+               //if (id_metricUnitWeight == null)
+               //{
+               //    settings.PreRender = (sender, e) =>
+               //    {
+               //        (sender as MVCxComboBox).SelectedIndex = null;
+               //    };
+               //}
+               settings.Properties.ClientSideEvents.Init = "WeightTypeCombo_Initi";
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "WeightTypeCombo_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Validation = "OnItemWeightTypeValidation";
+           }).BindList(DataProviderMetricUnit.WeightMetriUnit((int?)ViewData["id_company"])).Bind(id_metricUnitWeight).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Peso Bruto:*";
+                    settings.AssociatedControlName = "itemWeightGrossWeight";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.itemWeightGrossWeight, settings =>
+           {
+               settings.Name = "itemWeightGrossWeight";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+
+               settings.Properties.ClientInstanceName = "itemWeightGrossWeight";
+
+               settings.Properties.NumberType = SpinEditNumberType.Float;
+               settings.Properties.DecimalPlaces = 8;
+               settings.Properties.AllowMouseWheel = true;
+               settings.Properties.Increment = 0.1M;
+               settings.Properties.LargeIncrement = 1;
+               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+               settings.ReadOnly = (usedInInvoiceDetail && usedItem);
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnitemWeightGrossWeightValidation";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Peso Neto:*";
+                    settings.AssociatedControlName = "itemWeightNetWeight";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.itemWeightNetWeight, settings =>
+           {
+               settings.Name = "itemWeightNetWeight";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+
+               settings.Properties.ClientInstanceName = "itemWeightNetWeight";
+
+               settings.Properties.NumberType = SpinEditNumberType.Float;
+               settings.Properties.DecimalPlaces = 8;
+               settings.Properties.AllowMouseWheel = true;
+               settings.Properties.Increment = 0.1M;
+               settings.Properties.LargeIncrement = 1;
+               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+               settings.ReadOnly = (usedInInvoiceDetail && usedItem);
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnitemWeightNetWeightValidation";
+
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Conversión a Kilos:*";
+                    settings.AssociatedControlName = "conversionToKilos";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.conversionToKilos, settings =>
+           {
+               settings.Name = "conversionToKilos";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.ClientInstanceName = "conversionToKilos";
+               settings.ShowModelErrors = true;
+
+               settings.Properties.NumberType = SpinEditNumberType.Float;
+               settings.Properties.DecimalPlaces = 8;
+               settings.Properties.AllowMouseWheel = true;
+               settings.Properties.Increment = 0.1M;
+               settings.Properties.LargeIncrement = 1;
+               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+               settings.ReadOnly = (usedInInvoiceDetail && usedItem);
+
+               //settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnconversionToKilosValidation";
+               settings.Properties.ClientSideEvents.Init = "WeightTypeCombo_SelectedIndexChanged";
+
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Conversión a Libras:*";
+                    settings.AssociatedControlName = "conversionToPounds";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.conversionToPounds, settings =>
+           {
+               settings.Name = "conversionToPounds";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ClientInstanceName = "conversionToPounds";
+               settings.ShowModelErrors = true;
+
+               settings.Properties.NumberType = SpinEditNumberType.Float;
+               settings.Properties.DecimalPlaces = 8;
+               settings.Properties.AllowMouseWheel = true;
+               settings.Properties.Increment = 0.1M;
+               settings.Properties.LargeIncrement = 1;
+               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+
+
+               settings.ReadOnly = (usedInInvoiceDetail && usedItem);
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnconversionToPoundsValidation";
+               settings.Properties.ClientSideEvents.Init = "WeightTypeCombo_SelectedIndexChanged";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Peso con Glaseo:*";
+                    settings.AssociatedControlName = "weightWithGlaze";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.weightWithGlaze, settings =>
+           {
+               settings.Name = "weightWithGlaze";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ClientInstanceName = "weightWithGlaze";
+               settings.ShowModelErrors = true;
+
+               settings.Properties.NumberType = SpinEditNumberType.Float;
+               settings.Properties.DecimalPlaces = 8;
+               settings.Properties.AllowMouseWheel = true;
+               settings.Properties.Increment = 0.1M;
+               settings.Properties.LargeIncrement = 1;
+               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+               settings.ReadOnly = (usedInInvoiceDetail && usedItem);
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnweightWithGlazeValidation";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "% Glaseo:*";
+                    settings.AssociatedControlName = "glazePercentage";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.glazePercentage, settings =>
+           {
+               settings.Name = "glazePercentage";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ClientInstanceName = "glazePercentage";
+               settings.ShowModelErrors = true;
+
+               settings.Properties.NumberType = SpinEditNumberType.Float;
+               settings.Properties.DecimalPlaces = 8;
+               settings.Properties.AllowMouseWheel = true;
+               settings.Properties.Increment = 0.1M;
+               settings.Properties.LargeIncrement = 1;
+               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+               settings.ReadOnly = (usedInInvoiceDetail && usedItem);
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnglazePercentageValidation";
+
+           }).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>
+

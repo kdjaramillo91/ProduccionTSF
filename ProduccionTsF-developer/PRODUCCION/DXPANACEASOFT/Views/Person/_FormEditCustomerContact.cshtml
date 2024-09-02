@@ -1,0 +1,314 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.CustomerContact
+
+<table class="table table-condensed">
+    <tr>
+        <td width="100%" class="ps-bar-collapse" dtx="pscc-telepho" colspan="5">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Teléfonos</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="pscc-telepho">
+        <td>
+            @Html.DevExpress().LabelFor(m => m.phoneNumber, settings =>
+        {
+            settings.Name = "phoneNumberLabel";
+            settings.Text = "Telf 1*:";
+            settings.AssociatedControlName = "phoneNumber";
+        }).GetHtml()
+        </td>
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.phoneNumber, settings =>
+          {
+              settings.Name = "phoneNumber";
+              settings.Properties.ClientInstanceName = "phoneNumber1";
+              settings.Width = Unit.Percentage(100);
+              settings.Properties.MaskSettings.Mask = "(00)-000-0000";
+              settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+              settings.Properties.MaskSettings.ErrorText = "Número telefónico inválido (00)-000-0000";
+              //settings.Properties.ValidationSettings.CausesValidation = false;
+              settings.Properties.ValidationSettings.Display = Display.Dynamic;
+              settings.ShowModelErrors = true;
+              settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+              settings.CustomJSProperties = (s, e) =>
+              {
+                  
+                  e.Properties["cpTabContainer"] = "tabCustomer";
+                  e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                  e.Properties["cpInitialCondition"] = "(  )-   -";
+                  e.Properties["cpIsRequired"] = "true";
+                  e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (XX)-XXX-XXXX.";
+                  e.Properties["cpTabControl"] = "tabControl";
+              };
+          //settings.Properties.ClientSideEvents.Validation = "OnPhoneNumber1Validation";
+      }).GetHtml()
+
+        </td>
+        <td width=5%></td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.phoneCellular, settings =>
+           {
+               settings.Name = "phoneCellularLabel";
+               settings.Text = "Celular :";
+               settings.AssociatedControlName = "phoneCellular";
+           }).GetHtml()
+        </td>
+
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.phoneCellular, settings =>
+           {
+               settings.Name = "phoneCellular";
+               settings.Properties.ClientInstanceName = "phoneCellular";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.MaskSettings.Mask = "(99)-999-99999";
+               settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+               settings.Properties.MaskSettings.ErrorText = "Número telefónico inválido (09)-000-0000";
+               settings.Properties.ValidationSettings.Display = Display.Dynamic;
+               settings.ShowModelErrors = true;
+               //  settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+               //settings.CustomJSProperties = (s, e) =>
+               //{
+               //    e.Properties["cpTabContainer"] = "tabContactDataCustomer";
+               //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               //    e.Properties["cpInitialCondition"] = "(  )-   -";
+               //    e.Properties["cpIsRequired"] = "true";
+               //    e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+               //    e.Properties["cpTabControl"] = "tabControl";
+
+               //};
+           }).GetHtml()
+        </td>
+
+       
+    </tr>
+    <tr>
+        <td width="100%" class="ps-bar-collapse" dtx="pscc-email" colspan="5">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Direcciones de Correo Electrónico</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="pscc-email">
+        <td  >
+            @Html.DevExpress().LabelFor(m => m.emailGeneralBilling, settings =>
+           {
+               settings.Name = "emailGeneralBillingLabel";
+               settings.Text = "E-mail Facturación :";
+               settings.AssociatedControlName = "emailGeneralBilling";
+           }).GetHtml()
+        </td>
+
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.emailGeneralBilling, settings =>
+           {
+               settings.Name = "emailGeneralBilling";
+               settings.Properties.ClientInstanceName = "emailGeneralBilling";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+
+               settings.Properties.ValidationSettings.Display = Display.Dynamic;
+               settings.Properties.ValidationSettings.ErrorText = "Direccion de Correo inválida";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+               settings.CustomJSProperties = (s, e) =>
+               {
+                   e.Properties["cpTabContainer"] = "tabCustomer";
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   //e.Properties["cpInitialCondition"] = "";
+                   e.Properties["cpIsRequired"] = "true";
+                 //  e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+                   e.Properties["cpTabControl"] = "tabControl";
+
+               };
+           }).GetHtml()
+        </td>
+        <td width=5%></td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emailGeneralBillingBc, settings =>
+           {
+               settings.Name = "emailGeneralBillingBcLabel";
+               settings.Text = "E-mail Facturación (Bcc):";
+               settings.AssociatedControlName = "emailGeneralBillingBc";
+           }).GetHtml()
+        </td>
+
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.emailGeneralBillingBc, settings =>
+           {
+               settings.Name = "emailGeneralBillingBc";
+               settings.Properties.ClientInstanceName = "emailGeneralBillingBc";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+
+               settings.Properties.ValidationSettings.Display = Display.Dynamic;
+               settings.Properties.ValidationSettings.ErrorText = "Direccion de Correo inválida";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+               //settings.CustomJSProperties = (s, e) =>
+               //{
+               //    e.Properties["cpTabContainer"] = "tabCustomer";
+               //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               //    //e.Properties["cpInitialCondition"] = "";
+               //    e.Properties["cpIsRequired"] = "true";
+               //    //  e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+               //    e.Properties["cpTabControl"] = "tabControl";
+
+               //};
+           }).GetHtml()
+        </td>
+   
+    </tr>
+
+
+    <tr class="pscc-email">
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emailNC, settings =>
+           {
+               settings.Name = "emailNCLabel";
+               settings.Text = "E-mail NC :";
+               settings.AssociatedControlName = "emailNC";
+           }).GetHtml()
+        </td>
+
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.emailNC, settings =>
+       {
+           settings.Name = "emailNC";
+           settings.Properties.ClientInstanceName = "emailNC";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+
+           settings.Properties.ValidationSettings.Display = Display.Dynamic;
+           settings.Properties.ValidationSettings.ErrorText = "Direccion de Correo inválida";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpTabContainer"] = "tabCustomer";
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    //e.Properties["cpInitialCondition"] = "";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    //  e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+           //    e.Properties["cpTabControl"] = "tabControl";
+
+           //};
+       }).GetHtml()
+        </td>
+
+        <td width=5%></td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emailNCBc, settings =>
+           {
+               settings.Name = "emailNCBcLabel";
+               settings.Text = "E-mail NC (Bcc):";
+               settings.AssociatedControlName = "emailNCBc";
+           }).GetHtml()
+        </td>
+
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.emailNCBc, settings =>
+       {
+           settings.Name = "emailNCBc";
+           settings.Properties.ClientInstanceName = "emailNCBc";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+
+           settings.Properties.ValidationSettings.Display = Display.Dynamic;
+           settings.Properties.ValidationSettings.ErrorText = "Direccion de Correo inválida";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpTabContainer"] = "tabCustomer";
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    //e.Properties["cpInitialCondition"] = "";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    //  e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+           //    e.Properties["cpTabControl"] = "tabControl";
+
+           //};
+       }).GetHtml()
+        </td>
+    </tr>
+
+    <tr class="pscc-email">
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emailND, settings =>
+           {
+               settings.Name = "emailNDLabel";
+               settings.Text = "E-mail ND :";
+               settings.AssociatedControlName = "emailND";
+           }).GetHtml()
+        </td>
+
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.emailND, settings =>
+           {
+               settings.Name = "emailND";
+               settings.Properties.ClientInstanceName = "emailND";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+
+               settings.Properties.ValidationSettings.Display = Display.Dynamic;
+               settings.Properties.ValidationSettings.ErrorText = "Direccion de Correo inválida";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+               //settings.CustomJSProperties = (s, e) =>
+               //{
+               //    e.Properties["cpTabContainer"] = "tabCustomer";
+               //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               //    //e.Properties["cpInitialCondition"] = "";
+               //    e.Properties["cpIsRequired"] = "true";
+               //    //  e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+               //    e.Properties["cpTabControl"] = "tabControl";
+
+               //};
+           }).GetHtml()
+        </td>
+
+        <td width=5%></td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emailNDBc, settings =>
+           {
+               settings.Name = "emailNDBcLabel";
+               settings.Text = "E-mail ND (Bcc):";
+               settings.AssociatedControlName = "emailNDBc";
+           }).GetHtml()
+        </td>
+
+        <td width=25%>
+            @Html.DevExpress().TextBoxFor(m => m.emailNDBc, settings =>
+           {
+               settings.Name = "emailNDBc";
+               settings.Properties.ClientInstanceName = "emailNDBc";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+
+               settings.Properties.ValidationSettings.Display = Display.Dynamic;
+               settings.Properties.ValidationSettings.ErrorText = "Direccion de Correo inválida";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+               //settings.CustomJSProperties = (s, e) =>
+               //{
+               //    e.Properties["cpTabContainer"] = "tabCustomer";
+               //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               //    //e.Properties["cpInitialCondition"] = "";
+               //    e.Properties["cpIsRequired"] = "true";
+               //    //  e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+               //    e.Properties["cpTabControl"] = "tabControl";
+
+               //};
+           }).GetHtml()
+        </td>
+        <td width=30%></td>
+    </tr>
+
+</table>

@@ -1,0 +1,160 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    var treeList = Html.DevExpress().TreeList(settings => {
+        settings.Name = "tvMenu";
+        settings.CallbackRouteValues = new { Controller = "Menu", Action = "MenuTreeListPartial" };
+
+        settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "Menu", Action = "MenuTreeListPartialAddNew" };
+        settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "Menu", Action = "MenuTreeListPartialUpdate" };
+        settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "Menu", Action = "MenuTreeListPartialDelete" };
+        settings.SettingsEditing.NodeDragDropRouteValues = new { Controller = "Menu", Action = "MenuTreeListPartialMove" };
+
+        settings.SettingsEditing.Mode = TreeListEditMode.EditForm;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Caption = "Acciones";
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.DeleteButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.VisibleIndex = 10;
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsSelection.Enabled = true;
+
+        settings.Settings.GridLines = System.Web.UI.WebControls.GridLines.Both;
+
+        settings.KeyFieldName = "id";
+        settings.ParentFieldName = "id_parent";
+        settings.RootValue = null;
+
+        #region CLIENT SIDE EVENTES
+
+        settings.ClientSideEvents.BeginCallback = "MenuTreeView_BeginCallback";
+
+        #endregion
+
+        #region SELECTION
+
+        settings.SettingsSelection.Enabled = true;
+        settings.SettingsSelection.Recursive = true;
+        settings.SettingsSelection.AllowSelectAll = true;
+
+        #endregion
+
+        #region EDIT FORM
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_menu = (int?)DataBinder.Eval(c.DataItem, "id");
+            DXPANACEASOFT.Models.Menu menu = DataProviderMenu.Menu(id_menu);
+
+            int position = 1;
+
+            if(menu != null && menu.Menu1 != null && menu.Menu1.Count > 0)
+            {
+                position = menu.Menu1.OrderBy(m => m.position).ToList().Last().position + 1;
+            }
+            else
+            {
+                List<DXPANACEASOFT.Models.Menu> menues = DataProviderMenu.Menues();
+
+                if(menues != null && menues.Count > 0)
+                {
+                    menues = menues.Where(m => m.id_parent == null).ToList();
+
+                    position = menues.OrderBy(m => m.position).ToList().Last().position + 1;
+                }
+
+            }
+
+            menu = menu ?? new DXPANACEASOFT.Models.Menu
+            {
+                isActive = true,
+                position = position
+            };
+
+            Html.RenderPartial("_MenuEditFormPartial", menu);
+        });
+
+        #endregion
+
+        settings.Columns.Add(
+            column => {
+                column.FieldName = "title";
+                column.Name = "title";
+                column.Caption = "Título";
+            }
+        );
+        settings.Columns.Add(
+            column => {
+                column.FieldName = "id_controller";
+                column.Name = "id_controller";
+                column.Caption = "Módulo";
+
+                column.Width = Unit.Percentage(5);
+
+                column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+                column.SetDataCellTemplateContent(c =>
+                {
+                    int? id_controller = (int?)DataBinder.Eval(c.DataItem, "id_controller");
+                    TController controller = DataProviderController.Controller(id_controller);
+
+                    string text = string.Empty;
+                    if (controller != null)
+                    {
+                        text = controller.name;
+                    }
+
+                    ViewContext.Writer.Write(text);
+                });
+            }
+        );
+        settings.Columns.Add(
+            column => {
+                column.FieldName = "id_action";
+                column.Name = "id_action";
+                column.Caption = "Opción";
+
+                column.Width = Unit.Percentage(5);
+
+                column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+                column.SetDataCellTemplateContent(c =>
+                {
+                    int? id_action = (int?)DataBinder.Eval(c.DataItem, "id_action");
+                    TAction action = DataProviderAction.Action(id_action);
+
+                    string text = string.Empty;
+                    if (action != null)
+                    {
+                        text = action.name;
+                    }
+
+                    ViewContext.Writer.Write(text);
+                });
+            }
+        );
+        settings.Columns.Add(
+            column => {
+                column.FieldName = "isActive";
+                //column.Name = "isActive";
+                column.Caption = "¿Activo?";
+
+                column.Width = Unit.Percentage(5);
+
+                column.ColumnType = MVCxTreeListColumnType.CheckBox;
+            }
+        );
+
+    });
+
+    if (ViewData["EditError"] != null){
+        treeList.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@treeList.Bind(Model).GetHtml()

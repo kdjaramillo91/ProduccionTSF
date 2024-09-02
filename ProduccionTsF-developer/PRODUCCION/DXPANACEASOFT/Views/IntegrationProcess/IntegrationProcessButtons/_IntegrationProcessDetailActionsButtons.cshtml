@@ -1,0 +1,53 @@
+﻿@model DXPANACEASOFT.Models.IntegrationState
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnNewDetail";
+    //settings.Width = 90;
+    settings.Text = "";
+    //settings.RenderMode = ButtonRenderMode.Link;
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;//(Model.isReadOnly) ? false : true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    //settings.ClientSideEvents.Click = "AddNewDocument";
+    settings.ClientSideEvents.Click = "OIntegrationProcess.AddNewDocument";
+    
+    settings.ToolTip = "Agregar Documento";
+    settings.ClientVisible = (Model.code== "01" ) ;
+
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnRemoveDetail";
+    //settings.Width = 90;
+    settings.Text = "";
+    //settings.RenderMode = ButtonRenderMode.Link;
+    settings.Images.Image.IconID = IconID.ActionsRemoveitem16x16office2013;
+    settings.ClientEnabled = true; // (Model.isReadOnly) ? false : true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    //settings.ClientSideEvents.Click = "RemoveDocument";
+    settings.ClientSideEvents.Click = "OIntegrationProcess.RemoveDocument";    
+    settings.ToolTip = "Remover Documento";
+    settings.ClientVisible = (Model.code == "01");
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnRefreshDetails";
+    //settings.Width = 90;
+    settings.Text = "";
+    //settings.RenderMode = ButtonRenderMode.Link;
+    settings.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+    settings.ClientEnabled = true; // (Model.isReadOnly) ? false : true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "RefreshDetail";
+    settings.ToolTip = "Refrescar Documentos";
+    settings.ClientVisible = (Model.code == "01");
+
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />

@@ -1,0 +1,321 @@
+﻿
+@model ProductionCostCoefficientExecution
+
+@{ 
+	var bodegasTipoCalculoLibras = this.Model.ProductionCostCoefficientExecutionWarehouses
+		.GroupBy(d => new
+		{
+			d.id_warehouse,
+			d.id_poundType,
+		})
+		.Select(g => new
+		{
+			g.Key.id_warehouse,
+			name_warehouse = g.First().Warehouse.name,
+
+			g.Key.id_poundType,
+			name_poundType = g.First().ProductionCostPoundType.name,
+
+			Details = g.ToArray(),
+		})
+		.ToArray();
+
+	var tiposItem = this.Model.ProductionCostCoefficientExecutionWarehouses
+		.GroupBy(d => new
+		{
+			d.id_itemType,
+		})
+		.Select(g => new
+		{
+			g.Key.id_itemType,
+			ItemType = g.First().ItemType,
+		})
+		.ToArray();
+}
+
+<div style="padding-top: 10px"></div>
+<hr style="width: 100%;">
+
+<strong>Distribución de Costos por Coeficiente</strong>
+
+<div class="row" style="padding-top: 10px">
+	<div class="col-sm-12">
+		@Html.DevExpress().GridView(
+			grid =>
+			{
+				grid.Name = "gvCostCoefficientDistributionWarehouses";
+				grid.Width = Unit.Percentage(100);
+
+				#region GridView Behavior
+
+				grid.SettingsBehavior.AllowSort = false;
+				grid.SettingsBehavior.AllowSelectByRowClick = true;
+				grid.SettingsBehavior.AllowDragDrop = false;
+
+				grid.SettingsPager.Visible = false;
+				grid.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+				grid.SettingsSearchPanel.Visible = false;
+				grid.Settings.ShowTitlePanel = false;
+				grid.Settings.ShowGroupPanel = false;
+				grid.Settings.ShowFooter = true;
+
+				grid.Settings.ShowFilterRow = false;
+				grid.Settings.ShowFilterRowMenu = false;
+
+				grid.CommandColumn.Visible = false;
+				grid.SettingsDetail.ShowDetailRow = false;
+
+				#endregion
+
+				#region Adaptivity Settings
+
+				grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+				grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+				grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+				grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+				grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+				#endregion
+
+				grid.CustomUnboundColumnData = (s, e) =>
+				{
+					if (e.Column.FieldName.StartsWith("valor_"))
+					{
+						var idTipoItem = Int32.Parse(e.Column.FieldName.Substring("valor_".Length));
+						var detalles = (ProductionCostCoefficientExecutionWarehouse[])e.GetListSourceFieldValue("Details");
+
+						var detalle = detalles.FirstOrDefault(d => d.id_itemType == idTipoItem);
+						e.Value = (detalle != null) ? detalle.valor : 0m;
+					}
+					else if (e.Column.FieldName == "total_valor")
+					{
+						var detalles = (ProductionCostCoefficientExecutionWarehouse[])e.GetListSourceFieldValue("Details");
+						e.Value = detalles.Sum(d => d.valor);
+					}
+
+					else if (e.Column.FieldName.StartsWith("libras_"))
+					{
+						var idTipoItem = Int32.Parse(e.Column.FieldName.Substring("libras_".Length));
+						var detalles = (ProductionCostCoefficientExecutionWarehouse[])e.GetListSourceFieldValue("Details");
+
+						var detalle = detalles.FirstOrDefault(d => d.id_itemType == idTipoItem);
+						e.Value = (detalle != null) ? detalle.libras : 0m;
+					}
+					else if (e.Column.FieldName == "total_libras")
+					{
+						var detalles = (ProductionCostCoefficientExecutionWarehouse[])e.GetListSourceFieldValue("Details");
+						e.Value = detalles.Sum(d => d.libras);
+					}
+
+					else if (e.Column.FieldName.StartsWith("coeficientes_"))
+					{
+						var idTipoItem = Int32.Parse(e.Column.FieldName.Substring("coeficientes_".Length));
+						var detalles = (ProductionCostCoefficientExecutionWarehouse[])e.GetListSourceFieldValue("Details");
+
+						var detalle = detalles.FirstOrDefault(d => d.id_itemType == idTipoItem);
+						e.Value = (detalle != null) ? detalle.coeficiente : 0m;
+					}
+				};
+
+				#region Columns
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "name_warehouse";
+					column.Caption = "Bodega";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(25);
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Left;
+				});
+
+				grid.Columns.AddBand(band =>
+				{
+					band.Caption = "DÓLARES";
+					band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+					foreach(var tipoItem in tiposItem)
+					{
+						band.Columns.Add(column =>
+						{
+							column.FieldName = String.Concat("valor_", tipoItem.id_itemType);
+							column.Caption = tipoItem.ItemType.name;
+							column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+							column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+							column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+							column.PropertiesEdit.DisplayFormatString = "N2";
+							column.Width = Unit.Percentage(12);
+							column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+
+							column.FooterCellStyle.Font.Bold = true;
+							column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+						});
+					}
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "total_valor";
+					column.Caption = "TOTALES DÓLARES";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.PropertiesEdit.DisplayFormatString = "N2";
+					column.Width = Unit.Percentage(12);
+					column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "name_poundType";
+					column.Caption = "Tipo de Libras";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(25);
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Left;
+				});
+
+				grid.Columns.AddBand(band =>
+				{
+					band.Caption = "LIBRAS";
+					band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+					foreach (var tipoItem in tiposItem)
+					{
+						band.Columns.Add(column =>
+						{
+							column.FieldName = String.Concat("libras_", tipoItem.id_itemType);
+							column.Caption = tipoItem.ItemType.name;
+							column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+							column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+							column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+							column.PropertiesEdit.DisplayFormatString = "N2";
+							column.Width = Unit.Percentage(12);
+							column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+
+							column.FooterCellStyle.Font.Bold = true;
+							column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+						});
+					}
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "total_libras";
+					column.Caption = "TOTALES LIBRAS";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.PropertiesEdit.DisplayFormatString = "N2";
+					column.Width = Unit.Percentage(12);
+					column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+				});
+
+				grid.Columns.AddBand(band =>
+				{
+					band.Caption = "COEFICIENTES";
+					band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+					foreach (var tipoItem in tiposItem)
+					{
+						band.Columns.Add(column =>
+						{
+							column.FieldName = String.Concat("coeficientes_", tipoItem.id_itemType);
+							column.Caption = tipoItem.ItemType.name;
+							column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+							column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+							column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+							column.PropertiesEdit.DisplayFormatString = "N5";
+							column.Width = Unit.Percentage(12);
+							column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+						});
+					}
+				});
+
+				#endregion
+
+				#region Totals
+
+				if (this.Model.ProductionCostCoefficientExecutionPlants.Any())
+				{
+					grid.TotalSummary.Add(new ASPxSummaryItem()
+					{
+						FieldName = "name_warehouse",
+						SummaryType = DevExpress.Data.SummaryItemType.Custom,
+						ShowInColumn = "name_warehouse",
+					});
+
+					foreach (var tipoItem in tiposItem)
+					{
+						grid.TotalSummary.Add(new ASPxSummaryItem()
+						{
+							FieldName = String.Concat("valor_", tipoItem.id_itemType),
+							DisplayFormat = "N2",
+							SummaryType = DevExpress.Data.SummaryItemType.Sum,
+							ShowInColumn = String.Concat("valor_", tipoItem.id_itemType),
+						});
+
+						grid.TotalSummary.Add(new ASPxSummaryItem()
+						{
+							FieldName = String.Concat("libras_", tipoItem.id_itemType),
+							DisplayFormat = "N2",
+							SummaryType = DevExpress.Data.SummaryItemType.Sum,
+							ShowInColumn = String.Concat("libras_", tipoItem.id_itemType),
+						});
+					}
+
+
+					grid.TotalSummary.Add(new ASPxSummaryItem()
+					{
+						FieldName = "total_valor",
+						DisplayFormat = "N2",
+						SummaryType = DevExpress.Data.SummaryItemType.Sum,
+						ShowInColumn = "total_valor",
+					});
+
+					grid.TotalSummary.Add(new ASPxSummaryItem()
+					{
+						FieldName = "total_libras",
+						DisplayFormat = "N4",
+						SummaryType = DevExpress.Data.SummaryItemType.Sum,
+						ShowInColumn = "total_libras",
+					});
+
+
+					grid.CustomSummaryCalculate = (s, e) =>
+					{
+						var item = e.Item as ASPxSummaryItem;
+
+						if (item != null)
+						{
+							if (item.FieldName == "name_warehouse")
+							{
+								if (e.SummaryProcess == DevExpress.Data.CustomSummaryProcess.Finalize)
+								{
+									e.TotalValue = "TOTAL";
+									e.TotalValueReady = true;
+								}
+							}
+						}
+					};
+				}
+
+				#endregion
+
+			}).Bind(bodegasTipoCalculoLibras).GetHtml()
+	</div>
+</div>

@@ -1,0 +1,835 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using System.Drawing
+
+@model List<DXPANACEASOFT.Models.ItemIngredient>
+
+@{
+	var grid = Html.DevExpress().GridView<ItemIngredient>(settings =>
+	{
+		settings.Name = "Formulation";
+		settings.CallbackRouteValues = new { Controller = "Item", Action = "Formulation" };
+
+		settings.ClientSideEvents.BeginCallback = "Formulation_OnBeginCallback";
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Item", Action = "FormulationAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Item", Action = "FormulationUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Item", Action = "FormulationDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowNewButton = false;
+		settings.CommandColumn.ShowDeleteButton = true;
+		settings.CommandColumn.ShowEditButton = true;
+		settings.CommandColumn.ShowNewButtonInHeader = true;
+
+
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			//e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			//e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+			//List<LiquidationCartOnCartDetail> rows = (Model as List<LiquidationCartOnCartDetail>);
+			//rows = (rows != null) ? rows.ToList() : new List<LiquidationCartOnCartDetail>();
+
+			//e.Properties["cpEditingRowSalesOrderDetail"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id_SalesOrderDetail") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id_SalesOrderDetail") : 0;
+
+			//e.Properties["cpidItemLiq"] = ViewBag.idItemLiq;
+			//e.Properties["cpRowsCount"] = rows.Count;
+
+			int index = gv.EditingRowVisibleIndex >= 0 ? gv.EditingRowVisibleIndex : -1;
+			e.Properties["cpRowIndex"] = index;
+			if (gv.EditingRowVisibleIndex >= 0)
+			{
+				e.Properties["cpRowKey"] = gv.GetRowValues(index, "id") == null ? 0 : gv.GetRowValues(index, "id");
+			}
+		};
+
+		settings.InitNewRow = (s, e) =>
+		{
+			e.NewValues["id_costumerItem"] = (int?)this.ViewBag.IdCliente;
+		};
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.CommandColumn.Width = Unit.Percentage(8);
+
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(m => m.Item1.id_inventoryLine, column =>
+		{
+			//column.FieldName = "id_ingredientItem";
+			column.Caption = "Linea de Inventario";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+				Item item = DataProviderItem.Item(id_ingredientItem);
+
+				string inventoryLineIngredientItem = (item != null) ? item.InventoryLine.name : "";
+				ViewContext.Writer.Write(inventoryLineIngredientItem);
+			});
+
+			//column.SetEditItemTemplateContent(c =>
+			//{
+			//    id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+			//    Item item = DataProviderItem.Item(id_ingredientItem);
+			//    id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+
+
+
+			//    //var comboBox_inventoryLine = Html.DevExpress().ComboBox(settings2 =>
+			//    //{
+			//    //    settings2.Name = "id_inventoryLineIngredientItem";
+			//    //    settings2.Properties.ClientInstanceName = "id_inventoryLineIngredientItem";
+			//    //    settings2.Width = Unit.Percentage(100);
+
+			//    //    settings2.Properties.TextField = "name";
+			//    //    settings2.Properties.ValueField = "id";
+			//    //    settings2.Properties.ValueType = typeof(int);
+
+			//    //    settings2.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			//    //    settings2.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+			//    //    settings2.Properties.EnableSynchronization = DefaultBoolean.False;
+			//    //    settings2.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			//    //    settings2.ShowModelErrors = true;
+			//    //    settings2.Properties.ClientSideEvents.SelectedIndexChanged = "ComboInventoryLineIngredientItem_SelectedIndexChanged";
+			//    //    settings2.Properties.ClientSideEvents.Validation = "OnInventoryLineIngredientItemValidation";
+
+			//    //}).BindList(DataProviderInventoryLine.InventoryLinesByCompanyAndCurrent((int?)ViewData["id_company"], id_inventoryLineIngredientItem)).Bind(id_inventoryLineIngredientItem).GetHtml();
+
+
+			//});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				//int? id_ingredientItem = (Model != null) ? (int?)Model.id_ingredientItem : null;
+				////int? id_ingredientItem = (int?)DataBinder.Eval(p, "id_ingredientItem");
+				//Item item = DataProviderItem.Item(id_ingredientItem);
+				//int? id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+
+				p.DataSource = null;//DataProviderInventoryLine.InventoryLinesByCompanyAndCurrent((int?)ViewData["id_company"], null);//id_inventoryLineIngredientItem);
+				p.ClientInstanceName = "id_inventoryLineIngredientItem";
+				p.Width = Unit.Percentage(100);
+
+				p.TextField = "name";
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+				//p.EnableSynchronization = DefaultBoolean.False;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.CallbackRouteValues = new { Controller = "Item", Action = "LoadInventoryLineIngredientItem" };
+				p.ClientSideEvents.BeginCallback = "InventoryLineIngredientItem_BeginCallback";
+				p.ClientSideEvents.EndCallback = "InventoryLineIngredientItem_EndCallback";
+				//p.ShowModelErrors = true;
+				p.ClientSideEvents.SelectedIndexChanged = "ComboInventoryLineIngredientItem_SelectedIndexChanged";
+				p.ClientSideEvents.Validation = "OnInventoryLineIngredientItemValidation";
+				p.ClientSideEvents.Init = "OnInventoryLineIngredientItemInit";
+
+			});
+
+		});
+
+		settings.Columns.Add(m => m.Item1.id_itemType, column =>
+		{
+			//column.FieldName = "id_ingredientItem";
+			column.Caption = "Tipo de Producto";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+				Item item = DataProviderItem.Item(id_ingredientItem);
+
+				string itemTypeIngredientItem = (item != null) ? item.ItemType.name : "";
+				ViewContext.Writer.Write(itemTypeIngredientItem);
+			});
+
+			//column.SetEditItemTemplateContent(c =>
+			//{
+			//    int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+			//    Item item = DataProviderItem.Item(id_ingredientItem);
+			//    int? id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+			//    int? id_itemTypeIngredientItem = (item != null) ? (int?)item.id_itemType : null;
+
+			//    //var comboBox_id_itemType = 
+			//    Html.DevExpress().ComboBox(settings2 =>
+			//    {
+			//        settings2.Name = "id_itemTypeIngredientItem";
+			//        settings2.Properties.ClientInstanceName = "id_itemTypeIngredientItem";
+			//        settings2.Width = Unit.Percentage(100);
+
+			//        settings2.Properties.TextField = "name";
+			//        settings2.Properties.ValueField = "id";
+			//        settings2.Properties.ValueType = typeof(int);
+
+			//        settings2.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			//        settings2.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+			//        settings2.Properties.EnableSynchronization = DefaultBoolean.False;
+			//        settings2.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			//        settings2.ShowModelErrors = true;
+			//        settings2.Properties.ClientSideEvents.SelectedIndexChanged = "ComboItemTypeIngredientItem_SelectedIndexChanged";
+			//        settings2.Properties.ClientSideEvents.Validation = "OnItemTypeIngredientItemValidation";
+
+			//    }).BindList(DataProviderItemType.ItemsTypesByInventoryLineCompanyCurrent((int?)ViewData["id_company"], id_inventoryLineIngredientItem, id_itemTypeIngredientItem)).Bind(id_itemTypeIngredientItem).GetHtml();
+
+
+			//});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				//int? id_ingredientItem = (Model != null) ? (int?)Model.id_ingredientItem : null;
+				////int? id_ingredientItem = (int?)DataBinder.Eval(p, "id_ingredientItem");
+				//Item item = DataProviderItem.Item(id_ingredientItem);
+				//int? id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+
+				p.DataSource = null;// DataProviderItemType.ItemTypes((int?)ViewData["id_company"]);
+									//DataProviderItemType.ItemsTypesByInventoryLineCompanyCurrent((int?)ViewData["id_company"], null, null);//id_inventoryLineIngredientItem, id_itemTypeIngredientItem);
+				p.ClientInstanceName = "id_itemTypeIngredientItem";
+				p.Width = Unit.Percentage(100);
+
+				p.TextField = "name";
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+				//p.EnableSynchronization = DefaultBoolean.False;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.CallbackRouteValues = new { Controller = "Item", Action = "LoadItemTypeIngredientItem" };
+				p.ClientSideEvents.BeginCallback = "ItemTypeIngredientItem_BeginCallback";
+				p.ClientSideEvents.EndCallback = "ItemTypeIngredientItem_EndCallback";
+				//p.ShowModelErrors = true;
+				p.ClientSideEvents.SelectedIndexChanged = "ComboItemTypeIngredientItem_SelectedIndexChanged";
+				p.ClientSideEvents.Validation = "OnItemTypeIngredientItemValidation";
+				//p.ClientSideEvents.Init = "OnInventoryLineIngredientItemInit";
+
+
+			});
+		});
+
+		settings.Columns.Add(m => m.Item1.id_itemTypeCategory, column =>
+		{
+			//column.FieldName = "id_ingredientItem";
+			column.Caption = "Categoría";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+				Item item = DataProviderItem.Item(id_ingredientItem);
+
+				string itemTypeCategoryIngredientItem = (item != null) ? item.ItemTypeCategory.name : "";
+				ViewContext.Writer.Write(itemTypeCategoryIngredientItem);
+			});
+
+
+			//column.SetEditItemTemplateContent(c =>
+			//{
+			//    int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+			//    Item item = DataProviderItem.Item(id_ingredientItem);
+			//    int? id_itemTypeIngredientItem = (item != null) ? (int?)item.id_itemType : null;
+			//    int? id_itemTypeCategoryIngredientItem = (item != null) ? (int?)item.id_itemTypeCategory : null;
+
+			//    //var comboBox_id_itemTypeCategory = 
+			//    Html.DevExpress().ComboBox(settings2 =>
+			//    {
+			//        settings2.Name = "id_itemTypeCategoryIngredientItem";
+			//        settings2.Properties.ClientInstanceName = "id_itemTypeCategoryIngredientItem";
+			//        settings2.Width = Unit.Percentage(100);
+
+			//        settings2.Properties.TextField = "name";
+			//        settings2.Properties.ValueField = "id";
+			//        settings2.Properties.ValueType = typeof(int);
+
+			//        settings2.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			//        settings2.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+			//        settings2.Properties.EnableSynchronization = DefaultBoolean.False;
+			//        settings2.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			//        settings2.ShowModelErrors = true;
+			//        settings2.Properties.ClientSideEvents.SelectedIndexChanged = "ComboItemTypeCategoryIngredientItem_SelectedIndexChanged";
+			//        settings2.Properties.ClientSideEvents.Validation = "OnItemTypeCategoryIngredientItemValidation";
+
+			//    }).BindList(DataProviderItemTypeCategory.ItemsTypesCategoriesByItemType(id_itemTypeIngredientItem)).Bind(id_itemTypeCategoryIngredientItem).GetHtml();
+
+
+			//});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				//int? id_ingredientItem = (Model != null) ? (int?)Model.id_ingredientItem : null;
+				////int? id_ingredientItem = (int?)DataBinder.Eval(p, "id_ingredientItem");
+				//Item item = DataProviderItem.Item(id_ingredientItem);
+				//int? id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+
+				p.DataSource = null;// DataProviderItemTypeCategory.ItemsTypesCategories((int?)ViewData["id_company"]);
+									//DataProviderItemTypeCategory.ItemsTypesCategoriesByItemType(null);//id_itemTypeIngredientItem);
+				p.ClientInstanceName = "id_itemTypeCategoryIngredientItem";
+				p.Width = Unit.Percentage(100);
+
+				p.TextField = "name";
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+				//p.EnableSynchronization = DefaultBoolean.False;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.CallbackRouteValues = new { Controller = "Item", Action = "LoadItemTypeCategoryIngredientItem" };
+				p.ClientSideEvents.BeginCallback = "ItemTypeCategoryIngredientItem_BeginCallback";
+				p.ClientSideEvents.EndCallback = "ItemTypeCategoryIngredientItem_EndCallback";
+				//p.ShowModelErrors = true;
+				p.ClientSideEvents.SelectedIndexChanged = "ComboItemTypeCategoryIngredientItem_SelectedIndexChanged";
+				p.ClientSideEvents.Validation = "OnItemTypeCategoryIngredientItemValidation";
+				//p.ClientSideEvents.Init = "OnInventoryLineIngredientItemInit";
+
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_ingredientItem";
+			column.Caption = "Ingrediente";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			//column.EditorProperties().ComboBox(p =>
+			//{
+			//    p.DataSource = DataProviderItem.Items();
+			//    p.TextField = "name";
+			//    p.ValueField = "id";
+			//    p.ValueType = typeof(int);
+
+			//    p.Width = Unit.Percentage(100);
+			//});
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+				Item item = DataProviderItem.Item(id_ingredientItem);
+
+				string itemIngredientItem = (item != null) ? item.name : "";
+				ViewContext.Writer.Write(itemIngredientItem);
+			});
+
+			//column.SetEditItemTemplateContent(c =>
+			//{
+			//    int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+			//    Item item = DataProviderItem.Item(id_ingredientItem);
+			//    int? id_itemTypeIngredientItem = (item != null) ? (int?)item.id_itemType : null;
+			//    int? id_itemTypeCategoryIngredientItem = (item != null) ? (int?)item.id_itemTypeCategory : null;
+
+
+			//    //var comboBox_item = 
+			//    Html.DevExpress().ComboBox(settings2 =>
+			//    {
+			//        settings2.Name = "id_ingredientItem";
+			//        settings2.Properties.ClientInstanceName = "id_ingredientItem";
+			//        settings2.Width = Unit.Percentage(100);
+
+			//        settings2.Properties.TextField = "name";
+			//        settings2.Properties.ValueField = "id";
+			//        settings2.Properties.ValueType = typeof(int);
+
+			//        settings2.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			//        settings2.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+			//        settings2.Properties.EnableSynchronization = DefaultBoolean.False;
+			//        settings2.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			//        settings2.ShowModelErrors = true;
+			//        settings2.Properties.ClientSideEvents.SelectedIndexChanged = "ComboItemIngredientItem_SelectedIndexChanged";
+			//        settings2.Properties.ClientSideEvents.Validation = "OnItemIngredientItemValidation";
+			//        settings2.Properties.ClientSideEvents.Init = "OnItemIngredientItemInit";
+
+			//    }).BindList(DataProviderItem.ItemsByItemTypeItemTypeCategoryAndCurrent(id_itemTypeIngredientItem, id_itemTypeCategoryIngredientItem, id_ingredientItem)).Bind(id_ingredientItem).GetHtml();
+
+
+
+			//column.EditorProperties().ComboBox(p =>
+			//{
+			//    p.ClientInstanceName = "id_item";
+			//    p.DataSource = DataProviderItem.PurchaseItemsByCompany((int?)ViewData["id_company"]);
+			//    p.TextFormatString = "{1}";
+			//    p.ValueField = "id";
+			//    //p.TextField = "name";
+			//    p.Width = Unit.Percentage(120);
+			//    p.ValueType = typeof(int);
+			//    p.DropDownStyle = DropDownStyle.DropDownList;
+			//    p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			//    p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			//    p.Columns.Add("masterCode", "Código", 70);//, Unit.Percentage(50));
+			//    p.Columns.Add("name", "Nombre del Producto", 200);//, Unit.Percentage(70));
+			//    //p.Columns.Add("barCode", "EAN", Unit.Percentage(50));
+			//    p.Columns.Add("ItemPurchaseInformation.MetricUnit.code", "UM", 50);//, Unit.Percentage(20));
+			//    //p.ClientSideEvents.DropDown = "ItemDetailCombo_DropDown";
+			//    p.ClientSideEvents.SelectedIndexChanged = "ItemDetailCombo_SelectedIndexChanged";
+			//    p.ClientSideEvents.Init = "ComboItem_Init";
+			//    p.ClientSideEvents.Validation = "OnItemDetailValidation";
+			//});
+
+			//});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				//int? id_ingredientItem = (Model != null) ? (int?)Model.id_ingredientItem : null;
+				////int? id_ingredientItem = (int?)DataBinder.Eval(p, "id_ingredientItem");
+				//Item item = DataProviderItem.Item(id_ingredientItem);
+				//int? id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+
+				p.DataSource = null;// DataProviderItem.AllItemsByCompany((int?)ViewData["id_company"]);
+									//DataProviderItem.ItemsByItemTypeItemTypeCategoryAndCurrent(null, null, null);//id_itemTypeIngredientItem, id_itemTypeCategoryIngredientItem, id_ingredientItem);
+				p.ClientInstanceName = "id_ingredientItem";
+				p.Width = Unit.Percentage(100);
+
+				//p.TextField = "name";
+				p.ValueField = "id";
+				p.TextFormatString = "{0} | {1} | {2}";
+				p.ValueType = typeof(int);
+				p.CallbackPageSize = 20;
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.Columns.Add("masterCode", "Código", 25);//, Unit.Percentage(50));
+				p.Columns.Add("auxCode", "Código Aux.", 35);
+				p.Columns.Add("name", "Ingrediente", 70);//, Unit.Percentage(70));
+
+				//p.EnableSynchronization = DefaultBoolean.False;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.CallbackRouteValues = new { Controller = "Item", Action = "LoadIngredientItem" };
+				p.ClientSideEvents.BeginCallback = "IngredientItem_BeginCallback";
+				p.ClientSideEvents.EndCallback = "IngredientItem_EndCallback";
+				//p.ShowModelErrors = true;
+				p.ClientSideEvents.SelectedIndexChanged = "ComboItemIngredientItem_SelectedIndexChanged";
+				p.ClientSideEvents.Validation = "OnItemIngredientItemValidation";
+				p.ClientSideEvents.Init = "OnItemIngredientItemInit";
+
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+
+			column.Name = "masterCode";
+			column.Caption = "Código";
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.PropertiesEdit.ClientInstanceName = "masterCode";
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int id_item = (int)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+				Item item = DataProviderItem.Item(id_item);
+				if (item != null) ViewContext.Writer.Write(item.masterCode);
+			});
+
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "masterCode";
+				//p.ClientSideEvents.Init = "Item_masterCode_Init";
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+
+			column.Name = "auxCode";
+			column.Caption = "Código Auxiliar";
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.PropertiesEdit.ClientInstanceName = "auxCode";
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int id_item = (int)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+				Item item = DataProviderItem.Item(id_item);
+				if (item != null) ViewContext.Writer.Write(item.auxCode);
+			});
+
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "auxCode";
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "amount";
+			column.Caption = "Cantidad";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			//column.Width = Unit.Percentage(20);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? amount = (decimal?)DataBinder.Eval(c.DataItem, "amount");
+				ViewContext.Writer.Write(amount != null ? amount.Value.ToString("N5") : "");
+			});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.ClientInstanceName = "amountIngredientItem";
+				p.DisplayFormatString = "N5";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 5;
+				p.Increment = 0.1M;
+				p.LargeIncrement = 1.0M;
+				p.SpinButtons.ShowLargeIncrementButtons = true;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Number;
+				p.ClientSideEvents.ValueChanged = "AmountIngredientItem_ValueChanged";
+				p.ClientSideEvents.Validation = "OnAmountIngredientItemValidation";
+			});
+
+			//column.EditorProperties().SpinEdit(p =>
+			//{
+			//    p.Width = Unit.Percentage(127);
+			//    p.ClientInstanceName = "quantityRemitted";
+			//    p.DisplayFormatString = "N2";
+			//    p.DisplayFormatInEditMode = true;
+			//    p.DecimalPlaces = 2;
+			//    //p.SpinButtons.ShowIncrementButtons = true;
+			//    //p.SpinButtons.ShowLargeIncrementButtons = true;
+			//    //p.Increment = 0.01M;
+			//    //p.LargeIncrement = 1.0M;
+			//    p.MinValue = 0;
+			//    //p.MaxValue = 100;
+			//    p.NumberType = SpinEditNumberType.Float;
+			//    p.NumberFormat = SpinEditNumberFormat.Custom;
+			//    //p.NumberFormat = SpinEditNumberFormat.Number;
+
+			//    //p.ClientSideEvents.NumberChanged = "QuantityRemitted_NumberChange";
+			//    p.ClientSideEvents.Validation = "OnQuantityRemittedValidation";
+			//});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_metricUnit";
+			column.Caption = "UM";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			//column.Width = Unit.Percentage(3);
+
+			//column.EditorProperties().ComboBox(p =>
+			//{
+			//    p.DataSource = DataProviderMetricUnit.MetricUnits((int)ViewData["id_company"]);
+			//    p.TextField = "code";
+			//    p.ValueField = "id";
+			//    p.ValueType = typeof(int);
+
+			//    p.Width = Unit.Percentage(100);
+			//});
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_metricUnit = (int?)DataBinder.Eval(c.DataItem, "id_metricUnit");
+				MetricUnit metricUnit = DataProviderMetricUnit.MetricUnitById(id_metricUnit);
+
+				string metricUnitIngredientItem = (metricUnit != null) ? metricUnit.code : "";
+				ViewContext.Writer.Write(metricUnitIngredientItem);
+			});
+
+			//column.SetEditItemTemplateContent(c =>
+			//{
+			//    int? id_metricUnitIngredientItem = (int?)DataBinder.Eval(c.DataItem, "id_metricUnit");
+			//    int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+			//    Item item = DataProviderItem.Item(id_ingredientItem);
+			//    int? id_metricTypeIngredientItem = (item != null) ? (int?)item.id_metricType : null;
+
+
+			//    //var comboBox_metricUnit = 
+			//    Html.DevExpress().ComboBox(settings2 =>
+			//    {
+			//        settings2.Name = "id_metricUnitIngredientItem";
+			//        settings2.Properties.ClientInstanceName = "id_metricUnitIngredientItem";
+			//        settings2.Width = Unit.Percentage(100);
+
+			//        settings2.Properties.TextField = "code";
+			//        settings2.Properties.ValueField = "id";
+			//        settings2.Properties.ValueType = typeof(int);
+
+			//        settings2.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			//        settings2.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+			//        settings2.Properties.EnableSynchronization = DefaultBoolean.False;
+			//        settings2.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			//        settings2.ShowModelErrors = true;
+			//        settings2.Properties.ClientSideEvents.SelectedIndexChanged = "ComboMetricUnitIngredientItem_SelectedIndexChanged";
+			//        settings2.Properties.ClientSideEvents.Validation = "OnMetricUnitIngredientItemValidation";
+
+			//    }).BindList(DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], id_metricTypeIngredientItem, id_metricUnitIngredientItem)).Bind(id_metricUnitIngredientItem).GetHtml();
+
+
+			//});
+			column.EditorProperties().ComboBox(p =>
+			{
+				//int? id_ingredientItem = (Model != null) ? (int?)Model.id_ingredientItem : null;
+				////int? id_ingredientItem = (int?)DataBinder.Eval(p, "id_ingredientItem");
+				//Item item = DataProviderItem.Item(id_ingredientItem);
+				//int? id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+
+				p.DataSource = null;// DataProviderMetricUnit.MetricUnits((int?)ViewData["id_company"]);
+									//DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], null, null);//id_metricTypeIngredientItem, id_metricUnitIngredientItem);
+				p.ClientInstanceName = "id_metricUnitIngredientItem";
+				p.Width = Unit.Percentage(100);
+
+				p.TextField = "code";
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.CallbackRouteValues = new { Controller = "Item", Action = "LoadMetricUnitIngredientItem" };
+				p.ClientSideEvents.BeginCallback = "MetricUnitIngredientItem_BeginCallback";
+				p.ClientSideEvents.EndCallback = "MetricUnitIngredientItem_EndCallback";
+				//p.EnableSynchronization = DefaultBoolean.False;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				//p.ShowModelErrors = true;
+				p.ClientSideEvents.SelectedIndexChanged = "ComboMetricUnitIngredientItem_SelectedIndexChanged";
+				p.ClientSideEvents.Validation = "OnMetricUnitIngredientItemValidation";
+				//p.ClientSideEvents.Init = "OnInventoryLineIngredientItemInit";
+
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "amountMax";
+			column.Caption = "Cantidad(Max)";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			//column.Width = Unit.Percentage(20);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? amountMax = (decimal?)DataBinder.Eval(c.DataItem, "amountMax");
+				ViewContext.Writer.Write(amountMax != null ? amountMax.Value.ToString("N5") : "");
+			});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.ClientInstanceName = "amountMaxIngredientItem";
+				p.DisplayFormatString = "N5";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 5;
+				p.Increment = 0.1M;
+				p.LargeIncrement = 1.0M;
+				p.SpinButtons.ShowLargeIncrementButtons = true;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Number;
+				p.ClientSideEvents.ValueChanged = "AmountMaxIngredientItem_ValueChanged";
+				p.ClientSideEvents.Validation = "OnAmountMaxIngredientItemValidation";
+			});
+
+			//column.EditorProperties().SpinEdit(p =>
+			//{
+			//    p.Width = Unit.Percentage(127);
+			//    p.ClientInstanceName = "quantityRemitted";
+			//    p.DisplayFormatString = "N2";
+			//    p.DisplayFormatInEditMode = true;
+			//    p.DecimalPlaces = 2;
+			//    //p.SpinButtons.ShowIncrementButtons = true;
+			//    //p.SpinButtons.ShowLargeIncrementButtons = true;
+			//    //p.Increment = 0.01M;
+			//    //p.LargeIncrement = 1.0M;
+			//    p.MinValue = 0;
+			//    //p.MaxValue = 100;
+			//    p.NumberType = SpinEditNumberType.Float;
+			//    p.NumberFormat = SpinEditNumberFormat.Custom;
+			//    //p.NumberFormat = SpinEditNumberFormat.Number;
+
+			//    //p.ClientSideEvents.NumberChanged = "QuantityRemitted_NumberChange";
+			//    p.ClientSideEvents.Validation = "OnQuantityRemittedValidation";
+			//});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_metricUnitMax";
+			column.Caption = "UM(Max)";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			//column.Width = Unit.Percentage(3);
+
+			//column.EditorProperties().ComboBox(p =>
+			//{
+			//    p.DataSource = DataProviderMetricUnit.MetricUnits((int)ViewData["id_company"]);
+			//    p.TextField = "code";
+			//    p.ValueField = "id";
+			//    p.ValueType = typeof(int);
+
+			//    p.Width = Unit.Percentage(100);
+			//});
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_metricUnitMax = (int?)DataBinder.Eval(c.DataItem, "id_metricUnitMax");
+				MetricUnit metricUnitMax = DataProviderMetricUnit.MetricUnitById(id_metricUnitMax);
+
+				string metricUnitMaxIngredientItem = (metricUnitMax != null) ? metricUnitMax.code : "";
+				ViewContext.Writer.Write(metricUnitMaxIngredientItem);
+			});
+
+			//column.SetEditItemTemplateContent(c =>
+			//{
+			//    int? id_metricUnitMaxIngredientItem = (int?)DataBinder.Eval(c.DataItem, "id_metricUnitMax");
+			//    int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_ingredientItem");
+			//    Item item = DataProviderItem.Item(id_ingredientItem);
+			//    int? id_metricTypeIngredientItem = (item != null) ? (int?)item.id_metricType : null;
+
+
+			//    //var comboBox_metricUnitMax = 
+			//    Html.DevExpress().ComboBox(settings2 =>
+			//    {
+			//        settings2.Name = "id_metricUnitMaxIngredientItem";
+			//        settings2.Properties.ClientInstanceName = "id_metricUnitMaxIngredientItem";
+			//        settings2.Width = Unit.Percentage(100);
+
+			//        settings2.Properties.TextField = "code";
+			//        settings2.Properties.ValueField = "id";
+			//        settings2.Properties.ValueType = typeof(int);
+
+			//        settings2.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			//        settings2.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+			//        settings2.Properties.EnableSynchronization = DefaultBoolean.False;
+			//        settings2.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			//        settings2.ShowModelErrors = true;
+			//        settings2.Properties.ClientSideEvents.SelectedIndexChanged = "ComboMetricUnitMaxIngredientItem_SelectedIndexChanged";
+			//        settings2.Properties.ClientSideEvents.Validation = "OnMetricUnitMaxIngredientItemValidation";
+
+
+			//    }).BindList(DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], id_metricTypeIngredientItem, id_metricUnitMaxIngredientItem)).Bind(id_metricUnitMaxIngredientItem).GetHtml();
+
+
+			//});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				//int? id_ingredientItem = (Model != null) ? (int?)Model.id_ingredientItem : null;
+				////int? id_ingredientItem = (int?)DataBinder.Eval(p, "id_ingredientItem");
+				//Item item = DataProviderItem.Item(id_ingredientItem);
+				//int? id_inventoryLineIngredientItem = (item != null) ? (int?)item.id_inventoryLine : null;
+
+				p.DataSource = null;// DataProviderMetricUnit.MetricUnits((int?)ViewData["id_company"]);
+									//DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], null, null);//id_metricTypeIngredientItem, id_metricUnitMaxIngredientItem);
+				p.ClientInstanceName = "id_metricUnitMaxIngredientItem";
+				p.Width = Unit.Percentage(100);
+
+				p.TextField = "code";
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.CallbackRouteValues = new { Controller = "Item", Action = "LoadMetricUnitMaxIngredientItem" };
+				p.ClientSideEvents.BeginCallback = "MetricUnitMaxIngredientItem_BeginCallback";
+				p.ClientSideEvents.EndCallback = "MetricUnitMaxIngredientItem_EndCallback";
+				//p.EnableSynchronization = DefaultBoolean.False;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				//p.ShowModelErrors = true;
+				p.ClientSideEvents.SelectedIndexChanged = "ComboMetricUnitMaxIngredientItem_SelectedIndexChanged";
+				p.ClientSideEvents.Validation = "OnMetricUnitMaxIngredientItemValidation";
+				//p.ClientSideEvents.Init = "OnInventoryLineIngredientItemInit";
+
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_costumerItem";
+			column.Caption = "Cliente";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_costumerItem = (int?)DataBinder.Eval(c.DataItem, "id_costumerItem");
+				Person costumerItem = DataProviderPerson.PersonById(id_costumerItem);
+
+				string costumerItemIngredientItem = (costumerItem != null) ? costumerItem.fullname_businessName : "SIN CLIENTE";
+				ViewContext.Writer.Write(costumerItemIngredientItem);
+			});
+
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "id_costumerItem";
+				p.DataSource = DataProviderPerson.CustomerByCompanyWithForeignCustomer((int?)ViewData["id_company"]);
+				//p.DataSource = DataProviderPerson.CustomersExteriorAndAllPersonsLocalByCompany((int?)ViewData["id_company"]);
+				p.ValueField = "id";
+				p.TextField = "name";
+				p.Width = Unit.Percentage(100);
+				p.ValueType = typeof(int);
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.ValidationSettings.RequiredField.IsRequired = true;
+				//p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				//p.ClientSideEvents.SelectedIndexChanged = "ComboWarehouseProductionLotLiquidationDetail_SelectedIndexChanged";
+				//p.ClientSideEvents.Validation = "OnClientLiquidationCartOnCartDetailValidation";
+			});
+
+		});
+
+	});
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@grid.Bind(Model).GetHtml()
+
+

@@ -1,0 +1,51 @@
+﻿
+@model List<DXPANACEASOFT.Models.DTOModel.QualityControlPendingNewDTO>
+@{
+	string analisislot = DataProviderSetting.ValueSetting("ANALXLOT");
+	decimal cantidadLibras = 0;
+
+	if (!(string.IsNullOrEmpty(analisislot) || string.IsNullOrWhiteSpace(analisislot)))
+	{
+		var tmpCantidad = DataProviderSetting.ValueSettingDetailByCodes("ANALXLOT", "CANTLIB");
+		decimal.TryParse(tmpCantidad, out cantidadLibras);
+	}
+
+}
+
+@Html.Hidden("PARAMANALXLOT", analisislot)
+@Html.Hidden("PARAMCANTLIB", cantidadLibras)
+
+<div id="GridMessageErrorPurchaseRequest" style="display: none;">
+	@Html.DevExpress().Label(settings =>
+	   {
+		   settings.Name = "gridMessageErrorProductionLotDetail";
+		   settings.Properties.ClientInstanceName = "gridMessageErrorProductionLotDetail";
+		   settings.Text = "";
+	   }).GetHtml()
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnInsertQualityRMP";
+	settings.Text = "Ingresar Calidad";
+	settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+	settings.ClientEnabled = true;
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	if (analisislot == "SELGUIA")
+	{
+		settings.ClientSideEvents.Click = "InsertQualityRMPAnalPorLoteMultiplesGuias";
+	}
+	else
+	{
+		settings.ClientSideEvents.Click = "InsertQualityRMP";
+	}
+
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+	Html.RenderPartial("RMP/_ProductionLotDetailsPartial", Model);
+}
+

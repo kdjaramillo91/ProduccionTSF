@@ -1,0 +1,430 @@
+﻿@model DXPANACEASOFT.Models.Invoice
+
+<table class="table table-condensed" style="margin: 0px;">
+	<tr>
+		<td style="width: 33%; padding: 5px;">
+			<table class="table table-condensed" style="width: 100%;">
+				<tr class="ps-header">
+					<td colspan="2">
+						<span class="dxflGroupBoxCaption_Metropolis">Agentes Comerciales</span>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 30%;">
+						@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Name = "lblVendedor";
+					   settings.Text = "Vendedor:";
+				   }).GetHtml()
+					</td>
+					<td style="width: 70%;">
+						@{
+							int? _id_vendorAssigned = null;
+							int? _idVendor = null;
+							if (Model.Person != null && Model.Person.Customer != null)
+							{
+								_id_vendorAssigned = Model.Person.Customer.id_vendorAssigned;
+							}
+							if (Model.InvoiceExterior != null && Model.InvoiceExterior.idVendor != null)
+							{
+								_idVendor = Model.InvoiceExterior.idVendor;
+							}
+							string codeState = (Model != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+
+						}
+						@{
+							var idVendor = _id_vendorAssigned;
+							//var idVendor = _idVendor ?? _id_vendorAssigned;
+							if (_idVendor != null)
+							{
+								@Html.Hidden("idVendor", _idVendor)
+								@*@Html.Hidden("idVendor", _id_vendorAssigned)*@
+								var aFullNamePersonP = DataProviderPerson.GetOnePersonBasicModelInformation(_idVendor.Value).fullNamePersonP;
+								@Html.DevExpress().TextBox(settings =>
+							   {
+								   settings.Name = "boxVendedor";
+								   settings.Width = Unit.Percentage(100);
+								   settings.Properties.NullText = "-No Asignado-";
+								   settings.ReadOnly = true;
+								   if (idVendor != null)
+								   {
+									   settings.Text = aFullNamePersonP;
+								   }
+							   }).Bind(aFullNamePersonP).GetHtml()
+							}
+							else
+							{
+								@Html.DevExpress().ComboBox(settings =>
+								   {
+									   settings.Name = "idVendor";
+									   settings.Properties.ClientInstanceName = "idVendor";
+									   settings.Properties.ValueField = "id";
+									   settings.Properties.TextFormatString = "{1}";
+									   settings.Properties.ValueType = typeof(int);
+									   settings.Width = Unit.Percentage(100);
+									   settings.ReadOnly = codeState != "01";
+									   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+									   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+									   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+									   settings.Properties.Columns.Add("identification_number", "Doc. Identidad", 70);
+									   settings.Properties.Columns.Add("fullname_businessName", "Vendedor", 120);
+								   }).BindList(DataProviderVendor.VendorList()).Bind(idVendor).GetHtml()
+							}
+
+						}
+
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 30%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblComisionista";
+							settings.Text = "Comisionista:";
+						}).GetHtml()
+					</td>
+					<td style="width: 70%;">
+						@Html.DevExpress().CheckBoxFor(m => m.InvoiceExterior.commissionAgent, settings =>
+						{
+						   settings.Name = "commissionAgent";
+						   settings.Text = "Aplicar...?";
+						   settings.Properties.ClientSideEvents.Init = "OnInitComisionAgent";
+						   settings.Properties.ClientSideEvents.CheckedChanged = "OnChangeComisionAgent";
+						}).GetHtml()
+						@{
+
+							int? _id_commissionAgent = null;
+							int? _invoiceExteriorCommissionAgent = null;
+							if (Model.Person != null && Model.Person.Customer != null)
+							{
+								_id_commissionAgent = Model.Person.Customer.id_commissionAgent;
+							}
+							if (Model.InvoiceExterior != null)
+							{
+								_invoiceExteriorCommissionAgent = Model.InvoiceExterior.id_commissionAgent;
+							}
+
+						}
+						@Html.Hidden("id_commissionAgent", _id_commissionAgent)
+						@{
+							var idCommissionAgent = _invoiceExteriorCommissionAgent ?? _id_commissionAgent;
+
+							@Html.DevExpress().TextBox(settings =>
+							{
+								settings.Name = "namecommissionAgent";
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.NullText = "-No Asignado-";
+								settings.ReadOnly = true;
+								if (idCommissionAgent != null)
+								{
+									settings.Text = DataProviderPerson.GetOnePersonBasicModelInformation(idCommissionAgent.Value).fullNamePersonP;
+								}
+							}).GetHtml()
+						}
+
+					</td>
+				</tr>
+				<tr>
+					<td>
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "paidLbl";
+							settings.Text = "¿Pagado?";
+							settings.ClientVisible = IsEnabled("VerPagoFactura");
+						}).GetHtml()
+					</td>
+					<td>
+						@Html.DevExpress().CheckBoxFor(m => m.InvoiceExterior.paid, settings =>
+						{
+							settings.Name = "paid";
+							settings.Properties.ClientInstanceName = "paid";
+							settings.ShowModelErrors = true;
+							settings.ClientVisible = IsEnabled("VerPagoFactura");
+						}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td style="width: 33%; padding: 5px;">
+			<table class="table table-condensed" style="width: 100%;">
+				<tr class="ps-header">
+					<td colspan="2">
+						<span class="dxflGroupBoxCaption_Metropolis">Cobranzas</span>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblValorTotal";
+							settings.Text = "Valor Total:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().SpinEditFor(m => m.valuetotalCIFTruncate, settings =>
+						{
+							settings.Name = "valueTotal";
+							settings.Width = Unit.Percentage(100);
+							settings.ReadOnly = true;
+							settings.Properties.DisplayFormatString = "C";
+							settings.Number = 0.00M;
+						}).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblValorAbonado";
+							settings.Text = "Valor Abonado:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@{
+							decimal? valueSubscribed = (Model != null && Model.InvoiceExterior != null && Model.InvoiceExterior.valueSubscribed != null && Model.InvoiceExterior.valueSubscribed != 0) ? (decimal?)Model.InvoiceExterior.valueSubscribed : 0.00M;
+						}
+						@Html.DevExpress().SpinEdit(settings =>
+				   {
+					   settings.Name = "valueSubscribed";
+					   settings.Width = Unit.Percentage(100);
+					   settings.ReadOnly = false;
+					   settings.Properties.DisplayFormatString = "C";
+					   //settings.Number = Model.InvoiceExterior.valueSubscribed ?? 0;
+					   settings.Properties.ClientSideEvents.ValueChanged = "OnValueSubscribed_Changed";
+					   settings.Properties.ClientSideEvents.Validation = "OnValueSubscribed_Validate";
+					   settings.ShowModelErrors = true;
+				   }).Bind(valueSubscribed).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblSaldo";
+							settings.Text = "Saldo:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().SpinEdit(settings =>
+						{
+							settings.Name = "balance";
+							settings.Width = Unit.Percentage(100);
+							settings.ReadOnly = true;
+							settings.Properties.DisplayFormatString = "C";
+							settings.Number = Model.InvoiceExterior.balance ?? (Model.InvoiceExterior.valuetotalCIF - (Model.InvoiceExterior.valueSubscribed ?? 0));
+						}).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblPagoFinal";
+							settings.Text = "Pago Final:";
+							settings.ClientVisible = IsEnabled("VerPagoFactura");
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@{
+							decimal? finalPayment = (Model != null && Model.InvoiceExterior != null && Model.InvoiceExterior.finalPayment != null && Model.InvoiceExterior.finalPayment != 0) ? (decimal?)Model.InvoiceExterior.finalPayment : 0.00M;
+						}
+						@Html.DevExpress().SpinEdit(settings =>
+				   {
+					   settings.Name = "finalPayment";
+					   settings.Width = Unit.Percentage(100);
+					   settings.ReadOnly = false;
+					   settings.Properties.DisplayFormatString = "C";
+					   settings.ClientVisible = IsEnabled("VerPagoFactura");
+					   settings.Properties.ClientSideEvents.ValueChanged = "OnFinalPayment_Changed";
+					   settings.Properties.ClientSideEvents.Validation = "OnFinalPayment_Validate";
+					   settings.ShowModelErrors = true;
+				   }).Bind(finalPayment).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblFechaActualizacion";
+							settings.Text = "Fecha de Actualización:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().DateEditFor(m => m.InvoiceExterior.updateDate, settings =>
+						{
+							settings.Name = "updateDate";
+							settings.Width = Unit.Percentage(100);
+							settings.ReadOnly = true;
+						}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td style="width: 33%; padding: 5px;">
+			<table class="table table-condensed" style="width: 100%;">
+				<tr class="ps-header">
+					<td colspan="2">
+						<span class="dxflGroupBoxCaption_Metropolis">Financiamiento</span>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblNoTramite";
+							settings.Text = "No. Trámite/Operación:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().SpinEditFor(m => m.InvoiceExterior.operation, settings =>
+						{
+							settings.Name = "operation";
+							settings.Width = Unit.Percentage(100);
+							settings.Properties.MinValue = 10000000;
+							settings.Properties.MaxValue = 99999999;
+							settings.Properties.MaxLength = 8;
+							settings.Properties.NullText = "00000000";
+						}).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblCategoria";
+							settings.Text = "Categoría:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_fincncyCategory, settings =>
+						{
+							settings.Name = "id_fincncyCategory";
+							settings.Width = Unit.Percentage(100);
+							settings.Properties.NullDisplayText = "Seleccione...";
+							settings.Properties.NullText = "Seleccione...";
+							settings.Properties.ValueField = "id";
+							settings.Properties.TextField = "name";
+							settings.Properties.ValueType = typeof(int);
+							settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+							settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+							settings.Properties.EnableSynchronization = DefaultBoolean.False;
+							settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+						}).BindList(DataProviderFinancyCategory.GetAllActive()).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblValorFinanciado";
+							settings.Text = "Valor Financiado:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().SpinEditFor(m => m.InvoiceExterior.valueFinanced, settings =>
+						{
+							settings.Name = "valueFinanced";
+							settings.Width = Unit.Percentage(100);
+							settings.Properties.DisplayFormatString = "C";
+							settings.Number = 0.00M;
+							settings.Properties.MaxValue = Model.valuetotalCIFTruncate;
+						}).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblFechaVencFactura";
+							settings.Text = "Fecha Vencimiento Factura:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().DateEditFor(m => m.InvoiceExterior.expirationDate, settings =>
+						{
+							settings.Name = "expirationDate";
+							settings.Width = Unit.Percentage(100);
+							settings.Date = DateTime.Now;
+							settings.Properties.NullText = "dd/MM/yyyy";
+							settings.Properties.EditFormat = EditFormat.Custom;
+							settings.Properties.EditFormatString = "dd/MM/yyyy";
+							//settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//new DateTime(Model.Document.emissionDate.Year, Model.Document.emissionDate.Month, Model.Document.emissionDate.Day);
+							settings.Properties.ClientSideEvents.DateChanged = "OnChangedExpirationDate";
+						}).GetHtml()
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 50%;">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Name = "lblFechaConcVenc";
+							settings.Text = "Fecha Concesión Vencimiento:";
+						}).GetHtml()
+					</td>
+					<td style="width: 50%;">
+						@Html.DevExpress().DateEditFor(m => m.InvoiceExterior.concessionDate, settings =>
+						{
+							settings.Name = "concessionDate";
+							settings.Width = Unit.Percentage(100);
+							settings.Date = DateTime.Now;
+							settings.Properties.NullText = "dd/MM/yyyy";
+							settings.Properties.EditFormat = EditFormat.Custom;
+							settings.Properties.EditFormatString = "dd/MM/yyyy";
+							//settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//new DateTime(Model.Document.emissionDate.Year, Model.Document.emissionDate.Month, Model.Document.emissionDate.Day);
+						}).GetHtml()
+					</td>
+				</tr>
+				@*<tr>
+						<td style="width: 50%;">
+							@Html.DevExpress().Label(settings =>
+							{
+								settings.Name = "lblBanco";
+								settings.Text = "Banco:";
+							}).GetHtml()
+						</td>
+						<td style="width: 50%;">
+							@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_bank, settings =>
+							{
+								settings.Name = "id_bank";
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.NullDisplayText = "Seleccione...";
+								settings.Properties.NullText = "Seleccione...";
+								settings.Properties.ValueField = "id";
+								settings.Properties.TextField = "name";
+								settings.Properties.ValueType = typeof(int);
+								settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+								settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+								settings.Properties.EnableSynchronization = DefaultBoolean.False;
+								settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+							}).BindList(DataProviderBank.GetAllBankActive()).GetHtml()
+						</td>
+					</tr>*@
+			</table>
+		</td>
+	</tr>
+</table>
+
+@functions{
+
+	bool IsEnabled(string namePermission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.name.Equals(namePermission));
+
+		return (permission != null);
+	}
+
+}
+

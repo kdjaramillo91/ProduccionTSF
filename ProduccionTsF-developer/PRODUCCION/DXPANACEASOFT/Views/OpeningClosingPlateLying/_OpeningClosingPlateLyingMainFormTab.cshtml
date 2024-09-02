@@ -1,0 +1,65 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.OpeningClosingPlateLying
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Employee.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "ResponsableLabel";
+                settings.Text = "Responsable:";
+                settings.AssociatedControlName = "id_responsable";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_responsable = (Model != null && Model.id_responsable != 0) ? (int?) Model.id_responsable : null;
+                var rols = new List<string>() { "Responsable", "Empleado" };
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_responsable, settings =>
+           {
+               settings.Name = "id_responsable";
+               settings.Properties.ClientInstanceName = "id_responsable";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "fullname_businessName";
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.ReadOnly = (@Model.id != 0);
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnResponsableValidation";
+
+           }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], id_responsable, rols)).Bind(id_responsable).GetHtml()
+           @*.BindList(DataProviderPerson.EmployesByCompanyAndCurrent((int?) ViewData["id_company"], id_responsable)).Bind(id_responsable).GetHtml()*@
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Employee.Department.name, settings =>
+            {
+                settings.Name = "employeeDepartamentLabel";
+                settings.Text = "Departamento:";
+                settings.AssociatedControlName = "employeeDepartament";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Department.name, settings =>
+            {
+                settings.Name = "employeeDepartament";
+                settings.Properties.ClientInstanceName = "employeeDepartament";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+
+                settings.ShowModelErrors = true;
+
+            }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingEditForm.js"></script>

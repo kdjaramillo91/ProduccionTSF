@@ -1,0 +1,101 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    MetricType metricType = Model ?? new MetricType();
+}
+
+@Html.Hidden("id_metricType", metricType.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricType.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricType.name)
+        </td>
+    </tr>
+    <tr>
+    <tr>
+        <td>
+            <strong>
+                Tipo de Dato:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricType.DataType.name)
+        </td>
+    </tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricType.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(metricType.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricType.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(metricType.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricType.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@Html.Partial("_MetricTypeDetailMetricUnitsPartial", metricType.MetricUnit.ToList())
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

@@ -1,0 +1,192 @@
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.PriceListDetailCategoryAdjustment>
+
+@{
+    var grid = Html.DevExpress().GridView<PriceListDetailCategoryAdjustment>(settings => {
+        settings.Name = "gvPriceListDetailCategoryAdjustments";
+        settings.CallbackRouteValues = new { Controller = "PriceList", Action = "PriceListDetailCategoryAdjustmentsPartial" };
+
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "PriceList", Action = "PriceListDetailCategoryAdjustmentsPartialUpdate" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";
+
+        settings.Width = Unit.Percentage(50);
+
+        //Eventos
+        //settings.ClientSideEvents.Init = "PriceListDetailsOnGridViewInit";
+        //settings.ClientSideEvents.SelectionChanged = "PriceListDetailsOnGridViewSelectionChanged";
+        //settings.ClientSideEvents.BeginCallback = "PriceListDetailsOnGridViewBeginCallback";
+        //settings.ClientSideEvents.EndCallback = "PriceListDetailsOnGridViewEndCallback";
+
+        //settings.BeforeGetCallbackResult += (s, e) =>
+        //{
+        //    var gv = s as MVCxGridView;
+
+        //    gv.DataColumns["masterCode"].Visible = (bool)ViewData["ShowItem"];
+        //    gv.DataColumns["name"].Visible = (bool)ViewData["ShowItem"];
+        //    gv.DataColumns["itemTypeCategory"].Visible = (bool)ViewData["ShowItemTypeCategory"];
+        //    gv.DataColumns["itemSize"].Visible = (bool)ViewData["Showsize"];
+        //    gv.DataColumns["purchasePrice"].Visible = (bool)ViewData["ShowPurchasePrice"];
+        //    gv.DataColumns["salePrice"].Visible = (bool)ViewData["ShowSalePrice"];
+
+        //};
+
+        //settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        //settings.CustomJSProperties = (s, e) =>
+        //{
+        //    MVCxGridView gv = s as MVCxGridView;
+        //    if (gv == null) return;
+
+        //    e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+        //    e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+        //    List<PriceListDetailFilterShow> rows = (Model as List<PriceListDetailFilterShow>);
+        //    rows = (rows != null) ? rows.ToList() : new List<PriceListDetailFilterShow>();
+
+        //    e.Properties["cpRowsCount"] = rows.Count;
+        //};
+
+        //settings.SetFooterRowTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+        //    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+        //    {
+        //        ViewContext.Writer.Write(
+        //            @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""PriceListDetailsSelectAllRows();"">Seleccionar Todos</a>
+        //              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""PriceListDetailsClearSelection();"">Anular Selección.</a>"
+        //        );
+        //    }
+        //});
+
+        //settings.InitNewRow = (s, e) =>
+        //{
+        //    e.NewValues["isActive"] = true;
+        //};
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        //settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+        #region COLUMNS
+
+
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "name";
+            column.Name = "id_itemGroupCategory";
+            //column.PropertiesEdit.ClientInstanceName = "name";
+            column.Caption = "Categoría";
+            //column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(55);
+            column.UnboundType = UnboundColumnType.String;
+            //column.Visible = (bool)ViewData["ShowItem"];
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_itemGroupCategory = (int?)DataBinder.Eval(c.DataItem, "id_itemGroupCategory");
+                ItemGroupCategory itemGroupCategory = DataProviderItemGroupCategory.ItemGroupCategoryById(id_itemGroupCategory);
+                if (itemGroupCategory != null)
+                {
+                    ViewContext.Writer.Write(itemGroupCategory.name);
+                }
+                else ViewContext.Writer.Write("");
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_itemGroupCategory = (int?)DataBinder.Eval(c.DataItem, "id_itemGroupCategory");
+                ItemGroupCategory itemGroupCategory = DataProviderItemGroupCategory.ItemGroupCategoryById(id_itemGroupCategory);
+                if (itemGroupCategory != null)
+                {
+                    ViewContext.Writer.Write(itemGroupCategory.name);
+                }
+                else ViewContext.Writer.Write("");
+            });
+
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "adjustment";
+            column.Name = "adjustment";
+            column.Caption = "Ajuste";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(20);
+            //column.Visible = (bool)ViewData["ShowPurchasePrice"];
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal adjustment = (decimal)DataBinder.Eval(c.DataItem, "adjustment");
+                ViewContext.Writer.Write(adjustment.ToString("$#,0.000000"));
+            });
+
+            column.EditorProperties().SpinEdit(spinEdit =>
+            {
+                spinEdit.ClientInstanceName = "adjustment";
+
+                spinEdit.DisplayFormatInEditMode = true;
+                spinEdit.DisplayFormatString = "C6";
+                spinEdit.DecimalPlaces = 6;
+                spinEdit.NumberType = SpinEditNumberType.Float;
+                spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+
+                spinEdit.ClientSideEvents.Validation = "OnAdjustmentValidation";
+                spinEdit.ClientSideEvents.Init = "OnAdjustmentInit";
+            });
+        });
+
+
+
+        #endregion
+
+        #region COMMAND COLUMN
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            //ShowDeleteButton = false,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 13,
+            Caption = "Acciones",
+            Width = Unit.Percentage(20)
+        };
+
+
+
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+
+<script src="~/Scripts/pricelist/_priceListDetailCategoryAdjustmentsEditForm.js"></script>

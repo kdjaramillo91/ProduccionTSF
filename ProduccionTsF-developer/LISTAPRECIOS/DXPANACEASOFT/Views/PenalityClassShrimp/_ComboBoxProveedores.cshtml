@@ -1,0 +1,24 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.PenalityClassShrimpDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.id_provider,
+settings =>
+{
+    settings.Name = "ComboBoxPenalityProveedores";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Seleccionar...";
+    settings.CallbackRouteValues = new {
+        Controller = "PenalityClassShrimp",
+        Action = "ComboBoxPenalityProveedores",
+        From = "Edit",
+        enabled = ViewBag.enabled,
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !ViewBag.enabled;
+}
+).BindList(ViewData["Proveedores"]).GetHtml()
+

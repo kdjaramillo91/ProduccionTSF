@@ -1,0 +1,25 @@
+﻿
+@model DXPANACEASOFT.Models.RemissionGuideExportInformation
+   
+<table class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.uniqueCustomsDocument, settings =>
+            {
+                settings.Text = "No. Doc. Aduanero:";
+                settings.AssociatedControlName = "uniqueCustomsDocument";
+            }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.uniqueCustomsDocument, settings =>
+                {
+                    settings.Name = "uniqueCustomsDocument";
+                    settings.Properties.ClientInstanceName = "uniqueCustomsDocument";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.ValidationGroup = "tabExport";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnUniqueCustomsDocumentValidation";
+                }).GetHtml()
+        </td>
+    </tr>
+</table>

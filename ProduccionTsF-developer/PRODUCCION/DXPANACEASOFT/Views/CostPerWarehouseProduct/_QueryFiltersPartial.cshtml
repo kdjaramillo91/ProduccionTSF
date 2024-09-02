@@ -1,0 +1,88 @@
+﻿@using DXPANACEASOFT.DataProviders
+@{
+	var idCompany = (int)this.ViewBag.id_company;
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterCostPerWarehouseProduct", name = "formFilterCostPerWarehouseProduct" }))
+{
+	<table class="table table-condenced" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+		<tr>
+			<td style="width: 80%">
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td colspan="2">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Costos</span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 30%">
+							@Html.DevExpress().Label(
+								label =>
+								{
+									label.Name = "FechaCorteEditLabel";
+									label.Text = "Fecha Corte:";
+									label.AssociatedControlName = "FechaCorteEditText";
+								}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().DateEdit(
+								dateEdit =>
+								{
+									dateEdit.Name = "FechaCorteEditText";
+									dateEdit.Properties.ClientInstanceName = "FechaCorteEditText";
+									dateEdit.Width = Unit.Percentage(100);
+
+									dateEdit.Properties.NullDisplayText = "Desde";
+									dateEdit.Properties.NullText = "Desde";
+
+									dateEdit.Properties.DisplayFormatInEditMode = true;
+									dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+									dateEdit.Properties.EditFormat = EditFormat.Custom;
+									dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+
+								}).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td>
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px Solid #C0C0C0">
+						<td>
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(
+								button =>
+								{
+									button.Name = "btnAddNew";
+									button.Text = "Procesar Costo";
+									button.Width = Unit.Percentage(100);
+									button.RenderMode = ButtonRenderMode.Button;
+									button.ImagePosition = ImagePosition.Left;
+									button.Images.Image.IconID = IconID.ActionsAdd16x16;
+									button.UseSubmitBehavior = false;
+									button.ClientSideEvents.Click = "onProcesarCostoBodegaButtonClick";
+								}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().Button(
+								button =>
+								{
+									button.Name = "btnAdd1";
+									button.Text = "Procesar Saldo";
+									button.Width = Unit.Percentage(100);
+									button.RenderMode = ButtonRenderMode.Button;
+									button.ImagePosition = ImagePosition.Left;
+									button.Images.Image.IconID = IconID.ActionsAdd16x16;
+									button.UseSubmitBehavior = false;
+									button.ClientSideEvents.Click = "onProcesarSaldoBodegaButtonClick";
+								}).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+}

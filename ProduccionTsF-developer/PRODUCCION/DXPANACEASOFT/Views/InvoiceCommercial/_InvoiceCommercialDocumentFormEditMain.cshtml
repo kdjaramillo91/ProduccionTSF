@@ -1,0 +1,78 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.InvoiceCommercial
+
+@{
+	string codeState = "01";
+	if (Model != null)
+	{
+		var _documentState =
+			DataProviderDocumentState.DocumentStateByCodeCompany(
+				Model.Document != null
+					? Model.Document.id_documentState
+					: DataProviderDocumentState.GetIdDocumentStateDefault(),
+				(int)ViewData["id_company"]);
+		codeState = _documentState.code;
+	}
+
+}
+
+
+<table id="documentInvoiceCommercial" class="table table-condensed" style="margin: 0px;">
+
+
+	@{
+
+		Html.RenderPartial("_InvoiceCommercialDocumentFormEditA", Model.Document);
+	}
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.Document.emissionDate, settings =>
+			{
+				settings.Name = "emissionDateLabel";
+				settings.Text = "Fecha de Emisión:";
+				settings.AssociatedControlName = "emissionDate";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+		   {
+			   settings.Name = "emissionDate";
+			   settings.Properties.ClientInstanceName = "emissionDate";
+			   settings.Width = Unit.Percentage(100);
+			   settings.ReadOnly = codeState != "01"; //(@Model.id != 0);//true;
+			   settings.Properties.MinDate = (Model.Document.id_documentOrigen != null && Model.Document.Document2 != null)
+				   ? Model.Document.Document2.emissionDate.AddDays(-1) : DateTime.MinValue;
+		   }).GetHtml()
+		</td>
+
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.referenceInvoice, settings =>
+			{
+				settings.Name = "referenceInvoiceLabel";
+				settings.Text = "Referencia:";
+				settings.AssociatedControlName = "referenceInvoice";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(p => p.referenceInvoice, setting =>
+			{
+			   setting.Name = "referenceInvoice";
+			   setting.Properties.ClientInstanceName = "referenceInvoice";
+			   setting.Width = Unit.Percentage(100);
+			   setting.Properties.MaxLength = 20;
+
+			}).GetHtml()
+		</td>
+		<td></td>
+		<td></td>
+	</tr>
+	@{
+
+		Html.RenderPartial("_InvoiceCommercialDocumentFormEditB", Model.Document);
+	}
+
+</table>

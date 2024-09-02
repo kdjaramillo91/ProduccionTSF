@@ -1,0 +1,129 @@
+﻿@using System.Globalization;
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@*@model List<DXPANACEASOFT.Models.PurchasePlanningDetail>*@
+
+@{
+    var grid = Html.DevExpress().GridView<OpeningClosingPlateLyingDetail>(settings =>
+    {
+        settings.Name = "gvOpeningClosingPlateLyingDetailProductionLots" + ViewData["id_productionLotDailyClose"];
+        settings.CallbackRouteValues = new { Controller = "OpeningClosingPlateLying", Action = "OpeningClosingPlateLyingDetailPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "OpeningClosingPlateLyingDetails_BeginCallback";
+
+        settings.CommandColumn.Visible = false;
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdOpeningClosingPlateLying"] = 0;
+            }
+            e.Properties["cpIdOpeningClosingPlateLying"] = ViewData["id_openingClosingPlateLying"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        #region ColumnsAdd
+
+        settings.Columns.Add(m => m.InventoryMoveDetail.Lot.number, column =>
+        {
+            column.Name = "ProductionLotNumber";
+            column.Caption = "Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+        });
+
+        settings.Columns.Add(m => m.InventoryMoveDetail.Item.name, column =>
+        {
+            //column.FieldName = "totalQuantityOrdered";
+            column.Name = "name";
+            column.Caption = "Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.InventoryMoveDetail.Warehouse.name, column =>
+        {
+            //column.FieldName = "totalQuantityRemitted";
+            column.Name = "nameWarehouse";
+            column.Caption = "Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.InventoryMoveDetail.WarehouseLocation.name, column =>
+        {
+            //column.FieldName = "totalQuantityRemitted";
+            column.Name = "nameWarehouseLocation";
+            column.Caption = "Ubicación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.InventoryMoveDetail.balance, column =>
+        {
+            //column.FieldName = "totalQuantityLiquidation";
+            column.Name = "balance";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null) ? inventoryMoveDetail.balance.ToString("#,##0.00") : "";
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityTrash";
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null && inventoryMoveDetail.MetricUnit != null) ? inventoryMoveDetail.MetricUnit.code : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

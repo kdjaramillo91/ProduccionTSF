@@ -1,0 +1,399 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using RemissionGuideEntradaDTO = DXPANACEASOFT.Controllers.RemissionGuideControlVehicleEntranceController.RemissionGuideEntradaDTO;
+
+
+
+@{
+	string labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+}
+@{
+	var grid = Html.DevExpress().GridView<RemissionGuideEntradaDTO>(settings =>
+	{
+		settings.Name = "gvRemisssionGuideControlVehicleEntrance";
+		settings.CallbackRouteValues = new { Controller = "RemissionGuideControlVehicleEntrance", Action = "RemissionGuidePartialEntrance" };
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		settings.CommandColumn.Visible = true;
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		settings.CommandColumn.Width = Unit.Percentage(3);
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsExport.EnableClientSideExportAPI = true;
+		settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+		settings.SettingsExport.FileName = "Entrada_de_Vehículos" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+		settings.Toolbars.Add(t =>
+		{
+			t.EnableAdaptivity = true;
+			t.Items.Add(GridViewToolbarCommand.ExportToXls);
+			t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+			t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+		});
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+			e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+			if (ViewData["EditMessage"] != null)
+			{
+				e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+			}
+		};
+
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.Settings.ShowFooter = true;
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		//settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Guias de Remisión que tienen Entrada de Planta</span>");
+		});
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+					@"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+	  <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+				);
+			}
+		});
+
+		//MASTER DETAILS
+		settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+		settings.SettingsDetail.ShowDetailRow = false;
+
+		////DETALLES EN GRID LLAMADA A OTRA TABLA
+		//settings.SetDetailRowTemplateContent(columns =>
+		//{
+		//    int? id_remissionGuide = (int?)DataBinder.Eval(columns.DataItem, "id");
+		//    RemissionGuide remissionGuide = DataProviderRemissionGuide.RemissionGuide(id_remissionGuide);
+		//    Html.RenderPartial("_FormEditRemissionGuideControlVehicleEntrance", remissionGuide);
+		//});
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		//Document
+		settings.Columns.Add(m => m.Numero, column =>
+		{
+			column.Caption = "Número";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+		settings.Columns.Add(m => m.Estado, column =>
+		{
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+		settings.Columns.Add(m => m.Proceso, column =>
+		{
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+		settings.Columns.Add(m => m.Proveedor, column =>
+		{
+			column.Name = "proveedor";
+			column.Caption = "Proveedor";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		});
+		settings.Columns.Add(m => m.UnidadProduccion, column =>
+		{
+			column.Name = "productionUnitProvider";
+			column.Caption = labelPup != "" ? labelPup : "Unidad de Producción";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(m => m.Zona, column =>
+		{
+			column.Name = "FishingZone";
+			column.Caption = "Zona";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(m => m.Sitio, column =>
+		{
+			column.Name = "FishingSite";
+			column.Caption = "Sitio";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.Chofer, column =>
+		{
+			column.Name = "driverName";
+			column.Caption = "Chofer";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(m => m.Placa, column =>
+		{
+			column.Name = "carRegistration";
+			column.Caption = "Placa";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(m => m.FechaSalida, column =>
+		{
+			column.Name = "exitDateProductionBuilding";
+			column.Caption = "Fecha de Salida";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+			((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.HoraSalida, column =>
+		{
+			column.Name = "";
+			column.Caption = "Hora de Salida";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+		});
+		settings.Columns.Add(m => m.FechaEntrada, column =>
+		{
+			column.Name = "entranceDateProductionBuilding";
+			column.Caption = "Fecha de Entrada";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(8);
+			((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+			((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+		});
+
+		settings.Columns.Add(m => m.HoraEntrada, column =>
+		{
+			column.Name = "entranceTimeProductionBuilding";
+			column.Caption = "Hora de Entrada";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+		});
+
+		settings.Columns.Add(m => m.FechaLlegadaCamaronera, column =>
+		{
+			column.Name = "entranceDateProductionUnitProviderBuilding";
+			column.Caption = "Fecha de llegada a la camaronera";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(2);
+			((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+			((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+		});
+
+		settings.Columns.Add(m => m.HoraLlegadaCamaronera, column =>
+		{
+			column.Name = "entranceTimeProductionUnitProviderBuilding";
+			column.Caption = "Hora de llegada a la camaronera";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+		});
+
+		settings.Columns.Add(m => m.FechaSalidaCamaronera, column =>
+		{
+			column.Name = "exitDateProductionUnitProviderBuilding";
+			column.Caption = "Fecha de salida de la camaronera";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(2);
+			((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+			((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+		});
+
+		settings.Columns.Add(m => m.HoraSalidaCamaronera, column =>
+		{
+			column.Name = "exitTimeProductionUnitProviderBuilding";
+			column.Caption = "Hora de salida de la camaronera";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+		});
+
+		settings.Columns.Add(m => m.FechaEntradaPlanta, column =>
+		{
+			column.Name = "entranceDateProductionBuilding";
+			column.Caption = "Fecha de Entrada a la Planta";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(8);
+			((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+			((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+		});
+
+		settings.Columns.Add(m => m.HoraEntradaPlanta, column =>
+		{
+			column.Name = "entranceTimeProductionBuilding";
+			column.Caption = "Hora de llegada a la Planta";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+		});
+
+		settings.Columns.Add(m => m.LibrasRemitidas, column =>
+		{
+			column.Name = "entrancePoundsRemitted";
+			column.Caption = "Libras Remitidas";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.Piscina, column =>
+		{
+			column.Name = "Piscinas";
+			column.Caption = "Piscinas";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.NoGabetas, column =>
+		{
+			column.Name = "NoGabetas";
+			column.Caption = "No. Gavetas";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.NoBines, column =>
+		{
+			column.Name = "NoBines";
+			column.Caption = "No. Bines";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.Observacion, column =>
+		{
+			column.Name = "ObservationEntrance";
+			column.Caption = "Observación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.Sello1, column =>
+		{
+			column.Name = "Sello1";
+			column.Caption = "Sello 1";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.Sello2, column =>
+		{
+			column.Name = "Sello2";
+			column.Caption = "Sello 2";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.Sello3, column =>
+		{
+			column.Name = "Sello2";
+			column.Caption = "Sello 3";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.UsuarioCreacion, column =>
+		{
+			column.Name = "UsuarioCreacion";
+			column.Caption = "Usuario Creación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.FechaCreacion, column =>
+		{
+			column.Name = "fechaCreacion";
+			column.Caption = "Fecha de Creación";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(8);
+			column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+		});
+
+		settings.Columns.Add(m => m.UsuarioModificacion, column =>
+		{
+			column.Name = "UsuarioModificación";
+			column.Caption = "Usuario Modificación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(m => m.FechaModificacion, column =>
+		{
+			column.Name = "fechaModificacion";
+			column.Caption = "Fecha de Modificación";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(8);
+			column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+		});
+
+		// COMMAND COLUMN
+
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+		commandColumn.ShowEditButton = false;
+		commandColumn.ShowDeleteButton = false;
+		commandColumn.Visible = true;
+		commandColumn.VisibleIndex = 32;
+		commandColumn.Caption = "Acciones";
+		commandColumn.Width = Unit.Percentage(3);
+
+		commandColumn.CustomButtons.Add(
+			new GridViewCommandColumnCustomButton
+			{
+				ID = "btnEditRow",
+				Text = "Editar"
+			}
+		);
+		settings.ClientSideEvents.CustomButtonClick = "GridViewRemissionGuideControlVehicleEntranceCustomCommandButton_Click";
+		settings.Columns.Add(commandColumn);
+
+	});
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	String GetUserName(int id)
+	{
+		var user = DataProviderUser.UserById(id);
+		return user.username;
+	}
+
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+}
+
+

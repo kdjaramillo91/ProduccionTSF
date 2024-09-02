@@ -1,0 +1,235 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.TransportSizeDto
+
+
+<table class="table table-condensed">
+    <tr>
+        <td style="width: 8%;">
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+       {
+           settings.Text = "Código:*";
+           settings.AssociatedControlName = "code";
+
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+       {
+           //settings.Name = "code";
+           settings.Properties.ClientInstanceName = "code";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.NullText = "Código";
+           settings.ShowModelErrors = true;
+           settings.ClientVisible = true;
+           settings.Properties.ClientSideEvents.Validation = "OnCodeTransportSizeValidation";
+
+       }).GetHtml()
+        </td>
+       <td colspan="7"></td>
+
+    </tr>
+    <tr>
+        <td style="width: 8%;">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Nombre:*";
+                settings.AssociatedControlName = "transportSizeName";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+            {
+                settings.Properties.ClientInstanceName = "transportSizeName";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Nombre del Tamano del Transporte";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnTransportSizeNameValidation";
+            }).GetHtml()
+        </td>
+
+        <td style="width: 8%;">
+            @Html.DevExpress().LabelFor(m => m.id_transportTariffType, settings =>
+            {
+                settings.Text = "Tipo de Tarifario:*";
+                settings.AssociatedControlName = "id_transportTariffType";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_transportTariffType = (Model != null && Model.id_transportTariffType != 0) ? (int?)Model.id_transportTariffType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_transportTariffType, settings =>
+       {
+           settings.Name = "id_transportTariffType";
+           settings.Properties.ClientInstanceName = "id_transportTariffType";
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+
+           //settings.Properties.ValueType = typeof(string);
+           //settings.Properties.DisplayFormatString = "{0} ({1}-{2})";
+           //settings.Properties.Columns.Add("name", "Nombre", Unit.Percentage(40));
+           //settings.Properties.Columns.Add("range_ini", "R.Inicio", Unit.Percentage(20));
+           //settings.Properties.Columns.Add("range_end", "R.Fin", Unit.Percentage(20));
+
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NullText = "Seleccione Tipo de Tarifario";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnTransportTariffTypeValidation";
+       }).BindList(DataProviderTransportTariffType.TransportTariffTypeByCompanyAndCurrent((int)ViewData["id_company"], id_transportTariffType)).Bind(id_transportTariffType).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td style="width: 8%;">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Rango bin mínimo:";
+                settings.AssociatedControlName = "binRangeMinimum";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().SpinEditFor(m => m.binRangeMinimum, settings =>
+            {
+               settings.Name = "binRangeMinimum";
+               settings.Properties.ClientInstanceName = "binRangeMinimum";
+               settings.Properties.AllowMouseWheel = false;
+               settings.Properties.NumberType = SpinEditNumberType.Integer;
+               settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               settings.Properties.MaxValue = 100;
+               settings.Properties.MinValue = 0;
+               settings.Properties.ClientSideEvents.Validation = "binRangeMinimumValidate";
+           }).GetHtml()
+        </td>
+        <td style="width: 8%;">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Rango bin máximo:";
+                settings.AssociatedControlName = "binRangeMaximun";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().SpinEditFor(m => m.binRangeMaximun, settings =>
+           {
+               settings.Name = "binRangeMaximun";
+               settings.Properties.ClientInstanceName = "binRangeMaximun";
+               settings.Properties.AllowMouseWheel = false;
+               settings.Properties.NumberType = SpinEditNumberType.Integer;
+               settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               settings.Properties.MaxValue = 100;
+               settings.Properties.MinValue = 0;
+               settings.Properties.ClientSideEvents.Validation = "binRangeMaximunValidate";
+           }).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td style="width: 8%;">
+            @Html.DevExpress().LabelFor(m => m.id_iceBagRange, settings =>
+            {
+                settings.Text = "Rango de Fundas de Hielo:*";
+                settings.AssociatedControlName = "id_iceBagRange";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_iceBagRange = (Model != null && Model.id_iceBagRange != 0) ? (int?)Model.id_iceBagRange : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_iceBagRange, settings =>
+       {
+           settings.Properties.ClientInstanceName = "id_iceBagRange";
+
+           settings.Properties.ValueField = "id";
+           //settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.DisplayFormatString = "{0} ({1}-{2})";
+           settings.Properties.Columns.Add("name", "Nombre", Unit.Percentage(40));
+           settings.Properties.Columns.Add("range_ini", "R.Inicio", Unit.Percentage(20));
+           settings.Properties.Columns.Add("range_end", "R.Fin", Unit.Percentage(20));
+
+
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NullText = "Seleccione Rango de Fundas de Hielo";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnIceBagRangeValidation";
+       }).BindList(DataProviderIceBagRange.IceBagRangeByCompanyAndCurrent((int)ViewData["id_company"], id_iceBagRange)).Bind(id_iceBagRange).GetHtml()
+        </td>
+
+
+        <td style="width: 8%;">
+            @Html.DevExpress().LabelFor(m => m.id_poundsRange, settings =>
+            {
+                settings.Text = "Rango de Libras:*";
+                settings.AssociatedControlName = "id_poundsRange";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.Partial("CmbBoxesEdit/_ComboBoxPoundRangeEdit", Model)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+            {
+                settings.Text = "¿Activo?:";
+                settings.AssociatedControlName = "isActive";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+            {
+                settings.Properties.ClientInstanceName = "isActive";
+
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+        <td colspan="3"></td>
+    </tr>
+    <tr>
+        <td colspan="6" style="text-align: right;">
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnUpdate";
+                settings.Text = "Actualizar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+            }).GetHtml()
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnCancel";
+                settings.Text = "Cancelar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonCancel_Click";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr id="transportTariffTypeAlertRow" style="display: none;">
+        <td colspan="6">
+            <div class="alert alert-danger fade in" style="margin-top:18px;">
+                <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                <span id="transportSizeErrorMessage"></span>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<script src="~/Scripts/transportsize/editform.js"></script>

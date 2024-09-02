@@ -1,0 +1,203 @@
+﻿@using DXPANACEASOFT.Models
+
+@model ProductionCostCoefficient
+
+@{
+	var usarIntegracionContable = (bool)this.ViewBag.UsarIntegracionContable;
+}
+<div id="operacionesCoeficienteEditForm">
+	<div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_productionCostLabel";
+						label.Text = "Costos:*";
+						label.AssociatedControlName = "id_productionCost";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-4">
+				@{
+					var id_productionCost = (this.Model.id_productionCost > 0)
+						? (int?)this.Model.id_productionCost
+						: null;
+
+					var productionCostsAllModel = (List<ProductionCost>)DataProviderProductionCost.ProductionCostByCurrent(id_productionCost);
+
+					var productionCostsModel = productionCostsAllModel
+						.Where(p => (this.Model.id_executionType == p.id_executionType)
+							|| (id_productionCost == p.id))
+						.ToArray();
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_productionCost";
+						comboBox.Properties.ClientInstanceName = "id_productionCost";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpProductionCosts"] = productionCostsAllModel
+								.Select(p => new
+								{
+									p.id,
+									p.code,
+									p.name,
+									p.id_executionType,
+								})
+								.ToArray();
+						};
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnProductionCostSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnProductionCostValidation";
+
+					}).BindList(productionCostsModel).Bind(id_productionCost).GetHtml()
+			</div>
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_productionCostDetailLabel";
+						label.Text = "Subcostos:*";
+						label.AssociatedControlName = "id_productionCostDetail";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-4">
+				@{
+					var id_productionCostDetail = (this.Model.id_productionCostDetail > 0)
+						? (int?)this.Model.id_productionCostDetail
+						: null;
+
+					var productionCostDetailsAllModel = new List<ProductionCostDetail>();
+
+					productionCostsAllModel.ForEach(p =>
+					{
+						productionCostDetailsAllModel.AddRange(p.ProductionCostDetails
+							.Where(d => d.isActive || d.id == id_productionCostDetail)
+							.OrderBy(d => d.order).ThenBy(d => d.code));
+					});
+
+					var productionCostDetailsModel = productionCostDetailsAllModel
+						.Where(d => (id_productionCost == d.id_productionCost)
+							|| (id_productionCost == d.id))
+						.ToArray();
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_productionCostDetail";
+						comboBox.Properties.ClientInstanceName = "id_productionCostDetail";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpProductionCostDetails"] = productionCostDetailsAllModel
+								.Select(p => new
+								{
+									p.id,
+									p.code,
+									p.name,
+									p.id_productionCost,
+								})
+								.ToArray();
+						};
+
+						comboBox.Properties.ClientSideEvents.Validation = "OnProductionCostDetailValidation";
+
+					}).BindList(productionCostDetailsModel).Bind(id_productionCostDetail).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_productionPlantLabel";
+						label.Text = "Planta Proceso:*";
+						label.AssociatedControlName = "id_productionPlant";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-4">
+				@{
+					var id_productionPlant =
+						(this.Model.id_productionPlant.HasValue && (this.Model.id_productionPlant.Value > 0))
+						? (int?)this.Model.id_productionPlant
+						: null;
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_productionPlant";
+						comboBox.Properties.ClientInstanceName = "id_productionPlant";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ClientEnabled = id_productionPlant.HasValue;
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "processPlant";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.Validation = "OnProductionPlantDetailValidation";
+
+					}).BindList(this.ViewBag.PlantasProceso).Bind(id_productionPlant).GetHtml()
+			</div>
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "allProductionPlantsLabel";
+						label.Text = "¿Todas las plantas?:";
+						label.AssociatedControlName = "allProductionPlants";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-4">
+				@Html.DevExpress().CheckBox(
+					checkBox =>
+					{
+						checkBox.Name = "allProductionPlants";
+						checkBox.Properties.ClientInstanceName = "allProductionPlants";
+						checkBox.Width = Unit.Percentage(100);
+
+						checkBox.Checked = !id_productionPlant.HasValue;
+
+						checkBox.Properties.ClientSideEvents.CheckedChanged = "OnAllProductionPlantsCheckedChanged";
+					}).GetHtml()
+			</div>
+		</div>
+	</div>
+	@if (usarIntegracionContable)
+	{
+		<div style="padding-top: 10px"></div>
+		<hr style="width: 100%;">
+		<div>
+			@Html.Partial("_ProductionCoefficientDetailsPartial", this.Model.ProductionCostCoefficientDetails)
+		</div>
+	}
+</div>

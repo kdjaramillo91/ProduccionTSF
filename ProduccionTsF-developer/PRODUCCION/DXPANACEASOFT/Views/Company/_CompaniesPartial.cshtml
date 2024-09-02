@@ -1,0 +1,302 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvCompanies";
+        settings.CallbackRouteValues = new { Controller = "Company", Action = "CompaniesPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Company", Action = "CompaniesPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Company", Action = "CompaniesPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Company", Action = "CompaniesPartialDelete" };
+
+        settings.KeyFieldName = "id";
+
+        settings.Width = Unit.Percentage(100);
+
+        #region  GridViewBehavior
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox seleccionado para nuevos registros
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+            if (ViewData["EditMessage"] != null)
+            {
+                e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+            }
+        };
+
+        #endregion
+
+        #region EditForm
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Editar Compañía";
+
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 800;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        #endregion
+
+        #region  Pager
+
+        settings.SettingsPager.Visible = true;
+
+        #endregion
+
+        #region ClientSideEvents(JavaScript)
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        #endregion
+
+        #region SearchPanel
+
+        //Panel de Busqueda
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        #endregion
+
+        #region TitlePanel
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Compañías</span>");
+        });
+
+        #endregion
+
+        #region GroupPanel
+
+        settings.Settings.ShowGroupPanel = true;
+
+        #endregion
+
+        #region Filter
+
+        settings.Settings.ShowFilterRow = true;
+        //Boton de filtro para las columnas de la tabla
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+        #endregion
+
+        #region Footer
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""UnselectAllRows();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        #endregion
+
+        #region CommandColumn
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        #endregion
+
+        #region MasterDetailsView
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+
+        settings.SetDetailRowTemplateContent(column =>
+        {
+            int? id_company = (int?)DataBinder.Eval(column.DataItem, "id");
+            Company company = DataProviderCompany.CompanyById(id_company);
+            Html.RenderPartial("_CompaniesDetailPartial", company);
+        });
+
+        #endregion
+
+        #region AutoGenerate Dont Touch
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #endregion
+
+        #region ColumnsAdd
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ruc";
+            //column.Name = "ruc";
+            column.Caption = "RUC";
+
+            column.Width = Unit.Percentage(8);
+
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "businessName";
+            //column.Name = "name";
+            column.Caption = "Razón Social";
+
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "trademark";
+            //column.Name = "name";
+            column.Caption = "Nombre Comercial";
+
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_businessGroup";
+            //column.Name = "id_businessGroup";
+            column.Caption = "Grupo de Negocio";
+
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.Width = Unit.Percentage(15);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_businessGroup = (int?)DataBinder.Eval(c.DataItem, "id_businessGroup");
+                BusinessGroup businessGroup = DataProviderBusinessGroup.BusinessGroupById(id_businessGroup);
+
+                string name = (businessGroup != null) ? businessGroup.name : "";
+                ViewContext.Writer.Write(name);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            //column.Name = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+
+            column.AutoFilterBy("Sí");
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 10,
+            Width = Unit.Percentage(5),
+            Caption = "Acciones"
+        };
+
+        commandColumn.CustomButtons.Add(
+              new GridViewCommandColumnCustomButton
+              {
+                  ID = "btnDeleteRow",
+                  Text = "Eliminar"
+              }
+        );
+
+        settings.ClientSideEvents.CustomButtonClick = "GridViewItemsCustomCommandButton_Click";
+
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+        #region EDITOR FORM LAYOUT
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_company = (int?)DataBinder.Eval(c.DataItem, "id");
+            Company company = DataProviderCompany.CompanyById(id_company);
+
+            company = company ?? new Company
+            {
+                isActive = true
+            };
+
+            Html.RenderPartial("_CompanyEditFormPartial", company);
+        });
+
+        #endregion
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

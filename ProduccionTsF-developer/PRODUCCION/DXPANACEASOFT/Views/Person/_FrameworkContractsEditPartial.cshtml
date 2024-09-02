@@ -1,0 +1,225 @@
+﻿
+@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.FrameworkContract
+@{
+    var code_typeContractFramework = (Model != null && Model.TypeContractFramework != null) ? Model.TypeContractFramework.code : "";
+    var code_documentState = (Model != null && Model.Document != null) ? Model.Document.DocumentState.code : "";
+    //var isSave = (Model != null && Model.FrameworkContractItem != null) ? Model.QualityCorrectiveAction.isCorrected : (bool?)null;
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditFrameworkContract", name = "formEditFrameworkContract" }))
+{
+    @Html.Hidden("id_frameworkContract", Model.id)
+    @Html.Hidden("code_typeContractFramework", code_typeContractFramework)
+    @Html.Hidden("code_documentState", code_documentState)
+
+    <table id="frameworkContractTable" class="table table-condensed" style="margin: 0; padding: 0">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="4">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Datos Generales</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_company, settings =>
+           {
+               settings.Name = "companyLabel";
+               settings.Text = "Compañía*:";
+               settings.AssociatedControlName = "company";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_company = (Model != null && Model.id_company != 0) ? Model.id_company : (int?)null;
+                }
+                @Html.Hidden("id_companyFrameworkContract", id_company)
+                @Html.DevExpress().ComboBoxFor(m => m.id_company, settings =>
+           {
+               settings.Name = "id_company";
+               settings.Properties.ClientInstanceName = "id_company";
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.TextFormatString = "{0}";
+
+               settings.Properties.Columns.Add("code", "Cod.", 50);
+               settings.Properties.Columns.Add("businessName", "Nombre", 100);
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.ValueType = typeof(int);
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ReadOnly = (id_company != null && code_documentState != "" && code_documentState != "01");//01: PENDIENTE
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "FrameworkContractCompanyCombo_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Validation = "OnCompanyValidation";
+
+           }).BindList(DataProviderCompany.CompaniesWithCurrent(id_company)).Bind(id_company).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_typeContractFramework, settings =>
+           {
+               settings.Name = "typeContractFrameworkLabel";
+               settings.Text = "Tipo de Contrato*:";
+               settings.AssociatedControlName = "typeContractFramework";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_typeContractFramework = (Model != null && Model.id_typeContractFramework != 0) ? Model.id_typeContractFramework : (int?)null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_typeContractFramework, settings =>
+           {
+               settings.Name = "id_typeContractFramework";
+               settings.Properties.ClientInstanceName = "id_typeContractFramework";
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.TextFormatString = "{0}";
+
+               settings.Properties.Columns.Add("code", "Cod.", 50);
+               settings.Properties.Columns.Add("name", "Nombre", 100);
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.ValueType = typeof(int);
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ReadOnly = (id_typeContractFramework != null && code_documentState != "" && code_documentState != "01");//01: PENDIENTE
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "FrameworkContractTypeContractFrameworkCombo_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Validation = "OnTypeContractFrameworkValidation";
+
+           }).BindList(DataProviderFrameworkContract.TypeContractFrameworksWithCurrent(id_company, id_typeContractFramework)).Bind(id_typeContractFramework).GetHtml()
+            </td>            
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_rol, settings =>
+           {
+               settings.Name = "rolLabel";
+               settings.Text = "Rol en Contrato*:";
+               settings.AssociatedControlName = "rol";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_rol = (Model != null && Model.id_rol != 0) ? Model.id_rol : (int?)null;
+                }
+                @Html.Hidden("id_rolFrameworkContract", id_rol)
+                @Html.DevExpress().ComboBoxFor(m => m.id_rol, settings =>
+           {
+               settings.Name = "id_rol";
+               settings.Properties.ClientInstanceName = "id_rol";
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               //settings.Properties.TextFormatString = "{0}";
+
+               //settings.Properties.Columns.Add("code", "Cod.", 50);
+               //settings.Properties.Columns.Add("name", "Nombre", 100);
+
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueField = "id";
+               settings.Properties.ValueType = typeof(int);
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ReadOnly = (id_rol != null && code_documentState != "" && code_documentState != "01");//01: PENDIENTE
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Init = "FrameworkContractRolCombo_Init";
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "FrameworkContractRolCombo_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Validation = "OnRolValidation";
+
+           }).BindList(DataProviderRol.ListWithCurrent(id_rol)).Bind(id_rol).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.Document.DocumentState.name, settings =>
+           {
+               settings.Name = "documentStateLabel";
+               settings.Text = "Estado:";
+               settings.AssociatedControlName = "documentState";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var documentState = (Model != null && Model.Document != null) ? Model.Document.DocumentState.name : "PENDIENTE";
+                }
+                @Html.DevExpress().TextBox(settings =>
+           {
+               settings.Name = "documentState";
+               settings.Properties.ClientInstanceName = "documentState";
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.ReadOnly = true;
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnValidation";
+
+           }).Bind(documentState).GetHtml()
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Detalles de Producto</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                @{
+                    if (Model != null && Model.FrameworkContractItem != null)
+                    {
+                        ViewData["code_typeContractFramework"] = code_typeContractFramework;
+                        ViewData["code_documentState"] = code_documentState;
+                        Html.RenderPartial("_FormEditFrameworkContractItem", Model.FrameworkContractItem.OrderBy(od => od.id).ToList());
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+    
+    <table class="table table-condensed" style="margin: 0; padding: 0">    
+        <tr>
+            <td style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+           {
+               settings.Name = "btnUpdateFrameworkContract";//"btnUpdatePhase";
+               settings.Text = "Actualizar";
+               settings.RenderMode = ButtonRenderMode.Button;
+               settings.UseSubmitBehavior = false;
+               settings.ImagePosition = ImagePosition.Left;
+               settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+
+               settings.ValidateInvisibleEditors = true;
+               settings.ClientEnabled = (code_documentState == "" || code_documentState == "01") || 
+                                        (code_documentState == "03" && code_typeContractFramework != "VA31");//01: PENDIENTE
+               settings.ClientSideEvents.Click = "ButtonUpdateFrameworkContract_Click";//"ButtonUpdatePhase_Click";
+           }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancelFrameworkContract";//btnCancelPhase";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.ClientSideEvents.Click = "BtnCancelFrameworkContract_Click";//BtnCancelPhase_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+}

@@ -1,0 +1,113 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@Html.DevExpress().Button(
+	button =>
+	{
+		button.Name = "btnNew";
+		button.Text = "";
+		button.ToolTip = "Adicionar Elemento";
+		button.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+		button.ClientEnabled = true;
+		button.ClientVisible = IsEnabled(1);
+		button.UseSubmitBehavior = false;
+		button.EnableClientSideAPI = true;
+		button.ClientSideEvents.Click = "AddNewItem";
+	}).GetHtml()
+
+@Html.DevExpress().Button(
+	button =>
+	{
+		button.Name = "btnRemove";
+		button.Text = "";
+		button.ToolTip = "Eliminar Elemento(s)";
+		button.Images.Image.IconID = IconID.ActionsRemoveitem16x16office2013;
+		button.ClientEnabled = true;
+		button.ClientVisible = IsEnabled(8);
+		button.UseSubmitBehavior = false;
+		button.EnableClientSideAPI = true;
+		button.ClientSideEvents.Click = "RemoveItems";
+	}).GetHtml()
+
+@Html.DevExpress().Button(
+	button =>
+	{
+		button.Name = "btnRefresh";
+		button.Text = "";
+		button.ToolTip = "Refrescar";
+		button.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+		button.ClientEnabled = true;
+		button.ClientVisible = true;
+		button.UseSubmitBehavior = false;
+		button.EnableClientSideAPI = true;
+		button.ClientSideEvents.Click = "RefreshGrid";
+
+	}).GetHtml()
+
+@Html.DevExpress().Label(
+	label =>
+	{
+		label.Name = "lblEditMessage";
+		label.Properties.ClientInstanceName = "lblEditMessage";
+		label.Width = Unit.Percentage(100);
+		label.ClientVisible = false;
+	}).GetHtml()
+
+<script type="text/javascript">
+	var ShowEditMessage = function(s, e) {
+		if (s.cpEditMessage) {
+			lblEditMessage.SetText(s.cpEditMessage);
+			lblEditMessage.SetVisible(true);
+
+			delete s.cpEditMessage;
+
+			$(".close").click(function() {
+				$(".alert").alert('close');
+
+				lblEditMessage.SetText("");
+				lblEditMessage.SetVisible(false);
+			});
+
+			var message = document.getElementById("successMessage");
+			if (message !== undefined && message !== null) {
+				setTimeout(function() {
+					$("#successMessage").alert('close');
+
+					lblEditMessage.SetText("");
+					lblEditMessage.SetVisible(false);
+				}, 2000);
+			}
+		}
+	};
+</script>
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@functions{
+
+	bool IsEnabled(int id_permission)
+	{
+		var id_user = (int)ViewData["id_user"];
+		var id_menu = (int)ViewData["id_menu"];
+
+		var user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+		{
+			return false;
+		}
+
+		var userMenu = user.UserMenu
+			.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+		{
+			return false;
+		}
+
+		var permission = userMenu.Permission
+			.FirstOrDefault(p => p.id == id_permission);
+
+		return (permission != null);
+	}
+
+}

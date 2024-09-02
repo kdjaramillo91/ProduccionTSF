@@ -1,0 +1,193 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+@using DXPANACEASOFT.Models
+@{
+    var grid = Html.DevExpress().GridView<PurchaseOrderDetail>(settings =>
+    {
+        settings.Name = "gvPurchaseOrderDetailView"; /*+ ViewData["id_purchaseOrder"];*/
+        settings.SettingsDetail.MasterGridName = "gvPurchaseOrders";
+        settings.CallbackRouteValues = new { Controller = "PurchaseOrder", Action = "PurchaseOrderResultsDetailViewDetailsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "PurchaseOrderResultsDetailViewDetails_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Detalles Orden de Compra</span>");
+        });
+
+        settings.KeyFieldName = "id_item";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSort = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(/*m => m.PurchaseOrderDetailPurchaseRequest.FirstOrDefault().PurchaseRequestDetail.PurchaseRequest.Document.number,*/ column =>
+        {
+            column.Name = "purchaseRequests";
+            column.Caption = "No. Requerimiento";
+            column.ReadOnly = true;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.UnboundType = UnboundColumnType.String;
+
+            //column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                List<PurchaseOrderDetailPurchaseRequest> purchaseRequests = null;
+
+                try
+                {
+                    purchaseRequests = (List<PurchaseOrderDetailPurchaseRequest>)DataBinder.Eval(c.DataItem, "PurchaseOrderDetailPurchaseRequest");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        HashSet<PurchaseOrderDetailPurchaseRequest> temp = (HashSet<PurchaseOrderDetailPurchaseRequest>)DataBinder.Eval(c.DataItem, "PurchaseOrderDetailPurchaseRequest");
+                        purchaseRequests = temp.ToList();
+                    }
+                    catch (Exception)
+                    {
+                        purchaseRequests = null;
+                    }
+                }
+
+
+                string text = string.Empty;
+
+                if (purchaseRequests != null && purchaseRequests.Count > 0)
+                {
+                    int? id_purchaseRequest = purchaseRequests[0].id_purchaseRequest;
+                    PurchaseRequest request = DataProviderPurchaseRequest.PurchaseRequest(id_purchaseRequest);
+
+                    text += request.Document.number;
+
+                    text += (purchaseRequests.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseRequests.Count - 1).ToString() + "</a>" : "";
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+        settings.Columns.Add(c => c.productionUnitProviderPoolreference, column =>
+        {
+            column.Name = "productionUnitProviderPoolreference";
+            column.Caption = "Piscina";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(c => c.Item.masterCode ,column =>
+        {
+            column.Name = "masterCode";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(c => c.Item.name, column =>
+        {
+            column.Name = "item";
+            column.Caption = "Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(c => c.Grammage.description, column =>
+        {
+            column.Name = "grammage";
+            column.Caption = "Gramaje";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(c => c.Item.ItemPurchaseInformation.MetricUnit.code, column =>
+        {
+            column.Name = "code";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityRequested";
+            column.Caption = "Cantidad Solicitada";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityRequested = (decimal)DataBinder.Eval(c.DataItem, "quantityRequested");
+                ViewContext.Writer.Write(quantityRequested.ToString("N2"));
+            });
+
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityOrdered";
+            column.Caption = "Cantidad Pedida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityOrdered = (decimal)DataBinder.Eval(c.DataItem, "quantityOrdered");
+                ViewContext.Writer.Write(quantityOrdered.ToString("N2"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityApproved";
+            column.Caption = "Cantidad Aprobada";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityApproved = (decimal)DataBinder.Eval(c.DataItem, "quantityApproved");
+                ViewContext.Writer.Write(quantityApproved.ToString("N2"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityReceived";
+            column.Caption = "Cantidad Recibida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityReceived = (decimal)DataBinder.Eval(c.DataItem, "quantityReceived");
+                ViewContext.Writer.Write(quantityReceived.ToString("N2"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "price";
+            column.Caption = "Precio";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal price = (decimal)DataBinder.Eval(c.DataItem, "price");
+                ViewContext.Writer.Write(price.ToString("C6"));
+            });
+        });
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+
+    });
+}
+@grid.Bind(Model).GetHtml()

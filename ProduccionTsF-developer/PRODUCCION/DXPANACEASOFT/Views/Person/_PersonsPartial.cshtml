@@ -1,0 +1,352 @@
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.Person>
+
+@{
+    var grid = Html.DevExpress().GridView<Person>(settings =>
+    {
+        settings.Name = "gvPerson";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "PersonsPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "PersonsPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "PersonsPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "PersonsPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Registro Stakeholder";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 300;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.Settings.ShowHeaderFilterButton = true;
+        settings.SettingsPopup.HeaderFilter.Height = 200;
+        settings.SettingsPager.EnableAdaptivity = true;
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a href=""javascript:;"" id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+			  <a href=""javascript:;"" id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""UnselectAllRows();"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        #region CUSTOM PROPERTIES
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+
+        };
+        #endregion
+
+        #region Columns
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "identification_number";
+            column.Caption = "No. Identificación";
+            column.Width = Unit.Percentage(15);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientSideEvents.Validation = "OnIdentificationNumberValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "fullname_businessName";
+            column.Caption = "Razón Social";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientSideEvents.Validation = "OnFullnameBusinessNameValidation";
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "email";
+            column.Caption = "Correo Electrónico";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientSideEvents.Validation = "OnEmailValidation";
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "nameRols";
+            column.Caption = "Roles";
+            column.Width = Unit.Percentage(3);
+
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.EditorProperties().ComboBox(p =>
+            //{
+
+            //    p.DataSource = DataProviderRol.Rols().ToList();
+            //    p.TextField = "name";
+            //    p.ValueField = "id";
+            //    p.ValueType = typeof(int);
+
+            //    //p.ClientSideEvents.Validation = "OnPersonTypeValidation";
+
+            //});
+            //column.ColumnType = MVCxGridViewColumnType.DropDownEdit;
+
+            //column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            //var comboBoxProperties = column.PropertiesEdit as ComboBoxProperties;
+            //comboBoxProperties.DataSource = DataProviderRol.Rols().ToList();
+            //comboBoxProperties.TextField = "name";
+            //comboBoxProperties.ValueField = "id";
+            ////comboBoxProperties.ValueType = typeof(int);
+            //comboBoxProperties.DropDownStyle = DropDownStyle.DropDownList;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                List<Rol> roles = new List<Rol>();
+                try
+                {
+                    roles = (List<Rol>)DataBinder.Eval(c.DataItem, "Rol");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        HashSet<Rol> tempRoles = (HashSet<Rol>)DataBinder.Eval(c.DataItem, "Rol");
+                        roles = (tempRoles != null) ? tempRoles.ToList() : new List<Rol>();
+                    }
+                    catch (Exception)
+                    {
+                        roles = new List<Rol>();
+                    }
+                }
+
+                if (roles != null)
+                {
+                    ViewContext.Writer.Write(string.Join(",", roles.Select(x => x.name).ToArray()));
+                }
+            });
+        });
+
+
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "photo";
+            column.Visible = false;
+            //column.EditFormSettings.Visible = DefaultBoolean.True;
+
+            //column.EditorProperties().BinaryImage(p =>
+            //{
+            //    p.ImageWidth = 170;
+            //    p.ImageHeight = 160;
+            //    p.EnableServerResize = true;
+            //    p.ImageSizeMode = ImageSizeMode.FitProportional;
+            //    p.CallbackRouteValues = new { Controller = "Person", Action = "BinaryImageColumnPhotoUpdate" };
+            //    p.EditingSettings.Enabled = true;
+            //    p.EditingSettings.UploadSettings.UploadValidationSettings.MaxFileSize = 4194304;
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_personType";
+            column.Caption = "Tipo de Persona";
+            column.Visible = false;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.EditorProperties().ComboBox(p =>
+            {
+
+                p.DataSource = DataProviderPersonType.PersonTypes();
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.ClientSideEvents.Validation = "OnPersonTypeValidation";
+
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_identificationType";
+            column.Caption = "Tipo Identificación";
+            column.Visible = false;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_identificationType";
+                p.DataSource = DataProviderIdentificationType.IdentificationType();
+                p.TextField = "name";
+                p.ValueField = "id";
+
+                p.ClientSideEvents.Validation = "OnIdentificationTypeValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "address";
+            column.Caption = "Dirección";
+            column.Visible = false;
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientSideEvents.Validation = "OnAdressValidation";
+            });
+        });
+
+        settings.Columns.Add(m => m.Provider.ProviderGeneralData.ProviderType.name, column =>
+        {
+            column.Name = "providerTypeP";
+            column.Caption = "Tipo de Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.DropDownEdit;
+            column.Width = Unit.Percentage(8);
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = ShowDeleteButton(),
+            Visible = true,
+            VisibleIndex = 10,
+            Caption = "Acciones",
+            Width = Unit.Percentage(3)
+        };
+
+        settings.Columns.Add(commandColumn);
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SetDetailRowTemplateContent(column =>
+        {
+            var idCompany = DataBinder.Eval(column.DataItem, "id");
+            ViewData["id_company"] = idCompany;
+
+            int idPerson = (int)DataBinder.Eval(column.DataItem, "id");
+            Person persons = DataProviderPerson.Person(idPerson);
+            Html.RenderAction("PersonDetailPartial", new { person = persons });
+        });
+
+        #endregion
+
+        #region EditorLayout
+
+        settings.SetEditFormTemplateContent(content =>
+        {
+            int? id_person = (int?)DataBinder.Eval(content.DataItem, "id");
+            Person person = (id_person != null) ? DataProviderPerson.Person((int)id_person) : new Person { isActive = true };
+            this.ViewBag.rolValido = DataProviderPerson.validarRolExistente("Planta Proceso", person.Rol.Select(e => e.id).ToArray());
+            Html.RenderPartial("_PersonFormEdit", person);
+        });
+
+        #endregion
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        if (ViewData["EditError"] != null)
+        {
+            grid.SetEditErrorText((string)ViewData["EditError"]);
+        }
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+	bool ShowDeleteButton()
+	{
+		var permissions = (ViewData["permissions"] as List<int>);
+		return (permissions != null && permissions.Contains(8));
+	}
+}

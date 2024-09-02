@@ -1,0 +1,248 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<ClosePlateTunnelCoolDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewDetails";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "ClosePlateTunnelCool",
+            Action = "GridViewDetails",
+            //drawersNumber = ViewBag.drawersNumber,
+            //((List<LiquidationTurnDetailDTO>) Model).Count
+            //idTypeLiquidationTurn = ViewBag.idTypeLiquidationTurn,
+            //percentTara = ViewBag.percentTara,
+            enabled = ViewBag.enabled
+        };
+
+        settings.KeyFieldName = "id_inventoryMoveDetail";
+        //settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+        //settings.Enabled = ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+        settings.SettingsBehavior.AllowFixedGroups = true;
+        //settings.SettingsBehavior.AllowSort = false;
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        //settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        //settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        //settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            var list = (Model as List<LiquidationTurnDetailDTO>) ?? new List<LiquidationTurnDetailDTO>();
+            e.Properties["cpDetailCount"] = list.Count;
+        };
+
+#region SearchPanel
+
+        //Panel de Busqueda
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+#endregion
+
+        settings.Settings.ShowFooter = true;
+
+        settings.Columns.Add(m => m.warehouse, column =>
+        {
+            column.Name = "warehouse";
+            column.Caption = "Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(7);
+        }).GroupIndex = 0;
+
+        settings.Columns.Add(m => m.warehouseLocation, column =>
+        {
+            column.Name = "warehouseLocation";
+            column.Caption = "Ubicación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+        }).GroupIndex = 1;
+
+        settings.Columns.Add(m => m.productionCart, column =>
+        {
+            column.Name = "productionCart";
+            column.Caption = "Coche";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+        }).GroupIndex = 2;
+
+        settings.Columns.Add(m => m.size, column =>
+        {
+            column.Name = "size";
+            column.Caption = "Talla";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+        }).GroupIndex = 3;
+
+        settings.Columns.Add(m => m.numberInventoryMoveEntry, column =>
+        {
+            column.Name = "numberInventoryMoveEntry";
+            column.Caption = "No. de Ingreso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(7);
+        });
+
+        settings.Columns.Add(m => m.dateTimeEmisionStr, column =>
+        {
+            column.Name = "dateTimeEmisionStr";
+            column.Caption = "Fecha";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(4);
+        });
+
+        settings.Columns.Add(m => m.state, column =>
+        {
+            column.Name = "state";
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(6);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string cod_state = (string)DataBinder.Eval(c.DataItem, "cod_state");
+                string state = (string)DataBinder.Eval(c.DataItem, "state");
+
+                string text = state;
+                if (cod_state == "01")//01: Pendiente
+                {
+                    text = "<b style='color:#FF0000';>" + text + "</b>"; //<p style='color:#FF0000';>" + text + "</p>";
+                }
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        settings.Columns.Add(m => m.nameItem, column =>
+        {
+            column.Name = "nameItem";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+        });
+
+        settings.Columns.Add(m => m.tail, column =>
+        {
+            column.Name = "tail";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(m => m.whole, column =>
+        {
+            column.Name = "whole";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(m => m.total, column =>
+        {
+            column.Name = "total";
+            column.Caption = "No. de Cajas";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(4);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal total = (decimal)DataBinder.Eval(c.DataItem, "total");
+
+                string text = total.ToString("#,##0.00");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.numberLot, column =>
+        {
+            column.Name = "numberLot";
+            column.Caption = "No. Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+        });
+
+        settings.Columns.Add(m => m.plantProcess, column =>
+        {
+            column.Name = "plantProcess";
+            column.Caption = "Planta Proceso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+        });
+
+        settings.Columns.Add(m => m.customer, column =>
+        {
+            column.Name = "customer";
+            column.Caption = "Cliente";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(6);
+        });
+
+        settings.Columns.Add(m => m.provider, column =>
+        {
+            column.Name = "provider";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.nameProviderShrimp, column =>
+        {
+            column.Name = "nameProviderShrimp";
+            column.Caption = "Camaronera";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(7);
+        });
+
+        settings.Columns.Add(m => m.productionUnitProviderPool, column =>
+        {
+            column.Name = "productionUnitProviderPool";
+            column.Caption = "Piscina";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(4);
+        });
+
+        settings.Columns.Add(m => m.machineForProd, column =>
+        {
+            column.Name = "machineForProd";
+            column.Caption = "Máquina";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(6);
+        });
+
+        settings.Columns.Add(m => m.numberLiquidationCarOnCar, column =>
+        {
+            column.Name = "numberLiquidationCarOnCar";
+            column.Caption = "No. Liq CxC";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(6);
+        });
+
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "tail").DisplayFormat = "<b>Cola: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "whole").DisplayFormat = "<b>Entero: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>Total: {0:#,##0.00}</b>";
+    });
+}
+@grid.Bind(Model).GetHtml()

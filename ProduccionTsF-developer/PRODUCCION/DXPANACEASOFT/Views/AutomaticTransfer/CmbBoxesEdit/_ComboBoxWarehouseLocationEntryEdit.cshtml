@@ -1,0 +1,55 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string _id_WarehouseLocationEntry = Model.id_WarehouseLocationEntry != null ? Model.id_WarehouseLocationEntry.ToString() : "";
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+
+	List<SelectListItem> ls = new List<SelectListItem>();
+	using (var _db = new DBContext())
+	{
+		ls = _db.WarehouseLocation
+				.Where(e => e.isActive
+				&& e.id_warehouse == Model.id_WarehouseEntry)
+				.Select(s => new SelectListItem
+				{
+					Text = s.name,
+					Value = s.id.ToString(),
+				}).ToList();
+	}
+	if (ls != null && ls.Count() == 1)
+	{
+		var tmp = ls.FirstOrDefault();
+
+		if (Model.id_WarehouseLocationEntry == null)
+		{
+			_id_WarehouseLocationEntry = tmp.Value;
+		}
+	}
+	ViewData["CmbBoxWarehouseLocationEntryEdit"] = ls;
+}
+
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxWarehouseLocationEntryEdit";
+	settings.Properties.ClientInstanceName = "ComboBoxWarehouseLocationEntryEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxWarehouseLocationEntryEdit",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxWarehouseLocationEntryEdit_BeginCallback";
+	settings.Properties.ClientSideEvents.EndCallback = "ComboBoxWarehouseLocationEntryEdit_EndCallback";
+	settings.CustomJSProperties = (s, e) =>
+	{
+		e.Properties["cpValSelected"] = _id_WarehouseLocationEntry;
+	};
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.ReadOnly = !(this.ViewBag.Editable);
+}).BindList(ls).Bind(_id_WarehouseLocationEntry).GetHtml()

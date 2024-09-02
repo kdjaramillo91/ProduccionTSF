@@ -1,0 +1,89 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+@{ 
+    EconomicGroup economicGroup = Model ?? new EconomicGroup();
+}
+
+@Html.Hidden("id_economicGroup", economicGroup.id)
+
+<table style="width: 100%;">
+
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(economicGroup.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(economicGroup.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(economicGroup.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(economicGroup.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(economicGroup.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(economicGroup.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(economicGroup.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

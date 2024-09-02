@@ -1,0 +1,77 @@
+﻿
+
+@model DXPANACEASOFT.Models.DTOModel.PenalityClassShrimpDTO
+
+<head>
+    <style>
+        .panelEdition {
+            background: #fdf5ea;
+            border: solid 1px #8e8e8e;
+            padding: 10px;
+            max-width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            padding-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Penalidad de Clases</h3>
+    @Html.Partial("PanelButtonsEdit")
+
+    <form id="EditPenality">
+        <div class="panelEdition">
+            @Html.Hidden("id", Model.id)
+            <div class="row">
+                <div class="col-sm-12">
+                    <table>
+                        <tr class="row" style="padding: 0px;">
+                            <td>
+                                <div id="checkParaProveedores">
+                                    @Html.Hidden("paraProveedor", Model.byProvider)
+                                    @Html.DevExpress().RadioButtonFor(model => model.byProvider, settings =>
+                                   {
+                                       settings.Width = Unit.Percentage(100);
+                                       settings.Name = "rbParaProveedor";
+                                       settings.Text = "Para Proveedor";
+                                       settings.GroupName = "ProveedoresGrupo";
+                                       settings.ReadOnly = !ViewBag.enabled;
+                                       settings.Properties.ClientSideEvents.CheckedChanged = "RadioProveedoresGrupo_Click";
+                                   }).GetHtml()
+                                </div>
+                            </td>
+                            <td>
+                                <div id="checkParaGrupos">
+                                    @Html.Hidden("paraGrupo", Model.byGroup)
+                                    @Html.DevExpress().RadioButtonFor(model => model.byGroup, settings =>
+                                   {
+                                       settings.Width = Unit.Percentage(100);
+                                       settings.Name = "rbParaGrupo";
+                                       settings.Text = "Para Grupo";
+                                       settings.GroupName = "ProveedoresGrupo";
+                                       settings.ReadOnly = !ViewBag.enabled;
+                                       settings.Properties.ClientSideEvents.CheckedChanged = "RadioProveedoresGrupo_Click";
+                                   }).GetHtml()
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" id="divComboBoxProveedores" style="display: none; margin: 10px;">
+                        @Html.Partial("_ComboBoxProveedores")
+                    </div>
+                    <div class="col-sm-12" id="divComboBoxGrupos" style="display: none; margin: 10px;">
+                        @Html.Partial("_ComboBoxGrupos")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    @Html.Partial("_GridViewPenaltyDetails", Model.ListPriceListPenaltyDTO.OrderBy(ob=> ob.order))
+</body>
+
+<script src="~/Scripts/penality_class_shrimp/edit.js"></script>
+

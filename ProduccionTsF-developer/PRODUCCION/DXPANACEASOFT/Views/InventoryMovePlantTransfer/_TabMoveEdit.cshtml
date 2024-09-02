@@ -1,0 +1,72 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.InventoryMovePlantTransferDTO
+
+<div>
+    @*<div class="Etiqueta"><b>Liquidaci&oacute;n Carro por Carro</b></div>
+    <hr style="width: 100%; margin: 0px;">*@
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Naturaleza: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.natureMove,
+                settings =>
+                {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Recibidor: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxReceiver")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Motivo: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.inventoryReason,
+                settings =>
+                {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Text = "Bodega: ";
+            }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.warehouseEntry,
+                settings =>
+                {
+                    settings.Name = "warehouseEntry";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+        </div>
+    </div>
+</div>

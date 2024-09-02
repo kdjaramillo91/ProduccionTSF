@@ -1,0 +1,62 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+
+<table class="table table-condensed">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{
+                ViewData["id_productionLot"] = (Model != null) ? Model.id : 0;
+
+                Html.DevExpress().PageControl(tabs =>
+                {
+                    tabs.Name = "tabControl" + ViewData["id_productionLot"];
+                    tabs.Width = Unit.Percentage(100);
+                    tabs.Height = Unit.Pixel(200);
+
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabItemsDetails";
+                        tab.Text = "Materia Prima";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var itemsDetail = (Model != null && Model.ProductionLotDetail != null) ? Model.ProductionLotDetail.ToList() : new List<ProductionLotDetail>();
+                            Html.RenderPartial("_ProductionLotProcessDetailItemsPartial", itemsDetail);
+                        });
+                    });
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabProductionLotLiquidationsDetails";
+                        tab.Text = "Liquidación";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var productionLotLiquidationsDetail = (Model != null && Model.ProductionLotLiquidation != null) ? Model.ProductionLotLiquidation.ToList() : new List<ProductionLotLiquidation>();
+                            Html.RenderPartial("_ProductionLotProcessDetailProductionLotLiquidationsPartial", productionLotLiquidationsDetail);
+                        });
+                    });
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabProductionLotTrashsDetails";
+                        tab.Text = "Desperdicio";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var productionLotTrashsDetail = (Model != null && Model.ProductionLotTrash != null) ? Model.ProductionLotTrash.ToList() : new List<ProductionLotTrash>();
+                            Html.RenderPartial("_ProductionLotProcessDetailProductionLotTrashsPartial", productionLotTrashsDetail);
+                        });
+                    });
+                }).Render();
+            }
+        </td>
+    </tr>
+</table>

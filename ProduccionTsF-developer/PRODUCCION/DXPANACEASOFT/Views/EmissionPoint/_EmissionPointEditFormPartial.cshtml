@@ -1,0 +1,362 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.EmissionPoint
+
+
+    <table class="table table-condensed">
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.id_division, settings =>
+                {
+                    settings.Text = "División:*";
+                    settings.AssociatedControlName = "id_division";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_division = (Model != null && Model.id_division != 0) ? (int?) Model.id_division : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_division, settings =>
+           {
+               settings.Properties.ClientInstanceName = "id_division";
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullText = "Seleccione División";
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxDivisions_SelectedIndexChanged";
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsDivisionValidation";
+           }).BindList(DataProviderDivision.DivisionsByCompanyAndCurrent((int)ViewData["id_company"], id_division)).Bind(id_division).GetHtml()
+            </td>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.id_branchOffice, settings =>
+                {
+                    settings.Text = "Sucursal:*";
+                    settings.AssociatedControlName = "id_branchOffice";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_branchOffice = (Model != null && Model.id_branchOffice != 0) ? (int?)Model.id_branchOffice : null;
+                   
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_branchOffice, settings =>
+           {
+               settings.Properties.ClientInstanceName = "id_branchOffice";
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullText = "Seleccione Sucursal";
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxBranchOffices_SelectedIndexChanged";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsBrachofficeValidation";
+           }).BindList(DataProviderBranchOffice.BranchOfficesByDivisionAndCurrent(id_division, id_branchOffice)).Bind(id_branchOffice).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Nombre:*";
+                    settings.AssociatedControlName = "emissionPointName";
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "emissionPointName";
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "Nombre del Punto de Emisión";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsNameValidation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.code, settings =>
+                {
+                    settings.Text = "Código:*";
+                    settings.AssociatedControlName = "code";
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @{
+                    string code = (Model == null || Model.code == 0) ? "" : Model.code.ToString().PadLeft(3, '0');
+                }
+                @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "code";
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "Ej: 001";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsCodeValidation";
+                }).Bind(code).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.email, settings =>
+                {
+                    settings.Text = "Correo Electrónico:*";
+                    settings.AssociatedControlName = "email";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.email, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "email";
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "correo.electronico@miservidor.com";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsEmailValidation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.phoneNumber, settings =>
+                {
+                    settings.Text = "Teléfono:*";
+                    settings.AssociatedControlName = "phoneNumber";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.phoneNumber, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "phoneNumber";
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "No. de Telfono";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsPhoneValidation";
+                }).GetHtml()
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+		<tr>
+			<!-- desde aqui-->
+			<td style="width: 8%;">
+				@Html.DevExpress().LabelFor(m => m.id_documentType, settings =>
+				{
+					settings.Text = "Tipo de Documento:*";
+					settings.AssociatedControlName = "id_documentType";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_documentType = (Model != null && Model.id_documentType != 0) ? (int?)Model.id_documentType : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_documentType, settings =>
+		   {
+			   settings.Properties.ClientInstanceName = "id_documentType";
+
+			   settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+
+			   settings.Width = Unit.Percentage(100);
+
+			   settings.Properties.NullText = "Seleccione Tipo de documento";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			  // settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxTipoDocument_SelectedIndexChanged";
+
+			   settings.ShowModelErrors = true;
+			  // settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsDivisionValidation";
+		   }).BindList(DataProviderEmissionPoint.Documentypetyp_r()).Bind(id_documentType).GetHtml()
+
+				<!--BindList(DataProviderEmissionPoint.Documentypetyp_r((int)ViewData["id_documentType"], id_documentType)).Bind(id_documentType).GetHtml()-->
+			</td>
+
+
+			<!-- hasta aqui-->
+
+		</tr>
+        
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.secuenciaInicio, settings =>
+				{
+					settings.Text = "Secuencia inicio:*";
+					settings.AssociatedControlName = "secuenciaInicio";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					string secuenciaInicio = (Model == null || Model.secuenciaInicio == 0) ? "" : Model.secuenciaInicio.ToString().PadLeft(6, '0');
+				}
+				@Html.DevExpress().TextBoxFor(m => m.secuenciaInicio, settings =>
+				{
+					settings.Properties.ClientInstanceName = "secuenciaInicio";
+
+					settings.Width = Unit.Percentage(100);
+
+					//settings.Properties.NullText = "";
+					settings.ShowModelErrors = true;
+					//settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsCodeValidation";
+				}).Bind(secuenciaInicio).GetHtml()
+			</td>
+			<!-- segundo-->
+			<td>
+				@Html.DevExpress().LabelFor(m => m.secuenciaFinal, settings =>
+				{
+					settings.Text = "Secuencia Final:*";
+					settings.AssociatedControlName = "secuenciaFinal";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					string secuenciaFinal = (Model == null || Model.secuenciaFinal == 0) ? "" : Model.secuenciaFinal.ToString().PadLeft(6, '0');
+				}
+				@Html.DevExpress().TextBoxFor(m => m.secuenciaFinal, settings =>
+				{
+					settings.Properties.ClientInstanceName = "secuenciaFinal";
+
+					settings.Width = Unit.Percentage(100);
+
+					//settings.Properties.NullText = "";
+					settings.ShowModelErrors = true;
+					//settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsCodeValidation";
+				}).Bind(secuenciaFinal).GetHtml()
+			</td>
+			<!-- tercero-->
+			<td>
+				@Html.DevExpress().LabelFor(m => m.secuenciaFinal, settings =>
+				{
+					settings.Text = "Secuencia Actual:*";
+					settings.AssociatedControlName = "secuenciaValor";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					string secuenciaValor = (Model == null || Model.secuenciaValor == 0) ? "" : Model.secuenciaValor.ToString().PadLeft(8, '0');
+				}
+				@Html.DevExpress().TextBoxFor(m => m.secuenciaValor, settings =>
+				{
+					settings.Properties.ClientInstanceName = "secuenciaValor";
+
+					settings.Width = Unit.Percentage(100);
+
+					//settings.Properties.NullText = "";
+					settings.ShowModelErrors = true;
+					//settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsCodeValidation";
+				}).Bind(secuenciaValor).GetHtml()
+			</td>
+		</tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.address, settings =>
+                {
+                    settings.Text = "Dirección:*";
+                    settings.AssociatedControlName = "address";
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().MemoFor(m => m.address, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "address";
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "Dirección postal";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnEmissionPointsAddressValidation";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.description, settings =>
+                {
+                    settings.Text = "Descripción:";
+                    settings.AssociatedControlName = "description";
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().MemoFor(m => m.description, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "description";
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "";
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+                {
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "isActive";
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "isActive";
+
+                    settings.Width = Unit.Percentage(100);
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr id="emissionPointAlertRow" style="display: none;">
+            <td colspan="6">
+                <div class="alert alert-danger fade in" style="margin-top:18px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                    <span id="emissionPointErrorMessage"></span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+
+<script src="~/Scripts/emissionpoint/editform.js"></script>

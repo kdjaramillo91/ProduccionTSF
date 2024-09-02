@@ -1,0 +1,153 @@
+﻿@using System.Globalization;
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@*@model List<DXPANACEASOFT.Models.PurchasePlanningDetail>*@
+
+@{
+    var grid = Html.DevExpress().GridView<ProductionLotDailyCloseDetail>(settings =>
+    {
+        settings.Name = "gvProductionLotDailyCloseDetailProductionLots" + ViewData["id_productionLotDailyClose"];
+        settings.CallbackRouteValues = new { Controller = "ProductionLotDailyClose", Action = "ProductionLotDailyCloseDetailProductionLotsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "ProductionLotDailyCloseDetailProductionLots_BeginCallback";
+
+        settings.CommandColumn.Visible = false;
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdProductionLotDailyClose"] = 0;
+            }
+            e.Properties["cpIdProductionLotDailyClose"] = ViewData["id_productionLotDailyClose"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        #region ColumnsAdd
+
+        settings.Columns.Add(m => m.ProductionLot.number, column =>
+        {
+            column.Name = "ProductionLotNumber";
+            column.Caption = "Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityOrdered";
+            column.Name = "totalQuantityOrdered";
+            column.Caption = DataProviderSetting.ValueSetting("UCO");//"Libras Compradas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityOrdered = (productionLot != null) ? productionLot.totalQuantityOrdered : 0;
+                ViewContext.Writer.Write(totalQuantityOrdered.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add( column =>
+        {
+            //column.FieldName = "totalQuantityRemitted";
+            column.Name = "totalQuantityRemitted";
+            column.Caption = DataProviderSetting.ValueSetting("UER");//"Libras Enviadas/Remitidas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityRemitted = (productionLot != null) ? productionLot.totalQuantityRemitted : 0;
+                ViewContext.Writer.Write(totalQuantityRemitted.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityRecived";
+            column.Name = "totalQuantityRecived";
+            column.Caption = DataProviderSetting.ValueSetting("URE");//"Libras Recibidas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityRecived = (productionLot != null) ? productionLot.totalQuantityRecived : 0;
+                ViewContext.Writer.Write(totalQuantityRecived.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityLiquidation";
+            column.Name = "totalQuantityLiquidation";
+            column.Caption = DataProviderSetting.ValueSetting("ULI");//"Libras Liquidadas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityLiquidation = (productionLot != null) ? productionLot.totalQuantityLiquidation : 0;
+                ViewContext.Writer.Write(totalQuantityLiquidation.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityTrash";
+            column.Name = "totalQuantityTrash";
+            column.Caption = DataProviderSetting.ValueSetting("UDE");//"Libras de Desperdicio";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityTrash = (productionLot != null) ? productionLot.totalQuantityTrash : 0;
+                ViewContext.Writer.Write(totalQuantityTrash.ToString("N2"));
+            });
+
+        });
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,26 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string _id_CostCenterExit = Model.id_CostCenterExit != null ? Model.id_CostCenterExit.ToString() : "";
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+}
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxCostCenterExitEdit";
+	settings.Properties.ClientInstanceName = "ComboBoxCostCenterExitEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxCostCenterExitEdit",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxCostCenterExitEdit_SelIndexChanged";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.ReadOnly = !(this.ViewBag.Editable);
+}).BindList(ViewData["CmbBoxCostCenterExitEdit"]).Bind(_id_CostCenterExit).GetHtml()

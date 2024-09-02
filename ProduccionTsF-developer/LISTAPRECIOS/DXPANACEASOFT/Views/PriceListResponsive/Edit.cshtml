@@ -1,0 +1,337 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.PriceListDTO
+
+<head>
+    <style>
+        .panelEdition {
+            background: #fdf5ea;
+            border: solid 1px #8e8e8e;
+            padding: 10px;
+            max-width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            padding-bottom: 2px;
+        }
+        td {
+            color: #000 !important;
+        }
+    </style>
+</head>
+<body>
+    <h3>Lista de Precio</h3>
+    @{
+        int nViewAllCols = (ViewBag.nViewallHidden != null && ViewBag.nViewallHidden == 1) ? 1 : 0;
+
+        Html.RenderPartial("PanelButtonsEdit");
+    }
+
+<form class="panelEdition" id="EditPriceList">
+    @Html.Hidden("id_listPrice", Model.id)
+    @Html.Hidden("id_proveedor", Model.id_proveedor)
+    @Html.Hidden("id_grupo", Model.id_grupo)
+    @Html.Hidden("enabled", (bool)ViewBag.enabled)
+    @Html.Hidden("IsOwner", (bool)ViewBag.IsOwner)
+    @Html.Hidden("isQuotation", (bool)Model.isQuotation)
+    @Html.Hidden("from", (string)ViewBag.from)
+
+    @Html.Hidden("readOnly", (bool)ViewBag.readOnly)
+    @Html.Hidden("CanSave", (bool)ViewBag.CanSave)
+    @Html.Hidden("CanEdit", (bool)ViewBag.CanEdit)
+    @Html.Hidden("CanDuplicate", (bool)ViewBag.CanDuplicate)
+    @Html.Hidden("CanAproved", (bool)ViewBag.CanAproved)
+    @Html.Hidden("CanReverse", (bool)ViewBag.CanReverse)
+    @Html.Hidden("CanClose", (bool)ViewBag.CanClose)
+    @Html.Hidden("CanAnnul", (bool)ViewBag.CanAnnul)
+    @Html.Hidden("code_processtype", (string)ViewBag.code_processtype)
+    @Html.Hidden("NviewAllH", (int)nViewAllCols)
+
+    <div class="row">
+        <div class="col-sm-2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelNombre";
+                settings.Text = "Nombre: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4" id="divTextBoxNombre">
+            @Html.DevExpress().TextBoxFor(model => model.name,
+                settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "TextBoxNombre";
+                    settings.ReadOnly = true;
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                }).GetHtml()
+        </div>
+        <div class="col-sm-2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelEstado";
+                settings.Text = "Estado: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4">
+            @Html.DevExpress().TextBoxFor(model => model.state, settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "TextBoxEstado";
+                settings.ReadOnly = true;
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            }).GetHtml()
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelPeriodoCalendario";
+                settings.Text = "Periodo Calendario: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4">
+            @Html.Partial("_ComboBoxPeriodoCalendarioEdit")
+        </div>
+        <div class="col-sm-2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelResponsable";
+                settings.Text = "Responsable: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4">
+            @Html.Partial("_ComboBoxCompradoresEdit")
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelFechaDesde";
+                settings.Text = "Fecha Desde: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4">
+            @Html.DevExpress().DateEditFor(model => model.startDate, settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "DateEditFechaDesde";
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                settings.Properties.ClientSideEvents.Init = "setRangeDateForm";
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = !ViewBag.enabled || !ViewBag.IsOwner;
+                settings.Properties.ClientSideEvents.DateChanged = "DateEditFechaDesde_Changed";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelFechaHasta";
+                settings.Text = "Fecha Hasta: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4">
+            @Html.DevExpress().DateEditFor(model => model.endDate, settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "DateEditFechaHasta";
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                settings.Properties.ClientSideEvents.Init = "setRangeDateTo";
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = !ViewBag.enabled || !ViewBag.IsOwner;
+                settings.Properties.ClientSideEvents.DateChanged = "UpdateNamePriceList";
+            }).GetHtml()
+        </div>
+    </div>
+	<div class="row">
+		<div class="col-sm-2" id="divLabelComboBoxTipoListaCamaron">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Width = Unit.Percentage(100);
+				settings.Name = "LabelTipoCamaron";
+				settings.Text = "Tipo de Camarón: ";
+			}).GetHtml()
+		</div>
+		<div class="col-sm-4" id="divComboBoxTipoListaCamaron">
+			@Html.Partial("_ComboBoxTipoListaCamaronEdit", Model)
+		</div>
+		<div class="col-sm-2">
+			@*EMPTY*@
+		</div>
+		<div class="col-sm-4">
+			@Html.Hidden("isQuotation", Model.isQuotation)
+			@Html.DevExpress().CheckBoxFor(model => model.isQuotation, settings =>
+			{
+				settings.Width = Unit.Percentage(100);
+				settings.Text = "Es LP Proveedores";
+				settings.Name = "CheckBoxEsCotizacion";
+				settings.Checked = false;
+				settings.ReadOnly = !ViewBag.enabled || !ViewBag.IsOwner;
+				settings.Properties.ClientSideEvents.CheckedChanged = "CheckBoxEsCotizacion_Click";
+				settings.Properties.ClientSideEvents.Init = "CheckBoxEsCotizacion_OnInit";
+			}).GetHtml()
+		</div>
+		<div class="col-sm-2">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Width = Unit.Percentage(100);
+				settings.Name = "LabelUsuario";
+				settings.Text = "Usuario Aprueba: ";
+                settings.ClientVisible = ViewBag.IsApprovalGerencial;
+			}).GetHtml()
+		</div>
+		<div class="col-sm-4">
+			@Html.DevExpress().TextBoxFor(model => model.userAproval, settings =>
+       {
+           settings.Width = Unit.Percentage(100);
+           settings.Name = "TextBoxUserApproval";
+           settings.ReadOnly = true;
+           settings.ClientVisible = ViewBag.IsApprovalGerencial;
+       }).GetHtml()
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-sm-2" id="divLabelListaBase" style="display: none">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelListaBase";
+                settings.Text = "Lista Base: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4" id="divComboBoxListasPrecio" style="display: none">
+            @Html.Partial("_ComboBoxListasPrecioEdit")
+        </div>
+        <div class="col-sm-2"></div>
+        <div class="col-sm-4">
+            <table>
+                <tr class="row" style="padding: 0px;">
+                    <td>
+                        <div id="checkParaGrupos" style="display: none">
+                            @Html.Hidden("paraGrupo", Model.paraGrupo)
+                            @Html.DevExpress().RadioButtonFor(model => model.paraGrupo, settings =>
+                            {
+                                settings.Width = Unit.Percentage(100);
+                                settings.Name = "RadioButtonParaGrupo";
+                                settings.Text = "Para Grupo";
+                                settings.GroupName = "ProveedoresGrupo";
+                                settings.ReadOnly = !ViewBag.enabled || !ViewBag.IsOwner;
+                                settings.Properties.ClientSideEvents.CheckedChanged = "RadioProveedoresGrupo_Click";
+                            }).GetHtml()
+                        </div>
+                    </td>
+                    <td>
+                        <div id="checkParaProveedores" style="display: none">
+                            @Html.Hidden("paraProveedor", Model.paraProveedor)
+                            @Html.DevExpress().RadioButtonFor(model => model.paraProveedor, settings =>
+                            {
+                                settings.Width = Unit.Percentage(100);
+                                settings.Name = "RadioButtonParaProveedor";
+                                settings.Text = "Para Proveedor";
+                                settings.GroupName = "ProveedoresGrupo";
+                                settings.ReadOnly = !ViewBag.enabled || !ViewBag.IsOwner;
+                                settings.Properties.ClientSideEvents.CheckedChanged = "RadioProveedoresGrupo_Click";
+                            }).GetHtml()
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+    <div class="row" id="rowProveedorGrupo" style="display: none">
+        <div class="col-sm-2" id="divLabelProveedor" style="display: none">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelProveedor";
+                settings.Text = "Proveedor: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4" id="divComboBoxProveedores" style="display: none">
+            @Html.Partial("_ComboBoxProveedoresEdit")
+        </div>
+        <div class="col-sm-2" id="divLabelGrupo" style="display: none">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelGrupo";
+                settings.Text = "Grupo: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4" id="divComboBoxGrupos" style="display: none">
+            @Html.Partial("_ComboBoxGruposEdit")
+        </div>
+        <div class="col-sm-1" id="divGruposEye" style="display: none">
+            <div id="btnGroupEye" style="border: 1px solid #C0C0C0; width: 20px; height: 20px;">
+                <i class="fa fa-eye" style="padding: 2px"></i>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2" id="divLabelCertificacion" style="display: none">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Name = "LabelCertificacion";
+                settings.Text = "Certificación: ";
+            }).GetHtml()
+        </div>
+        <div class="col-sm-4" id="divComboBoxCertificaciones" style="display: none">
+            @Html.Partial("_ComboBoxCertificacionesEdit")
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12" id="divTabControlPriceListDetails">
+            @Html.Partial("_TabControlPriceListDetails")
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-condensed">
+                <tr style="border-top: 1px Solid #C0C0C0;">
+                    <td colspan="6" style="text-align: right; margin-top: 5px;">
+                        @{
+                            Html.DevExpress().Button(button =>
+                            {
+                                button.Name = "btnUpdate";
+                                button.Text = "Guardar";
+                                button.RenderMode = ButtonRenderMode.Button;
+                                button.ImagePosition = ImagePosition.Left;
+                                button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                                button.UseSubmitBehavior = false;
+                                button.ValidateInvisibleEditors = true;
+                                button.ClientSideEvents.Click = "SaveItem";
+                                button.ClientVisible = ViewBag.enabled;
+                            }).Render();
+
+                            ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                            Html.DevExpress().Button(button =>
+                            {
+                                button.Name = "btnCancel";
+                                button.Text = ViewBag.enabled ? "Cancelar" : "Cerrar";
+                                button.RenderMode = ButtonRenderMode.Button;
+                                button.ImagePosition = ImagePosition.Left;
+                                button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                                button.UseSubmitBehavior = false;
+                                button.ClientSideEvents.Click = "ButtonCancel_Click";
+                            }).Render();
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>
+</body>
+
+<script src="~/Scripts/price_list_responsive/edit.js"></script>

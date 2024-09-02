@@ -1,0 +1,34 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.AdvanceProvider
+@{
+	string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "01";
+	int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+	int? id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+	DateTime dt = (Model != null && Model.purchaseOrderDate != null) ? (DateTime)Model.purchaseOrderDate : DateTime.Now;
+	int? idPt = Model.id_processType ?? 0;
+}
+@Html.DevExpress().ComboBoxFor(m => m.id_priceList, settings =>
+{
+	settings.Properties.ClientInstanceName = "id_priceList";
+	settings.Width = Unit.Percentage(100);
+
+	settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+	settings.CallbackRouteValues = new { Controller = "AdvanceProvider", Action = "GetPriceListsByProvider"};
+	settings.Properties.CallbackPageSize = 10;
+
+	settings.ReadOnly = codeState != "01";
+
+	settings.Properties.ValueField = "id";
+	settings.Properties.TextField = "name";
+	settings.Properties.ValueType = typeof(int);
+
+	settings.Properties.ClientSideEvents.BeginCallback = "OnPriceListBeginCallback";
+	settings.Properties.ClientSideEvents.Validation = "OnPriceListValidation";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnPriceListSelectedIndexChanged";
+}).BindList(DataProviderPriceList.PriceListByCompanyWithCurrentAndProviderAndCommercialDate2((int?)ViewData["id_company"], id_priceList, id_provider, dt, idPt)).Bind(id_priceList).GetHtml()
+
+@*//}).BindList(DataProviderVehicle.VehiclesForRemissionGuide(Model.id_TransportationType, Model.id_vehicle)).Bind((id_vehicle != null) ? id_vehicle.ToString() : carRegistration).GetHtml()*@

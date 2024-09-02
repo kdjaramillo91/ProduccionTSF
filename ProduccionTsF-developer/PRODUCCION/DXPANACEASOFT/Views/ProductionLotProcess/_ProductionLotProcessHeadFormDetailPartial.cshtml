@@ -1,0 +1,128 @@
+﻿@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ProductionLot
+@{
+
+	int? id_dischargeReason = (Model != null && Model.id_dischargeReason != null && Model.id_dischargeReason != 0) ? (int?)Model.id_dischargeReason : null;
+	int? id_incomeReason = (Model != null && Model.id_incomeReason != null && Model.id_incomeReason != 0) ? (int?)Model.id_incomeReason : null;
+
+}
+<table id="mainTabProductionLotTransfer" class="table table-condensed" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="9">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Generación de Movimientos</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "nameWareHouseLabel";
+				settings.Text = "Bodega a Transferir:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_wareHouseTransfer, settings =>
+			{
+				settings.Name = "id_wareHouseTransfer";
+				settings.Properties.ClientInstanceName = "id_wareHouseTransfer";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = false;
+				settings.ShowModelErrors = true;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboWarehouseProductionLotLiquidationDetailTransfer_SelectedIndexChanged";
+				settings.Properties.ClientSideEvents.Validation = "OnWarehouseProductionLotLiquidationDetailValidation";
+			}).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"], null, 0)).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "nameWareHouseLocationLabel";
+				settings.Text = "Ubicación a Transferir:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_wareHouseLocationTransfer, settings =>
+			{
+				settings.Name = "id_wareHouseLocationTransfer";
+				settings.Properties.ClientInstanceName = "id_wareHouseLocationTransfer";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = false;
+				settings.ShowModelErrors = true;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.Init = "ComboWarehouseLocationProductionLotLiquidationDetailTranfer_Init";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboWarehouseLocationProductionLotLiquidationDetailTransfer_SelectedIndexChanged";
+				settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationProductionLotLiquidationDetailValidation";
+			}).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "nameDischargeReasonLabel";
+				settings.Text = "Motivo Egreso:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_dischargeReason, settings =>
+	   {
+		   settings.Name = "id_dischargeReason";
+		   settings.Properties.ClientInstanceName = "id_dischargeReason";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.ReadOnly = false;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   //settings.Properties.ClientSideEvents.Init = "OnDischargeReasonInit";
+		   settings.Properties.ClientSideEvents.Validation = "OnDischargeReasonValidation";
+		   //settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnSelectedDischargeReasonChanged";
+	   }).BindList(DataProviderInventoryMove.InventoryReasonsByCompanyCodeDocumentAndCurrent((int?)ViewData["id_company"], "E", id_dischargeReason, true, false)).Bind(id_dischargeReason).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "nameIncomeReasonLabel";
+				settings.Text = "Motivo Ingreso:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_incomeReason, settings =>
+	   {
+		   settings.Name = "id_incomeReason";
+		   settings.Properties.ClientInstanceName = "id_incomeReason";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.ReadOnly = false;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   //settings.Properties.ClientSideEvents.Init = "OnDischargeReasonInit";
+		   settings.Properties.ClientSideEvents.Validation = "OnIncomeReasonValidation";
+		   //settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnSelectedDischargeReasonChanged";
+	   }).BindList(DataProviderInventoryMove.InventoryReasonsByCompanyCodeDocumentAndCurrent((int?)ViewData["id_company"], "I", id_incomeReason, true, false)).Bind(id_incomeReason).GetHtml()
+		</td>
+	</tr>
+</table>
+<br />
+<br />

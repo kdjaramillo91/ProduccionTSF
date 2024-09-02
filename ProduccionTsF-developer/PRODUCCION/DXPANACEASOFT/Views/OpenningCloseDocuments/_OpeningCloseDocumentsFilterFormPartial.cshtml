@@ -1,0 +1,166 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.OpeningCloseDocumentsDTO.OpeningCloseDocumentsFilter
+
+@using (Html.BeginForm("", "", FormMethod.Post, new {@id = "formFilterOpeningCloseDocuments", name = "formFilterOpeningCloseDocuments" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr>
+     
+        <td style="width: 35%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="4">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Fecha de Emisi&oacute;n</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 35%;">
+                        @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "emissionDateStartLabel";
+                                settings.Text = "Fecha Emisión:";
+                                settings.AssociatedControlName = "emissionDateStartLabel";
+                            }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().DateEditFor(m => m.emissionDateStart, settings =>
+                        {
+                            settings.Name = "emissionDateStartP";
+                            settings.Properties.ClientInstanceName = "emissionDateStartP";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Desde";
+                            settings.Properties.NullText = "Desde";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.MinDayCount = 0;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().DateEditFor(m => m.emissionDateEnd, settings =>
+                        {
+                            settings.Name = "emissionDateEndP";
+                            settings.Properties.ClientInstanceName = "emissionDateEndP";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Hasta";
+                            settings.Properties.NullText = "Hasta";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.StartDateEditID = "emissionDateStartP";
+                            settings.Properties.DateRangeSettings.MinDayCount = 0;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    </td>
+                    <td colspan="2">
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 50%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="4">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Tipo de Documento</span>
+                    </td>
+                </tr>
+                <tr>
+
+                    <td style="width: 35%;">
+                        @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "id_documentTypeLabel";
+                                settings.Text = "Tipo:";
+                                settings.AssociatedControlName = "id_documentTypeLabel";
+                            }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBoxFor(m => m.id_DocumentType, settings =>
+                   {
+                       settings.Name = "id_DocumentType";
+                       settings.Properties.ClientInstanceName = "id_DocumentTypeP";
+
+                       settings.Properties.ValueField = "id";
+                       settings.Properties.TextField = "name";
+                       settings.Properties.ValueType = typeof(int);
+
+                       settings.Properties.NullDisplayText = "Todos";
+                       settings.Properties.NullText = "Todos";
+
+                       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                       settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                   }).BindList(DataProviderDocumentType.DocumentTypeOpeningClose()).GetHtml()
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+         
+            </table>
+        </td>
+        <td>
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "btnSearch";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Buscar";
+                            settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnSearch_click";
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "Clear";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Limpiar";
+                            settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnClear_click";
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+
+ 
+
+}

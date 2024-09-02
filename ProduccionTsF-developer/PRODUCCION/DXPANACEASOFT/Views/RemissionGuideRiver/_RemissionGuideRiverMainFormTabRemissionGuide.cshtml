@@ -1,0 +1,369 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuideRiver
+
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Fechas</span>
+        </td>
+    </tr>
+    <!--FILA 1 Fechas DESPACHO -->
+    <tr>
+        <!--FECHA DESPACHO-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "despachureDateLabel";
+                settings.Text = "Fecha Despacho:";
+                settings.AssociatedControlName = "despachureDate";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            <div class="row">
+                <div class="col-md-6">
+                    @Html.DevExpress().DateEditFor(m => m.despachureDate, settings =>
+               {
+                   settings.Name = "despachureDate";
+                   settings.Properties.ClientInstanceName = "despachureDate";
+                   settings.Properties.UseMaskBehavior = true;
+                   settings.Properties.EditFormat = EditFormat.Custom;
+                   settings.Properties.EditFormatString = "dd/MM/yyyy";
+                   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                   settings.ShowModelErrors = true;
+                   settings.ReadOnly = codeState != "01";
+                   settings.Properties.ClientSideEvents.Validation = "OnDespachureDateValidation";
+                   settings.Properties.ClientSideEvents.ValueChanged= "DespachureDate_ValueChanged";
+               }).GetHtml()
+                </div>
+                <div class="col-md-6">
+                    @{
+                        TimeSpan? despachurehour =   (Model != null) ? (TimeSpan?)Model.despachurehour : null;
+                    }
+                    @Html.DevExpress().TimeEdit( settings =>
+               {
+                   settings.Name = "despachurehour";
+                   settings.Properties.ClientInstanceName = "despachurehour";
+                   settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                   settings.Properties.EditFormat = EditFormat.Time;
+                   settings.Properties.EditFormatString = "HH:mm";
+                   settings.Properties.DisplayFormatString = "HH:mm tt";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = codeState != "01";
+                   if (despachurehour != null)
+                   {settings.DateTime = new DateTime(2014, 1, 1, despachurehour.Value.Hours, despachurehour.Value.Minutes, 0);
+                   }
+                   settings.ShowModelErrors = false;
+                   settings.Properties.ClientSideEvents.Validation = "OndespachurehourValidation";
+               }).GetHtml()
+                </div>
+                </div>
+         </td>
+         <td>
+         </td>
+         <td>                 
+         </td>
+         <td>
+         </td>
+         <td>
+         </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n General</span>
+        </td>
+    </tr>
+    <!--FILA 2 MOTIVO,RECIBE-->
+    <tr>
+        <!--MOTIVO-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "id_reasonLabel";
+            settings.Text = "Motivo:";
+            settings.AssociatedControlName = "id_reason";
+        }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_reason = (Model != null && Model.id_reason != 0) ? (int?)Model.id_reason : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_reason, settings =>
+            {
+                settings.Name = "id_reason";
+                settings.Properties.ClientInstanceName = "id_reason";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextFormatString = "{1}";
+                //settings.Properties.TextField = "name";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Columns.Add("code", "Cod.", 50);
+                settings.Properties.Columns.Add("name", "Nombre", 200);
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnReasonValidation";
+            }).BindList(DataProviderRemissionGuideReason.RemisisonGuideReasonsByCompanyAndCurrent((int?)ViewData["id_company"], id_reason)).Bind(id_reason).GetHtml()
+        </td>
+        <!--RECIBE-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "id_reciverLabel";
+                settings.Text = "Recibe:";
+                settings.AssociatedControlName = "id_reciver";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_reciver = (Model != null && Model.id_reciver != 0) ? (int?)Model.id_reciver : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_reciver, settings =>
+            {
+                settings.Name = "id_reciver";
+                settings.Properties.ClientInstanceName = "id_reciver";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "fullname_businessName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnReciverValidation";
+            }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], id_reciver, "Recibidor")).Bind(id_reciver).GetHtml()
+         </td>
+         <td>
+        </td>
+    <!--INFORMACIÓN PROVEEDOR UNIDAD DE PRODUCCIÓN-->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n Proveedor</span>
+        </td>
+    </tr>
+    <!--FILA 3-->
+    <tr>
+        <!--PROVEEDOR-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "ProviderLabel";
+                settings.Text = "Proveedor:";
+                settings.AssociatedControlName = "provieder";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_proviederGuia = (Model != null && Model.id_providerRemisionGuideRiver != 0) ? (int?)Model.id_providerRemisionGuideRiver : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_providerRemisionGuideRiver, settings =>
+            {
+                settings.Name = "id_providerRemisionGuideRiver";
+                settings.Properties.ClientInstanceName = "id_providerRemisionGuideRiver";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Columns.Add("name", "Nombre", 200);
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProviderRemisionGuideRiver_SelectedIndexChanged";
+                settings.Properties.EnableClientSideAPI = true;
+                settings.Properties.CallbackPageSize = 20;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnReasonValidation";
+                settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { id_productionUnitProvider.PerformCallback();  id_productionUnitProviderPool.PerformCallback();   }";
+            }).BindList(DataProviderPerson.ProviderByCompany((int?)ViewData["id_company"])).Bind(id_proviederGuia).GetHtml()
+        </td>
+        <!--UNIDAD DE PRODUCCIÓN-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_productionUnitProvider, settings =>
+            {
+                settings.Name = "id_productionUnitProviderLabel";
+                settings.Text = "Unidad de Producción:";
+                settings.AssociatedControlName = "id_productionUnitProviderPool";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                Html.RenderPartial("comboboxcascading/_cmbProviderProductionUnitPartial", Model);
+            }
+        </td>
+         <td>
+        </td>
+        <td>
+       </td>
+    </tr>
+    <!--FILA 4-->
+    <tr>
+        <!--Sitio -->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Sitio:";
+                settings.AssociatedControlName = "nameFishingSite";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.FishingSite.name, settings =>
+            {
+                settings.Properties.ClientInstanceName = "nameFishingSite";
+                settings.Name = "nameFishingSite";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+         </td>
+        <!--Zona -->
+         <td >
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Zona:";
+                settings.AssociatedControlName = "nameFishingZone";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.FishingSite.FishingZone.name, settings =>
+            {
+                settings.Properties.ClientInstanceName = "nameFishingZone";
+                settings.Name = "nameFishingZone";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()  
+        </td>
+        <td >
+        </td>
+        <td>
+        </td>
+    </tr>
+    <!--DIRECCIONES -->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Direcciones y tipo de Viaje</span>
+        </td>
+    </tr>
+    <!--FILA 5-->
+    <tr>
+        <!--DIRECCIÓN DE PARTIDA-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "startAdressLabel";
+                settings.Text = "Dirección Partida:";
+                settings.AssociatedControlName = "startAdress";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.startAdress, settings =>
+            {
+                settings.Name = "startAdress";
+                settings.Properties.ClientInstanceName = "startAdress";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnStartAddressValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <!--FILA 6-->
+    <tr>
+        <!--DIRECCIÓN DE DESTINO-->
+        <td>
+            @Html.DevExpress().Label( settings =>
+            {
+                settings.Name = "routeLabel";
+                settings.Text = "Dirección de Destino:";
+                settings.AssociatedControlName = "route";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.route, settings =>
+            {
+                settings.Name = "route";
+                settings.Properties.ClientInstanceName = "route";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                //settings.Properties.ClientSideEvents.Validation = "OnRouteValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <!--VÍA DE TRANSPORTE-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "shippingType";
+                settings.Text = "Vía de Transporte:";
+                settings.AssociatedControlName = "shippingType";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? shippingtype = (Model != null && Model.id_shippingType != 0) ? (int?)Model.id_shippingType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_shippingType, settings =>
+       {
+           settings.Name = "id_shippingType";
+           settings.Properties.ClientInstanceName = "id_shippingType";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           //settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { id_TransportTariffType.PerformCallback(); id_vehicle.PerformCallback(); mark.SetValue(null);  model.SetValue(null);}";
+           settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { id_TransportTariffType.PerformCallback(); id_vehicle.PerformCallback(); mark.SetValue(null);  model.SetValue(null);}";
+         //  settings.ClientEnabled = false;
+           //settings.Properties.ClientSideEvents.Validation = "OnShippingTypeValidation";
+       }).BindList(DataProviderPurchaseOrder.PurchaseOrderShippingType()).Bind(shippingtype).GetHtml()
+        </td>
+        <td>
+            @{
+                string lableEnterprise = DataProviderSetting.ValueSetting("EEPRIM");
+            }
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "requiredLogisticLbl";
+                settings.Text = (lableEnterprise != "") ? "Logística " + lableEnterprise : "Logística Empresa";
+                settings.AssociatedControlName = "requiredLogistic";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.requiredLogistic, settings =>
+            {
+                settings.Name = "requiredLogistic";
+                settings.Properties.ClientInstanceName = "requiredLogistic";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+    </tr>
+
+    
+    
+    
+    
+    
+
+
+    
+
+    
+    
+    
+
+</table>

@@ -1,0 +1,37 @@
+﻿
+@model DXPANACEASOFT.Models.InventoryMove
+
+<table id="mainTabInventoryMove" class="table table-condenced" style="margin: 0px;">
+    @{
+        if (Model != null && Model.Document != null && Model.Document.DocumentType != null)
+        {
+            string code = Model.Document.DocumentType.code;
+            string _natureMove = (string)ViewData["_natureMove"];
+            ViewData["code"] = code;
+
+            if (_natureMove.Equals("I"))
+            {
+                Html.RenderPartial("_InventoryEntryMoveEditFormPartial", Model);
+            }
+            else if (_natureMove.Equals("E"))
+            {
+                Html.RenderPartial("_InventoryExitMoveEditFormPartial", Model);
+            }
+            else if (_natureMove.Equals("A"))
+            {
+                Html.RenderPartial("_InventoryAutoMoveEditFormPartial", Model);
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" style="text-align: center; vertical-align: middle;"> TIPO DE DOCUMENTO INV&Aacute;LIDO </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            }
+        }
+    }
+</table>

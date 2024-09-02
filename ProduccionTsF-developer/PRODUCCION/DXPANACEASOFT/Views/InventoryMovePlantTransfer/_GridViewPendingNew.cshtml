@@ -1,0 +1,150 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<InventoryMovePlantTransferPendingNewDTO>(settings =>
+    {
+        settings.Name = "GridViewPendingNew";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "InventoryMovePlantTransfer",
+            Action = "GridViewPendingNew",
+        };
+
+        settings.KeyFieldName = "id_liquidationCartOnCartDetail";
+
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewPendingNewSelectionChanged";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_liquidationCartOnCartDetail";
+            column.Name = "id_liquidationCartOnCartDetail";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberLiquidationCartOnCart";
+            column.Caption = "No.Liq.";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "emissionDate";
+            column.Caption = "Fecha Liq.";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "machineForProd";
+            column.Caption = "Máquina";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "turn";
+            column.Caption = "Turno";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "productionCart";
+            column.Caption = "Carro";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "processType";
+            column.Caption = "Proceso";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberLot";
+            column.Caption = "No. Lote";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "processPlant";
+            column.Caption = "Planta Proceso";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "provider";
+            column.Caption = "Proveedor";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "customer";
+            column.Caption = "Cliente";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "itemWarehouse";
+            column.Caption = "Producto a Bodega";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "box";
+            column.Caption = "Cjas Pendientes Recibir";
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal box = (decimal)DataBinder.Eval(c.DataItem, "box");
+
+                ViewContext.Writer.Write(box.ToString("#,#"));
+            });
+        });
+
+        //MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        //{
+        //    ShowEditButton = false,
+        //    ShowDeleteButton = false,
+        //    Visible = true,
+        //    VisibleIndex = 11,
+        //    Caption = "Acción",
+        //    Width = Unit.Percentage(8)
+        //};
+
+        //commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+        //{
+        //    ID = "btnProcess",
+        //    Text = "Registrar"
+        //});
+
+        //settings.ClientSideEvents.CustomButtonClick = "GridViewGenerate_Click";
+        //settings.ClientSideEvents.RowDblClick = "GridViewGenerate_Click";
+        //settings.Columns.Add(commandColumn);
+
+    });
+}
+@grid.Bind(Model).GetHtml()

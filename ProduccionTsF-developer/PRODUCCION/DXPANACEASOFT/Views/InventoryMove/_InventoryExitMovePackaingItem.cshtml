@@ -1,0 +1,48 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryMove
+
+
+@{
+
+    int? id_ItemLot = (Model == null)?null:Model.idLotePackagingMaterials;
+    int? idItem = null;
+    if (Model != null && Model.InventoryMoveExitPackingMaterial != null )
+    {
+        idItem = (int)Model.InventoryMoveExitPackingMaterial.id_ItemMaster;
+
+    }
+    
+
+
+}
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "idItemFilter";
+    settings.Properties.ClientInstanceName = "idItemFilter";
+    settings.Width = Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+
+    settings.Properties.ValueField = "idModelP";
+    settings.Properties.TextFormatString = "{0} | {1}";
+    settings.Properties.Columns.Add("masterCodeModelP", "Cod.", 120);
+    settings.Properties.Columns.Add("auxCodeModelP", "Cod.Aux", 160);
+    settings.Properties.Columns.Add("nameModelP", "Nombre", 160);
+    
+
+
+    settings.Properties.Columns.Add("descriptionModelP", "Descripcion", 0);
+
+    settings.Properties.ValueType = typeof(int);
+    settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "GetItemFilter" /*, TextField = "CityName"*/ };
+    settings.Properties.Width = Unit.Percentage(100);
+    settings.Properties.CallbackPageSize = 10;
+
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemFilter_OnSelectedIndexChanged";
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.ShowModelErrors = true;
+}).BindList(DataProviderItem.GetListItemModelPByCustomInventoryLine( )).Bind(idItem).GetHtml()

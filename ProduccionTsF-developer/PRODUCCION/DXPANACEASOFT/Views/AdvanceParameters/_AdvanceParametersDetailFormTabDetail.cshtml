@@ -1,0 +1,210 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.AdvanceParameters
+
+@{
+    TimeSpan? TimeInit = (Model != null) ? (TimeSpan?)Model.valueTime : null;
+    var dateTimeTimeInitLiquidationAux = (TimeInit == null) ? new DateTime(2014, 1, 1, 0, 0, 0) :
+                                                                                     new DateTime(2014, 1, 1, TimeInit.Value.Hours, TimeInit.Value.Minutes, TimeInit.Value.Seconds);
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Name = "codeL2abel";
+                settings.Text = "Código:";
+                settings.AssociatedControlName = "code";
+            }).GetHtml()
+
+
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+            {
+                settings.Name = "co2de";
+                settings.Properties.ClientInstanceName = "code";
+                settings.Properties.NullText = "Código";
+                settings.Width = Unit.Percentage(100);
+                settings.Height = Unit.Percentage(100);
+                settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = true;
+                settings.Properties.MaxLength = 20;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+            }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Name = "descript2ionLabel";
+                settings.Text = "Descripción:";
+                settings.AssociatedControlName = "code";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.description, settings =>
+            {
+                settings.Name = "des2cription";
+                settings.Properties.ClientInstanceName = "description";
+                settings.Properties.NullText = "Descripción";
+                settings.Width = Unit.Percentage(100);
+                settings.Height = Unit.Percentage(100);
+                settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = true;
+                settings.Properties.MaxLength = 50;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+            }).GetHtml()
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueVarchar, settings =>
+            {
+                settings.Name = "valueVar2charLabel";
+                settings.Text = "Valor Texto:";
+                settings.AssociatedControlName = "valueVarchar";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.valueVarchar, settings =>
+            {
+                settings.Name = "valueVa2rchar";
+                settings.Properties.ClientInstanceName = "valueVarchar";
+                settings.Properties.NullText = "Valor de Texto";
+                settings.Width = Unit.Percentage(100);
+                settings.Height = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.ShowModelErrors = true;
+                settings.Properties.MaxLength = 20;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueInteger, settings =>
+            {
+                settings.Name = "valueInte2gerLabel";
+                settings.Text = "Valor Numérico:";
+                settings.AssociatedControlName = "valueInteger";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.valueInteger, settings =>
+            {
+                settings.Name = "valueI2nteger";
+                settings.Properties.ClientInstanceName = "valueInteger";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueDecimal, settings =>
+            {
+                settings.Name = "valueDecima2lLabel";
+                settings.Text = "Valor Décimal:";
+                settings.AssociatedControlName = "valueDecimal";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.valueDecimal, settings =>
+            {
+                settings.Name = "valueDeci2mal";
+                settings.Properties.ClientInstanceName = "valueDecimal";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.DisplayFormatString = "N2";
+                settings.ReadOnly = true;
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueDate, settings =>
+            {
+                settings.Name = "valueDateLa2bel";
+                settings.Text = "Valor Fecha:";
+                settings.Properties.DisplayFormatString = "N2";
+                settings.AssociatedControlName = "valueInteger";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.valueDate, settings =>
+            {
+                settings.Name = "valueD2ate";
+                settings.Properties.ClientInstanceName = "valueDate";
+                settings.Width = Unit.Percentage(92);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueTime, settings =>
+            {
+                settings.Name = "value2TimeLabel";
+                settings.Text = "Valor Tiempo:";
+                settings.AssociatedControlName = "valueTime";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TimeEdit(timeEdit =>
+             {
+                 timeEdit.Name = "valueT2ime";
+                 timeEdit.Properties.ClientInstanceName = "valueTime";
+                 timeEdit.Width = Unit.Percentage(92);
+                 timeEdit.Properties.DisplayFormatInEditMode = true;
+                 timeEdit.Properties.EditFormatString = "HH:mm:ss";
+                 timeEdit.Properties.DisplayFormatString = "HH:mm:ss";
+                 timeEdit.Properties.EditFormat = EditFormat.Custom;
+                 timeEdit.ShowModelErrors = false;
+                 timeEdit.ReadOnly = true;
+                 timeEdit.DateTime = dateTimeTimeInitLiquidationAux;
+                 timeEdit.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+             }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.hasDetail, settings =>
+           {
+               settings.Name = "hasDetai2lLabel";
+               settings.Text = "¿Detalle?:";
+               settings.AssociatedControlName = "hasDetail";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.hasDetail, settings =>
+             {
+                settings.Name = "hasDet2ail";
+                settings.ReadOnly = true;
+             }).GetHtml()
+        </td>
+
+    </tr>
+
+
+    <tr></tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+
+
+

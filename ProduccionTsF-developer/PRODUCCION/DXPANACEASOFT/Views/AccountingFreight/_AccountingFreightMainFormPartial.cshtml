@@ -1,0 +1,137 @@
+﻿@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.AccountingFreight
+
+@{
+	string MessageError = "";
+	string Message = "";
+	@Html.Hidden("id_accountingFreight", this.Model.id)
+}
+
+
+
+<div id="messageAlert"></div>
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditAccountingFreightDetails", name = "formEditAccountingFreightDetails" }))
+{
+	<div id="infoAccountingFreightDetails">
+		@{
+			if (ViewData["EditMessage"] != null)
+			{
+				Message = (string)ViewData["EditMessage"];
+			}
+
+			if (ViewData["ErrorMessage"] != null)
+			{
+				MessageError = (string)ViewData["ErrorMessage"];
+			}
+
+		}
+	</div>
+
+	Html.RenderPartial("_GridMessage", Message);
+
+	<table id="mainAccountingFreight" class="table table-condenced" style="margin: 0px;">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td style="width: 8%;">
+				@Html.DevExpress().LabelFor(m => m.id_processPlant, settings =>
+						{
+							settings.Text = "Planta Proceso:";
+							settings.AssociatedControlName = "id_processPlant";
+						}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBox(settings =>
+		   {
+			   settings.Name = "id_processPlant";
+			   settings.Properties.ClientInstanceName = "id_processPlant";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "processPlant";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Width = Unit.Percentage(50);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnProcessPlantSelectedIndexChanged";
+			   settings.ShowModelErrors = true;
+
+		   }).BindList(DataProviderPerson.GetPersonProcesPlant()).Bind(Model.id_processPlant).GetHtml()
+			</td>
+			<td style="width: 8%;">
+				@Html.DevExpress().LabelFor(m => m.liquidation_type, settings =>
+				{
+					settings.Text = "Tipo Liquidación:";
+					settings.AssociatedControlName = "liquidation_type";
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBox(settings =>
+		   {
+			   settings.Name = "liquidation_type";
+			   settings.Properties.ClientInstanceName = "liquidation_type";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(string);
+			   settings.Properties.Width = Unit.Percentage(50);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnLiquidationTypeSelectedIndexChanged";
+			   settings.ShowModelErrors = true;
+
+		   }).BindList(DataProviderAccountingFreight.GetLiquidationType()).Bind(Model.liquidation_type).GetHtml()
+			</td>
+		</tr>
+
+	</table>
+
+	<table id="mainAccountingFreight" class="table table-condenced">
+		@{
+			var details = (Model != null && Model.AccountingFreightDetails != null) ? Model.AccountingFreightDetails.ToList() : new List<AccountingFreightDetails>();
+			Html.RenderPartial("DocumentTemplates/_DocumentDetailsActionsButtons");
+			Html.RenderPartial("_AccountingFreightDetailsEditFormPartial", details);
+		}
+	</table>
+
+
+	<table class="table table-condensed">
+		<tr style="border-top: 1px Solid #C0C0C0;">
+			<td colspan="6" style="text-align: right">
+				@{
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnUpdate";
+						button.Text = "Guardar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.ClientEnabled = true;
+						button.UseSubmitBehavior = false;
+						button.EnableClientSideAPI = true;
+						button.ClientSideEvents.Click = "ButtonUpdate_Click";
+					}).Render();
+
+					ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnClose";
+						button.Text = "Cerrar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						button.ClientEnabled = true;
+						button.UseSubmitBehavior = false;
+						button.EnableClientSideAPI = true;
+						button.ClientSideEvents.Click = "ButtonClose_Click";
+					}).Render();
+				}
+			</td>
+		</tr>
+	</table>
+}
+
+<script src="~/Scripts/accountingFreight/editform.js"></script>
+<script src="~/Scripts/accountingFreight/accountingFreightDetailsEditFormPartial.js"></script>

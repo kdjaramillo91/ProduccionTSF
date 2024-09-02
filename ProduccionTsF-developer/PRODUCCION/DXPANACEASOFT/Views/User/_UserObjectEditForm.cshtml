@@ -1,0 +1,120 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ObjectPermissionUser
+
+<table class="table table-condensed">
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Text = "Objeto:";
+				settings.AssociatedControlName = "code";
+			}).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_objectPermission = (Model != null && Model.id_objectPemission != 0) ? (int?)Model.id_objectPemission : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_objectPemission, settings =>
+			{
+				settings.Properties.ClientInstanceName = "id_objectPermissionUser";
+				settings.Name = "id_objectPemissionUser";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione objeto";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ShowModelErrors = true;
+			}).BindList(DataProviderUser.GetObjectPermissionUser(id_objectPermission)).Bind(id_objectPermission).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+				{
+					settings.Text = "Controlador:*";
+					settings.AssociatedControlName = "name";
+				}).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_controlador = (Model != null && Model.id_controller != 0) ? (int?)Model.id_controller : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_controller, settings =>
+		   {
+			   settings.Properties.ClientInstanceName = "id_Controller";
+
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+
+			   settings.Width = Unit.Percentage(100);
+
+			   settings.Properties.NullText = "Seleccione controlador";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			   settings.ShowModelErrors = true;
+			   //settings.Properties.ClientSideEvents.Validation = "OnItemTypesInventoryLineValidation";
+		   }).BindList(DataProviderController.Controllers()).Bind(id_controlador).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+			{
+				settings.Text = "¿Activo?:";
+				settings.AssociatedControlName = "isActive";
+			}).GetHtml()
+		</td>
+		@*<td>
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			{
+				settings.Properties.ClientInstanceName = "isActive";
+
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>*@
+	</tr>
+	@*<tr>
+		<td colspan="6" style="text-align: right;">
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnUpdate";
+				settings.Text = "Actualizar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+				settings.UseSubmitBehavior = false;
+				//settings.ClientSideEvents.Click = "ActualizarClick";
+			}).GetHtml()
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnCancel";
+				settings.Text = "Cancelar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+				settings.UseSubmitBehavior = false;
+				//settings.ClientSideEvents.Click = "CancelarClick";
+			}).GetHtml()
+		</td>
+	</tr>*@
+	<tr id="objectUserAlertRow" style="display: none;">
+		<td colspan="6">
+			<div class="alert alert-danger fade in" style="margin-top:18px;">
+				<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+				<span id="objectUserErrorMessage"></span>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<script src="~/Scripts/user/editform.js"></script>

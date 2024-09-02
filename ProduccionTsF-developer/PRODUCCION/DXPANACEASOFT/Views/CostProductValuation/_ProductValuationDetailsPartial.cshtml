@@ -1,0 +1,211 @@
+﻿@model ProductionCostProductValuation
+<table width="100%">
+	<tr>
+		<td>
+			<strong>Valorización de Inventarios</strong>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@{
+				var detallesBodega = this.Model
+					.ProductionCostProductValuationWarehouse
+					.Select(x => new
+					{
+						x.id_warehouse,
+						warehouse_code = x.Warehouse.code,
+						warehouse_name = x.Warehouse.name,
+						warehouseType_name = x.Warehouse.WarehouseType.name,
+						inventoryLine_name = x.Warehouse.InventoryLine.name,
+						x.id_periodState,
+						periodState_name = x.AdvanceParametersDetail.valueName,
+						x.process,
+						x.isActive
+					})
+					.ToArray();
+			}
+
+			@Html.DevExpress().GridView(
+				grid =>
+				{
+					grid.Name = "gvProductValuationWarehouse";
+					grid.Width = Unit.Percentage(100);
+
+					#region GridView Behavior
+
+					grid.SettingsBehavior.AllowSort = false;
+					grid.SettingsBehavior.AllowSelectByRowClick = true;
+					grid.SettingsBehavior.AllowDragDrop = false;
+
+					grid.SettingsPager.Visible = false;
+					grid.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+					grid.SettingsSearchPanel.Visible = false;
+					grid.Settings.ShowTitlePanel = false;
+					grid.Settings.ShowGroupPanel = false;
+					grid.Settings.ShowFooter = false;
+
+					grid.Settings.ShowFilterRow = false;
+					grid.Settings.ShowFilterRowMenu = false;
+
+					grid.CommandColumn.Visible = false;
+					grid.SettingsDetail.ShowDetailRow = false;
+
+					grid.CustomJSProperties = (s, e) =>
+					{
+						e.Properties["cpDetallesBodegas"] = detallesBodega;
+					};
+
+					#endregion
+
+					#region Adaptivity Settings
+
+					grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+					grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+					grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+					grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+					grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+					#endregion
+
+					#region Columns
+					grid.Columns.Add(column =>
+					{
+						column.Caption = " ";
+						column.FieldName = "process";
+						column.Name = "process";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+						column.HeaderStyle.Wrap = DefaultBoolean.True;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+						column.Width = Unit.Percentage(5);
+
+						if (this.ViewBag.DetailsEditable)
+						{
+							column.SetDataItemTemplateContent(content =>
+							{
+								var indiceItem = content.VisibleIndex;
+								var checkBoxName = String.Concat("UsarBodegaValorizacionEditCheckBox_", indiceItem);
+								var process = detallesBodega[indiceItem].process;
+
+								Html.DevExpress().CheckBox(checkBox =>
+								{
+									checkBox.Name = checkBoxName;
+									checkBox.Checked = true;
+									checkBox.CustomJSProperties = (s, e) =>
+									{
+										e.Properties["cpIndice"] = indiceItem;
+									};
+
+									//checkBox.Properties.ClientSideEvents.CheckedChanged = "onUsarDetalleGrupoCostoEditCheckedChanged";
+
+								}).Bind(process).Render();
+							});
+						}
+						else
+						{
+							column.ColumnType = MVCxGridViewColumnType.CheckBox;
+						}
+					});
+
+
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "warehouse_code";
+						column.Name = "warehouse_code";
+						column.Caption = "Cód. Bodega";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(12);
+
+						column.FooterCellStyle.Font.Bold = true;
+						column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Left;
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "warehouse_name";
+						column.Name = "warehouse_name";
+						column.Caption = "Bodega";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "warehouseType_name";
+						column.Name = "warehouseType_name";
+						column.Caption = "Tipo de Bodega";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "inventoryLine_name";
+						column.Name = "inventoryLine_name";
+						column.Caption = "Línea de Inventario";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "periodState_name";
+						column.Name = "periodState_name";
+						column.Caption = "Periodo Bodega";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "isActive";
+						column.Name = "isActive";
+						column.Caption = "¿Activo?";
+						column.Width = Unit.Percentage(10);
+						column.ColumnType = MVCxGridViewColumnType.CheckBox;
+					});
+
+					#endregion
+
+				}).Bind(detallesBodega).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<hr style="margin-top: 8px; margin-bottom: 2px; border: 0px;" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div style="text-align:right;">
+				@Html.DevExpress().Button(
+					button =>
+					{
+						button.Name = "CalcularValoracionEditButton";
+						button.Text = "Calcular Valoración";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.SpreadsheetCreatefromselection16x16;
+						button.UseSubmitBehavior = false;
+
+						button.Style.Add("margin-right", "25px");
+
+						button.ClientSideEvents.Click = "onCalcularValoracionButtonClick";
+						button.ClientVisible = (bool)this.ViewBag.DetailsEditable && this.Model.processed;
+					}).GetHtml()
+			</div>
+		</td>
+	</tr>
+</table>

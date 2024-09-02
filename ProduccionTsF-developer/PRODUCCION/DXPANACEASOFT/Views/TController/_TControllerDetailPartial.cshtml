@@ -1,0 +1,38 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.TController
+
+
+@{
+    TController tcontroller = Model ?? new TController();
+}
+
+@Html.Hidden("id_tcontroller", tcontroller.id)
+
+<table style="width: 100%;">
+
+    <tr>
+        <td>Nombre:</td>
+        <td colspan="4">
+            @Html.Raw(tcontroller.name)
+        </td>
+    </tr>
+    <tr>
+        <td>Descripción:</td>
+        <td colspan="4">
+            @Html.Raw(tcontroller.description)
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

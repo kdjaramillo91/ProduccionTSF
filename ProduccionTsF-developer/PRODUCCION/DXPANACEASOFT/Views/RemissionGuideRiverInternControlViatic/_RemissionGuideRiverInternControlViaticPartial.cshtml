@@ -1,0 +1,222 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<RemissionGuideRiver>(settings =>
+    {
+        settings.Name = "gvRemisssionGuideRiverInternControlViatic";
+        settings.CallbackRouteValues = new { Controller = "RemissionGuideRiverInternControlViatic", Action = "RemissionGuideRiverInternControlViaticPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Settings.ShowFooter = true;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Guias de Remisión Aprobadas</span>");
+        });
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = false;
+
+        //DETALLES EN GRID LLAMADA A OTRA TABLA
+        settings.SetDetailRowTemplateContent(columns =>
+        {
+            int? id_remissionGuideRiver = (int?)DataBinder.Eval(columns.DataItem, "id");
+            RemissionGuideRiver remissionGuideRiver = DataProviderRemissionGuideRiver.RemissionGuideRiver(id_remissionGuideRiver);
+            Html.RenderPartial("_RemissionGuideRiverInternControlViaticDetailViewPartial", remissionGuideRiver);
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //Document
+        settings.Columns.Add(m => m.Document.number, column =>
+        {
+            column.Name = "number";
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+
+        });
+        settings.Columns.Add(m => m.PurchaseOrderShippingType.name, column =>
+        {
+            column.Name = "PurchaseOrderShippingType";
+            column.Caption = "Medio de Transporte";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+
+        });
+
+        settings.Columns.Add(m => m.Provider.Person.fullname_businessName, column =>
+        {
+            column.Name = "proveedor";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.ProductionUnitProvider.name, column =>
+        {
+            column.Name = "productionUnitProvider";
+            column.Caption = "Unidad de Producción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.ProductionUnitProvider.FishingSite.FishingZone.name, column =>
+        {
+            column.Name = "FishingZone";
+            column.Caption = "Zona";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.ProductionUnitProvider.FishingSite.name, column =>
+        {
+            column.Name = "FishingSite";
+            column.Caption = "Sitio";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.RemissionGuideRiverTransportation.driverName, column =>
+        {
+            column.Name = "driverName";
+            column.Caption = "Chofer";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.RemissionGuideRiverTransportation.Vehicle.carRegistration, column =>
+        {
+            column.Name = "carRegistration";
+            column.Caption = "Placa";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.RemissionGuideRiverCustomizedViaticPersonalAssigned.tbsysCatalogState.descriptionState, column =>
+        {
+            column.Name = "descriptionState";
+            column.Caption = "Estado Pago";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.RemissionGuideRiverCustomizedViaticPersonalAssigned.id_UserApproved, column =>
+        {
+            column.Name = "id_UserApproved";
+            column.Caption = "Usuario Gestión";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_User = DataBinder.Eval(c.DataItem, string.Format("RemissionGuideRiverCustomizedViaticPersonalAssigned.{0}", "id_UserApproved"));
+                string nameUser = "";
+                if (id_User != null)
+                {
+                    nameUser = DataProviderUser.UserById((int)id_User).Employee.Person.fullname_businessName;
+                }
+                ViewContext.Writer.Write(nameUser);
+            });
+        });
+        //settings.Columns.Add(m => m.RemissionGuideRiverControlVehicle.exitDateProductionBuilding, column =>
+        //{
+        //    column.Name = "exitDateProductionBuilding";
+        //    column.Caption = "Fecha de Salida";
+        //    column.ColumnType = MVCxGridViewColumnType.DateEdit;
+        //    ((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+        //    ((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+        //    column.Width = Unit.Percentage(8);
+        //});
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.Name = "";
+        //    column.Caption = "Hora de Salida";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //    column.Width = Unit.Percentage(5);
+
+        //    column.SetDataItemTemplateContent(c =>
+        //    {
+        //        string exHour = "exitTimeProductionBuilding";
+        //        TimeSpan tmp = new TimeSpan();
+        //        var exitTime = DataBinder.Eval(c.DataItem, string.Format("RemissionGuideRiverControlVehicle.{0}", "exitTimeProductionBuilding"));
+        //        if (exitTime != null)
+        //        {
+        //            tmp = (TimeSpan)exitTime;
+        //            exHour = tmp.ToString(@"hh\:mm");
+        //        }
+
+        //        ViewContext.Writer.Write(exHour);
+        //    });
+        //});
+
+        // COMMAND COLUMN
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+        commandColumn.ShowEditButton = false;
+        commandColumn.ShowDeleteButton = false;
+        commandColumn.Visible = true;
+        commandColumn.VisibleIndex = 14;
+        commandColumn.Caption = "Acciones";
+        commandColumn.Width = Unit.Percentage(3);
+
+        commandColumn.CustomButtons.Add(
+            new GridViewCommandColumnCustomButton
+            {
+                ID = "btnEditRow",
+                Text = "Editar"
+            }
+        );
+        settings.ClientSideEvents.CustomButtonClick = "GridViewRemissionGuideRiverInternControlViaticCustomCommandButton_Click";
+        settings.Columns.Add(commandColumn);
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}
+

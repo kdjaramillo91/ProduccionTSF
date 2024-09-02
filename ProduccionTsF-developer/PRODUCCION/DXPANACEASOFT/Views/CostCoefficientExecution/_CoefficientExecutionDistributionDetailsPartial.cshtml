@@ -1,0 +1,216 @@
+﻿
+@model ProductionCostCoefficientExecution
+
+
+<div style="padding-top: 10px"></div>
+<hr style="width: 100%;">
+
+<strong>Distribución de Libras</strong>
+
+<div class="row" style="padding-top: 10px">
+	<div class="col-sm-12">
+		@Html.DevExpress().GridView(
+			grid =>
+			{
+				grid.Name = "gvCostCoefficientDistributionPounds";
+				grid.Width = Unit.Percentage(100);
+
+				#region GridView Behavior
+
+				grid.SettingsBehavior.AllowSort = false;
+				grid.SettingsBehavior.AllowSelectByRowClick = true;
+				grid.SettingsBehavior.AllowDragDrop = false;
+
+				grid.SettingsPager.Visible = false;
+				grid.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+				grid.SettingsSearchPanel.Visible = false;
+				grid.Settings.ShowTitlePanel = false;
+				grid.Settings.ShowGroupPanel = false;
+				grid.Settings.ShowFooter = true;
+
+				grid.Settings.ShowFilterRow = false;
+				grid.Settings.ShowFilterRowMenu = false;
+
+				grid.CommandColumn.Visible = false;
+				grid.SettingsDetail.ShowDetailRow = false;
+
+				#endregion
+
+				#region Adaptivity Settings
+
+				grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+				grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+				grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+				grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+				grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+				#endregion
+
+				grid.CustomUnboundColumnData = (s, e) =>
+				{
+					if (e.Column.FieldName == "name_planta")
+					{
+						var processPlant = (Person)e.GetListSourceFieldValue("ProductionPlant");
+						e.Value = (processPlant.processPlant != null)
+							? processPlant.processPlant
+							: processPlant.fullname_businessName;
+					}
+				};
+
+				#region Columns
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "name_planta";
+					column.Caption = "Planta";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(25);
+					column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Left;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "InventoryLine.name";
+					column.Name = "name_inventoryLine";
+					column.Caption = "Línea de Inventario";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(25);
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "ItemType.name";
+					column.Name = "name_itemType";
+					column.Caption = "Tipo de Ítem";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(25);
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "libras";
+					column.Name = "libras";
+					column.Caption = "Libras";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.PropertiesEdit.DisplayFormatString = "N2";
+					column.Width = Unit.Percentage(12);
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "porcentaje";
+					column.Name = "porcentaje";
+					column.Caption = "%";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.PropertiesEdit.DisplayFormatString = "N4";
+					column.Width = Unit.Percentage(12);
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "valor";
+					column.Name = "valor";
+					column.Caption = "Valor";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.PropertiesEdit.DisplayFormatString = "N2";
+					column.Width = Unit.Percentage(12);
+
+					column.FooterCellStyle.Font.Bold = true;
+					column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "coeficiente";
+					column.Name = "coeficiente";
+					column.Caption = "Coeficiente";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.PropertiesEdit.DisplayFormatString = "N5";
+					column.Width = Unit.Percentage(12);
+				});
+
+				#endregion
+
+				#region Totals
+
+				if (this.Model.ProductionCostCoefficientExecutionPlants.Any())
+				{
+					grid.TotalSummary.Add(new ASPxSummaryItem()
+					{
+						FieldName = "name_planta",
+						SummaryType = DevExpress.Data.SummaryItemType.Custom,
+						ShowInColumn = "name_planta",
+					});
+
+					grid.TotalSummary.Add(new ASPxSummaryItem()
+					{
+						FieldName = "libras",
+						DisplayFormat = "N2",
+						SummaryType = DevExpress.Data.SummaryItemType.Sum,
+						ShowInColumn = "libras",
+					});
+
+					grid.TotalSummary.Add(new ASPxSummaryItem()
+					{
+						FieldName = "porcentaje",
+						DisplayFormat = "N4",
+						SummaryType = DevExpress.Data.SummaryItemType.Sum,
+						ShowInColumn = "porcentaje",
+					});
+
+					grid.TotalSummary.Add(new ASPxSummaryItem()
+					{
+						FieldName = "valor",
+						DisplayFormat = "N2",
+						SummaryType = DevExpress.Data.SummaryItemType.Sum,
+						ShowInColumn = "valor",
+					});
+
+					grid.CustomSummaryCalculate = (s, e) =>
+					{
+						var item = e.Item as ASPxSummaryItem;
+
+						if (item != null)
+						{
+							if (item.FieldName == "name_planta")
+							{
+								if (e.SummaryProcess == DevExpress.Data.CustomSummaryProcess.Finalize)
+								{
+									e.TotalValue = "TOTAL";
+									e.TotalValueReady = true;
+								}
+							}
+						}
+					};
+				}
+
+				#endregion
+
+			}).Bind(this.Model.ProductionCostCoefficientExecutionPlants).GetHtml()
+	</div>
+</div>

@@ -1,0 +1,2 @@
+insert into Setting(name,code,value,id_settingDataType,id_module,id_company,isActive,id_userCreate,dateCreate, id_userUpdate, dateUpdate,description)
+values ('Selector de Piscina', 'SPP','SI',1,5,1,1,1,GETDATE(),1,GETDATE(),'')

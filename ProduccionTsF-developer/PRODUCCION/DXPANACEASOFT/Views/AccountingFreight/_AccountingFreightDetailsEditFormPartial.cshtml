@@ -1,0 +1,454 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.Dto
+
+
+@{ 
+	int id_accountingFreight = (int?)ViewData["id_accountingFreight"] ?? 0;
+}
+
+@{
+
+	var grid = Html.DevExpress().GridView<AccountingFreightDetails>(settings =>
+	{
+		settings.Name = "gridViewMoveDetails";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "AccountingFreight",
+			Action = "AccountingFreightDetailsEditFormPartial"
+		};
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "AccountingFreight", Action = "AccountingFreightDetailsEditFormPartialAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "AccountingFreight", Action = "AccountingFreightDetailsEditFormPartialUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "AccountingFreight", Action = "AccountingFreightDetailsEditFormPartialDelete" };
+
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+		settings.Width = Unit.Percentage(100);
+		settings.CommandColumn.Visible = true;
+
+		settings.Enabled = true;
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowGroup = false;
+		settings.SettingsBehavior.AllowSort = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+		settings.SettingsBehavior.ConfirmDelete = false;
+
+		#region Edit Form
+
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+		settings.SettingsText.PopupEditFormCaption = "Editar Detalle de Plantilla";
+
+		settings.SettingsPopup.EditForm.Modal = true;
+		settings.SettingsPopup.EditForm.Width = 800;
+		settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+		settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		#endregion
+
+		#region Command Column
+
+		settings.CommandColumn.Width = Unit.Percentage(8);
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowNewButton = false;
+		settings.CommandColumn.ShowDeleteButton = true;
+		settings.CommandColumn.ShowEditButton = true;
+		//settings.CommandColumn.ShowNewButtonInHeader = true;
+
+		#endregion
+
+
+
+		settings.KeyFieldName = "id";
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+		settings.Settings.ShowFooter = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "accountingAccountCodeLabel";
+			column.Caption = "Cuenta Contable";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				string id_warehouseLocation = (string)DataBinder.Eval(c.DataItem, "accountingAccountCode");
+				var text = DataProviderAccountingFreight.AccountingCountCode(id_warehouseLocation);
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new AccountingFreightDetails();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_accountingAccountCode = detIM.accountingAccountCode == "" ? (string) "": detIM.accountingAccountCode;
+					var accountingAccounts = DataProviderAccountingFreight.AccountingCount();
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "accountingAccountCode";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ReadOnly = false;
+						var prop = comboBox.Properties;
+
+						prop.ValueField = "idCuentaContable";
+						prop.TextField = "cuentaContable";
+						prop.ValueType = typeof(string);
+
+						comboBox.Properties.TextFormatString = "{0}-{1}";
+
+						comboBox.Properties.Columns.Add("idCuentaContable", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("cuentaContable", "Nombre", Unit.Percentage(70));
+
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpCuentasContables"] = accountingAccounts;
+						};
+
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnCuentaContableDetailSelectedIndexChanged";
+
+
+					}).BindList(accountingAccounts).Bind(id_accountingAccountCode).GetHtml();
+
+				});
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "isAuxiliar";
+			column.Name = "isAuxiliarLabel";
+			column.Caption = "Auxiliar";
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			column.ReadOnly = true;
+
+			column.EditorProperties().CheckBox(checkbox =>
+			{
+				checkbox.ClientInstanceName = "isAuxiliarCheck";
+				checkbox.ValueType = typeof(bool);
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "code_AuxiliarLabel";
+			column.Caption = "Tipo Auxiliar";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				string code_Auxiliar = (string)DataBinder.Eval(c.DataItem, "code_Auxiliar");
+				var text = DataProviderAccountingFreight.GetTypeAuxiliaresContablesForCode(code_Auxiliar);
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new AccountingFreightDetails();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_code_Auxiliar = detIM.code_Auxiliar == "" ? (string)null : detIM.code_Auxiliar;
+					var  id_cuentaContable = detIM.accountingAccountCode == "" ? (string)null : detIM.accountingAccountCode;
+					var data= DataProviderAccountingFreight.AccountingCountTypeAuxiliar(id_cuentaContable);
+
+					var codeAuxiliarList = data.Select(x => new
+					{
+						idTipoAuxContable = x.CCiTipoAuxiliar,
+						tipoAuxContable = x.CDsTipoAuxiliar
+					}).OrderBy(d => d.idTipoAuxContable).ToArray();
+
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "code_Auxiliar";
+						comboBox.Width = Unit.Percentage(100);
+						var prop = comboBox.Properties;
+						prop.ClientInstanceName = "id_tipoAuxContab";
+
+						prop.ValueField = "idTipoAuxContable";
+						prop.TextField = "tipoAuxContable";
+						prop.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{1}";
+
+
+						comboBox.Properties.Columns.Add("idTipoAuxContable", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("tipoAuxContable", "Nombre", Unit.Percentage(70));
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						prop.ClientSideEvents.SelectedIndexChanged = "OnTipoAuxiliarContableDetailSelectedIndexChanged";
+						//prop.ClientSideEvents.Validation = "OnSubCostCenterDetailValidation";
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).BindList(codeAuxiliarList).Bind(id_code_Auxiliar).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "idAuxContableLabel";
+			column.Caption = "Auxiliar Contable ";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				string id_idAuxContable = (string)DataBinder.Eval(c.DataItem, "idAuxContable");
+				string text = DataProviderAccountingFreight.GetAuxiliaresContablesForCode(id_idAuxContable);
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new AccountingFreightDetails();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var code_Auxiliar = detIM.code_Auxiliar == "" ? "" : detIM.code_Auxiliar;
+					var idAuxContable = detIM.idAuxContable == "" ? "" : detIM.idAuxContable;
+					var auxiliarContable  = DataProviderAccountingFreight.GetAuxiliaresContablesByCurrent(code_Auxiliar, idAuxContable);
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "idAuxContable";
+						comboBox.Properties.ClientInstanceName = "id_auxiliarContab";
+						comboBox.Width = Unit.Percentage(100);
+						//comboBox.ClientEnabled = requiereAuxiliarContable;
+
+						comboBox.Properties.ValueField = "idAuxContable";
+						comboBox.Properties.TextField = "auxContable";
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("idAuxContable", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("auxContable", "Nombre", Unit.Percentage(70));
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnAuxiliarContableDetailSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnAuxiliarContableDetailValidation";
+
+					}).BindList(auxiliarContable).Bind(idAuxContable).GetHtml();
+
+
+				});
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_costCenterDetailLabel";
+			column.Caption = "Centro Costo";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_costCenter = (int?)DataBinder.Eval(c.DataItem, "id_costCenter");
+				CostCenter costCenter = DataProviderCostCenter.CostCenterById(id_costCenter);
+				string text = (costCenter != null) ? costCenter.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c => {
+
+					int? id_costCenter = (int?)DataBinder.Eval(c.DataItem, "id_costCenter");
+
+					var costCenterT = DataProviderCostCenter.AllCostCenters();
+					Html.DevExpress().ComboBox(
+						comboBox =>
+						{
+							comboBox.Name = "id_costCenterDetail";
+							comboBox.Width = Unit.Percentage(100);
+
+							var prop = comboBox.Properties;
+
+							prop.ValueField = "id";
+							prop.TextField = "name";
+							prop.ValueType = typeof(int);
+
+							prop.ClientInstanceName = "id_costCenterDetail";
+							prop.DropDownStyle = DropDownStyle.DropDownList;
+							prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+							prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+							comboBox.Properties.ClientSideEvents.Init = "OnInitCostCenterCombo";
+							comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnCostCenterCombo_SelectedIndexChanged";
+							comboBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+						}).BindList(costCenterT).Bind(id_costCenter).GetHtml();
+				});
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_subCostCenterLabel";
+			column.Name = "id_subCostCenterDetail";
+			column.Caption = "Sub. C.Costo";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_subCostCenter = (int?)DataBinder.Eval(c.DataItem, "id_subCostCenter");
+				CostCenter costCenter = DataProviderCostCenter.CostCenterById(id_subCostCenter);
+				string text = (costCenter != null) ? costCenter.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new AccountingFreightDetails();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_costCenterAux = detIM.id_costCenter == 0 ? (int?)null : detIM.id_costCenter;
+					var id_subCostCenterAux = detIM.id_costCenter == 0 ? (int?)null : detIM.id_subCostCenter;
+					var costCenters = DataProviderCostCenter.SubCostCentersByCostCenterAndCurrent(id_costCenterAux, id_subCostCenterAux);
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_subCostCenterDetail";
+						comboBox.Width = Unit.Percentage(100);
+						var prop = comboBox.Properties;
+						prop.ClientInstanceName = "id_subCostCenterDetail";
+
+						prop.ValueField = "id";
+						prop.TextField = "name";
+						prop.ValueType = typeof(int);
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.CallbackRouteValues = new { Controller = "AccountingFreight", Action = "GetSubCostCenter" };
+						prop.ClientSideEvents.BeginCallback = "InventoryMoveSubCostCenter_BeginCallback";
+						prop.ClientSideEvents.EndCallback = "InventoryMoveSubCostCenter_EndCallback";
+						//prop.ClientSideEvents.Validation = "OnSubCostCenterDetailValidation";
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).BindList(costCenters).Bind(id_subCostCenterAux).GetHtml();
+
+				});
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "accountTypeLabel";
+			column.Caption = "Tipo Cuenta";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				string idCC = (string)DataBinder.Eval(c.DataItem, "accountType");
+				var text = DataProviderAccountingFreight.GetAccountingTypeCode(idCC);
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				column.SetEditItemTemplateContent(c =>
+				{
+					var detIM = new AccountingFreightDetails();
+					if (c.ItemIndex >= 0)
+					{
+						detIM = Model[c.ItemIndex];
+					}
+					var id_accountType = detIM.accountType == "" ? "": detIM.accountType;
+
+					var accountType = DataProviderAccountingFreight.GetAccountingType();
+					Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "accountType";
+						comboBox.Width = Unit.Percentage(100);
+						var prop = comboBox.Properties;
+						prop.ClientInstanceName = "accountType";
+
+						prop.ValueField = "id";
+						prop.TextField = "name";
+						prop.ValueType = typeof(string);
+
+						prop.DropDownStyle = DropDownStyle.DropDownList;
+						prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					}).BindList(accountType).Bind(id_accountType).GetHtml();
+
+				});
+			});
+
+
+
+		});
+
+
+		settings.InitNewRow = (s, e) =>
+		{
+			e.NewValues["isActive"] = true;
+		};
+
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+
+}
+
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,75 @@
+﻿@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.InventoryMove
+@*@{
+		int? id_dischargeReason = (Model != null && Model.id_dischargeReason != null && Model.id_dischargeReason != 0) ? (int?)Model.id_dischargeReason : null;
+		int? id_incomeReason = (Model != null && Model.id_incomeReason != null && Model.id_incomeReason != 0) ? (int?)Model.id_incomeReason : null;
+
+}*@
+<table id="mainTabInventoryMoveDetail" class="table table-condensed" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="9">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Consulta Ubicaciones</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "wareHouseLocationEntryLabel";
+				settings.Text = "Ubicación:";
+				settings.AssociatedControlName = "idWarehouseLocationEntry";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_WarehouseEntry = (Model != null && Model.idWarehouse != null && Model.idWarehouse != 0) ? (int?)Model.idWarehouse : null;
+				int? _id_WarehouseLocationExit = null;
+
+				List<SelectListItem> ls = new List<SelectListItem>();
+				using (var _db = new DBContext())
+				{
+					ls = _db.WarehouseLocation
+							.Where(e => e.isActive
+							&& e.id_warehouse == id_WarehouseEntry)
+							.Select(s => new SelectListItem
+							{
+								Text = s.name,
+								Value = s.id.ToString(),
+							}).ToList();
+				}
+				if (ls != null && ls.Count() == 1)
+				{
+					var tmp = ls.FirstOrDefault();
+
+					_id_WarehouseLocationExit = Int32.Parse(tmp.Value);
+
+				}
+			}
+			@Html.DevExpress().ComboBox(settings =>
+	   {
+		   settings.Name = "idWarehouseLocationEntry";
+		   settings.Width = Unit.Percentage(50);
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		   //settings.ClientEnabled = (codeState == "01");
+		   settings.ShowModelErrors = true;
+		   //settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationValidation";
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnSelectedWareHouseLocationChanged";
+	   }).BindList(DataProviderWarehouseLocation.WarehouseLocationsByWarehouse((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"], id_WarehouseEntry)).Bind(_id_WarehouseLocationExit).GetHtml()
+		</td>
+		<td colspan="10"></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	
+</table>

@@ -1,0 +1,165 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuideRiverControlVehicle
+@using DXPANACEASOFT.Models
+
+@{
+    TempData.Keep("remissionGuideRiverForControlVehicle");
+    string codeState = (Model != null && Model.RemissionGuideRiver != null && Model.RemissionGuideRiver.Document != null && Model.RemissionGuideRiver.Document.DocumentState != null && Model.RemissionGuideRiver.Document.DocumentState.code != "") ? Model.RemissionGuideRiver.Document.DocumentState.code : "";
+    var edpb = Model.exitDateProductionBuilding;
+}
+@Html.Hidden("edpb", edpb)
+
+<table id="RGCVContainer" class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="4">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Fecha de Despacho</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.RemissionGuideRiver.despachureDate, settings =>
+            {
+                settings.Name = "despachureDateLabel";
+                settings.Text = "Fecha:";
+                settings.AssociatedControlName = "despachureDateLabel";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.RemissionGuideRiver.despachureDate, settings =>
+            {
+                settings.Name = "despachureDate";
+                settings.Properties.ClientInstanceName = "despachureDate";
+                settings.Properties.UseMaskBehavior = true;
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.ShowModelErrors = false;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.RemissionGuideRiver.despachurehour, settings =>
+            {
+                settings.Name = "despachurehourLabel";
+                settings.Text = "Fecha:";
+                settings.AssociatedControlName = "despachurehourLabel";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                TimeSpan? despachurehour = (Model != null && Model.RemissionGuideRiver != null && Model.RemissionGuideRiver.despachurehour != null) ? (TimeSpan?)Model.RemissionGuideRiver.despachurehour : null;
+            }
+            @Html.DevExpress().TimeEdit(settings =>
+            {
+                settings.Name = "despachurehour";
+                settings.Properties.ClientInstanceName = "despachurehour";
+
+                settings.Properties.EditFormat = EditFormat.Time;
+                settings.Properties.EditFormatString = "HH:mm";
+                settings.Properties.DisplayFormatString = "HH:mm";
+                settings.ReadOnly = true;
+                settings.Width = Unit.Percentage(100);
+                if (despachurehour != null)
+                {
+                    settings.DateTime = new DateTime(2018, 1, 1, despachurehour.Value.Hours, despachurehour.Value.Minutes, 0);
+                }
+                settings.ShowModelErrors = false;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="4">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Salida del Edificio de Producci&oacute;n</span>
+        </td>
+    </tr>
+    <tr>
+        <!-- CODIGO VA AQUI-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.exitDateProductionBuilding, settings =>
+        {
+            settings.Name = "exitDateProductionBuildingLabel";
+            settings.Text = "Fecha:";
+            settings.AssociatedControlName = "exitDateProductionBuildingLabel";
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.exitDateProductionBuilding, settings =>
+       {
+           settings.Name = "exitDateProductionBuilding";
+           settings.Properties.ClientInstanceName = "exitDateProductionBuilding";
+           settings.Properties.UseMaskBehavior = false;
+           settings.Properties.EditFormat = EditFormat.Custom;
+           settings.Properties.ClientSideEvents.Init = "exitDateProductionBuildingOnInit";
+           settings.Properties.EditFormatString = "dd/MM/yyyy";
+           settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+           settings.Width = Unit.Percentage(100);
+           settings.CustomJSProperties = (s, e) =>
+           {
+               e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               e.Properties["cpIsRequired"] = "true";
+               e.Properties["cpHasTab"] = "false";
+           };
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           settings.ShowModelErrors = true;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.exitTimeProductionBuilding, settings =>
+            {
+                settings.Name = "exitTimeProductionBuildingLabel";
+                settings.Text = "Hora:";
+                settings.AssociatedControlName = "exitTimeProductionBuildingLabel";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                TimeSpan? exitTimeProductionBuilding = (Model != null) ? (TimeSpan?)Model.exitTimeProductionBuilding : null;
+            }
+
+            @Html.DevExpress().TimeEdit(settings =>
+        {
+            settings.Name = "exitTimeProductionBuilding";
+            settings.Properties.ClientInstanceName = "exitTimeProductionBuilding";
+
+            settings.Properties.EditFormat = EditFormat.Time;
+            settings.Properties.EditFormatString = "HH:mm";
+            settings.Properties.DisplayFormatString = "HH:mm tt";
+            settings.Width = Unit.Percentage(100);
+            if (exitTimeProductionBuilding != null)
+            {
+                settings.DateTime = new DateTime(2018, 1, 1, exitTimeProductionBuilding.Value.Hours, exitTimeProductionBuilding.Value.Minutes, 0);
+            }
+            settings.ShowModelErrors = false;
+            settings.CustomJSProperties = (s, e) =>
+            {
+                e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                e.Properties["cpIsRequired"] = "true";
+                e.Properties["cpHasTab"] = "false";
+            };
+            settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+        }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ObservationExit, settings =>
+        {
+            settings.Name = "ObservationExitLabel";
+            settings.Text = "Observación:";
+            settings.AssociatedControlName = "ObservationExitLabel";
+        }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.ObservationExit, settings =>
+        {
+            settings.Name = "ObservationExit";
+            settings.Properties.ClientInstanceName = "ObservationExit";
+            settings.Width = Unit.Percentage(100);
+            settings.ShowModelErrors = true;
+        }).GetHtml()
+        </td>
+    </tr>
+</table>
+

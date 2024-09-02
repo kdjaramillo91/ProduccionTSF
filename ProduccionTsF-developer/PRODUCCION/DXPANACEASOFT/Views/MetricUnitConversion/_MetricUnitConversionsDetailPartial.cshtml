@@ -1,0 +1,87 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    MetricUnitConversion metricUnitConversion = Model ?? new MetricUnitConversion();
+}
+
+@Html.Hidden("id_metricUnitConversion", metricUnitConversion.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Metrica de Origen:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(metricUnitConversion.MetricUnit.name)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Metrica de Destino:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(metricUnitConversion.MetricUnit1.name)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Factor:
+            </strong>
+        </td>
+        <td >
+            @Html.Raw(metricUnitConversion.factor)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(metricUnitConversion.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricUnitConversion.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(metricUnitConversion.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(metricUnitConversion.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

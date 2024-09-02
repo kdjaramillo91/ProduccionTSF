@@ -1,0 +1,25 @@
+﻿
+<h4>Editar Recepción de Materia Prima</h4>
+<hr style="margin: 10px 0px;" />
+@{ 
+	var loteManual = (bool?)this.ViewBag.loteManual ?? false;
+	var loteManualEdit = (bool?)this.ViewBag.loteManualEdit ?? false;
+}
+@{
+
+	Html.RenderPartial("_ProductionLotReceptionEditFormToolbarPartial");
+	<div id="mainform">
+		@if (loteManual || loteManualEdit)
+		{
+			@Html.Partial("_ProductionLotManualReceptionEditFormPartial")
+		}
+		else
+		{
+			@Html.Partial("_ProductionLotReceptionEditFormPartial")
+		}
+
+	</div>
+}
+
+<script src="~/Scripts/productionlotreception/_productionLotReceptionEditFormPartial.js"></script>
+<script src="~/Scripts/productionlotreception/validations.js"></script>

@@ -1,0 +1,257 @@
+﻿@using System.Data
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<PendingPurchaseOrdersAndRemissionGuides>(settings =>
+    {
+        settings.Name = "gvPurchaseOrderDetails";
+        settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "PurchaseOrderDetailsPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "PurchaseOrderDetailsOnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "PurchaseOrderDetailsOnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "PurchaseOrderDetailsOnGridViewEndCallback";
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+            //e.Properties["cpEnabledBtnGenerateLot"] = false;
+            //DataRow rowData = null;
+            //var listRowList = (gv.GetFilteredSelectedValues("id"));
+            //for (var i = 0; i < listRowList.Count(); i++)
+            //{
+            //    var objecto =  listRowList[i];
+            //    //rowData = gv.GetDataRow(listRowList[i]);
+            //    //console.log("rowData: ");
+            //    //console.log(rowData);
+            //}
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""PurchaseOrderDetailsSelectAllRow();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""PurchaseOrderDetailsClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //settings.Columns.Add(m => m.id, column =>
+        //{
+        //    column.FieldName = "id";
+        //    column.Name = "ID";
+        //    column.Caption = "ID";
+        //    column.Width = Unit.Percentage(0);
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //    //column.Visible = false;
+        //    //column.SetDataItemTemplateContent(c =>
+        //    //{
+        //    //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+        //    //    ViewContext.Writer.Write(detail.purchaseOrderDetail.PurchaseOrder.Document.number);
+        //    //});
+
+        //});
+
+        settings.Columns.Add(m => m.purchaseOrderDetail.PurchaseOrder.Document.number, column =>
+        {
+            //column.FieldName = "id";
+            column.Name = "noOrder";
+            column.Caption = "No. Orden";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.purchaseOrderDetail.PurchaseOrder.Document.number);
+            //});
+
+        });
+
+        settings.Columns.Add(m => m.remissionGuideDetail.RemissionGuide.Document.number, column =>
+        {
+            //column.FieldName = "id";
+            column.Name = "noGuide";
+            column.Caption = "No. Guía";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.remissionGuideDetail == null ? "" : detail.remissionGuideDetail.RemissionGuide.Document.number);
+            //});
+
+        });
+
+        settings.Columns.Add(m => m.purchaseOrderDetail.Item.name, column =>
+        {
+            //column.FieldName = "id_item";
+            column.Name = "item";
+            column.Caption = "Ítem";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.purchaseOrderDetail.Item.name);
+            //});
+
+        });
+
+        settings.Columns.Add(m => m.metricUnit, column =>
+        {
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+            //    string text = "Lbs";
+            //    if(detail.purchaseOrderDetail.Item.ItemPurchaseInformation  != null &&
+            //       detail.purchaseOrderDetail.Item.ItemPurchaseInformation.MetricUnit != null)
+            //    {
+            //        text = detail.purchaseOrderDetail.Item.ItemPurchaseInformation.MetricUnit.code;
+            //    }
+            //    ViewContext.Writer.Write(text);
+            //});
+        });
+
+        //settings.Columns.Add(m => (m.PurchaseOrder.requiredLogistic ? m.RemissionGuideDetailPurchaseOrderDetail.FirstOrDefault(rgdpod => rgdpod.id_purchaseOrderDetail == m.id).RemissionGuideDetail.quantityDispatchPending : m.quantityApproved), (@id = quantityApproved), column =>
+        settings.Columns.Add(m => m.quantityPendingOrder, column =>
+        {
+            column.Name = "quantityPendingOrder";
+            //column.FieldName = "quantityApproved";
+            column.Caption = "Cant. Pendiente Orden";
+            column.Width = Unit.Percentage(5);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+                var quantity = detail.purchaseOrderDetail.quantityApproved - detail.purchaseOrderDetail.quantityReceived;
+                ViewContext.Writer.Write(quantity < 0 ? "0.00": quantity.ToString("#,##0.00"));
+            });
+        });
+
+        settings.Columns.Add(m => m.quantityPendingGuide, column =>
+        {
+            column.Name = "quantityPendingGuide";
+            //column.FieldName = "quantityApproved";
+            column.Caption = "Cant. Pendiente Guía";
+            column.Width = Unit.Percentage(5);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+                var quantity = detail.remissionGuideDetail == null ? 0: (detail.remissionGuideDetail.quantityProgrammed - detail.remissionGuideDetail.quantityReceived);
+                ViewContext.Writer.Write(quantity < 0 ? "0.00" : quantity.ToString("#,##0.00"));
+            });
+        });
+
+        settings.Columns.Add(m => m.provider.Person.fullname_businessName, column =>
+        {
+            //column.FieldName = "id_proposedProvider";
+            column.Name = "provider";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.provider.Person.fullname_businessName);
+            //});
+
+        });
+
+        settings.Columns.Add(m => m.buyer.fullname_businessName, column =>
+        {
+            //column.FieldName = "id_proposedProvider";
+            column.Name = "buyer";
+            column.Caption = "Comprador";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.buyer.fullname_businessName);
+            //});
+
+        });
+
+        settings.Columns.Add(m => m.withPrice, column =>
+        {
+            //column.FieldName = "id_proposedProvider";
+            column.Name = "withPrice";
+            column.Caption = "Con Precio";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Visible = false;
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PendingPurchaseOrdersAndRemissionGuides detail = (PendingPurchaseOrdersAndRemissionGuides)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.buyer.fullname_businessName);
+            //});
+
+        });
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+

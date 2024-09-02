@@ -1,0 +1,152 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Dto.CustodianIncomeDto
+
+@{
+    int id_custodianIncome = (Model != null) ? Model.Id : 0;
+    string codeDocumentState = (Model != null)
+                                ?(Model.Document != null ? (Model.Document.DocumentState != null ? (Model.Document.DocumentState.code != null ? Model.Document.DocumentState.code : "") : "") :"")
+                                : "";
+
+    int id_RemissionGuide = (Model != null) ? Model.id_RemissionGuide : 0;
+
+    string messageError = "";
+    if (ViewData["EditMessage"] != null)
+    {
+        messageError = (string)ViewData["EditMessage"];
+    }
+    if (ViewBag.ErrorPriceFreight != null)
+    {
+        messageError += " " + (string)ViewBag.ErrorPriceFreight;
+    }
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditCustodianIncome", name = "formEditCustodianIncome" }))
+{
+    if (messageError.Trim() != "")
+    {
+        @Html.Raw(messageError);
+    }
+    Html.RenderPartial("_GridMessageErrorCustodianIncome");
+    @Html.Hidden("id_custodianIncome", id_custodianIncome, new { idcustodianIncome = id_custodianIncome })
+    @Html.Hidden("codeDocumentState", codeDocumentState)
+    @Html.Hidden("id_RemissionGuide", id_RemissionGuide)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+    tabs.EnableClientSideAPI = true;
+
+    tabs.ClientSideEvents.Init = "TabControl_Init";
+    tabs.ClientSideEvents.ActiveTabChanged = "TabControl_ActiveTabChanged";
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var document = (Model != null && Model.Document != null) ? Model.Document : new Document();
+            Html.RenderPartial("DocumentTemplates/_DocumentFormEdit", document);
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabCustodianControl";
+
+        tab.Text = "Control de Custodios    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_ControlCustodianMainForm", Model);
+        });
+    });
+
+}).GetHtml()
+
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ClientVisible = IsEnabled(11);
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                        button.ClientEnabled = codeDocumentState == "01"; 
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+
+}
+
+
+@functions{
+
+    bool IsEnabled(int id_permission)
+    {
+        int id_user = (int)ViewData["id_user"];
+        int id_menu = (int)ViewData["id_menu"];
+
+        User user = DataProviderUser.UserById(id_user);
+
+        if (user == null)
+            return false;
+
+        UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+        if (userMenu == null)
+            return false;
+
+        Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+        return (permission != null);
+    }
+
+}
+
+
+

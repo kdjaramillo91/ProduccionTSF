@@ -1,0 +1,221 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingDTO
+@{
+	var habModificacionUbiDestino = DataProviderSetting.SettingByCode("MODUNTP").value == "SI";
+	this.ViewBag.HabModificacionUbiDestino = habModificacionUbiDestino;
+	ViewBag.id_DestinyWarehouse = Model.id_warehouseDestiny;
+	ViewBag.id_DestinyWarehouseLocation = Model.id_warehouseLocationDestiny;
+
+	var warehouse = new Warehouse[] { };
+	var warehouseLocation = new WarehouseLocation[] { };
+	if(Model.id != 0)
+	{
+		if (Model.id_warehouseDestiny.HasValue)
+		{
+			warehouse = new[]
+			{
+				new Warehouse(){ id = Model.id_warehouseDestiny.Value, name = Model.name_warehouseDestiny }
+			};
+		}
+
+		if (Model.id_warehouseLocationDestiny.HasValue)
+		{
+			warehouseLocation = new[]
+			{
+				new WarehouseLocation()
+				{
+					id = Model.id_warehouseLocationDestiny.Value,
+					name = Model.name_warehouseDestiny ,
+					id_warehouse = Model.id_warehouseDestiny.Value,
+				}
+			};
+		}
+	}
+}
+<div class="row">
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Túnel/Placa: ";
+			settings.Name = "TúnelPlacaLabel";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_ComboBoxFreezerMachineForProd")
+	</div>
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Name = "BodegaCongelacionLabel";
+			settings.Text = "Bodega Congelacion:";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_ComboBoxFreezerWarehouse")
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Ubicación Congelación: ";
+			settings.Name = "UbicacionCongelacionLabel";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_TokenBoxFreezerWarehouseLocations")
+	</div>
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Coche: ";
+			settings.Name = "CocheLabel";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_TokenBoxProductionCarts")
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Lote - Lote Interno: ";
+			settings.Name = "LoteLoteInternoLabel";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_TokenBoxLots")
+	</div>
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Producto: ";
+			settings.Name = "ProductoLabel";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_TokenBoxItems")
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Cantidad Seleccionada: ";
+			settings.Name = "CantidadSeleccionadaLabel";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.DevExpress().TextBoxFor(model => model.selectedQuantityStr,
+			settings =>
+			{
+				settings.Name = "selectedQuantityStr";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = true;//!((bool)ViewBag.enabled);
+			}).GetHtml()
+	</div>
+	@if (!habModificacionUbiDestino)
+	{
+		<div class="col-sm-2">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Width = Unit.Percentage(100);
+				settings.Text = "Transferencia Túnel – Placa: ";
+				settings.Name = "TransferenciaTunelPlacaLabel";
+			}).GetHtml()
+		</div>
+		<div class="col-sm-4">
+			@Html.DevExpress().CheckBoxFor(model => model.tunnelTransferPlate,
+				settings =>
+				{
+					settings.Name = "tunnelTransferPlate";
+					settings.Width = Unit.Percentage(100);
+					settings.Properties.ClientSideEvents.CheckedChanged = "CheckBoxTunnelTransferPlate_CheckedChanged";
+					settings.ReadOnly = !((bool)ViewBag.enabled);
+				}).GetHtml()
+		</div>
+	}
+	else
+	{
+		<div class="col-sm-2"></div>
+		<div class="col-sm-4"></div>
+	}
+</div>
+@if (habModificacionUbiDestino)
+{
+	<div class="row">
+		<div class="col-sm-2">
+			<h5>Destino</h5>
+		</div>
+		<div class="col-sm-4"></div>
+		<div class="col-sm-2"></div>
+		<div class="col-sm-4"></div>
+	</div>
+}
+<div class="row">
+	@if (habModificacionUbiDestino)
+	{
+		<div class="col-sm-2">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Width = Unit.Percentage(100);
+				settings.Text = "Transferencia Túnel – Placa: ";
+				settings.Name = "TransferenciaTunelPlacaDestinoLabel";
+			}).GetHtml()
+		</div>
+		<div class="col-sm-4">
+			@Html.DevExpress().CheckBoxFor(model => model.tunnelTransferPlate,
+				settings =>
+				{
+					settings.Name = "tunnelTransferPlate";
+					settings.Width = Unit.Percentage(100);
+					settings.Properties.ClientSideEvents.CheckedChanged = "CheckBoxTunnelTransferPlate_CheckedChanged";
+					settings.ReadOnly = !((bool)ViewBag.enabled);
+				}).GetHtml()
+		</div>
+	}
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Túnel – Placa: ";
+			settings.Name = "TúnelPlacaDestinoLabel";
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_ComboBoxFreezerMachineForProdDestination")
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Bodega Destino: ";
+			settings.Name = "BodegaDestinoLabel";
+			settings.ClientVisible = habModificacionUbiDestino;
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_ComboBoxDestinyWarehouse", warehouse)
+	</div>
+	<div class="col-sm-2">
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Width = Unit.Percentage(100);
+			settings.Text = "Ubicación Destino: ";
+			settings.Name = "UbicacionDestinoLabel";
+			settings.ClientVisible = habModificacionUbiDestino;
+		}).GetHtml()
+	</div>
+	<div class="col-sm-4">
+		@Html.Partial("_ComboBoxDestinyWarehouseLocation", warehouseLocation)
+	</div>
+</div>

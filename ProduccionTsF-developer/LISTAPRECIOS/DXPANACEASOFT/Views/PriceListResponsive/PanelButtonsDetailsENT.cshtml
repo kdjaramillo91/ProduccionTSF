@@ -1,0 +1,27 @@
+﻿
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnReplicateDetailsENT";
+    settings.Text = "";
+    settings.ToolTip = "Replica D0";
+    settings.Images.Image.IconID = IconID.EditCopy16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "ReplicateDetailsENT";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.enabled != null ? ((bool)ViewBag.enabled) : true);
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnRePaintDetailsENT";
+    settings.Text = "";
+    settings.ToolTip = "Re-Pintar";
+    settings.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "RePaintDetailsENT";
+    settings.Enabled = true;// ViewBag.canRefreshReplicate;
+}).GetHtml()

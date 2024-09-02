@@ -1,0 +1,152 @@
+﻿
+@model DXPANACEASOFT.Models.RequestInventoryMoveDTO.RequestInventoryMoveTransferP
+
+@{
+    string codeState = (Model != null && Model.documentRequestTransferP != null) ? Model.documentRequestTransferP.codeDocumentStateTransferP : "";
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Cabecera</span>
+        </td>
+    </tr>
+    <!--Fila 1 -->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "documentTypeLabel";
+                settings.Text = "Tipo de Documento:";
+            }).GetHtml()
+        </td>
+        <td colspan="3" width="10%">
+            @Html.HiddenFor(m => m.idDocumentTypeHeadP, new { @id = "id_documentType" })
+            @Html.DevExpress().TextBoxFor(m => m.nameDocumenTypeHeadP, settings =>
+            {
+                settings.Name = "documentTypeName";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "emissionDateFromRGLabel";
+                settings.Text = "Fecha de Emisión Desde Logística:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.emissionDateHeadPOrigin, settings =>
+            {
+                settings.Name = "emissionDateHeadPOrigin";
+                settings.Properties.ClientInstanceName = "emissionDateHeadPOrigin";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+            }).GetHtml()
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <!--Fila 2-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "personRequestLabelEdit";
+                settings.Text = "Persona Requiere:";
+            }).GetHtml()
+        </td>
+        <td colspan="3" width="7%">
+            @Html.DevExpress().ComboBoxFor(m => m.idPersonRTransferP, settings =>
+            {
+                settings.Name = "idPersonRequestF";
+                settings.Properties.ClientInstanceName = "idPersonRequestF";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValueField = "idPersonRequestF";
+                settings.Properties.TextField = "descPersonRequestF";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = this.Model.ReadOnlyBeRemissionGuide || !this.Model.documentRequestTransferP.codeDocumentStateTransferP.Equals("01");
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.NullDisplayText = "Todos";
+                settings.Properties.NullText = "Todos";
+            }).BindList(ViewData["_PersonRequestEdit"]).Bind(Model.idPersonRTransferP).GetHtml()
+        </td>
+    </tr>
+    <!-- Información de Guía de Remisión -->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n Origen Desde Gu&iacute;a de Remisi&oacute;n</span>
+        </td>
+    </tr>
+    <!--Fila 3-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "remissionGuideSequentialLabel";
+                settings.Text = "Guía de Remisión:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.sequential_remissionGuide, settings =>{
+                settings.ReadOnly = this.Model.ReadOnlyBeRemissionGuide;
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "emissionDateRemissionGuideLabel";
+                settings.Text = "Fecha Guía:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.emissionDateRemissionGuide, settings =>
+            {
+                settings.Name = "emissionDateRemissionGuide";
+                settings.Properties.ClientInstanceName = "emissionDateHeadPOrigin";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = this.Model.ReadOnlyBeRemissionGuide;
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "warehouseRequisitionLabel";
+                settings.Text = "Número de Requisición:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.sequentialWarehouseRequisitionModelHeadP, settings =>{
+                settings.ReadOnly = this.Model.ReadOnlyBeRemissionGuide;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "nameProviderLabel";
+                settings.Text = "Nombre Proveedor:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.nameProviderRGTransferP, settings =>
+            {
+                settings.ReadOnly = this.Model.ReadOnlyBeRemissionGuide;
+            }).GetHtml()
+        </td>
+
+    </tr>
+</table>

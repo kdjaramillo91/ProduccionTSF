@@ -1,0 +1,29 @@
+﻿@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.PriceListDet
+
+@model List<PriceListDetItemSize>
+
+@Html.DevExpress().PopupControl(
+    settings =>
+    {
+    settings.Name = "popupControlPLDetail";
+    //settings.Width = 500;
+    settings.Width = 700;
+    settings.CallbackRouteValues = new { Controller = "PriceListDetail", Action = "PopupControlPriceListDetailPartial" };
+
+    //settings.AllowDragging = true;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.CloseOnEscape = false;
+    settings.PopupAnimationType = AnimationType.None;
+    settings.HeaderText = "Detalle de Lista de Precios";
+    settings.Modal = true;
+    settings.LoadContentViaCallback = LoadContentViaCallback.OnFirstShow;
+    settings.AutoUpdatePosition = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.SetContent(() =>
+    {
+        Html.RenderAction("PopupControlPriceListDetail", "PriceListDetail", Model);
+    });
+}).GetHtml()
+

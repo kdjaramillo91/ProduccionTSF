@@ -1,0 +1,127 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<ResultReceptionDispatchMaterial>(settings =>
+    {
+        settings.Name = "GridViewReceptionMaterialApproved";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "LiquidationMaterial",
+            Action = "GridViewReceptionMaterialApproved",
+
+        };
+
+
+        settings.KeyFieldName = "idReceptionDispatchMaterial";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode =GridViewSelectAllCheckBoxMode.Page;
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //settings.ClientSideEvents.RowClick = "OnGridFocusedRowChanged";
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "idReceptionDispatchMaterial";
+            column.Name = "idReceptionDispatchMaterial";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberRemissionGuide";
+            column.Name = "numberRemissionGuide";
+            column.Caption = "No. de Guia";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "dateRemissionGuide";
+            column.Name = "dateRemissionGuide";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.SettingsHeaderFilter.Mode = GridHeaderFilterMode.DateRangePicker;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "nameState";
+            column.Name = "nameState";
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "idProvider";
+            column.Name = "idProvider";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "nameProvider";
+            column.Name = "nameProvider";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "nameProviderShrimp";
+            column.Name = "nameProviderShrimp";
+            column.Caption = "Camaronera";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberRecepctionDispatchMaterials";
+            column.Name = "numberRecepctionDispatchMaterials";
+            column.Caption = "No. Recepción Materiales";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "dateReception";
+            column.Name = "dateReception";
+            column.Caption = "Fecha de Recepción";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.SettingsHeaderFilter.Mode = GridHeaderFilterMode.DateRangePicker;
+
+        });
+
+    });
+}
+@grid.Bind(Model).GetHtml()

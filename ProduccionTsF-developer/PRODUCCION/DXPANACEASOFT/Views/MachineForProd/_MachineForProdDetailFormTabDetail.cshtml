@@ -1,0 +1,533 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.MachineForProd
+
+<div id="GridMessageError" style="display: none;">
+	@Html.DevExpress().Label(settings =>
+	   {
+		   settings.Name = "gridMessageError";
+		   settings.Properties.ClientInstanceName = "gridMessageError";
+		   settings.Text = "";
+	   }).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+		</td>
+	</tr>
+	<tr>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.code, settings =>
+		{
+			settings.Name = "dcodeLabel";
+			settings.Text = "Código:";
+			settings.AssociatedControlName = "code";
+		}).GetHtml()
+
+
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+	   {
+		   settings.Name = "dcode";
+		   settings.Properties.ClientInstanceName = "code";
+		   settings.Properties.NullText = "Código";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ReadOnly = true;
+			settings.Height = Unit.Percentage(100);
+
+		   settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.MaxLength = 20;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+	   }).GetHtml()
+
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.name, settings =>
+			{
+				settings.Name = "dnameLabel";
+				settings.Text = " Nombre:";
+				settings.AssociatedControlName = "name";
+
+			}).GetHtml()
+
+		</td>
+		<td colspan="3">
+			@Html.DevExpress().TextBoxFor(m => m.name, settings =>
+	   {
+		   settings.Name = "dname";
+		   settings.Properties.ClientInstanceName = "name";
+		   settings.Properties.NullText = "Nombre";
+		  settings.Width = Unit.Percentage(100);
+		settings.Height = Unit.Percentage(100);
+		   settings.ReadOnly = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.MaxLength = 100;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+	   }).GetHtml()
+
+		</td>
+
+	</tr>
+
+	<tr>
+
+		<td>
+
+			@Html.DevExpress().LabelFor(m => m.QuantityCapacity, settings =>
+			{
+				settings.Name = "ddQuantityCapacityLabel";
+				settings.Text = " Capacidad de Máquina:";
+				settings.AssociatedControlName = "QuantityCapacity";
+
+			}).GetHtml()
+
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.QuantityCapacity, settings =>
+		   {
+
+			   settings.Width = Unit.Percentage(90);
+			   settings.Name = "dQuantityCapacityLabel";
+				settings.Height = Unit.Percentage(100);
+			   settings.Properties.ClientInstanceName = "ddQuantityCapacity";
+			   settings.Properties.DisplayFormatString = "N4";
+			   settings.Properties.DisplayFormatInEditMode = true;
+			   settings.Properties.DecimalPlaces = 4;
+			   settings.ReadOnly = true;
+			   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+			   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+			   settings.Properties.Increment = 0.01M;
+			   settings.Properties.LargeIncrement = 1.0M;
+			   settings.Properties.MinValue = 0;
+			   settings.Properties.MaxValue = 500;
+			   settings.Properties.NumberType = SpinEditNumberType.Float;
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+			   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			   settings.Properties.ClientSideEvents.Validation = "OnCapacityMachineValidation";
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_tbsysTypeMachineForProd, settings =>
+			{
+				settings.Name = "did_tbsysTypeMachineForProdLabel";
+				settings.Text = "Tipo de Máquina:";
+				settings.AssociatedControlName = "id_tbsysTypeMachineForProd";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_tbsysTypeMachineForProd = (Model != null && Model.id_tbsysTypeMachineForProd != 0) ? (int?)Model.id_tbsysTypeMachineForProd : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_tbsysTypeMachineForProd, settings =>
+			   {
+				   settings.Name = "did_tbsysTypeMachineForProd";
+				   settings.Properties.ClientInstanceName = "id_tbsysTypeMachineForProd";
+				   settings.Properties.NullDisplayText = "Seleccione...";
+				   settings.Properties.NullText = "Seleccione...";
+				   settings.Properties.ValueField = "id";
+				   settings.Properties.TextField = "name";
+				   settings.ReadOnly = true;
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   settings.Properties.ValueType = typeof(int);
+				   settings.Properties.Columns.Add("name", "Nombre", 200);
+				   settings.Width = Unit.Percentage(100);
+				   settings.Height = Unit.Percentage(100);
+				   settings.Properties.EnableClientSideAPI = true;
+				   settings.Properties.CallbackPageSize = 20;
+				   settings.Properties.ClientSideEvents.Validation = "OnTypeMachineValidation";
+				   //settings.ShowModelErrors = true;
+			   }).BindList(DataProviderMachineForProd.TbsysTypeMachineForProdAll((int?)id_tbsysTypeMachineForProd)).Bind(id_tbsysTypeMachineForProd).GetHtml()
+		</td>
+
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_personProcessPlant, settings =>
+			{
+			settings.Name = "did_personProcessPlantLabel";
+			settings.Text = "Planta Proceso:";
+			settings.AssociatedControlName = "id_personProcessPlant";
+			}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().ComboBoxFor(m => m.id_personProcessPlant, settings =>
+		   {
+			   settings.Name = "did_personProcessPlant";
+			   settings.Properties.NullDisplayText = "Seleccione...";
+			   settings.Properties.NullText = "Seleccione...";
+			   settings.Properties.ValueField = "id";
+			   settings.ReadOnly = true;
+			   settings.Properties.TextFormatString = "{1}";
+			   settings.Properties.Columns.Add("planta", "Planta", 50);
+			   settings.Properties.Columns.Add("processPlant", "Nombre", 100);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Height = Unit.Percentage(100);
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.Validation = "OnPlantProcesoValidation";
+		   }).BindList(DataProviderPerson.GetPersonProcesPlant()).GetHtml()
+
+
+		</td>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_warehouseType, settings =>
+			{
+			settings.Name = "Did_warehouseTypeLabel";
+			settings.Text = "Tipo de Bodega:";
+			settings.AssociatedControlName = "id_warehouseType";
+			}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().ComboBoxFor(m => m.id_warehouseType, settings =>
+		   {
+				settings.Name = "Did_warehouseType";
+				//settings.Properties.ClientInstanceName = "id_warehouseType";
+				settings.Properties.NullDisplayText = "Seleccione...";
+				settings.Properties.NullText = "Seleccione...";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ValueType = typeof(int);
+				settings.Properties.Columns.Add("name", "Nombre", 200);
+				settings.Width = Unit.Percentage(100);
+			   settings.ReadOnly = true;
+				settings.Height = Unit.Percentage(100);
+				settings.Properties.EnableClientSideAPI = true;
+				settings.Properties.CallbackPageSize = 20;
+				settings.Properties.ClientSideEvents.Validation = "OnWareouseTypeValidation";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseTypeCombo_SelectedIndexChanged";
+		   }).BindList(DataProviderWarehouseType.WarehousesTypes((int)ViewData["id_company"])).GetHtml()
+		</td>
+
+	</tr>
+
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="2">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px; border-right: 10px solid white">
+				Compra de Materia Prima
+			</span>
+		</td>
+		<td colspan="2">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px; border-left: 10px solid white">
+				Proceso Materia Prima Terceros
+			</span>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialWarehouse, settings =>
+			{
+			settings.Name = "Did_materialWarehouseLabel";
+			settings.Text = "Bodega:";
+			settings.AssociatedControlName = "id_materialWarehouse";
+			}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialWarehouse, settings =>
+		   {
+			   settings.Name = "Did_materialWarehouse";
+			   //settings.Properties.ClientInstanceName = "id_materialWarehouse";
+
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Height = Unit.Percentage(100);
+
+			   settings.Properties.NullDisplayText = "Todas";
+			   settings.Properties.NullText = "Todas";
+			 settings.ReadOnly = true;
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.Init = "OnWarehouseEntryInit";
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseMaterialCombo_SelectedIndexChanged";
+			   settings.Properties.ClientSideEvents.Validation = "OnWarehouseValidation";
+		   }).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"])).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialthirdWarehouse, settings =>
+			{
+			settings.Name = "Did_materialthirdWarehouseLabel";
+			settings.Text = "Bodega:";
+			settings.AssociatedControlName = "id_materialthirdWarehouse";
+			}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialthirdWarehouse, settings =>
+		   {
+			   settings.Name = "Did_materialthirdWarehouse";
+			   //settings.Properties.ClientInstanceName = "id_materialthirdWarehouse";
+
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(90);
+			   settings.Height = Unit.Percentage(100);
+
+			   settings.Properties.NullDisplayText = "Todas";
+			   settings.Properties.NullText = "Todas";
+			 settings.ReadOnly = true;
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.Init = "OnWarehouseEntryInit";
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "ThirdWarehouseMaterialCombo_SelectedIndexChanged";
+		   }).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"])).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialWarehouseLocation, settings =>
+			{
+			settings.Name = "Did_materialWarehouseLocationLabel";
+			settings.Text = "Ubicación:";
+			settings.AssociatedControlName = "id_materialWarehouseLocation";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialWarehouseLocation, settings =>
+		   {
+			   settings.Name = "Did_materialWarehouseLocation";
+			   //settings.Properties.ClientInstanceName = "id_materialWarehouseLocation";
+			   settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+			settings.ReadOnly = true;
+			   settings.Properties.NullDisplayText = "Todas";
+			   settings.Properties.NullText = "Todas";
+
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.Init = "OnMaterialWarehouseLocationEntryInit";
+			   settings.Properties.ClientSideEvents.Validation = "OnMaterialWarehouseLocationValidation";
+		   }).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialthirdWarehouseLocation, settings =>
+			{
+			settings.Name = "Did_materialthirdWarehouseLocationLabel";
+			settings.Text = "Ubicación:";
+			settings.AssociatedControlName = "id_materialthirdWarehouseLocation";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialthirdWarehouseLocation, settings =>
+		   {
+			   settings.Name = "Did_materialthirdWarehouseLocation";
+			   //settings.Properties.ClientInstanceName = "id_materialthirdWarehouseLocation";
+			   settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+			settings.ReadOnly = true;
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+
+			   settings.Properties.NullDisplayText = "Todas";
+			   settings.Properties.NullText = "Todas";
+
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.Init = "OnThirdMaterialWarehouseLocationEntryInit";
+			   settings.Properties.ClientSideEvents.Validation = "OnThirdMaterialWarehouseLocationValidation";
+		   }).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialCostCenter, settings =>
+			{
+			settings.Name = "Did_materialCostCenterLabel";
+			settings.Text = "Centro de Costo:";
+			settings.AssociatedControlName = "id_materialCostCenter";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialCostCenter, settings =>
+		   {
+				settings.Name = "Did_materialCostCenter";
+				//settings.Properties.ClientInstanceName = "id_materialCostCenter";
+				settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+			settings.ReadOnly = true;
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Properties.NullDisplayText = "Todas";
+				settings.Properties.NullText = "Todas";
+
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.Validation = "OnMaterialCenterCostValidation";
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "MaterialSubCostCenterCombo_SelectedIndexChanged";
+		   }).BindList(DataProviderCostCenter.AllCostCenters()).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialthirdCostCenter, settings =>
+			{
+			settings.Name = "Did_materialthirdCostCenterLabel";
+			settings.Text = "Centro de Costo:";
+			settings.AssociatedControlName = "id_materialthirdCostCenter";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialthirdCostCenter, settings =>
+		   {
+				settings.Name = "Did_materialthirdCostCenter";
+				//settings.Properties.ClientInstanceName = "id_materialthirdCostCenter";
+				settings.Width = Unit.Percentage(90);
+				settings.Height = Unit.Percentage(100);
+			   settings.ReadOnly = true;
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Properties.NullDisplayText = "Todas";
+				settings.Properties.NullText = "Todas";
+
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				//settings.Properties.ClientSideEvents.Validation = "OnMaterialCenterCostValidation";
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "MaterialThirdSubCostCenterCombo_SelectedIndexChanged";
+		   }).BindList(DataProviderCostCenter.AllCostCenters()).GetHtml()
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialSubCostCenter, settings =>
+			{
+			settings.Name = "Did_materialSubCostCenterLabel";
+			settings.Text = "SubCentro de Costo:";
+			settings.AssociatedControlName = "id_materialSubCostCenter";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialSubCostCenter, settings =>
+		   {
+				settings.Name = "Did_materialSubCostCenter";
+				//settings.Properties.ClientInstanceName = "id_materialSubCostCenter";
+				settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+			settings.ReadOnly = true;
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Properties.NullDisplayText = "Todas";
+				settings.Properties.NullText = "Todas";
+
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.Init = "OnMaterialSubCostCenterEntryInit";
+				settings.Properties.ClientSideEvents.Validation = "OnMaterialSubCenterCostValidation";
+
+		   }).BindList(DataProviderCostCenter.SubCostCenters()).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_materialthirdSubCostCenter, settings =>
+			{
+			settings.Name = "Did_materialthirdSubCostCenterLabel";
+			settings.Text = "SubCentro de Costo:";
+			settings.AssociatedControlName = "id_materialthirdSubCostCenter";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_materialthirdSubCostCenter, settings =>
+		   {
+				settings.Name = "Did_materialthirdSubCostCenter";
+				//settings.Properties.ClientInstanceName = "id_materialthirdSubCostCenter";
+				settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+			settings.ReadOnly = true;
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Properties.NullDisplayText = "Todas";
+				settings.Properties.NullText = "Todas";
+
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.Init = "OnMaterialthirdSubCostCenterInit";
+				settings.Properties.ClientSideEvents.Validation = "OnMaterialthirdSubCostCenterValidation";
+
+		   }).BindList(DataProviderCostCenter.SubCostCenters()).GetHtml()
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+			{
+			settings.Name = "DisActiveLabel";
+			settings.Text = "Activo?:";
+			settings.AssociatedControlName = "isActive";
+			}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+		   {
+			   settings.ReadOnly = true;
+			   settings.Name = "DisActive";
+			   //settings.Properties.ClientInstanceName = "isActive";
+		   }).GetHtml()
+
+		</td>
+	</tr>
+	<tr></tr>
+
+</table>
+
+
+
+

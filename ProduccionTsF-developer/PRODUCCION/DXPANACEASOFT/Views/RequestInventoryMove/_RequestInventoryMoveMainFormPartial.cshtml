@@ -1,0 +1,150 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.RequestInventoryMoveDTO
+@using DXPANACEASOFT.Models
+
+@model RequestInventoryMoveEditForm
+
+
+@{
+    string codeDocumentState = (Model.rqTransfer != null) ? (Model.rqTransfer.documentRequestTransferP != null ? Model.rqTransfer.documentRequestTransferP.codeDocumentStateTransferP : "") : "";
+    int idRim = (Model != null && Model.rqTransfer != null) ? Model.rqTransfer.idRIMTransferP : 0;
+    string messageError = "";
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditRequestInventoryMove", name = "formEditRequestInventoryMove" }))
+{
+    if (messageError.Trim() != "")
+    {
+        @Html.Raw(messageError);
+    }
+    Html.RenderPartial("_GridMessageErrorRequestInventoryMove");
+
+    @Html.Hidden("id_RequestInventoryMove", idRim, new { idRequestInventoryMove = idRim })
+
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+    tabs.EnableClientSideAPI = true;
+
+    tabs.ClientSideEvents.Init = "TabControl_Init";
+    tabs.ClientSideEvents.ActiveTabChanged = "TabControl_ActiveTabChanged";
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("DocumentInformation/_DocumentFormEdit", Model.rqTransfer.documentRequestTransferP);
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabRequestInventoryMoe";
+        tab.Text = "Requerimiento de Inventario    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_RequestInventoryMoveMainFormTab", Model.rqTransfer);
+            Html.RenderPartial("ComponentsDetail/_TableHeader","Información Generada en Inventario");
+            Html.RenderPartial("_RequestInventoryMoveDocGeneratedIMDetailViewDetailsPartial", Model.rqTransfer.lstReqAppDocsIM.OrderBy(o => o.nameNatureMove).ToList());
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDetails";
+        tab.Text = "Detalle    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_RequestInventoryMoveDetails", Model.rqTransfer.lstRequestInvDetail.Where(w => w.isActive).ToList());
+
+        });
+    });
+
+}).GetHtml()
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ClientVisible = IsEnabled(11);
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                        button.ClientEnabled = codeDocumentState == "01";
+                    }).Render();
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+<script src="~/Scripts/requestinventorymove/editform.js"></script>
+
+@functions{
+
+    bool IsEnabled(int id_permission)
+    {
+        int id_user = (int)ViewData["id_user"];
+        int id_menu = (int)ViewData["id_menu"];
+
+        User user = DataProviderUser.UserById(id_user);
+
+        if (user == null)
+            return false;
+
+        UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.id_menu == id_menu);
+
+        if (userMenu == null)
+            return false;
+
+        Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+        return (permission != null);
+    }
+
+}

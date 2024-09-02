@@ -1,0 +1,20 @@
+﻿
+@model List<DXPANACEASOFT.Models.ProductionLot>
+
+@{
+    @Html.DevExpress().Button(settings =>
+    {
+        settings.Name = "btnLiquidateLot";
+        settings.Text = "Liquidar Lote";
+        settings.Images.Image.IconID = IconID.ViewSales16x16devav;
+        settings.ClientEnabled = true;
+        settings.UseSubmitBehavior = false;
+        settings.EnableClientSideAPI = true;
+        settings.ClientSideEvents.Click = "ButtonLiquidateLot_Click";
+    }).GetHtml()
+
+    <hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+    Html.RenderPartial("_ProductionLotLiquidationsPartial", Model);
+
+}

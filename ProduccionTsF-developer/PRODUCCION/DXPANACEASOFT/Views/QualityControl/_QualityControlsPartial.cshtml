@@ -1,0 +1,288 @@
+@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+@{
+	string analisislot = DataProviderSetting.ValueSetting("ANALXLOT");
+}
+@{
+	var grid = Html.DevExpress().GridView<QualityControlResultConsultDTO>(settings =>
+	{
+		settings.Name = "gvQualityControls";
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.CallbackRouteValues = new { Controller = "QualityControl", Action = "QualityControlsPartial" };
+
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		settings.CommandColumn.Visible = true;
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		settings.CommandColumn.Width = Unit.Percentage(3);
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.Settings.ShowFooter = true;
+
+		settings.ClientSideEvents.Init = "QualityControlOnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "QualityControlOnGridViewSelectionChanged";
+		settings.ClientSideEvents.EndCallback = "QualityControlOnGridViewEndCallback";
+		settings.ClientSideEvents.RowDblClick = "QualityControlOnRowDoubleClick";
+
+
+		settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+		settings.SettingsDetail.ShowDetailRow = true;
+
+		settings.SetDetailRowTemplateContent(column =>
+		{
+			//QualityControlResultConsultDTO qualityControl = (QualityControlResultConsultDTO)Model[column.ItemIndex];
+			int id_qualityControl = (int)DataBinder.Eval(column.DataItem, "id");
+			QualityControl qualityControl = DataProviderQualityControl.QualityControlById(id_qualityControl);
+			//Item detail = DataProviderItem.Item(id_item);
+			if (qualityControl != null && qualityControl.QualityControlDetail != null)
+			{
+
+				//Html.RenderAction("_BusinessOportunityPhasesDetailPartial", new { item = detail });
+				ViewData["id_qualityControl"] = id_qualityControl;
+				Html.RenderPartial("_QualityControlDetailsViewPartial", qualityControl.QualityControlDetail.OrderBy(od => od.id_qualityAnalysis).ThenBy(tb => tb.id).ToList());
+			}
+
+		});
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Análisis de Calidad</span>");
+		});
+
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+		};
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+					@"<a id=""lnkSelectAllRowsQualityControl"" style=""cursor: pointer;"" onclick=""QualityControlSelectAllRows()"">Seleccionar Todos</a>
+	  <a id=""lnkClearSelectionQualityControl"" style=""cursor: pointer;"" onclick=""QualityControlClearSelection()"">Anular Selección</a>"
+				);
+			}
+		});
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+		settings.Columns.Add(m => m.number, column =>
+		{
+			column.Caption = "No. Análisis";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+
+		});
+		settings.Columns.Add(m => m.analysisType, column =>
+		{
+			column.Caption = "Tipo de Análisis";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(15);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+		});
+		settings.Columns.Add(m => m.dateAnalysis, column =>
+		{
+			column.Caption = DataProviderSetting.ValueSetting("NOMFEAN");//"Fecha de Análisis";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(8);
+
+			var dateEdit = column.PropertiesEdit as DateEditProperties;
+			dateEdit.Width = 75;
+			dateEdit.DisplayFormatString = "dd/MM/yyyy";
+			//column.EditorProperties().DateEdit(dateEdit =>
+			//{
+			//    dateEdit.DisplayFormatInEditMode = true;
+			//    dateEdit.DisplayFormatString = "dd/MM/yyyy";
+
+			//});
+		});
+		settings.Columns.Add(m => m.internalNumber, column =>
+		{
+			//CAMBIO FEO
+			column.Caption = "No. Lote";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(15);
+
+		});
+		settings.Columns.Add(m => m.remissionGuideNumber, column =>
+		{
+			column.Caption = "No. de GUÍA";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(15);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			if (analisislot == "SI")
+				column.Visible = false;
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    var id_pld = DataBinder.Eval(c.DataItem, "id");
+			//    if (id_pld != null)
+			//    {
+			//        int ipl = (int)id_pld;
+			//        ViewContext.Writer.Write(DataProviderQualityControl.RemissionGuideNumberByQualityControl(ipl));
+			//    }
+			//});
+		});
+		settings.Columns.Add(m => m.remissionGuideProcess, column =>
+		{
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(100);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    var id_pld = DataBinder.Eval(c.DataItem, "id");
+			//    if (id_pld != null)
+			//    {
+			//        int ipl = (int)id_pld;
+			//        ViewContext.Writer.Write(DataProviderQualityControl.RemissionGuideProcessByQualityControl(ipl));
+			//    }
+			//});
+		});
+		settings.Columns.Add(m => m.proveedor, column =>
+		{
+			column.Caption = "Proveedor";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+
+		});
+
+		settings.Columns.Add(m => m.processType, column =>
+		{
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(15);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+		});
+		settings.Columns.Add(m => m.quantityPoundsReceived, column =>
+		{
+			column.Caption = "Libras Recibidas";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+			SpinEdit.Width = 75;
+			SpinEdit.NumberFormat = SpinEditNumberFormat.Number;
+			SpinEdit.DisplayFormatString = "N2";
+
+		});
+		settings.Columns.Add(m => m.analyst, column =>
+		{
+			column.Caption = "Analista";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(m => m.isConformsStr, column =>
+		{
+			//column.FieldName = "isConforms";
+			column.Caption = "Es Conforme";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var isConforms = (bool)DataBinder.Eval(c.DataItem, "isConforms");
+				string text = (isConforms ? "<font color='green'>" + "Conforme" + "</font>" : "<font color='red'>" + "No Conforme" + "</font>");
+				ViewContext.Writer.Write(text);
+
+			});
+		});
+
+		settings.Columns.Add(m => m.documentState, column =>
+		{
+			column.Name = "documentState";
+			//column.FieldName = "id_documentState";
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			//column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.Width = Unit.Percentage(10);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+		});
+
+		// COMMAND COLUMN
+
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = false,
+			ShowDeleteButton = false,
+			Visible = true,
+			VisibleIndex = 14,
+			Caption = "Acciones",
+			Width = Unit.Percentage(5)
+		};
+
+		commandColumn.CustomButtons.Add(
+			new GridViewCommandColumnCustomButton
+			{
+				ID = "btnEditRow",
+				Text = "Editar"
+			}
+		);
+		settings.ClientSideEvents.CustomButtonClick = "QualityControlGridViewCustomCommandButton_Click";
+		settings.Columns.Add(commandColumn);
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+
+	//void Update(MVCxGridView grid)
+	//{
+	//    $("#id_qualityControl").val();
+	//    //return grid.Selection.FilteredCount - selectedRowsOnPage;
+	//}
+}

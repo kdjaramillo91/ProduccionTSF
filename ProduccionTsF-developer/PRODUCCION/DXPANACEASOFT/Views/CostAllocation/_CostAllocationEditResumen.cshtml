@@ -1,0 +1,681 @@
+﻿@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DevExpress.XtraGrid
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.Dto
+@using System.Drawing
+
+@{
+	bool _viewEditResume = false;
+	if (ViewBag.viewEditResume != null)
+	{
+		_viewEditResume = ViewBag.viewEditResume;
+	}
+
+	var grid = Html.DevExpress().GridView<CostAllocationResumidoDto>(settings =>
+	{
+		settings.Name = "gvCostAllocationEditResumido";
+		settings.CallbackRouteValues = new { Controller = "CostAllocation", Action = "CostAllocationEditResumeDetailPartial" };
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "CostAllocation", Action = "CostAllocationEditResumeDetailAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "CostAllocation", Action = "CostAllocationEditResumeDetailUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "CostAllocation", Action = "CostAllocationEditResumeDetailDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+		//settings.CommandColumn.Visible = true;
+		settings.Width = Unit.Percentage(100);
+		settings.SettingsBehavior.AutoExpandAllGroups = true;
+
+		settings.Styles.FixedColumn.BackColor = Color.LightYellow;
+		settings.Settings.HorizontalScrollBarMode = ScrollBarMode.Visible;
+		settings.KeyFieldName = "id";
+
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		//Checkbox de registros de tabla
+		settings.CommandColumn.ShowSelectCheckbox = false;
+
+
+		//Pie de tabla
+		settings.Settings.ShowFooter = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+		settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+
+		//Eventos
+		settings.ClientSideEvents.Init = "OnGridViewCostAllocationResumeInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewCostAllocationResumeSelectionChanged";
+		settings.ClientSideEvents.BeginCallback = "OnGridViewCostAllocationResumeBeginCallback";
+		settings.ClientSideEvents.EndCallback = "OnGridViewCostAllocationResumeEndCallback";
+
+
+		settings.SettingsExport.EnableClientSideExportAPI = true;
+		settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+		settings.SettingsExport.FileName = "AsignacionCostosResumido_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+		settings.Toolbars.Add(t =>
+		{
+			t.EnableAdaptivity = true;
+			t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+		});
+
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = 0;
+			//GetFilteredRowCountWithoutPage(gv);
+
+			List<CostAllocationResumidoDto> rows = (Model as List<CostAllocationResumidoDto>);
+			rows = (rows != null) ? rows.ToList() : new List<CostAllocationResumidoDto>();
+
+			e.Properties["cpRowsCount"] = rows.Count;
+		};
+
+		/* columnas Indice */
+
+		settings.Columns.Add(f => f.id_InventoryLine, column =>
+		{
+			column.FieldName = "id_InventoryLine";
+			column.PropertiesEdit.ClientInstanceName = "id_InventoryLineRes";
+			column.Caption = "Línea de Inventario";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.ReadOnly = true;
+			column.Width = Unit.Pixel(0);
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				string _inventoryLineName = (string)DataBinder.Eval(c.DataItem, "InventoryLineName");
+
+				Html.DevExpress().TextBox(p =>
+				{
+					p.Width = Unit.Percentage(0);
+					p.ReadOnly = true;
+					p.Name = "id_InventoryLineRes";
+					p.Properties.ClientInstanceName = "id_InventoryLineRes";
+					p.ShowModelErrors = false;
+				}).Bind(_inventoryLineName).Render();
+			});
+
+		});
+
+
+		settings.Columns.Add(f => f.InventoryLineName, column =>
+		{
+			column.FieldName = "InventoryLineName";
+			column.PropertiesEdit.ClientInstanceName = "InventoryLineName";
+			column.Width = 150;
+			column.Caption = "Línea de Inventario";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.ReadOnly = true;
+
+
+		});
+
+
+		settings.Columns.Add(f => f.id_ItemType, column =>
+		{
+			column.FieldName = "id_ItemType";
+			column.Caption = "Tipo Producto";
+			column.PropertiesEdit.ClientInstanceName = "id_ItemTypeRes";
+			column.Width = Unit.Pixel(0);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.ReadOnly = true;
+
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				string _iItemTypeName = (string)DataBinder.Eval(c.DataItem, "ItemTypeName");
+
+				Html.DevExpress().TextBox(p =>
+				{
+					p.Width = Unit.Percentage(0);
+					p.ReadOnly = true;
+					p.Name = "id_ItemTypeRes";
+					p.Properties.ClientInstanceName = "id_ItemTypeRes";
+					p.ShowModelErrors = false;
+				}).Bind(_iItemTypeName).Render();
+			});
+
+		});
+
+		settings.Columns.Add(f => f.ItemTypeName, column =>
+		{
+			column.FieldName = "ItemTypeName";
+			column.Caption = "Tipo Producto";
+			column.PropertiesEdit.ClientInstanceName = "ItemTypeName";
+			column.Width = 150;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.Visible = true;
+
+		});
+
+		settings.Columns.Add(f => f.id_ItemTypeCategory, column =>
+		{
+			column.FieldName = "id_ItemTypeCategory";
+			column.PropertiesEdit.ClientInstanceName = "id_ItemTypeCategoryRes";
+			column.Width = Unit.Pixel(0);
+			column.Caption = "Categoría";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.ReadOnly = true;
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				string _itemTypeCategoryName = (string)DataBinder.Eval(c.DataItem, "ItemTypeCategoryName");
+
+				Html.DevExpress().TextBox(p =>
+				{
+					p.Width = Unit.Percentage(0);
+					p.ReadOnly = true;
+					p.Name = "id_ItemTypeCategoryRes";
+					p.Properties.ClientInstanceName = "id_ItemTypeCategoryRes";
+					p.ShowModelErrors = false;
+				}).Bind(_itemTypeCategoryName).Render();
+			});
+
+		});
+
+		settings.Columns.Add(f => f.ItemTypeCategoryName, column =>
+		{
+			column.FieldName = "ItemTypeCategoryName";
+			column.PropertiesEdit.ClientInstanceName = "ItemTypeCategoryName";
+			column.Width = 100;
+			column.Caption = "Categoría";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.ReadOnly = true;
+
+		});
+
+		settings.Columns.Add(f => f.id_ItemSize, column =>
+		{
+			column.FieldName = "id_ItemSize";
+			column.PropertiesEdit.ClientInstanceName = "id_ItemSizeRes";
+			column.Width = Unit.Pixel(0);
+			column.Caption = "Talla";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.ReadOnly = true;
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				string _itemSizeName = (string)DataBinder.Eval(c.DataItem, "ItemSizeName");
+
+				Html.DevExpress().TextBox(p =>
+				{
+					p.Width = Unit.Percentage(0);
+					p.ReadOnly = true;
+					p.Name = "id_ItemSizeRes";
+					p.Properties.ClientInstanceName = "id_ItemSizeRes";
+					p.ShowModelErrors = false;
+				}).Bind(_itemSizeName).Render();
+			});
+
+		});
+
+		settings.Columns.Add(f => f.ItemSizeName, column =>
+		{
+			column.FieldName = "ItemSizeName";
+			column.PropertiesEdit.ClientInstanceName = "ItemSizeName";
+			column.Width = 100;
+			column.Caption = "Talla";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.FixedStyle = GridViewColumnFixedStyle.Left;
+			column.ReadOnly = true;
+
+		});
+
+		settings.Columns.Add(f => f.amountBox, column =>
+		{
+			column.FieldName = "amountBox";
+			column.Width = 80;
+			column.Caption = "No./Unidades";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "amountBox";
+				p.DisplayFormatString = "N2";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 2;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+
+
+
+
+
+			// Totalizadores
+			//column.GroupFooterTemplate = new TotalGroupSummaryEllipsis.Controllers.MyTemplate(fieldName);
+			// Template Total summary footer
+			//column.SetFooterTemplateContent(c =>
+			//    {
+			//        Html.DevExpress().Label(lbSettings =>
+			//        {
+			//            lbSettings.Name = "lblFooter_amountBox";
+			//            lbSettings.Properties.EnableClientSideAPI = true;
+			//            ASPxSummaryItem summaryItem = c.Grid.TotalSummary.First(j => j.Tag == "amountBox");
+			//            //lbSettings.Text = Convert.ToDecimal(c.Grid.GetTotalSummaryValue(summaryItem)).ToMoneyFormat();
+			//            lbSettings.Text = Convert.ToDecimal(c.Grid.GetTotalSummaryValue(summaryItem)).ToString();
+			//        }).Render();
+			//    });
+
+		});
+
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "amountPound";
+			column.Width = 100;
+			column.Caption = "Cantidad/Libras";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    decimal? amountPound = (decimal?)DataBinder.Eval(c.DataItem, "amountPound");
+			//    ViewContext.Writer.Write(amountPound != null ? (amountPound.Value.ToString("N2")) : "0.00");
+			//});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "amountPound";
+				p.DisplayFormatString = "N2";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 2;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "amountKg";
+			column.Width = 100;
+			column.Caption = "Cantidad/Kilos";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    decimal? amountKg = (decimal?)DataBinder.Eval(c.DataItem, "amountKg");
+			//    ViewContext.Writer.Write(amountKg != null ? (amountKg.Value.ToString("N2")) : "0.00");
+			//});
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "amountKg";
+				p.DisplayFormatString = "N2";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 2;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "unitCostPounds";
+			column.Name = "unitCostPounds";
+			column.Caption = "C. Unitario Lbs.";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(100);
+			column.CellStyle.BackColor = Color.LightYellow;
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? unitCostPounds = (decimal?)DataBinder.Eval(c.DataItem, "unitCostPounds");
+				ViewContext.Writer.Write(unitCostPounds != null ? (unitCostPounds.Value.ToString("N5")) : "0.00000");
+			});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "unitCostPounds";
+				p.DisplayFormatString = "N5";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 5;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				p.ClientSideEvents.NumberChanged = "OnNumberChange_unitCostPounds";
+				p.ClientSideEvents.Validation = "OnValidation_unitCostPounds";
+
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "unitCostKg";
+			column.Width = 100;
+			column.Caption = "C. Unitario Kgs";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    decimal? unitCostKg = (decimal?)DataBinder.Eval(c.DataItem, "unitCostKg");
+			//    ViewContext.Writer.Write(unitCostKg != null ? (unitCostKg.Value.ToString("N2")) : "0.00");
+			//});
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "unitCostKg";
+				p.DisplayFormatString = "N5";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 5;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "averageCostUnit";
+			column.Width = 100;
+			column.Caption = "Costo Promedio Unidad";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal? averageCostUnit = (decimal?)DataBinder.Eval(c.DataItem, "averageCostUnit");
+				ViewContext.Writer.Write(averageCostUnit != null ? (averageCostUnit.Value.ToString("N5")) : "0.00000");
+			});
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    decimal? unitCostPounds = (decimal?)DataBinder.Eval(c.DataItem, "unitCostPounds");
+			//    ViewContext.Writer.Write(unitCostPounds != null ? (unitCostPounds.Value.ToString("N5")) : "0.00000");
+			//});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "averageCostUnit";
+				p.DisplayFormatString = "N5";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 5;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalCostPounds";
+			column.Width = 100;
+			column.Caption = "Costo Total Lbs";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    decimal? totalCostPounds = (decimal?)DataBinder.Eval(c.DataItem, "totalCostPounds");
+			//    ViewContext.Writer.Write(totalCostPounds != null ? (totalCostPounds.Value.ToString("N2")) : "0.00");
+			//});
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "totalCostPounds";
+				p.DisplayFormatString = "N2";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 2;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalCostKg";
+			column.Width = 100;
+			column.Caption = "Costo Total Kgs";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    decimal? totalCostKg = (decimal?)DataBinder.Eval(c.DataItem, "totalCostKg");
+			//    ViewContext.Writer.Write(totalCostKg != null ? (totalCostKg.Value.ToString("N2")) : "0.00");
+			//});
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(70);
+				p.ClientInstanceName = "totalCostKg";
+				p.DisplayFormatString = "N2";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 2;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalCostUnit";
+			column.Width = 100;
+			column.Caption = "Costo Total Unidades";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+
+			//column.SetDataItemTemplateContent(c =>
+			//{
+			//    decimal? totalCostUnit = (decimal?)DataBinder.Eval(c.DataItem, "totalCostUnit");
+			//    ViewContext.Writer.Write(totalCostUnit != null ? (totalCostUnit.Value.ToString("N2")) : "0.00");
+			//});
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Pixel(110);
+				p.ClientInstanceName = "totalCostUnit";
+				p.DisplayFormatString = "N2";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 2;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		/*
+           Custom Total
+        */
+		decimal totalCantidadLibras = 0;
+		decimal totalCostoLibras = 0;
+		decimal totalCantidadKilos = 0;
+		decimal totalCostoKilos = 0;
+		decimal totalCantidad = 0;
+		decimal totalCostoUnitario = 0;
+		string[] fieldsCustom = new string[] { "unitCostPounds", "unitCostKg", "averageCostUnit" };
+
+		settings.CustomSummaryCalculate = (s, e) =>
+		{
+			ASPxSummaryItem summary = e.Item as ASPxSummaryItem;
+			MVCxGridView gridView = s as MVCxGridView;
+			if (!fieldsCustom.Contains(summary.FieldName) ) return;
+
+			if (e.IsTotalSummary)
+			{
+
+				if (e.SummaryProcess ==  CustomSummaryProcess.Start)
+				{
+					if (summary.FieldName == "unitCostPounds")
+					{
+						totalCantidadLibras = 0;
+						totalCostoLibras = 0;
+					}
+					if (summary.FieldName == "unitCostKg")
+					{
+						totalCantidadKilos = 0;
+						totalCostoKilos = 0;
+					}
+					if (summary.FieldName == "averageCostUnit")
+					{
+						totalCantidad = 0;
+						totalCostoUnitario = 0;
+					}
+
+				}
+				else if (e.SummaryProcess == CustomSummaryProcess.Calculate)
+				{
+					if (summary.FieldName == "unitCostPounds")
+					{
+						var _tCostoLibras = e.GetValue("totalCostPounds");
+						if (_tCostoLibras != null)
+						{
+							totalCostoLibras += (decimal)_tCostoLibras;
+						}
+						var _cantLibras = e.GetValue("amountPound");
+						if (_cantLibras != null)
+						{
+							totalCantidadLibras += (decimal)_cantLibras;
+						}
+					}
+					if (summary.FieldName == "unitCostKg")
+					{
+						var _tCostoKilos = e.GetValue("totalCostKg");
+						if (_tCostoKilos != null)
+						{
+							totalCostoKilos += (decimal)_tCostoKilos;
+						}
+						var _cantKilos = e.GetValue("amountKg");
+						if (_cantKilos != null)
+						{
+							totalCantidadKilos += (decimal)_cantKilos;
+						}
+					}
+					if (summary.FieldName == "averageCostUnit")
+					{
+						var _tCostoUnit = e.GetValue("totalCostUnit");
+						if (_tCostoUnit != null)
+						{
+							totalCostoUnitario += (decimal)_tCostoUnit;
+						}
+						var _cantUnidades = e.GetValue("amountBox");
+						if (_cantUnidades != null)
+						{
+							totalCantidad += (decimal)_cantUnidades;
+						}
+					}
+
+				}
+				else if (e.SummaryProcess == CustomSummaryProcess.Finalize)
+				{
+					if (summary.FieldName == "unitCostPounds")
+					{
+						if (totalCostoLibras > 0 && totalCantidadLibras > 0)
+						{
+
+							e.TotalValue = totalCostoLibras / totalCantidadLibras;
+						}
+						else
+							e.TotalValue = 0;
+					}
+					if (summary.FieldName == "unitCostKg")
+					{
+						if (totalCostoKilos > 0 && totalCantidadKilos > 0)
+						{
+
+							e.TotalValue = totalCostoKilos / totalCantidadKilos;
+						}
+						else
+							e.TotalValue = 0;
+					}
+					if(summary.FieldName == "averageCostUnit")
+					{
+						if (totalCostoUnitario > 0 && totalCantidad > 0)
+						{
+
+							e.TotalValue = totalCostoUnitario / totalCantidad;
+						}
+						else
+							e.TotalValue = 0;
+					}
+
+					e.TotalValueReady = true;
+				}
+			}
+		};
+
+		settings.Settings.ShowFooter = true;
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountBox").DisplayFormat = "{0:#,##0.00}";
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountPound").DisplayFormat = "{0:#,##0.00}";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountKg").DisplayFormat = "{0:#,##0.00}";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Custom, "unitCostPounds").DisplayFormat = "{0:#,##0.00000}";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Custom, "unitCostKg").DisplayFormat = "{0:#,##0.00000}";
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Custom, "averageCostUnit").DisplayFormat = "{0:#,##0.00000}";
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalCostPounds").DisplayFormat = "{0:#,##0.00}";
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalCostKg").DisplayFormat = "{0:#,##0.00}";
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalCostUnit").DisplayFormat = "{0:#,##0.00}";
+
+		if (_viewEditResume)
+		{
+			//Botones de comandos para registros de la tabla
+			MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+			{
+				ShowEditButton = true,
+				ShowDeleteButton = false,
+				ShowCancelButton = true,
+				ShowUpdateButton = true,
+				Visible = true,
+				VisibleIndex = 20,
+				Caption = "Acciones"
+			};
+			commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			commandColumn.Width = Unit.Pixel(120);
+			commandColumn.VisibleIndex = 0;
+			commandColumn.FixedStyle = GridViewColumnFixedStyle.Left;
+			settings.Columns.Add(commandColumn);
+		}
+
+	});
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+
+}
+@grid.Bind(Model).GetHtml()

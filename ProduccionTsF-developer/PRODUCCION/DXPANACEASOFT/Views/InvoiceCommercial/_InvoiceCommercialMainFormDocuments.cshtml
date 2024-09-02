@@ -1,0 +1,25 @@
+﻿
+
+@model DXPANACEASOFT.Models.InvoiceCommercial
+
+<table class="table table-condensed" style="margin: 0px;">
+	<tr>
+		<td width="25%">Sellos:</td>
+		<td width="75%">
+			@Html.DevExpress().MemoFor(m => m.seals, settings =>
+			{
+				settings.Name = "seals";
+				settings.Width = Unit.Percentage(100);
+
+				settings.ReadOnly = Model.seals_CSI.isReadOnly;
+
+				if (Model.seals_CSI.isRequired)
+				{
+					settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+					settings.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				}
+			}).GetHtml()
+		</td>
+	</tr>
+</table>
+

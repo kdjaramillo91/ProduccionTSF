@@ -1,0 +1,56 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDetailDTO
+
+@{ 
+	bool requiereLoteSistema = ViewData["requiereUsuarioLote"] != null ? ((string)ViewData["requiereUsuarioLote"] == "S" ? true : false) : false;
+	bool requiereUsuarioSistema = ViewData["requiereSistemaLote"] != null ? ((string)ViewData["requiereSistemaLote"] == "S" ? true : false) : false;
+
+	int? id_warehouse_exit = ViewData["id_warehouse_exit"] != null ? (int)ViewData["id_warehouse_exit"] : 0;
+	int? id_warehouse_location_exit = ViewData["id_warehouse_location_exit"] != null ? (int)ViewData["id_warehouse_location_exit"] : 0;
+	int? id_warehouse_entry = ViewData["id_warehouse_entry"] != null ? (int)ViewData["id_warehouse_entry"] : 0;
+	int? id_warehouse_location_entry = ViewData["id_warehouse_location_entry"] != null ? (int)ViewData["id_warehouse_location_entry"] : 0;
+	DateTime? fechaEmision = ViewData["fechaEmision"] != null
+		? ((DateTime?)ViewData["fechaEmision"]) : null;
+
+}
+
+@Html.DevExpress().ComboBoxFor(m => m.id_lot, settings =>
+{
+	settings.Name = "id_lot";
+	settings.Properties.ClientInstanceName = "id_lot";
+	settings.Width = Unit.Percentage(100);
+
+	settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+	settings.CallbackRouteValues = new { Controller = "AutomaticTransfer", Action = "ComboBoxLotEdit" };
+	settings.Properties.CallbackPageSize = 10;
+
+	//settings.Properties.DisplayFormatString = "{0} - {1}";
+	settings.Properties.TextField = "number";
+	settings.Properties.ValueField = "id";
+	settings.Properties.ValueType = typeof(int);
+
+	//settings.Properties.ClientSideEvents.Init = "ComboBoxLotEdit_Init";
+	settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxLotEdit_BeginCallback";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxLotEdit_SelectedIndexChanged";
+	settings.ItemTextCellPrepared = (sender, e) =>
+	{
+		e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+	};
+}).BindList(DataProviderAutomaticTransfer.LotDetail (	(int)ViewData["id_company"],
+														null, 
+														Model.id_Item, 
+														Model.id_MetricUnitMov, 
+														id_warehouse_exit, 
+														id_warehouse_location_exit, 
+														id_warehouse_location_entry, 
+														id_warehouse_location_entry, 
+														Model.id_lot, 
+														requiereLoteSistema, 
+														requiereUsuarioSistema, 
+														fechaEmision)).Bind(Model.id_lot).GetHtml()
+
+@*//}).BindList(DataProviderAutomaticTransfer.LotDetail(Model.id_warehouse_exit, Model.id_warehouselocation_exit, Model.id_Item, Model.id_lot)).Bind(Model.id_lot).GetHtml()*@

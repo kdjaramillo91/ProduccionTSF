@@ -1,0 +1,85 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using ValidationSettings = System.Web.UI.ValidationSettings
+@model DXPANACEASOFT.Models.Invoice
+@{ 
+	var _ControlState = (tbsysDocumentDocumentStateControlsState)this.ViewBag.ControlState;
+}
+<div class="row">
+	<div class="col-sm-1" style="width: 20%">
+			Seleccione la Unidad de Medida de la Factura:
+		</div>
+		<div class="col-sm-2">
+			@{
+				int? id_metricUnitInvoice = (Model != null && Model.SalesQuotationExterior.id_metricUnitInvoice != 0)
+					? (int?)Model.SalesQuotationExterior.id_metricUnitInvoice : null;
+				if (id_metricUnitInvoice == null)
+				{
+					id_metricUnitInvoice = 999;
+				}
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.SalesQuotationExterior.id_metricUnitInvoice, settings =>
+			{
+				settings.Name = "id_metricUnitInvoice";
+
+				settings.Properties.ClientInstanceName = "id_metricUnitInvoice";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextFormatString = "{1}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.Columns.Add("code", "Cod.", 60);
+				settings.Properties.Columns.Add("name", "U.M.", 80);
+				settings.Properties.ClientSideEvents.Init = "onInitSalesQuotationExteriorMetricUnitInvoice";
+
+				settings.Properties.AllowNull = false;
+				settings.ReadOnly = _ControlState.id == 0 || _ControlState.isReadOnly;
+
+				settings.Properties.ClientSideEvents.Validation = "validationSalesQuotationExteriorMetricUnitInvoice";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "onChangeSalesQuotationExteriorMetricUnitInvoice";
+
+				settings.ToolTip = "Seleccionar Unidad de Medida Factura";
+			}).BindList(DataProviderMetricUnit.WeightMetriUnitInvoiceExterior((int?)ViewData["id_company"])).Bind(id_metricUnitInvoice).GetHtml()
+		</div>
+	<div class="col-sm-1" style="width: 9%">
+		% Variaci&oacute;n +/-:
+	</div>
+	<div class="col-sm-2">
+		@Html.DevExpress().SpinEdit(settings =>
+		{
+			settings.Name = "porcVariationPlusMinus";
+
+			settings.Properties.ClientInstanceName = "porcVariationPlusMinus";
+			settings.Width = Unit.Percentage(90);
+
+			settings.Properties.AllowNull = false;
+			settings.ReadOnly = _ControlState.id == 0 || _ControlState.isReadOnly;
+
+
+			settings.ToolTip = "Seleccionar % Variación +/- General";
+		}).Bind(0.00M).GetHtml()
+	</div>
+	<div class="col-sm-6">
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-1" style="width: 15%">
+		Buscar por Nombre Extranjero:
+	</div>
+	<div>
+
+		@Html.DevExpress().CheckBox(settings =>
+   {
+	   settings.Name = "bsNombreExtranjero";
+
+	   settings.Properties.ClientInstanceName = "bsNombreExtranjero";
+	   settings.Properties.ClientSideEvents.CheckedChanged = "OnNombreExtranjero_CheckedChanged";
+
+   }).GetHtml()
+	</div>
+</div>
+
+

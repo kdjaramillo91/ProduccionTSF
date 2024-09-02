@@ -1,0 +1,18 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComboBoxWarehouseEntryIndex";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "InventoryMovePlantTransfer",
+        Action = "ComboBoxWarehouseEntryIndex",
+    };
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxWarehouseEntryIndex_SelectedIndexChanged";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}).BindList(ViewData["WarehouseEntryIndex"]).GetHtml()
+

@@ -1,0 +1,375 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.Customer
+
+@{
+    //var code_identification = (Model != null && Model.Provider != null && Model.Provider.Person != null && Model.Provider.Person.id_identificationType != 0) ? Model.Provider.Person.IdentificationType.codeSRI : "";
+    //var codeCountrySystem = DataProviderSetting.ValueSetting("COSCO");
+}
+
+<table id="tabGeneralDataCustomerTable" class="table table-condensed" style="margin: 0px;">
+
+    @*@Html.Hidden("codeCountrySystem", codeCountrySystem) *@
+    <tr>
+        <td colspan="6" class="ps-bar-collapse" dtx="psn-infventas">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Inf. Ventas</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="psn-infventas">
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_clientCategory, settings =>
+       {
+           settings.Name = "id_clientCategoryLabel";
+           settings.Text = "Categoría:";
+           settings.AssociatedControlName = "id_clientCategory";
+       }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_clientCategory = (Model != null && Model.id_clientCategory != 0) ? (int?)Model.id_clientCategory : null;
+                if (id_clientCategory == null)
+                {
+                    id_clientCategory = DataProviderClientCategory.ClientCategorybyCompanyDefault((int)ViewData["id_company"]);
+                }
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_clientCategory, settings =>
+       {
+           settings.Name = "id_clientCategory";
+           settings.Properties.ClientInstanceName = "id_clientCategory";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.Properties.Columns.Add("description", "Descripción", 100);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnSelectedIndexChanged_ClientCategory";
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           settings.CustomJSProperties = (s, e) =>
+           {
+
+               e.Properties["cpTabContainer"] = "tabCustomer";
+               e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               // e.Properties["cpInitialCondition"] = "(  )-   -";
+               e.Properties["cpIsRequired"] = "true";
+               e.Properties["cpMessageErrorFormart"] = "Debe seleccionar Categoría ";
+               e.Properties["cpTabControl"] = "tabControl";
+           };
+
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProviderType_SelectedIndexChanged";
+       }).BindList(DataProviderClientCategory.ClientCategoryByCompanyAndCurrent((int)ViewData["id_company"], id_clientCategory)).Bind(id_clientCategory).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_economicGroupCusm, settings =>
+           {
+               settings.Name = "id_economicGroupCusmLabel";
+               settings.Text = "Grupo Económico:";
+               settings.AssociatedControlName = "id_economicGroupCusm";
+           }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_economicGroupCusm = (Model != null && Model.id_economicGroupCusm != 0) ? (int?)Model.id_economicGroupCusm : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_economicGroupCusm, settings =>
+           {
+               settings.Name = "id_economicGroupCusm";
+               settings.Properties.ClientInstanceName = "id_economicGroupCusm";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextFormatString = "{1}";
+               settings.Properties.ValueType = typeof(int);
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.Properties.Columns.Add("code", "Cod.", 50);
+               settings.Properties.Columns.Add("name", "Nombre", 100);
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProviderType_SelectedIndexChanged";
+           }).BindList( DataProviderEconomicGroup.EconomicGroup()).Bind(id_economicGroupCusm).GetHtml()
+        </td>
+
+    </tr>
+    <tr class="psn-infventas">
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_customerType, settings =>
+       {
+           settings.Name = "id_customerTypeLabel";
+           settings.Text = "Tipo Cliente:";
+           settings.AssociatedControlName = "id_customerType";
+       }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_customerType = (Model != null && Model.id_customerType != 0) ? (int?)Model.id_customerType : null;
+                if (id_customerType == null)
+                {
+                    id_customerType = DataProviderCustomerType.CustomerTypebyCompanyDefault((int)ViewData["id_company"]);
+                }
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_customerType, settings =>
+       {
+           settings.Name = "id_customerType";
+           settings.Properties.ClientInstanceName = "id_customerType";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.Properties.Columns.Add("name", "Nombre", 100);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnSelectedIndexChanged_CustomerType";
+           settings.CallbackRouteValues = new { Controller = "Person", Action = "LoadCustomerType" };
+           settings.Properties.ClientSideEvents.BeginCallback = "CustomerType_BeginCallback";
+           settings.Properties.ClientSideEvents.EndCallback = "CustomerType_EndCallback";
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           settings.CustomJSProperties = (s, e) =>
+           {
+
+               e.Properties["cpTabContainer"] = "tabCustomer";
+               e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               // e.Properties["cpInitialCondition"] = "(  )-   -";
+               e.Properties["cpIsRequired"] = "true";
+               e.Properties["cpMessageErrorFormart"] = "Debe seleccionar Tipo de Cliente ";
+               e.Properties["cpTabControl"] = "tabControl";
+           };
+
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProviderType_SelectedIndexChanged";
+       }).BindList(DataProviderCustomerType.CustomerTypebyCompanyClientCategoryAndCurrent((int)ViewData["id_company"], id_clientCategory, id_customerType)).Bind(id_customerType).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_commissionAgent, settings =>
+                       {
+                           settings.Name = "id_commissionAgentLabel";
+                           settings.Text = "Comisionista:";
+                           settings.AssociatedControlName = "id_commissionAgent";
+                       }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_commissionAgent = (Model != null && Model.id_commissionAgent != 0) ? (int?)Model.id_commissionAgent : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_commissionAgent, settings =>
+            {
+                settings.Name = "id_commissionAgent";
+                settings.Properties.ClientInstanceName = "id_commissionAgent";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextFormatString = "{1}";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                settings.Properties.Columns.Add("id", "Código.", 80);
+                settings.Properties.Columns.Add("fullname_businessName", "Nombre", 150);
+                settings.ShowModelErrors = true;
+            }).BindList( DataProviderPerson.GetCommisionAgents()).GetHtml()
+        </td>
+
+    </tr>
+    <tr class="psn-infventas">
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_businessLine, settings =>
+       {
+           settings.Name = "id_businessLineLabel";
+           settings.Text = "Giro de Negocio:";
+           settings.AssociatedControlName = "id_businessLine";
+       }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_businessLine = (Model != null && Model.id_businessLine != 0) ? (int?)Model.id_businessLine : null;
+                if (id_businessLine == null)
+                {
+                    id_businessLine = DataProviderBusinessLine.BusinessLinebyCompanyDefault((int)ViewData["id_company"]);
+                }
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_businessLine, settings =>
+       {
+           settings.Name = "id_businessLine";
+           settings.Properties.ClientInstanceName = "id_businessLine";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.Properties.Columns.Add("description", "Descripción", 100);
+           settings.ShowModelErrors = true;
+           settings.CallbackRouteValues = new { Controller = "Person", Action = "LoadBusinessLine" };
+           settings.Properties.ClientSideEvents.BeginCallback = "BusinessLine_BeginCallback";
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           settings.CustomJSProperties = (s, e) =>
+           {
+
+               e.Properties["cpTabContainer"] = "tabCustomer";
+               e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               // e.Properties["cpInitialCondition"] = "(  )-   -";
+               e.Properties["cpIsRequired"] = "true";
+               e.Properties["cpMessageErrorFormart"] = "Debe seleccionar el Giro de Negocio ";
+               e.Properties["cpTabControl"] = "tabControl";
+           };
+
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProviderType_SelectedIndexChanged";
+       }).BindList(DataProviderBusinessLine.BusinessLinebyCompanyClientCategoryCustomerTypeAndCurrent((int)ViewData["id_company"], id_clientCategory, id_customerType, id_businessLine)).Bind(id_businessLine).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_vendorAssigned, settings =>
+               {
+                   settings.Name = "id_vendorAssignedLabel";
+                   settings.Text = "Vendedor Asignado:";
+                   settings.AssociatedControlName = "id_vendorAssigned";
+               }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_vendorAssigned = (Model != null && Model.id_vendorAssigned != 0) ? (int?)Model.id_vendorAssigned : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_vendorAssigned, settings =>
+       {
+           settings.Name = "id_vendorAssigned";
+           settings.Properties.ClientInstanceName = "id_vendorAssigned";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.Properties.Columns.Add("id", "Código.", 80);
+           settings.Properties.Columns.Add("name", "Nombre", 150);
+           settings.ShowModelErrors = true;
+       }).BindList(DataProviderPerson.GetSellerAssigned()).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Name = "id_customerStateLabel";
+                       settings.Text = "Estado del Cliente:";
+                       settings.AssociatedControlName = "id_customerState";
+                   }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_customerState = (Model != null && Model.id_customerState != 0) ? (int?)Model.id_customerState : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_customerState, settings =>
+       {
+           settings.Name = "id_customerState";
+           settings.Properties.ClientInstanceName = "id_customerState";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.ShowModelErrors = true;
+
+       }).BindList(DataProviderCustomerState.GetAllActive()).GetHtml()
+        </td>
+    </tr>
+
+    <tr><td colspan="3"></td></tr>
+
+    <tr>
+        <td colspan="6" class="ps-bar-collapse" dtx="psn-inftribut">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Inf. tributaria</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+
+
+    <tr class="psn-inftribut">
+        <td style="border-spacing: 1px;">
+            @Html.DevExpress().LabelFor(m => m.specialTaxPayerCusm, settings =>
+           {
+               settings.Name = "specialTaxPayerCusmLabel";
+               settings.Text = "Contribuyente Especial:";
+               settings.AssociatedControlName = "specialTaxPayerCusm";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.specialTaxPayerCusm, settings =>
+           {
+               settings.Name = "specialTaxPayerCusm";
+               settings.Properties.ClientInstanceName = "specialTaxPayerCusm";
+               settings.ShowModelErrors = true;
+
+           }).GetHtml()
+        </td>
+        <td style="border-spacing: 1px;">
+            @Html.DevExpress().LabelFor(m => m.forceToKeepAccountsCusm, settings =>
+           {
+               settings.Name = "forceToKeepAccountsCusmLabel";
+               settings.Text = "Obligado llevar Contabilidad:";
+               settings.AssociatedControlName = "forceToKeepAccountsCusm";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.forceToKeepAccountsCusm, settings =>
+           {
+               settings.Name = "forceToKeepAccountsCusm";
+               settings.Properties.ClientInstanceName = "forceToKeepAccountsCusm";
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               //settings.CustomJSProperties = (s, e) =>
+               //{
+               //    e.Properties["cpTabContainer"] = "tabProvider";
+               //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               //    e.Properties["cpIsRequired"] = "true";
+               //    e.Properties["cpTabControl"] = "tabControl";
+               //};
+           }).GetHtml()
+        </td>
+
+
+        <td style="border-spacing: 1px;">
+            @Html.DevExpress().LabelFor(m => m.applyIva, settings =>
+           {
+               settings.Name = "applyIvaLabel";
+               settings.Text = "Grava IVA:";
+               settings.AssociatedControlName = "applyIva";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.applyIva, settings =>
+           {
+               settings.Name = "applyIva";
+               settings.Properties.ClientInstanceName = "applyIva";
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               //settings.CustomJSProperties = (s, e) =>
+               //{
+               //    e.Properties["cpTabContainer"] = "tabProvider";
+               //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               //    e.Properties["cpIsRequired"] = "true";
+               //    e.Properties["cpTabControl"] = "tabControl";
+               //};
+           }).GetHtml()
+        </td>
+
+    </tr>
+
+</table>
+
+
+<script src="~/Scripts/person/_providerGeneralData.js"></script>

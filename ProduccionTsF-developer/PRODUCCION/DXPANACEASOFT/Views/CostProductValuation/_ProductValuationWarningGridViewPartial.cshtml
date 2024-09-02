@@ -1,0 +1,120 @@
+﻿@model IList<ProductionCostProductValuationWarning>
+@{ 
+	var novedades = DXPANACEASOFT.Controllers.CostProductValuationController
+		.ConvertToDTO(this.Model);
+}
+@Html.DevExpress().GridView(
+	gridView =>
+	{
+		#region Configuración general
+
+		// Configuración general
+		gridView.Name = "gvNovedadesValorizacion";
+		gridView.KeyFieldName = "Orden";
+		gridView.Width = Unit.Percentage(100);
+		gridView.SettingsSearchPanel.Visible = false;
+
+		var header = gridView.Styles.Header;
+		header.BackColor = System.Drawing.Color.FromArgb(255, 255, 191, 102);
+		header.Font.Bold = true;
+		header.ForeColor = System.Drawing.Color.Black;
+
+		var settings = gridView.Settings;
+		settings.ShowTitlePanel = false;
+		settings.ShowGroupPanel = false;
+		settings.ShowFilterRow = false;
+		settings.ShowFilterRowMenu = false;
+		settings.HorizontalScrollBarMode = ScrollBarMode.Auto;
+		settings.VerticalScrollBarMode = ScrollBarMode.Hidden;
+		settings.VerticalScrollableHeight = 600;
+		settings.VerticalScrollBarStyle = GridViewVerticalScrollBarStyle.Virtual;
+		settings.ShowFooter = false;
+
+		var behavior = gridView.SettingsBehavior;
+		behavior.AllowSelectByRowClick = true;
+		behavior.AllowEllipsisInText = true;
+		behavior.AllowDragDrop = false;
+		behavior.AllowSort = false;
+		behavior.EnableRowHotTrack = true;
+
+		var pager = gridView.SettingsPager;
+		pager.Visible = false;
+		pager.PageSize = 80;
+		pager.Mode = GridViewPagerMode.EndlessPaging;
+
+		var loading = gridView.SettingsLoadingPanel;
+		loading.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+		loading.Text = "Cargando...";
+
+		var styles = gridView.Styles;
+		styles.AlternatingRow.Enabled = DevExpress.Utils.DefaultBoolean.True;
+		styles.AlternatingRow.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffffff");
+		styles.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#f5f3f4");
+
+		var adaptivity = gridView.SettingsAdaptivity;
+		adaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+
+
+		// Parámetros de Exportación
+		var exportSettings = gridView.SettingsExport;
+
+		exportSettings.EnableClientSideExportAPI = true;
+		exportSettings.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+
+		exportSettings.FileName = String.Format("{0}_{1:yyyyMMdd HHmm}", "NovedadesValorizacion", DateTime.Now);
+
+		exportSettings.Styles.Header.Font.Name = "Verdana";
+		exportSettings.Styles.Header.Font.Size = FontUnit.Point(10);
+
+		exportSettings.Styles.Default.Font.Name = "Verdana";
+		exportSettings.Styles.Default.Font.Size = FontUnit.Point(8);
+
+		gridView.Toolbars.Add(toolbar =>
+		{
+			toolbar.Items.Add(new MVCxGridViewToolbarItem()
+			{
+				Name = "ExportToXlsx",
+				Text = "Exportar datos a Excel (2003)",
+				Command = GridViewToolbarCommand.ExportToXlsx,
+			});
+		});
+
+		// Eventos y callbacks
+		gridView.CallbackRouteValues = new { Controller = "CostProductValuation", Action = "QueryProductionCostProductValuationWarningValorizacionDetails" };
+
+		// Pie de página
+		gridView.Settings.ShowFooter = true;
+		gridView.SetFooterRowTemplateContent(content =>
+		{
+			this.ViewContext.Writer.Write(@"<span id=""lblNovedadValorizacionGridViewInfo""></span>");
+		});
+
+		gridView.SetClientJSProperties(null, null,
+			new Dictionary<string, object>
+			{
+				{ "Model", novedades },
+			});
+
+		#region Colummnas
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Orden";
+			column.Caption = "Orden";
+			column.Width = Unit.Percentage(5);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Descripcion";
+			column.Caption = "Descripción";
+			column.Width = Unit.Percentage(95);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+		});
+		#endregion
+
+		#endregion
+
+	}).Bind(novedades).GetHtml()

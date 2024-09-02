@@ -1,0 +1,233 @@
+﻿@using DevExpress.Data
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{ 
+    string labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+    string lableEnterprise = DataProviderSetting.ValueSetting("EEPRIM");
+}
+@{
+    var grid = Html.DevExpress().GridView<PurchaseOrderDetail>(settings =>
+    {
+        settings.Name = "gvPurchaseOrderDetails";
+        settings.CallbackRouteValues = new { Controller = "Logistics", Action = "PurchaseOrderDetailsForReassignmentPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "OnGridViewPurchaseOrderDetailsReassignmentInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewPurchaseOrderDetailsReassignmentSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewPurchaseOrderDetailsReassignmentEndCallback";
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""GridViewPurchaseOrderDetailsReassignmentSelectAllRow();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""GridViewPurchaseOrderDetailsReassignmentClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(m => m.PurchaseOrder.Document.number, column =>
+        {
+            column.Caption = "No. Orden";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+
+        settings.Columns.Add(m => m.PurchaseOrder.Document.authorizationDate, column =>
+        {
+            column.Caption = "Fecha Autorización";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            ((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy HH:mm";
+            ((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy HH:mm";
+        });
+
+        settings.Columns.Add(m => m.PurchaseOrder.Provider.Person.fullname_businessName, column =>
+        {
+            column.Caption = "Proveedor";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+        });
+
+
+        settings.Columns.Add(m => m.PurchaseOrder.ProductionUnitProvider.FishingSite.FishingZone.name, column =>
+        {
+            column.Caption = "Zona Cosecha";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(9);
+        });
+
+
+        settings.Columns.Add(m => m.PurchaseOrder.ProductionUnitProvider.FishingSite.name, column =>
+        {
+            column.Caption = "Sitio Cosecha";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(9);
+        });
+        settings.Columns.Add(m => m.productionUnitProviderPoolreference, column =>
+        {
+            column.Caption = "Piscina";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(9);
+        });
+        settings.Columns.Add( m => m.PurchaseOrder.deliveryDate, column =>
+        {
+            column.Caption = (labelPup != "") ? "Fecha en " + labelPup : "Fecha Entrega";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(9);
+
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            ((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+            ((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+        });
+
+
+        settings.Columns.Add(m => m.PurchaseOrder.deliveryhour, column =>
+        {
+            column.Caption = (labelPup != "") ? "Hora en " + labelPup : "Hora Entrega";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TimeEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string delHour = "";
+                TimeSpan tmp = new TimeSpan();
+                var deliveryHour = DataBinder.Eval(c.DataItem, string.Format("PurchaseOrder.{0}", "deliveryHour"));
+                if (deliveryHour != null)
+                {
+                    tmp = (TimeSpan)deliveryHour;
+                    delHour = tmp.ToString(@"hh\:mm");
+                }
+
+                ViewContext.Writer.Write(delHour);
+            });
+            column.Width = Unit.Percentage(9);
+        });
+        
+        settings.Columns.Add(m => m.PurchaseOrder.requiredLogistic, column =>
+        {
+            column.Caption = (lableEnterprise != "") ? "Logística " + lableEnterprise : "Logística Empresa";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(9);
+        });
+
+        settings.Columns.Add(m => m.PurchaseOrder.PurchaseOrderShippingType.name, column =>
+        {
+            column.Caption = "Via Transporte";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(9);
+        });
+
+        settings.Columns.Add(m => m.Item.name, column =>
+        {
+            column.Caption = "Item";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.quantityApproved, column =>
+        {
+            column.Caption = "Cant. Pend. Despachar";
+            column.Width = Unit.Percentage(5);
+            column.UnboundType = UnboundColumnType.Decimal;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityApproved = (decimal)DataBinder.Eval(c.DataItem, "quantityApproved");
+                decimal quantityDispatched = (decimal)DataBinder.Eval(c.DataItem, "quantityDispatched");
+                decimal quantityPendingToShip = quantityApproved - quantityDispatched;
+
+                ViewContext.Writer.Write(quantityPendingToShip.ToString("N2"));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_metricUnitPurchase";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(3);
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.ItemPurchaseInformation != null && item.ItemPurchaseInformation.MetricUnit != null) ? item.ItemPurchaseInformation.MetricUnit.code : "";
+                ViewContext.Writer.Write(metricUnit);
+            });
+
+        });
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        string[] values = new string[] { "id" };
+        foreach (var key in grid.GetCurrentPageRowValues(values))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

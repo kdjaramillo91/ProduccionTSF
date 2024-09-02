@@ -1,0 +1,21 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.DrainingTestDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.idAnalist, settings =>
+{
+    settings.Name = "ComboBoxAnalist";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Seleccionar...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "DrainingTest",
+        Action = "ComboBoxAnalist",
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["Analistas"]).GetHtml()
+

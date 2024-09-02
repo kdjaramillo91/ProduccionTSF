@@ -1,0 +1,166 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ItemTaxation>
+
+
+@{
+    var grid = Html.DevExpress().GridView<ItemTaxation>(settings => {
+        settings.Name = "Taxation";
+        settings.CallbackRouteValues = new { Controller = "Item", Action = "Taxation" };
+
+        settings.ClientSideEvents.BeginCallback = "Taxation_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Item", Action = "TaxationAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Item", Action = "TaxationUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Item", Action = "TaxationDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_taxType";
+            column.Caption = "Impuesto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_taxType = (int)DataBinder.Eval(c.DataItem, "id_taxType");
+                TaxType taxType = DataProviderTaxType.TaxTypeById(id_taxType);
+
+                if (taxType != null)
+                {
+                    ViewContext.Writer.Write(taxType.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_taxType";
+                p.DataSource = DataProviderTaxType.TaxTypes((int)ViewData["id_company"]);
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Init = "ItemTaxationTaxTypeCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "ItemTaxationTaxCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_rate";
+            column.Caption = "Tarifa";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_rate = (int)DataBinder.Eval(c.DataItem, "id_rate");
+                Rate rate = DataProviderRate.Rate(id_rate);
+
+                if (rate != null)
+                {
+                    ViewContext.Writer.Write(rate.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_rate";
+                p.DataSource = DataProviderRate.RatesByCompany((int?)ViewData["id_company"]);
+
+                //p.CallbackRouteValues = new { Controller = "Item", Action = "ComboBoxTaxationRatePartial" };
+
+
+                //p.ClientSideEvents.BeginCallback = "ItemTaxationRateCombo_BeginCallback";
+                p.ClientSideEvents.Init = "ItemTaxationRateCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "ItemTaxationRateCombo_SelectedIndexChanged";
+
+                //p.settings.ControlStyle.CssClass = "editor";
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                //p.TextFormatString = "{0}";
+
+                //p.Columns.Add("name").Caption = "Tarifa";
+                //p.Columns.Add("percentage").Caption = "Porcentaje";
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "percentage";
+            column.Caption = "Porcentaje";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? percentage = (decimal?)DataBinder.Eval(c.DataItem, "percentage");
+                ViewContext.Writer.Write(percentage != null ? percentage.Value.ToString("N2") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "percentage";
+                p.NumberType = SpinEditNumberType.Float;
+                p.DecimalPlaces = 2;
+                p.AllowMouseWheel = true;
+                p.Increment = 0.1M;
+                p.LargeIncrement = 1;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+            });
+        });
+
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+

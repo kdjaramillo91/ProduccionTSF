@@ -1,0 +1,25 @@
+﻿@Html.DevExpress().ComboBox(settings =>{
+    settings.CallbackRouteValues = new { Controller = "ItemGroupCategory", Action = "ComboBoxItemSubGroupsPartial" };
+    settings.Name = "id_itemGroup";
+    settings.Properties.ClientInstanceName = "id_itemGroup";
+
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Properties.ClientSideEvents.BeginCallback = "ItemSubGroupsCombo_BeginCallback";
+    //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemGroupsCombo_SelectedIndexChanged";
+    //settings.Properties.ClientSideEvents.EndCallback = "ItemGroupsCombo_EndCallback";
+
+
+}).BindList(Model).Bind(ViewData["id_itemGroup"]).GetHtml()
+

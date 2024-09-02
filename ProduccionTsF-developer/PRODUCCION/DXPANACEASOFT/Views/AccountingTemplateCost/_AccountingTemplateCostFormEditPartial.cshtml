@@ -1,0 +1,232 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.AccountingTemplate
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditAccountingTemplate", name = "formEditAccountingTemplate" }))
+{
+    @Html.Hidden("id_accountingTemplate", Model.id)
+     
+    <table id="accountingTemplateCostTable" class="table table-condensed">
+		<tr>
+			<td style="width: 8%;">
+				@Html.DevExpress().LabelFor(m => m.code, settings =>
+				{
+				   settings.Text = "Código: *";
+				   settings.AssociatedControlName = "code";
+
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+				{
+				   settings.Name = "code";
+				   settings.Properties.ClientInstanceName = "code";
+				   settings.Width = Unit.Percentage(100);
+				   settings.Properties.NullText = "Código";
+				   settings.ShowModelErrors = true;
+				   settings.ClientVisible = true;
+				   settings.Properties.ClientSideEvents.Validation = "OnCodeAccountingTemplateValidation";
+
+				}).GetHtml()
+			</td>
+			<td style="width: 8%;">
+				@Html.DevExpress().LabelFor(m => m.id_costProduction, settings =>
+				{
+					settings.Text = "Clasificación de Costos: *";
+					settings.AssociatedControlName = "id_costProduction";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_productionCost = (Model != null && Model.id_costProduction != 0) ? (int?)Model.id_costProduction : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_costProduction, settings =>
+		   {
+			   settings.Name = "id_costProduction";
+			   settings.Properties.ClientInstanceName = "id_costProduction";
+			   settings.Width = Unit.Percentage(100);
+
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.ShowModelErrors = true;
+
+			   settings.Properties.ClientSideEvents.Init = "onCodeAccountingTemplateInit";
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "CostProductionCombo_SelectedIndexChanged";
+			   settings.Properties.ClientSideEvents.Validation = "OnProducionCostValidation";
+		   }).BindList(DataProviderProductionCost.ProductionExpenseByCompanyAndCurrentOld((int)ViewData["id_company"], id_productionCost)).Bind(id_productionCost).GetHtml()
+			</td>
+		</tr>        
+		<tr>
+			<td style="width: 8%;">
+				@Html.DevExpress().LabelFor(m => m.id_expenseProduction, settings =>
+				{
+					settings.Text = "Gastos de Producción: *";
+					settings.AssociatedControlName = "id_expenseProduction";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_productionExpense = (Model != null && Model.id_expenseProduction != 0) ? (int?)Model.id_expenseProduction : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_expenseProduction, settings =>
+				   {
+						settings.Name = "id_expenseProduction";
+						settings.Properties.ClientInstanceName = "id_expenseProduction";
+						settings.Width = Unit.Percentage(100);
+
+						settings.Properties.ValueField = "id";
+						settings.Properties.TextField = "name";
+						settings.Properties.ValueType = typeof(int);
+
+						settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+						settings.ShowModelErrors = true;
+
+						settings.Properties.ClientSideEvents.Init = "onCodeProductionExpenseAccountingTemplateInit";
+						settings.Properties.ClientSideEvents.Validation = "OnAccountingTemplateProductionExpenseValidation";
+				   }).BindList(DataProviderProductionExpense.ProductionExpenseByCompanyAndCurrent(id_productionCost)).GetHtml()
+			</td>
+
+			<td style="width: 8%;">
+				@Html.DevExpress().LabelFor(m => m.id_processPlant, settings =>
+				{
+					settings.Text = "Planta Proceso:";
+					settings.AssociatedControlName = "id_processPlant";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_personProcessPlant = (Model != null && Model.id_processPlant != 0) ? (int?)Model.id_processPlant : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_processPlant, settings =>
+			   {
+				   settings.Name = "id_processPlant";
+				   settings.Properties.ClientInstanceName = "id_processPlant";
+				   settings.Width = Unit.Percentage(100);
+
+				   settings.Properties.ValueField = "id";
+				   settings.Properties.TextField = "processPlant";
+				   settings.Properties.ValueType = typeof(int);
+
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   settings.ShowModelErrors = true;
+
+				   settings.Properties.ClientSideEvents.Init = "onCodeProcessPlantAccountingTemplateInit";
+
+			   }).BindList(DataProviderPerson.GetPersonProcesPlant()).Bind(id_personProcessPlant).GetHtml()
+
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.description, settings =>
+				{
+					settings.Text = "Descripción:";
+					settings.AssociatedControlName = "description";
+				}).GetHtml()
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().MemoFor(m => m.description, settings =>
+				{
+					settings.Properties.ClientInstanceName = "description";
+
+					settings.Width = Unit.Percentage(100);
+
+					settings.Properties.NullText = "";
+					settings.ShowModelErrors = true;
+				}).GetHtml()
+			</td>
+		</tr>
+        <tr>
+            <td width="8%">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "isActiveLabel";
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "is_Active";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Name = "isActive";
+                    settings.Properties.ClientInstanceName = "isActive";
+
+                    
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td  colspan="5">
+				<div id="objAccountingTemplateCostDetail">
+					@{
+						ViewContext.Writer.Write(@"<input id=""accountingTemplateId"" type=""hidden"" value=""" + Model.id + @"""/>");
+						Html.DevExpress().PageControl(tabs =>
+						{
+							tabs.Name = "tabControl";
+							tabs.Width = Unit.Percentage(100);
+							tabs.EnableClientSideAPI = true;
+
+							tabs.TabPages.Add(tab =>
+							{
+								tab.Name = "tabCuentaContable";
+								tab.Text = "Cuentas Contables";
+								tab.TabStyle.Width = Unit.Percentage(100);
+								tab.TabImage.Width = Unit.Pixel(16);
+								tab.TabImage.Height = Unit.Pixel(16);
+								tab.TabImage.Align = ImageAlign.Right;
+								tab.ActiveTabImage.Align = ImageAlign.Right;
+								tab.SetContent(() =>
+								{
+									var accountingTemplateCostDetail = Model.AccountLedger.Where(w => w.isActive).ToList();
+									Html.RenderPartial("_AccountingTemplateCostDetailPartial", accountingTemplateCostDetail);
+								});
+							});
+						}).Render();
+					}
+				</div>
+			</td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+		<tr id="accountingTemplateCostAlertRow" style="display: none;">
+			<td colspan="6">
+				<div class="alert alert-danger fade in" style="margin-top:18px;">
+					<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+					<span id="accountingTemplateCostErrorMessage"></span>
+				</div>
+			</td>
+		</tr>
+    </table>
+ }

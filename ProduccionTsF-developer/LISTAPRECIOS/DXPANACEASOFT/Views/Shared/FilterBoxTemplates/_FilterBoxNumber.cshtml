@@ -1,0 +1,65 @@
+﻿@using DXPANACEASOFT.Models.Filter
+
+@model List<FilterType>
+@*@{
+    ViewData["isBtnToReturn"] = true;
+}*@
+<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="3">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">N&uacute;meros</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 30%">
+            @{
+                Html.RenderPartial("FilterBoxTemplates/_FilterBoxNumberGridViewLeft", Model);
+            }
+        </td>
+        <td style="width: 10%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnToRightNumber";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = ">>>";
+                                settings.Images.Image.IconID = IconID.ActionsRight16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnToRightNumber_click";
+                            }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnToLeftNumber";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "<<<";
+                                settings.Images.Image.IconID = IconID.ActionsLeft16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnToLeftNumber_click";
+                            }).GetHtml()
+                    </td>
+                </tr>
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 60%">
+            @{
+                Html.RenderPartial("FilterBoxTemplates/_FilterBoxNumberGridViewRight", new List<FilterTypeWithCondition>());
+            }
+        </td>
+    </tr>
+</table>

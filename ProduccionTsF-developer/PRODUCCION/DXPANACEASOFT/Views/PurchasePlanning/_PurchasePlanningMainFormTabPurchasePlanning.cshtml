@@ -1,0 +1,93 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.PurchasePlanning
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_purchasePlanningPeriod, settings =>
+                {
+                    settings.Name = "purchasePlanningPeriodLabel";
+                    settings.Text = "Período:";
+                    settings.AssociatedControlName = "purchasePlanningPeriod";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_purchasePlanningPeriod = (Model != null && Model.id_purchasePlanningPeriod != 0) ? (int?)Model.id_purchasePlanningPeriod : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_purchasePlanningPeriod, settings =>
+           {
+               settings.Name = "id_purchasePlanningPeriod";
+               settings.Properties.ClientInstanceName = "id_purchasePlanningPeriod";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "periodo";
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.Enabled = id_purchasePlanningPeriod == null;
+               //settings.ReadOnly = @Model.totalQuantityOrdered > 0;
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnPurchasePlanningPeriodValidation";
+
+           }).BindList(DataProviderPurchasePlanningPeriod.PurchasePlanningPeriodsByCompanyAndCurrentWithout((int?)ViewData["id_company"], id_purchasePlanningPeriod)).Bind(id_purchasePlanningPeriod).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Employee.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "personPlanningLabel";
+                settings.Text = "Planificador:";
+                settings.AssociatedControlName = "personPlanning";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_personPlanning = (Model != null && Model.id_personPlanning != 0) ? (int?) Model.id_personPlanning : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_personPlanning, settings =>
+            {
+                settings.Name = "id_personPlanning";
+                settings.Properties.ClientInstanceName = "id_personPlanning";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "fullname_businessName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Width = Unit.Percentage(100);
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                //settings.ReadOnly = @Model.totalQuantityOrdered > 0;
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnPersonPlanningValidation";
+
+            }).BindList(DataProviderPerson.EmployesByCompanyAndCurrent((int?) ViewData["id_company"], id_personPlanning)).Bind(id_personPlanning).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Employee.Department.name, settings =>
+            {
+                settings.Name = "employeeDepartamentLabel";
+                settings.Text = "Departamento:";
+                settings.AssociatedControlName = "employeeDepartament";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Department.name, settings =>
+            {
+                settings.Name = "employeeDepartament";
+                settings.Properties.ClientInstanceName = "employeeDepartament";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+
+                settings.ShowModelErrors = true;
+
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+
+<script src="~/Scripts/purchaseplanning/_purchasePlanningEditForm.js"></script>

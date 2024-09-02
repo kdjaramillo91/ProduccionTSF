@@ -1,0 +1,162 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ProductionLot
+@{
+	string modificarPrecio = DataProviderSetting.ValueSetting("MODPREC");
+}
+
+@{
+	var lbReferenceVal = DataProviderProductionLot.ReferenceLotCost(Model.id);
+	Html.DevExpress<ProductionLot>().FormLayout(settings =>
+	{
+		settings.Name = "formLayoutEditProductionLotLotCost";
+		settings.Width = Unit.Percentage(100);
+		settings.ColCount = 8;
+
+
+		//GroupItem0
+		#region GroupItem0
+		var groupItem0 = settings.Items.AddGroupItem(i =>
+		{
+			i.Caption = "";
+			i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+			i.ColCount = 8;
+			i.ColSpan = 8;
+		});
+		//Fila 0
+		#region Fila 0
+
+		//Concepto
+		groupItem0.Items.Add(item =>
+		{
+			item.Name = "Concept";
+			item.Caption = "Concepto";
+			item.ShowCaption = DefaultBoolean.False;
+			item.ColSpan = 2;
+			//item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+			//                                                             //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+			//item.Width = Unit.Percentage(100);
+			item.NestedExtension().Label(label =>
+			{
+				label.ControlStyle.Font.Bold = true;
+				label.ControlStyle.Font.Underline = true;
+				label.Name = "lbConcept";
+				label.Text = "Concepto";
+			});
+		});
+
+		//Valor
+		groupItem0.Items.Add(item =>
+		{
+			item.Name = "Value";
+			item.Caption = "Valor";
+			item.ShowCaption = DefaultBoolean.False;
+			item.ColSpan = 2;
+			//item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+			//                                                             //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+			//item.Width = Unit.Percentage(100);
+			item.NestedExtension().Label(label =>
+			{
+				label.ControlStyle.Font.Bold = true;
+				label.ControlStyle.Font.Underline = true;
+				label.Name = "lbValue";
+				label.Text = "Valor";
+			});
+		});
+
+		//Referencia
+		groupItem0.Items.Add(item =>
+		{
+			item.Name = "Reference2";
+			item.Caption = "Referencia";
+			item.ShowCaption = DefaultBoolean.False;
+			item.ColSpan = 4;
+			//item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+			//                                                             //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+			//item.Width = Unit.Percentage(100);
+			item.NestedExtension().Label(label =>
+			{
+				label.ControlStyle.Font.Bold = true;
+				label.ControlStyle.Font.Underline = true;
+				label.Name = "lbReference2";
+				label.Text = "Referencia";
+			});
+		});
+
+		#endregion
+
+		//Fila 1
+		#region Fila 1
+
+		//ConceptoValor
+		groupItem0.Items.Add(item =>
+		{
+			item.Name = "ConceptVal";
+			item.Caption = "Materia Prima";
+			//item.CaptionStyle.Font.Bold = true;
+			//item.CaptionStyle.Font.Underline = true;
+			item.ShowCaption = DefaultBoolean.False;
+			item.ColSpan = 2;
+			//item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+			//                                                             //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+			//item.Width = Unit.Percentage(100);
+			item.NestedExtension().Label(label =>
+			{
+				label.Name = "lbConceptVal";
+				label.Text = "Materia Prima";
+			});
+		});
+
+		//ValorValor
+		groupItem0.Items.Add(item =>
+		{
+			item.Name = "ValueVal";
+			//item.Caption = Model.totalToPay.ToString("$#,#.00");
+			//item.CaptionStyle.Font.Bold = true;
+			//item.CaptionStyle.Font.Underline = true;
+			item.ShowCaption = DefaultBoolean.False;
+			item.ColSpan = 2;
+			//item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+			//                                                             //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+			//item.Width = Unit.Percentage(100);
+			item.NestedExtension().Label(label =>
+			{
+				label.Name = "lbValueVal";
+				if(modificarPrecio == "SI")
+				{
+					label.Text = Model.totalToPayEq.ToString("$#,#.00");
+				}
+				else
+				{
+					label.Text = Model.totalToPay.ToString("$#,#.00");
+				}
+			});
+		});
+
+		//ReferenciaValor
+		groupItem0.Items.Add(item =>
+		{
+			item.Name = "ReferenceVal";
+			item.Caption = lbReferenceVal;
+			//item.CaptionStyle.Font.Bold = true;
+			//item.CaptionStyle.Font.Underline = true;
+			item.ShowCaption = DefaultBoolean.False;
+			item.ColSpan = 4;
+			//item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+			//                                                             //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+			//item.Width = Unit.Percentage(100);
+			item.NestedExtension().Label(label =>
+			{
+				label.Name = "lbReferenceVal";
+				label.Text = lbReferenceVal;
+			});
+		});
+
+		#endregion
+		#endregion
+
+	}).Render();
+
+}
+

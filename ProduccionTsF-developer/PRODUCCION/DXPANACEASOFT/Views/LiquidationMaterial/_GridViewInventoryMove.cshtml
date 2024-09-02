@@ -1,0 +1,47 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+
+@{
+
+    //int estado = ViewData["id_documentState"] != null ? (int)ViewData["id_documentState"] : 1;
+    bool canAproved = ViewBag.canAproved != null && (bool)ViewBag.canAproved;
+    bool canAuthorize = ViewBag.canAuthorize != null && (bool)ViewBag.canAuthorize;
+    bool canReverse = ViewBag.canReverse != null && (bool)ViewBag.canReverse;
+}
+
+@{
+    var grid = Html.DevExpress().GridView<LiquidationMaterialDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewInventoryMove";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "LiquidationMaterial",
+            Action = "GridViewInventoryMove",
+
+            canAproved = canAproved,
+            canAuthorize = canAuthorize,
+            canReverse = canReverse
+        };
+        settings.KeyFieldName = "idDocumentIM";
+        settings.Width = Unit.Percentage(100);
+
+        settings.Columns.Add("sequentialIM").Caption = "Número";
+        settings.Columns.Add("nameNatureMoveIM").Caption = "Naturaleza";
+        settings.Columns.Add("nameInventoryReasonIM").Caption = "Motivo";
+        settings.Columns.Add("nameRemissionGuide").Caption = "Guía Remisión";
+        settings.Columns.Add(column =>
+        {
+            column.Name = "actions";
+            column.Caption = "Impresión";
+            column.Width = Unit.Percentage(8);
+            column.SetDataItemTemplateContent(c =>
+            {
+                int id = (int)DataBinder.Eval(c.DataItem, "idDocumentIM");
+                Html.RenderPartial("_ActionsButtonsOnDetailDG", id);
+            });
+        });
+    });
+}
+@grid.Bind(Model).GetHtml()

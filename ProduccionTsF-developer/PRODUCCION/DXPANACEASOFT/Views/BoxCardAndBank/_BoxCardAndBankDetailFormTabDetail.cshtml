@@ -1,0 +1,159 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using  DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.BoxCardAndBank
+
+@{
+    
+    bool modifi =true ;
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Name = "dcodeLabel";
+                settings.Text = "Código:";
+                settings.AssociatedControlName = "dcode";
+            }).GetHtml()
+
+
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+           {
+               settings.Name = "dcode";
+               settings.Properties.ClientInstanceName = "dcode";
+
+               settings.ShowModelErrors = true;
+               settings.Properties.MaxLength = 20;
+               settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+               settings.ReadOnly = modifi;
+               //settings.Width = Unit.Percentage(50);
+               //settings.Height = Unit.Percentage(50);
+           }).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+        <td></td>
+        <td colspan="3"></td>
+
+    </tr>
+
+    <tr>
+
+        <td>
+
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+            {
+                settings.Name = "dnameLabel";
+                settings.Text = " Nombre:";
+                settings.AssociatedControlName = "dnombre";
+
+            }).GetHtml()
+
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "dnombre";
+           settings.Properties.ClientInstanceName = "dnombre";
+           settings.Width = Unit.Percentage(100);
+
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ReadOnly = modifi;
+       }).GetHtml()
+
+        </td>
+
+    </tr>
+
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_typeBoxCardAndBank, settings =>
+            {
+                settings.Name = "did_typeBoxCardAndBankLabel";
+                settings.Text = "Tipo:";
+                settings.AssociatedControlName = "did_typeBoxCardAndBank";
+            }).GetHtml()
+
+
+        </td>
+        <td>
+            @{
+                int? id_typeBoxCardAndBank = (Model != null && Model.id_typeBoxCardAndBank != 0) ? (int?)Model.id_typeBoxCardAndBank : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_typeBoxCardAndBank, settings =>
+           {
+               settings.Name = "did_typeBoxCardAndBank";
+               settings.Properties.ClientInstanceName = "did_typeBoxCardAndBank";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Columns.Add("name", "Nombre", 200);
+               settings.Width = Unit.Percentage(50);
+               settings.Height = Unit.Percentage(50);
+               settings.Properties.EnableClientSideAPI = true;
+               settings.Properties.CallbackPageSize = 20;
+               settings.ReadOnly = modifi;
+               settings.ShowModelErrors = true;
+
+            }).BindList(DataProviderBoxCardAndBank.AllTypeBoxCardAndBanks()).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+        <td></td>
+        <td></td>
+
+    </tr>
+
+    <tr>
+
+        <td colspan="2">
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+       {
+           settings.Name = "disActive";
+           settings.Properties.ClientInstanceName = "disActive";
+           settings.Text = "Activo";
+           settings.ReadOnly = modifi;
+       }).GetHtml()
+
+
+        </td>
+        <td></td>
+        <!-- FECHA FIn-->
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+
+
+    <tr></tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+    
+
+

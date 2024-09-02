@@ -1,0 +1,42 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PurchasePlanning
+
+<table class="table table-condensed">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{  
+                ViewData["id_purchasePlanning"] = (Model != null) ? Model.id : 0;
+
+                Html.DevExpress().PageControl(tabs =>
+                {
+                    tabs.Name = "tabControl" + ViewData["id_purchasePlanning"];
+                    tabs.Width = Unit.Percentage(100);
+                    tabs.Height = Unit.Pixel(200);
+
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabItemsDetails";
+                        tab.Text = "Detalle";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var itemsDetail = (Model != null && Model.PurchasePlanningDetail != null) ? Model.PurchasePlanningDetail.ToList() : new List<PurchasePlanningDetail>();
+                            Html.RenderPartial("_PurchasePlanningDetailItemsPartial", itemsDetail);
+                        });
+                    });
+                }).Render();
+            }
+        </td>
+    </tr>
+</table>
+
+@*AsEnumerable().OrderByDescending(o=> new { o.datePlanning,provider = o.Provider.Person.fullname_businessName,buyer = o.Person.fullname_businessName})*@

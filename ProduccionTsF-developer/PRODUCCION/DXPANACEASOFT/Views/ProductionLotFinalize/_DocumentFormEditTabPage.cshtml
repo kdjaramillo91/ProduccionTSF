@@ -1,0 +1,194 @@
+﻿@model ProductionLotFinalize.Detallado
+@{ 
+	var lote = this.ViewBag.lote;
+}
+<div id="datosDocumentEditForm">
+	<div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "documentTypeLabel";
+						label.Text = "Tipo de Documento:";
+						label.AssociatedControlName = "documentType";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.DocumentType,
+					textBox =>
+					{
+						textBox.Name = "documentType";
+						textBox.Properties.ClientInstanceName = "documentType";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "documentNumberLabel";
+						label.Text = "Nº de Documento:";
+						label.AssociatedControlName = "documentNumber";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.NumeroDocumento,
+					textBox =>
+					{
+						textBox.Name = "documentNumber";
+						textBox.Properties.ClientInstanceName = "documentNumber";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "documentStateLabel";
+						label.Text = "Estado:";
+						label.AssociatedControlName = "documentState";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.Estado,
+					textBox =>
+					{
+						textBox.Name = "documentState";
+						textBox.Properties.ClientInstanceName = "documentState";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "emissionDateLabel";
+						label.Text = "Fecha Emisión:*";
+						label.AssociatedControlName = "emissionDate";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().DateEditFor(
+					m => m.FechaEmision,
+					dateEdit =>
+					{
+						dateEdit.Name = "emissionDate";
+						dateEdit.Properties.ClientInstanceName = "emissionDate";
+						dateEdit.Width = Unit.Percentage(100);
+						dateEdit.SetDefaultQuerySettings();
+
+						dateEdit.ShowModelErrors = true;
+						dateEdit.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+
+						dateEdit.Properties.ClientSideEvents.Validation = "OnEmissionDateProductionLotFinalizeValidation";
+
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "numeroLoteLabel";
+						label.Text = "Lote:";
+						label.AssociatedControlName = "numeroLote";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBox(textBox =>
+					{
+						textBox.Name = "numeroLote";
+						textBox.Properties.ClientInstanceName = "numeroLote";
+						textBox.Text = lote;
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "solicitanteLabel";
+						label.Text = "Solicitante:";
+						label.AssociatedControlName = "solicitante";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.Solicitante,
+					textBox =>
+					{
+						textBox.Name = "solicitante";
+						textBox.Properties.ClientInstanceName = "solicitante";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "descriptionLabel";
+						label.Text = "Descripción:";
+						label.AssociatedControlName = "description";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-11">
+				@Html.DevExpress().MemoFor(
+					m => m.Descripcion,
+					memo =>
+					{
+						memo.Name = "description";
+						memo.Properties.ClientInstanceName = "description";
+						memo.Width = Unit.Percentage(100);
+						memo.ShowModelErrors = true;
+						memo.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "referenceLabel";
+						label.Text = "Referencia:";
+						label.AssociatedControlName = "reference";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-11">
+				@Html.DevExpress().MemoFor(
+					m => m.Referencia,
+					memo =>
+					{
+						memo.Name = "reference";
+						memo.Properties.ClientInstanceName = "reference";
+						memo.Width = Unit.Percentage(100);
+						memo.ShowModelErrors = true;
+						memo.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+		</div>
+	</div>
+
+</div>

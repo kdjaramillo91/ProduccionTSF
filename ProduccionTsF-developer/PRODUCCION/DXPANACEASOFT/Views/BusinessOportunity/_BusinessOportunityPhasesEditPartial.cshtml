@@ -1,0 +1,319 @@
+﻿
+@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.BusinessOportunityPhase
+@{
+//var code_inventoryLine = (Model != null && Model.InventoryLine != null && Model.InventoryLine.id != 0) ? Model.InventoryLine.code : "";
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditBusinessOportunityPhase", name = "formEditBusinessOportunityPhase" }))
+{
+    Html.RenderPartial("_GridMessageErrorPhase");
+    @Html.Hidden("id_businessOportunityPhase", Model.id)
+
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.startDatePhase, settings =>
+           {
+               settings.Text = "Fecha de Inicio*:";
+               settings.AssociatedControlName = "startDatePhase";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.startDatePhase, settings =>
+           {
+               settings.Properties.ClientInstanceName = "startDatePhase";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnStartDatePhaseValidation";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.endDatePhase, settings =>
+           {
+               settings.Text = "Fecha de Fin*:";
+               settings.AssociatedControlName = "endDatePhase";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.endDatePhase, settings =>
+           {
+               settings.Properties.ClientInstanceName = "endDatePhase";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnEndDatePhaseValidation";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_employee, settings =>
+           {
+               settings.Text = "Ejecutivo*:";
+               settings.AssociatedControlName = "id_executivePersonPhase";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_executivePersonPhase = (Model != null && Model.id_employee != 0) ? (int?)Model.id_employee : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_employee, settings =>
+           {
+               settings.Properties.ClientInstanceName = "id_executivePersonPhase";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "fullname_businessName";
+               settings.Properties.ValueType = typeof(int);
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnExecutivePersonPhaseValidation";
+           }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int)ViewData["id_company"], id_executivePersonPhase, "Ejecutivo")).Bind(id_executivePersonPhase).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_businessOportunityDocumentTypePhase, settings =>
+           {
+               settings.Text = "Etapa*:";
+               settings.AssociatedControlName = "id_businessOportunityDocumentTypePhase";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_businessOportunityDocumentTypePhase = (Model != null && Model.id_businessOportunityDocumentTypePhase != 0) ? (int?)Model.id_businessOportunityDocumentTypePhase : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_businessOportunityDocumentTypePhase, settings =>
+           {
+               settings.Properties.ClientInstanceName = "id_businessOportunityDocumentTypePhase";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+               settings.ReadOnly = id_businessOportunityDocumentTypePhase != null;//Pendiente
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnPhaseValidation";
+               settings.Properties.ClientSideEvents.Init = "OnPhaseInit";
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "DetailsPhaseCombo_SelectedIndexChanged";
+           }).BindList(DataProviderPhase.BusinessOportunityDocumentTypePhasesByCompanyAndCurrent((int?)ViewData["id_company"], id_businessOportunityDocumentTypePhase)).Bind(id_businessOportunityDocumentTypePhase).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.weightedAmount, settings =>
+           {
+               settings.Text = "Monto Ponderado:";
+               settings.AssociatedControlName = "weightedAmount";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.weightedAmount, settings =>
+           {
+               settings.Properties.ClientInstanceName = "weightedAmount";
+               settings.Width = Unit.Percentage(100);
+
+               //settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "N2";
+               //settings.Properties.MinValue = 0.01M;
+               //settings.Properties.MaxValue = 9999999999999.99M;
+               //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ReadOnly = true;
+               settings.Properties.SpinButtons.Visible = false;
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.advance, settings =>
+           {
+               settings.Text = "% Avance:";
+               settings.AssociatedControlName = "advance";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.advance, settings =>
+           {
+               settings.Properties.ClientInstanceName = "advance";
+               settings.Width = Unit.Percentage(100);
+
+               //settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "N2";
+               //settings.Properties.MinValue = 0.01M;
+               //settings.Properties.MaxValue = 9999999999999.99M;
+               //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ReadOnly = true;
+               settings.Properties.SpinButtons.Visible = false;
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.BusinessOportunity.BusinessOportunityPlaninng.amount, settings =>
+           {
+               settings.Text = "Monto Potencial:";
+               settings.AssociatedControlName = "potentialAmount";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.BusinessOportunity.BusinessOportunityPlaninng.amount, settings =>
+           {
+               settings.Properties.ClientInstanceName = "potentialAmount";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "N2";
+               //settings.Properties.MinValue = 0.01M;
+               //settings.Properties.MaxValue = 9999999999999.99M;
+               //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ReadOnly = true;
+               settings.Properties.SpinButtons.Visible = false;
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.referencePhase, settings =>
+           {
+               settings.Name = "referencePhaseLabel";
+               settings.Text = "Referencia:";
+               settings.AssociatedControlName = "referencePhase";
+           }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().TextBoxFor(m => m.referencePhase, settings =>
+           {
+               settings.Name = "referencePhase";
+               settings.Properties.ClientInstanceName = "referencePhase";
+               //settings.ReadOnly = codeState != "01";
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               settings.Width = Unit.Percentage(100);
+               //settings.Properties.ClientSideEvents.Validation = "OnPersonValidation";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.descriptionPhase, settings =>
+           {
+               settings.Name = "descriptionPhaseLabel";
+               settings.Text = "Descripción:";
+               settings.AssociatedControlName = "descriptionPhase";
+           }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().MemoFor(m => m.descriptionPhase, settings =>
+           {
+               settings.Name = "descriptionPhase";
+               settings.Properties.ClientInstanceName = "descriptionPhase";
+               //settings.ReadOnly = codeState != "01";
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               settings.Width = Unit.Percentage(100);
+           }).GetHtml()
+            </td>
+        </tr>
+    </table>
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Documentos Adjuntos</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                @{
+                    if (Model != null && Model.BusinessOportunityPhaseAttachment != null)
+                    {
+                        //ViewContext.Writer.Write(Html.Partial("_BusinessOportunityPhaseAttachmentEditPartial", Model.BusinessOportunityPhaseAttachment));
+                        Html.RenderPartial("_BusinessOportunityPhaseAttachmentEditPartial", Model.BusinessOportunityPhaseAttachment.OrderByDescending(od => od.id).ToList());
+                    }
+                }
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Actividades</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                @{
+                    if (Model != null && Model.BusinessOportunityPhaseActivity != null)
+                    {
+                        //ViewContext.Writer.Write(Html.Partial("_BusinessOportunityPhaseActivityEditPartial", Model.BusinessOportunityPhaseActivity));
+                        Html.RenderPartial("_BusinessOportunityPhaseActivityEditPartial", Model.BusinessOportunityPhaseActivity.OrderByDescending(od => od.id).ToList());
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+    <table class="table table-condensed" style="margin: 0; padding: 0">    
+        <tr>
+            <td style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdatePhase";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    
+                    settings.ValidateInvisibleEditors = true;
+                    settings.ClientSideEvents.Click = "ButtonUpdatePhase_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancelPhase";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.ClientSideEvents.Click = "BtnCancelPhase_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+}

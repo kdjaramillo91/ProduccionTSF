@@ -1,0 +1,85 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryMove
+
+<table class="table table-condensed">
+    <tr>
+        <td><strong>Tipo de Movimiento:</strong></td>
+        <td>@Html.Raw(Model.Document.DocumentType.name)</td>
+        <td><strong>Clave Acceso:</strong></td>
+        <td>@Html.Raw(Model.Document.accessKey)</td>
+    </tr>
+    <tr>
+        <td><strong>No. Autorizaci&oacute;n:</strong></td>
+        <td>@Html.Raw(Model.Document.authorizationNumber)</td>
+        <td><strong>Fecha. Autorizaci&oacute;n:</strong></td>
+        <td>@Html.Raw(Model.Document.authorizationDate)</td>
+    </tr>
+    <tr>
+        <td><strong>Referencia:</strong></td>
+        <td>@Html.Raw(Model.Document.reference)</td>
+        <td><strong>Descripci&oacute;n:</strong></td>
+        <td>@Html.Raw(Model.Document.description)</td>
+    </tr>
+    <tr>
+        <td><strong>Creador por:</strong></td>
+        <td>@Html.Raw(GetUserName(Model.Document.id_userCreate))</td>
+        <td><strong>Fecha de Modificaci&oacute;n:</strong></td>
+        <td>@Html.Raw(Model.Document.dateCreate)</td>
+    </tr>
+    <tr>
+        <td><strong>Actualizado por:</strong></td>
+        <td>@Html.Raw(GetUserName(Model.Document.id_userUpdate))</td>
+        <td><strong>Fecha de Modificaci&oacute;n:</strong></td>
+        <td>@Html.Raw(Model.Document.dateUpdate)</td>
+    </tr>
+
+    @{
+
+        bool viewExit = (Model.Document.DocumentType.code.Equals("05") || Model.Document.DocumentType.code.Equals("06"));
+
+        if (viewExit)
+        {
+            <tr>
+                <td><strong>Bodega de Salida:</strong></td>
+                <td>@Html.Raw(Model.InventoryExitMove.Warehouse.name)</td>
+                <td><strong>Ubicaci&oacute;n de Salida:</strong></td>
+                <td>@Html.Raw(Model.InventoryExitMove.WarehouseLocation.name)</td>
+                <td><strong>Despachado por:</strong></td>
+                <td>@Html.Raw(Model.InventoryExitMove.Employee.Person.fullname_businessName)</td>
+            </tr>
+        }
+
+
+        bool viewEntry = (Model.Document.DocumentType.code.Equals("03") || Model.Document.DocumentType.code.Equals("04") || Model.Document.DocumentType.code.Equals("06"));
+
+        if (viewEntry)
+        {
+            <tr>
+                <td><strong>Bodega de Entrada:</strong></td>
+                <td>@Html.Raw(Model.InventoryEntryMove.Warehouse.name)</td>
+                <td><strong>Ubicaci&oacute;n de Entrada:</strong></td>
+                <td>@Html.Raw(Model.InventoryEntryMove.WarehouseLocation.name)</td>
+                <td><strong>Recibido por:</strong></td>
+                <td>@Html.Raw(Model.InventoryEntryMove.Employee.Person.fullname_businessName)</td>
+            </tr>
+        }
+    }
+
+</table>
+
+@{
+    ViewData["id_inventoryMove"] = Model.id;
+    ViewData["code"] = Model.Document.DocumentType.code;
+    Html.RenderPartial("_InventoryMoveDetailsPartial", Model.InventoryMoveDetail);
+}
+
+@functions {
+    String GetUserName(int id)
+    {
+        if (id == -1)
+            return "";
+
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}

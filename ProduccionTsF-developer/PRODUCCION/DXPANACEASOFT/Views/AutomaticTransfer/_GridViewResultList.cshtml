@@ -1,0 +1,166 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+	var grid = Html.DevExpress().GridView<AutomaticTransferResultDTO>(settings =>
+	{
+		settings.Name = "GridViewAutomaticTransferResult";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "AutomaticTransfer",
+			Action = "GridViewAutomaticTransfer",
+		};
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowFooter = true;
+
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+		settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+		settings.Width = Unit.Percentage(100);
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.ClientSideEvents.RowClick = "OnGridFocusedRowChanged";
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id";
+			column.Name = "id";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canEdit";
+			column.Name = "canEdit";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canAproved";
+			column.Name = "canAproved";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canReverse";
+			column.Name = "canReverse";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canAnnul";
+			column.Name = "canAnnul";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "number";
+			column.Caption = "Número";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "dateEmission";
+			column.Caption = "Fecha de Emisión";
+			column.Width = Unit.Percentage(10);
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "warehouseExit";
+			column.Caption = "Bodega de Envío";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "warehouseLocationExit";
+			column.Caption = "Ubicación de Envío";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "numberExit";
+			column.Caption = "Número de Egreso";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "warehouseEntry";
+			column.Caption = "Bodega de Recepción";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "warehouseLocationEntry";
+			column.Caption = "Ubicación de Recepción";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "numberEntry";
+			column.Caption = "Número de Ingreso";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "dispatcher";
+			column.Caption = "Despachador";
+			column.Width = Unit.Percentage(15);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "stateDocument";
+			column.Caption = "Estado";
+			column.Width = Unit.Percentage(15);
+		});
+		
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = false,
+			ShowDeleteButton = false,
+			Visible = true,
+			VisibleIndex = 10,
+			Caption = "Acción",
+			Width = Unit.Percentage(5)
+		};
+
+		commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+		{
+			ID = "btnShowRow",
+			Text = "Mostrar"
+		});
+
+		settings.ClientSideEvents.CustomButtonClick = "GridViewBtnShow_Click";
+		settings.ClientSideEvents.RowDblClick = "GridViewBtnShow_Click";
+		settings.Columns.Add(commandColumn);
+
+	});
+}
+@grid.Bind(Model).GetHtml()

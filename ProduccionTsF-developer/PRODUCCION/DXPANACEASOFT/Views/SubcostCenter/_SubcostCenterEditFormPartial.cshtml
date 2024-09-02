@@ -1,0 +1,155 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.CostCenter
+
+
+<table class="table table-condensed">
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.code, settings =>
+		   {
+			   settings.Text = "Código:*";
+			   settings.AssociatedControlName = "code";
+
+		   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+		   {
+			   settings.Name = "code";
+			   settings.Properties.ClientInstanceName = "code";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.NullText = "Código";
+			   settings.ShowModelErrors = true;
+			   settings.ClientVisible = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnCodeSubcostCenterValidation";
+
+		   }).GetHtml()
+		</td>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.id_higherCostCenter, settings =>
+			{
+				settings.Text = "Centro de Costo:*";
+				settings.AssociatedControlName = "id_higherCostCenter";
+			}).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_higherCostCenter = (Model != null && Model.id_higherCostCenter != 0) 
+													? (int?)Model.id_higherCostCenter : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_higherCostCenter, settings =>
+			{
+				settings.Properties.ClientInstanceName = "id_higherCostCenter";
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.Properties.TextFormatString = "{1}";
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Seleccione Centro de Costo";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				
+				settings.Properties.Columns.Add("code", "Código", 15);
+				settings.Properties.Columns.Add("name", "Nombre", 85);
+
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnCostCenterValidation";
+			}).BindList(DataProviderCostCenter.AllCostCenters()).Bind(id_higherCostCenter).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Text = "Nombre:*";
+				settings.AssociatedControlName = "subcostCenterName";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().TextBoxFor(m => m.name, settings =>
+			{
+				settings.Properties.ClientInstanceName = "subcostCenterName";
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "Nombre del Subcentro de Costo";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnSubcostCenterNameValidation";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.description, settings =>
+			{
+				settings.Text = "Descripción:";
+				settings.AssociatedControlName = "description";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().MemoFor(m => m.description, settings =>
+			{
+				settings.Properties.ClientInstanceName = "description";
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.NullText = "";
+				settings.ShowModelErrors = true;
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+			{
+				settings.Text = "¿Activo?:";
+				settings.AssociatedControlName = "isActive";
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			{
+				settings.Properties.ClientInstanceName = "isActive";
+
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6" style="text-align: right;">
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnUpdate";
+				settings.Text = "Actualizar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+			}).GetHtml()
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnCancel";
+				settings.Text = "Cancelar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonCancel_Click";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr id="subcostCenterAlertRow" style="display: none;">
+		<td colspan="6">
+			<div class="alert alert-danger fade in" style="margin-top: 18px;">
+				<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+				<span id="subcostCenterErrorMessage"></span>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<script src="~/Scripts/subcostCenter/index.js"></script>

@@ -1,0 +1,18 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComboBoxProveedores";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Seleccionar...";
+    settings.CallbackRouteValues = new {
+        Controller = "LiquidationMaterial",
+        Action = "ComboBoxProveedores",
+        From = "Index"
+    };
+    settings.Properties.CallbackPageSize = 30;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}
+).BindList(ViewData["Proveedores"]).GetHtml()
+

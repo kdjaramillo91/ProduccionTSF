@@ -1,0 +1,47 @@
+﻿@{
+	var puedeModificarInfoProforma = DataProviderSetting.SettingByCode("MODINFP").value == "SI";
+}
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnNewDetail";
+	//settings.Width = 90;
+	settings.Text = "";
+	//settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+	settings.ClientEnabled = (puedeModificarInfoProforma) ? false : true;
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "AddNewDetail";
+	settings.ToolTip = "Adicionar";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnRemoveDetail";
+	//settings.Width = 90;
+	settings.Text = "";
+	//settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsRemoveitem16x16office2013;
+	settings.ClientEnabled = (puedeModificarInfoProforma) ? false : true; 
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "RemoveDetail";
+	settings.ToolTip = "Eliminar";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnRefreshDetails";
+	//settings.Width = 90;
+	settings.Text = "";
+	//settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+	settings.ClientEnabled = true;
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "RefreshDetail";
+	settings.ToolTip = "Refrescar";
+
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />

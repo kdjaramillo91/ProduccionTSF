@@ -1,0 +1,41 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.LiquidationCartOnCart
+
+<table class="table table-condensed">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{  
+                ViewData["id_liquidationCartOnCart"] = (Model != null) ? Model.id : 0;
+
+                Html.DevExpress().PageControl(tabs =>
+                {
+                    tabs.Name = "tabControl" + ViewData["id_liquidationCartOnCart"];
+                    tabs.Width = Unit.Percentage(100);
+                    tabs.Height = Unit.Pixel(200);
+
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabLiquidationCartOnCartDetails";
+                        tab.Text = "Detalle";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var liquidationCartOnCartDetail = (Model != null && Model.LiquidationCartOnCartDetail != null) ? Model.LiquidationCartOnCartDetail.ToList() : new List<LiquidationCartOnCartDetail>();
+                            Html.RenderPartial("_LiquidationCartOnCartViewsDetailPartial", liquidationCartOnCartDetail.OrderBy(od => od.id).ToList());
+                        });
+                    });
+                }).Render();
+            }
+        </td>
+    </tr>
+</table>
+

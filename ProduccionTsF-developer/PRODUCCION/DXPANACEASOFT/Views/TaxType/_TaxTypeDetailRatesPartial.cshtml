@@ -1,0 +1,74 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<Rate>(settings =>
+    {
+        settings.Name = "gvTaxesTypesDetail";
+        settings.SettingsDetail.MasterGridName = "gvTaxesTypes";
+        settings.CallbackRouteValues = new { Controller = "TaxType", Action = "TaxTypeDetailRatesPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Tarifas</span>");
+        });
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        //settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #region ADD CLOUMN
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "code";
+            column.Caption = "Código";
+            column.Width = Unit.Percentage(3);
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "percentage";
+            column.Caption = "Porciento(%)";
+            column.Width = Unit.Percentage(3);
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+
+        #endregion
+    });
+}
+
+@grid.Bind(Model).GetHtml()

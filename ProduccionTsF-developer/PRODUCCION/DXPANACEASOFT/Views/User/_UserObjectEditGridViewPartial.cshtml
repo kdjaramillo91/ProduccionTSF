@@ -1,0 +1,171 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.ObjectPermissionUser>
+@{
+	var grid = Html.DevExpress().GridView<ObjectPermissionUser>(settings =>
+	{
+		settings.Name = "gvUserObjects";
+		settings.CallbackRouteValues = new { Controller = "User", Action = "UserObjectPermissionPartial" };
+
+		settings.ClientSideEvents.BeginCallback = "UserObjectOnBeginCallBack";
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "User", Action = "UserObjectPartialAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "User", Action = "UserObjectPartialUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "User", Action = "UserObjectPartialDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+		var setC = settings.CommandColumn;
+		setC.Visible = true;
+		setC.ShowNewButton = false;
+		setC.ShowDeleteButton = true;
+		setC.ShowEditButton = true;
+		setC.ShowNewButtonInHeader = true;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			int index = gv.EditingRowVisibleIndex >= 0 ? gv.EditingRowVisibleIndex : -1;
+			e.Properties["cpRowIndex"] = index;
+			if (gv.EditingRowVisibleIndex >= 0)
+			{
+				e.Properties["cpRowKey"] = gv.GetRowValues(index, "id") == null ? 0 : gv.GetRowValues(index, "id");
+			}
+		};
+
+		#region Title Panel
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Objetos de Usuario</span>");
+		});
+
+		#endregion
+
+		settings.InitNewRow = (s, e) =>
+		{
+			e.NewValues["isActive"] = true;
+		};
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		var sa = settings.SettingsAdaptivity;
+		sa.AdaptivityMode = GridViewAdaptivityMode.Off;
+		sa.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		sa.AdaptiveDetailColumnCount = 1;
+		sa.AllowOnlyOneAdaptiveDetailExpanded = false;
+		sa.HideDataCellsAtWindowInnerWidth = 0;
+
+		setC.Width = Unit.Percentage(8);
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_controller";
+			column.Name = "id_controller";
+			column.Caption = "Controlador";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.Width = Unit.Percentage(20);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? idController = (int?)DataBinder.Eval(c.DataItem, "id_Controller");
+			 	DXPANACEASOFT.Models.Menu menu = DataProviderController.GetControllerByName((int?)ViewData["id_company"], idController);
+
+				string name = (menu != null) ? menu.title : "";
+
+				ViewContext.Writer.Write(name);
+			});
+
+			column.EditorProperties().ComboBox(comboBox =>
+			{
+				comboBox.ClientInstanceName = "id_controller";
+				comboBox.DataSource = DataProviderController.GetControllersByName((int?)ViewData["id_company"]);
+				comboBox.ValueField = "id_controller";
+				comboBox.TextField = "title";
+				comboBox.ValueType = typeof(int);
+
+				comboBox.DropDownStyle = DropDownStyle.DropDown;
+				comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				comboBox.Width = Unit.Percentage(100);
+
+				comboBox.ClientSideEvents.Validation = "onObjectControllerValidate";
+			});
+		});
+
+		settings.Columns.Add(columns =>
+		{
+			columns.FieldName = "id_objectPemission";
+			columns.Name = "id_objectPemission";
+			columns.Caption = "Objeto";
+
+			columns.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+			columns.SetDataItemTemplateContent(c =>
+			{
+				int? id_objectPemission = (int?)DataBinder.Eval(c.DataItem, "id_objectPemission");
+				ObjectPermission PermisoObjeto = DataProviderUser.GetObjectsPermission(id_objectPemission);
+
+				string ObjectName = (PermisoObjeto != null) ? PermisoObjeto.name : string.Empty;
+
+				ViewContext.Writer.Write(ObjectName);
+
+			});
+
+			columns.EditorProperties().ComboBox(comboBox =>
+			{
+				comboBox.ClientInstanceName = "id_objectPemission";
+				comboBox.DataSource = DataProviderUser.GetAllObjectPermissions();
+				comboBox.ValueField = "id";
+				comboBox.TextField = "name";
+				comboBox.ValueType = typeof(int);
+
+				comboBox.DropDownStyle = DropDownStyle.DropDown;
+				comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				comboBox.Width = Unit.Percentage(100);
+
+				comboBox.ClientSideEvents.Validation = "onObjectPermissionValidate";
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "isActive";
+			column.Name = "isActive";
+			column.Caption = "¿Activo?";
+			column.Width = Unit.Percentage(3);
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			column.AutoFilterBy("Sí");
+			column.Settings.AllowAutoFilter = DefaultBoolean.True;
+		});
+
+		//MASTER DETAILS
+		settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+		settings.SettingsDetail.ShowDetailRow = false;
+		settings.SetDetailRowTemplateContent(colum =>
+		{
+
+		});
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@grid.Bind(Model).GetHtml()
+
+<script src="~/Scripts/user/editform.js"></script>

@@ -1,0 +1,262 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    var grid = Html.DevExpress().GridView<PriceList>(settings => {
+        settings.Name = "gvPriceLists";
+        settings.CallbackRouteValues = new { Controller = "PriceList", Action = "PriceListPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "PriceList", Action = "PriceListPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "PriceList", Action = "PriceListPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "PriceList", Action = "PriceListPartialDelete" };
+
+        settings.CustomActionRouteValues = new { Controller = "PriceList", Action = "DeleteSelectedPriceLists" };
+
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = false;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.SettingsText.PopupEditFormCaption = "Editar Lista de Precio";
+        settings.SettingsPopup.EditForm.Width = 700;
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.TopSides;
+
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.ClientSideEvents.RowDblClick = "OnRowDoubleClick";
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView itemGrid = s as MVCxGridView;
+            if (itemGrid == null) return;
+
+            e.Properties["cpVisibleRowCount"] = itemGrid.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(itemGrid);
+
+            if (ViewData["EditMessage"] != null)
+            {
+                e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+            }
+        };
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listas de Precios</span>");
+        });
+
+        settings.Settings.ShowFooter = true;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+                    <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""ClearSelection();"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        #region MASTER DETAILS VIEW
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+        settings.SetDetailRowTemplateContent(column =>
+        {
+            int? id_priceList = (int?)DataBinder.Eval(column.DataItem, "id");
+            PriceList priceList = DataProviderPriceList.PriceListById(id_priceList);
+            Html.RenderPartial("_PriceListDetailViewPartial", priceList);
+        });
+
+        #endregion
+
+        #region COLUMNS
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Name = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "startDate";
+            column.Name = "startDate";
+            column.Caption = "Fecha Inicio";
+
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "endDate";
+            column.Name = "endDate";
+            column.Caption = "Fecha Fin";
+
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_calendarPriceList";
+            column.Name = "id_calendarPriceList";
+            column.Caption = "Calendario";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.EditorProperties().ComboBox(comboBox =>
+            {
+                comboBox.DataSource = DataProviderCalendarPriceList.CalendarPriceLists((int)ViewData["id_company"]);
+
+                comboBox.ValueField = "id";
+                comboBox.TextField = "name";
+                comboBox.ValueType = typeof(int);
+
+                comboBox.DropDownStyle = DropDownStyle.DropDown;
+                comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            });
+        });
+
+        settings.Columns.Add(m=> m.Document.DocumentType.name, column =>
+        {
+            //column.FieldName = "name";
+            column.Name = "documentType";
+            column.Caption = "Tipo Documento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.Document.DocumentState.name, column =>
+        {
+            //column.FieldName = "name";
+            column.Name = "documentState";
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "isForPurchase";
+        //    column.Name = "isForPurchase";
+        //    column.Caption = "Compra";
+        //    column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        //    column.Width = Unit.Percentage(3);
+        //});
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "isForSold";
+        //    column.Name = "isForSold";
+        //    column.Caption = "Venta";
+        //    column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        //    column.Width = Unit.Percentage(3);
+        //});
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "isQuotation";
+        //    column.Name = "isQuotation";
+        //    column.Caption = "Cotización";
+        //    column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        //    column.Width = Unit.Percentage(3);
+        //});
+
+        // COMMAND COLUMN
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+        commandColumn.ShowEditButton = false;
+        commandColumn.ShowDeleteButton = false;
+        commandColumn.Visible = true;
+        commandColumn.VisibleIndex = 14;
+        commandColumn.Caption = "Acciones";
+        commandColumn.Width = Unit.Percentage(8);
+
+        commandColumn.CustomButtons.Add(
+            new GridViewCommandColumnCustomButton
+            {
+                ID = "btnEditRow",
+                Text = "Editar"
+            }
+        );
+
+        //commandColumn.CustomButtons.Add(
+        //    new GridViewCommandColumnCustomButton
+        //    {
+        //        ID = "btnDeleteRow",
+        //        Text = "Eliminar"
+        //    }
+        //);
+        settings.ClientSideEvents.CustomButtonClick = "GridViewPriceListCustomCommandButton_Click";
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+        //settings.PreRender = (s, e) =>
+        //{
+        //    MVCxGridView g = (s as MVCxGridView);
+        //    if (g != null)
+        //    {
+        //        g.FilterExpression = "isActive = true";
+        //    }
+        //};
+
+    });
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

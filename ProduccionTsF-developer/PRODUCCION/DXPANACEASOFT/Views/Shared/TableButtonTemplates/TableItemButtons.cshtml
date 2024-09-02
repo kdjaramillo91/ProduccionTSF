@@ -1,0 +1,223 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnNew";
+	//settings.Width = 90;
+	settings.Text = "";
+	settings.ToolTip = "Adicionar Elemento";
+	//settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+	//settings.ClientEnabled = true;
+	settings.ClientEnabled = this.ViewBag.PuedeAdicionar;
+	//settings.ClientVisible = IsEnabeled(1);
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "AddNewItem";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnRemove";
+	//settings.Width = 90;
+	settings.Text = "";
+	settings.ToolTip = "Eliminar Elemento(s)";
+	//settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsRemoveitem16x16office2013;
+	//settings.ClientEnabled = true;
+	settings.ClientEnabled = this.ViewBag.PuedeAnular;
+	//settings.ClientVisible = IsEnabeled(8);
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "RemoveItems";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+	{
+		settings.Name = "btnCopy";
+		settings.ToolTip = "Copiar";
+		//settings.Width = 90;
+		settings.Text = "";
+		//settings.RenderMode = ButtonRenderMode.Link;
+		settings.Images.Image.IconID = IconID.EditCopy16x16office2013;
+		settings.ClientEnabled = true;
+		settings.ClientEnabled = this.ViewBag.PuedeCopiar;
+		//settings.ClientVisible = IsEnabeled(8);
+		settings.UseSubmitBehavior = false;
+		settings.EnableClientSideAPI = true;
+		settings.ClientSideEvents.Click = "function (s, e) { try{ CopyItems(s, e);	}catch(error){ console.log('Undefined function CopyItems(s, e)');}}";
+		//settings.ClientSideEvents.Click = "CopyItem";
+	}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+
+	settings.Name = "btnImport";
+	settings.Text = "\u25bc";
+	settings.ToolTip = "Importar desde Archivo";
+	settings.Images.Image.IconID = IconID.ActionsExport16x16devav;
+	//settings.ClientEnabled = true;
+	settings.ClientEnabled = this.ViewBag.PuedeImportar;
+	//settings.ClientVisible = IsEnabeled(9);
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.Style.Add("margin-left", "10px");
+	settings.ClientSideEvents.Click = @"importItemsFile";
+
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnRefresh";
+	//settings.Width = 90;
+	settings.Text = "";
+	settings.ToolTip = "Refrescar";
+	//settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+	settings.ClientEnabled = true;
+	settings.ClientEnabled = this.ViewBag.PuedeActualizar;
+	//settings.ClientVisible = true;
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "RefreshGrid";
+
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnPrint";
+	//settings.Width = 90;
+	settings.Text = "";
+	settings.ToolTip = "Imprimir";
+	//settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+	//settings.ClientEnabled = true;
+	settings.ClientEnabled = this.ViewBag.PuedeImprimir;
+	//settings.ClientVisible = IsEnabeled(7);
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "Print";
+
+
+}).GetHtml()
+
+@Html.DevExpress().Label(settings =>
+{
+	settings.Name = "lblEditMessage";
+	settings.Properties.ClientInstanceName = "lblEditMessage";
+	settings.Width = Unit.Percentage(100);
+	settings.ClientVisible = false;
+}).GetHtml()
+
+@Html.DevExpress().PopupMenu(
+		popupMenu =>
+		{
+			popupMenu.Name = "VerImportarPopupMenu";
+			popupMenu.AllowSelectItem = true;
+			popupMenu.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+			popupMenu.PopupVerticalAlign = PopupVerticalAlign.Below;
+			popupMenu.ClientSideEvents.ItemClick = "importProductFile";
+
+			popupMenu.Items.Add(menuItem =>
+			{
+				menuItem.Text = "Importar productos";
+				menuItem.Name = "ImportProductButton";
+				menuItem.Image.IconID = IconID.ActionsExport16x16devav;
+				menuItem.ItemStyle.Paddings.PaddingTop = Unit.Pixel(6);
+				menuItem.ItemStyle.Paddings.PaddingBottom = Unit.Pixel(6);
+				menuItem.ItemStyle.Height = Unit.Pixel(30);
+			});
+
+			popupMenu.Items.Add(menuItem =>
+			{
+				menuItem.Text = "Importar formulaciones";
+				menuItem.Name = "ImportFormulationButton";
+				menuItem.Image.IconID = IconID.ActionsExport16x16devav;
+				menuItem.ItemStyle.Paddings.PaddingTop = Unit.Pixel(6);
+				menuItem.ItemStyle.Paddings.PaddingBottom = Unit.Pixel(6);
+				menuItem.ItemStyle.Height = Unit.Pixel(30);
+			});
+
+			popupMenu.Items.Add(menuItem =>
+			{
+				menuItem.Text = "Importar equivalencia";
+				menuItem.Name = "ImportEquivalenceButton";
+				menuItem.Image.IconID = IconID.ActionsExport16x16devav;
+				menuItem.ItemStyle.Paddings.PaddingTop = Unit.Pixel(6);
+				menuItem.ItemStyle.Paddings.PaddingBottom = Unit.Pixel(6);
+				menuItem.ItemStyle.Height = Unit.Pixel(30);
+			});
+}).GetHtml()
+
+<input id="file" type="file" style="display: none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" onchange="FileChange();" />
+
+<script type="text/javascript">
+	function FileChange() {
+		var filesList = $("#file")[0].files;
+		if (filesList !== null && filesList !== undefined && filesList.length > 0) {
+			var file = filesList[0];
+			if (file.size > 0) {
+				var data = new FormData();
+				data.append("file", file);
+				try {
+					ImportFile(data);
+				} catch (exception) {
+					console.log("function ImportFile(data) {} is not defined");
+				}
+			}
+		}
+	}
+
+	function ShowEditMessage(s, e) {
+		if (s.cpEditMessage) {
+
+			lblEditMessage.SetText(s.cpEditMessage);
+			lblEditMessage.SetVisible(true);
+
+			delete s.cpEditMessage;
+
+			$(".close").click(function () {
+				$(".alert").alert('close');
+
+				lblEditMessage.SetText("");
+				lblEditMessage.SetVisible(false);
+			});
+
+			var message = document.getElementById("successMessage");
+			if (message !== undefined && message !== null) {
+				setTimeout(function () {
+					$("#successMessage").alert('close');
+
+					lblEditMessage.SetText("");
+					lblEditMessage.SetVisible(false);
+				}, 2000);
+			}
+		}
+	}
+</script>
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@functions{
+
+	bool IsEnabeled(int id_permission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+		return (permission != null);
+	}
+
+}

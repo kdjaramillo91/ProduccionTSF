@@ -1,0 +1,81 @@
+﻿@model DXPANACEASOFT.Models.ProductionLot
+
+	<div style="width: 100%;">
+
+		<div class="vertical-divider"></div>
+
+		@Html.DevExpress().Button(settings =>
+		{
+
+			settings.Name = "btnPrintLiquidationClose";
+			settings.ToolTip = "Imprimir Liquidación";
+			//settings.Width = 90;
+			settings.Text = "";
+			//settings.RenderMode = ButtonRenderMode.Link;
+			settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+			settings.ClientEnabled = true;
+			settings.UseSubmitBehavior = false;
+			settings.EnableClientSideAPI = true;
+			settings.ClientSideEvents.Click = "PrintLiquidationClose";
+
+		}).GetHtml()
+
+
+		<div class="vertical-divider"></div>
+
+		@Html.DevExpress().Button(settings =>
+		{
+
+			settings.Name = "btnPrintCloseLiquClose";
+			settings.ToolTip = "Imprimir Reporte Cierre";
+			//settings.Width = 90;
+			settings.Text = "";
+			//settings.RenderMode = ButtonRenderMode.Link;
+			settings.Images.Image.IconID = IconID.ProgrammingShowtestreport16x16;
+			settings.ClientEnabled = true;
+			settings.UseSubmitBehavior = false;
+			settings.EnableClientSideAPI = true;
+			settings.ClientSideEvents.Click = "PrintCloseLiq";
+
+		}).GetHtml()
+
+		<div class="vertical-divider"></div>
+
+		@Html.DevExpress().Button(settings =>
+		{
+
+			settings.Name = "btnPrintCloseLiquRendClose";
+			settings.ToolTip = "Imprimir Reporte Cierre 2";
+			//settings.Width = 90;
+			settings.Text = "";
+			//settings.RenderMode = ButtonRenderMode.Link;
+			settings.Images.Image.IconID = IconID.ProgrammingShowtestreport16x16;
+			settings.ClientEnabled = true;
+			settings.UseSubmitBehavior = false;
+			settings.EnableClientSideAPI = true;
+			settings.ClientSideEvents.Click = "PrintCloseLiqRend";
+
+		}).GetHtml()
+
+
+		<div class="vertical-divider"></div>
+
+		@Html.DevExpress().Label(settings =>
+	   {
+		   settings.Text = "Liquidación No: ";
+		   settings.ControlStyle.Font.Size = FontUnit.Large;
+		   settings.ControlStyle.Font.Bold = true;
+	   }).GetHtml()
+		@{
+			var labelLiquidationPago = Model.sequentialLiquidation;
+		}
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "labelLiquidationClose";
+			settings.ControlStyle.Font.Size = FontUnit.Large;
+			settings.ControlStyle.Font.Bold = true;
+		}).Bind(labelLiquidationPago).GetHtml()
+	</div>
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+

@@ -1,0 +1,73 @@
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ProductionLotLiquidations";
+        settings.CallbackRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationsPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationsPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationsPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationsPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = false;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "number";
+            column.Caption = "No. Lote";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "internalNumber";
+            column.Caption = "No. Lote Interno";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_productionProcess";
+            column.Caption = "Proceso";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "totalQuantityRecived";
+            column.Caption = "Libras Recibidas";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "receptionDate";
+            column.Caption = "Fecha de Producción";
+        });
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "id_ProductionLotState";
+            column.Caption = "Proveedor";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_ProductionLotState";
+            column.Caption = "Estado";
+        });
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

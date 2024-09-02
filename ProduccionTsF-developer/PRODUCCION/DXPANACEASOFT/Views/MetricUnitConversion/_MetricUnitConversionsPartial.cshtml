@@ -1,0 +1,365 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvMetricUnitConversions";
+        settings.CallbackRouteValues = new { Controller = "MetricUnitConversion", Action = "MetricUnitConversionsPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "MetricUnitConversion", Action = "MetricUnitConversionsPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "MetricUnitConversion", Action = "MetricUnitConversionsPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "MetricUnitConversion", Action = "MetricUnitConversionsPartialDelete" };
+
+        settings.CustomActionRouteValues = new { Controller = "MetricUnitConversion", Action = "DeleteSelectedMetricUnits" };
+
+        settings.KeyFieldName = "id";
+
+        settings.Width = Unit.Percentage(100);
+
+        #region GRIDVIEW BEHAIVOR
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+            if (ViewData["EditMessage"] != null)
+            {
+                e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+            }
+        };
+
+        #endregion
+
+        #region EDITFORM
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Editar Unidad de Conversión de Métrica";
+
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 800;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        #endregion
+
+        #region PAGER
+
+        settings.SettingsPager.Visible = true;
+
+        #endregion
+
+        #region CLIENT SIDE EVENTS (JAVASCRIPT)
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        #endregion
+
+        #region SEARCH PANEL
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        #endregion
+
+        #region TITLE PANEL
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Conversiones de Métricas</span>");
+        });
+
+        #endregion
+
+        #region GROUP PANEL
+
+        settings.Settings.ShowGroupPanel = true;
+
+        #endregion
+
+        #region FILTER ROW
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+        #endregion
+
+        #region FOOTER ROW
+
+        settings.Settings.ShowFooter = true;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""UnselectAllRows();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        #endregion
+
+        #region COMMAND COLUMN
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        #endregion
+
+        #region MASTER DETAILS VIEW
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+        settings.SetDetailRowTemplateContent(column =>
+        {
+            int? id_metricUnitConversion = (int?)DataBinder.Eval(column.DataItem, "id");
+            MetricUnitConversion metricUnitConversion = DataProviderMetricUnitConversion.MetricUnitConversionById(id_metricUnitConversion);
+            Html.RenderPartial("_MetricUnitConversionsDetailPartial", metricUnitConversion);
+        });
+
+        #endregion
+
+        #region AUTOGENERATED
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #endregion
+
+        #region ColumnsAdd
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_metricOrigin";
+            column.Name = "id_metricOrigin";
+            column.Caption = "Métrica de Origen";
+
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_metricOrigin = (int?)DataBinder.Eval(c.DataItem, "id_metricOrigin");
+                MetricUnit metricUnit = DataProviderMetricUnit.MetricUnitById(id_metricOrigin);
+
+                string name = (metricUnit != null) ? metricUnit.name : "";
+                ViewContext.Writer.Write(name);
+            });
+
+            column.EditorProperties().ComboBox(comboBox =>
+            {
+                comboBox.DataSource = DataProviderMetricUnit.MetricUnitFilter((int)ViewData["id_company"]);
+                comboBox.ValueField = "id";
+                comboBox.TextField = "name";
+                comboBox.ValueType = typeof(int);
+
+                comboBox.DropDownStyle = DropDownStyle.DropDown;
+                comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_metricDestiny";
+            column.Name = "id_metricDestiny";
+            column.Caption = "Métrica de Destino";
+
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_metricDestiny = (int?)DataBinder.Eval(c.DataItem, "id_metricDestiny");
+                MetricUnit metricUnit = DataProviderMetricUnit.MetricUnitById(id_metricDestiny);
+
+                string name = (metricUnit != null) ? metricUnit.name : "";
+                ViewContext.Writer.Write(name);
+            });
+
+            column.EditorProperties().ComboBox(comboBox =>
+            {
+                comboBox.DataSource = DataProviderMetricUnit.MetricUnitFilter((int)ViewData["id_company"]);
+                comboBox.ValueField = "id";
+                comboBox.TextField = "name";
+                comboBox.ValueType = typeof(int);
+
+                comboBox.DropDownStyle = DropDownStyle.DropDown;
+                comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "factor";
+            column.Name = "factor";
+            column.Caption = "Factor";
+
+            column.Width = Unit.Percentage(10);
+
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.DisplayFormatString = "N6";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 6;
+                p.SpinButtons.ShowIncrementButtons = true;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 1.00M;
+                p.LargeIncrement = 0.5M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Name = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+
+            column.AutoFilterBy("Sí");
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+        });
+
+        if (ShowEditButton() || ShowDeleteButton())
+        {
+            MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+            {
+                ShowEditButton = ShowEditButton(),
+                ShowDeleteButton = false,
+                Visible = true,
+                VisibleIndex = 10,
+                Width = Unit.Percentage(5),
+                Caption = "Acciones"
+            };
+
+            if (ShowDeleteButton())
+            {
+                commandColumn.CustomButtons.Add(
+                      new GridViewCommandColumnCustomButton
+                      {
+                          ID = "btnDeleteRow",
+                          Text = "Eliminar"
+                      }
+                );
+            }
+
+            settings.ClientSideEvents.CustomButtonClick = "GridViewItemsCustomCommandButton_Click";
+
+            settings.Columns.Add(commandColumn);
+        }
+
+
+        #endregion
+
+        #region EDITOR FORM LAYOUT
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_metricUnitConversion = (int?)DataBinder.Eval(c.DataItem, "id");
+            MetricUnitConversion metricUnitConversion = DataProviderMetricUnitConversion.MetricUnitConversionById(id_metricUnitConversion);
+
+            if (metricUnitConversion == null && ViewData["rowToCopy"] != null)
+            {
+                metricUnitConversion = (ViewData["rowToCopy"] as MetricUnitConversion) ?? new MetricUnitConversion
+                {
+                    isActive = true
+                };
+                metricUnitConversion.id = 0;
+                metricUnitConversion.MetricUnit.name += "-Copia";
+                metricUnitConversion.MetricUnit1.name += "-Copia";
+                metricUnitConversion.factor = 1;
+            }
+
+            metricUnitConversion = metricUnitConversion ?? new MetricUnitConversion
+            {
+                isActive = true,
+
+            };
+
+            Html.RenderPartial("_MetricUnitConversionEditFormPartial", metricUnitConversion);
+        });
+
+        #endregion
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+
+    });
+
+
+}
+
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    bool ShowEditButton()
+    {
+        var permissions = (ViewData["permissions"] as List<int>);
+        return (permissions != null && permissions.Contains(10));
+    }
+
+    bool ShowDeleteButton()
+    {
+        var permissions = (ViewData["permissions"] as List<int>);
+        return (permissions != null && permissions.Contains(8));
+    }
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

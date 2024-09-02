@@ -1,0 +1,65 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<ItemGroup>(settings =>
+    {
+        settings.Name = "gvItemGroupItemSubGroupsDetail" /*+ ViewData["id_branchOffice"]*/;
+        settings.SettingsDetail.MasterGridName = "gvItemGroups";
+        settings.CallbackRouteValues = new { Controller = "ItemGroup", Action = "ItemGroupDetailItemSubGroupsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "GridViewItemGroupItemSubGroupsDetails_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Sub-Grupos</span>");
+        });
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        //settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.Width = Unit.Percentage(20);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "description";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+
+    });
+}
+
+@grid.Bind(Model).GetHtml()

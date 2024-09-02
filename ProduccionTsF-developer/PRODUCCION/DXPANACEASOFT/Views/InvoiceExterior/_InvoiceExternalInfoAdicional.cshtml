@@ -1,0 +1,57 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.ModelExtension
+
+@model DXPANACEASOFT.Models.Invoice
+
+
+<table class="table table-condensed">
+    <tr class="ps-line-sep">
+        <td colspan="6" class="ps-bar-collapse" dtx="psn-ininfadic">
+            <span class="dxflGroupBoxCaption_Metropolis">Inf. Adicional</span>
+        </td>
+
+    </tr>
+    <tr>
+        <td>Total CM:</td>
+        <td colspan="5">
+            @Model.InvoiceExterior.totalBoxes
+        </td>
+    </tr>
+
+    @{
+        Boolean breakControl = false;
+        List<InvoiceWeightView> modelPesos = Model.InvoiceWeightList;
+        if (modelPesos != null)
+        {
+
+            foreach (InvoiceWeightView pesos in modelPesos)
+            {
+
+                if (!breakControl)
+                {
+
+                    @Html.Raw("<tr><td>" + pesos.namePeso + ":</td><td>" + pesos.peso + "</td><td>" + pesos.codeUnidadMedida + "</td>");
+
+                }
+
+
+                if (breakControl)
+                {
+
+                    @Html.Raw(" <td>" + pesos.peso + "</td><td>" + pesos.codeUnidadMedida + "</td><td style='width:50% !important'></td></tr>");
+
+                }
+
+                breakControl = (breakControl) ? false : true;
+
+            }
+
+        }
+
+
+
+    }
+
+</table>

@@ -1,0 +1,505 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ProductionLot
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "ProductionLotProcessFilterForm", name = "ProductionLotProcessFilterForm" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff;">
+        <tr>
+            <td style="width: 23%">
+                <table class="table table-condensed">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="2">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Lote</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%">
+                            @Html.DevExpress().LabelFor(m => m.id_ProductionLotState, settings =>
+                            {
+                                settings.Name = "productionLotStateLabel";
+                                settings.Text = "Estado:";
+                                settings.AssociatedControlName = "id_ProductionLotState";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBoxFor(m => m.id_ProductionLotState, settings =>
+                            {
+                                settings.Name = "id_ProductionLotState";
+                                settings.Properties.ClientInstanceName = "id_ProductionLotState";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.Properties.ClientSideEvents.Init = "ProductionLotStateCombo_Init";
+                            }).BindList(DataProviderProductionLotState.ProductionLotStatesByCompany((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.number, settings =>
+                            {
+                                settings.Name = "numberLabel";
+                                settings.Text = "No.:";
+                                settings.AssociatedControlName = "number";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBoxFor(m => m.number, settings =>
+                            {
+                                settings.Name = "number";
+                                settings.Properties.ClientInstanceName = "number";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.internalNumber, settings =>
+                            {
+                                settings.Name = "internalNumberLabel";
+                                settings.Text = "No. Interno:";
+                                settings.AssociatedControlName = "internalNumber";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBoxFor(m => m.internalNumber, settings =>
+                            {
+                                settings.Name = "internalNumber";
+                                settings.Properties.ClientInstanceName = "internalNumber";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.reference, settings =>
+                            {
+                                settings.Name = "referenceLabel";
+                                settings.Text = "Referencia:";
+                                settings.AssociatedControlName = "reference";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBoxFor(m => m.reference, settings =>
+                            {
+                                settings.Name = "reference";
+                                settings.Properties.ClientInstanceName = "reference";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todas";
+                                settings.Properties.NullText = "Todas";
+
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+            <td style="width: 23%">
+                <table class="table table-condensed">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="2">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Proceso - Producto</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.id_productionUnit, settings =>
+                            {
+                                settings.Name = "productionUnitLabel";
+                                settings.Text = "Unidad:";
+                                settings.AssociatedControlName = "id_productionUnit";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @{
+                                //int? id_pruductionProcessREC = DataProviderProductionProcess.ProductionProcessByCode("REC", (int?)ViewData["id_company"]);
+                                int? id_productionProcess = (Model != null && Model.id_productionProcess != 0) ? (int?)Model.id_productionProcess : null;
+                            }
+                            @Html.DevExpress().ComboBoxFor(m => m.id_productionUnit, settings =>
+                            {
+                                settings.Name = "id_productionUnit";
+                                settings.Properties.ClientInstanceName = "id_productionUnit";
+                                settings.Width = Unit.Percentage(100);
+                                //settings.Properties.DataSource = DataProviderPerson.Providers();
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todas";
+                                settings.Properties.NullText = "Todas";
+
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.Properties.ClientSideEvents.Init = "ProductionUnitCombo_Init";
+                            }).BindList(DataProviderProductionUnit.ProductionUnitsByProcessAndBranchoffice(id_productionProcess, (int?) ViewData["id_sucursal"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.id_productionProcess, settings =>
+                            {
+                                settings.Name = "productionProcessLabel";
+                                settings.Text = "Proceso:";
+                                settings.AssociatedControlName = "id_productionProcess";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBoxFor(m => m.id_productionProcess, settings =>
+                            {
+                                settings.Name = "id_productionProcess";
+                                settings.Properties.ClientInstanceName = "id_productionProcess";
+                                settings.Width = Unit.Percentage(100);
+                                //settings.Properties.DataSource = DataProviderPerson.Providers();
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.Properties.ClientSideEvents.Init = "ProductionProcessCombo_Init";
+                            }).BindList(DataProviderProductionProcess.ProductionProcessesWithoutRECWithCurrent((int)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        @*<td>
+                            @Html.DevExpress().LabelFor(m => m.Item.ItemType.id, settings =>
+                            {
+                                settings.Name = "itemTypeLabel";
+                                settings.Text = "Tipo:";
+                                settings.AssociatedControlName = "itemType";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBoxFor(m => m.Item.ItemType.id, settings =>
+                            {
+                                settings.Name = "itemType";
+                                settings.Properties.ClientInstanceName = "filterItemType";
+                                settings.Width = Unit.Percentage(100);
+                                //settings.Properties.DataSource = DataProviderPerson.Providers();
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.Properties.ClientSideEvents.Init = "ItemTypeCombo_Init";
+                            }).BindList(DataProviderItemType.ItemTypes()).GetHtml()
+                        </td>*@
+                    </tr>
+                    <tr>
+                        @*<td>
+                            @Html.DevExpress().LabelFor(m => m.Item.ItemTypeCategory.id, settings =>
+                            {
+                                settings.Name = "itemTypeCategoryLabel";
+                                settings.Text = "Categoría:";
+                                settings.AssociatedControlName = "itemTypeCategory";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBoxFor(m => m.Item.ItemTypeCategory.id, settings =>
+                            {
+                                settings.Name = "itemTypeCategory";
+                                settings.Properties.ClientInstanceName = "filterItemTypeCategory";
+                                settings.Width = Unit.Percentage(100);
+                                //settings.Properties.DataSource = DataProviderPerson.Providers();
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.Properties.ClientSideEvents.Init = "ItemTypeCategoryCombo_Init";
+                            }).BindList(DataProviderItemTypeCategory.ItemsTypesCategories()).GetHtml()
+                        </td>*@
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "itemLabel";
+                                settings.Text = "Producto:";
+                                settings.AssociatedControlName = "item";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "items";
+                                settings.Properties.ClientInstanceName = "items";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                            }).BindList(DataProviderItem.SalesItems()).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+            <td style="width: 44%">
+                <table class="table table-condensed" style="padding-top: 0px; margin-top: 0px;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="4">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Ubicación</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "warehouseLabel";
+                                settings.Text = "Bodega:";
+                                settings.AssociatedControlName = "warehouse";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                            {
+                                settings.Name = "warehouse";
+                                settings.Properties.ClientInstanceName = "filterWarehouse";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todas";
+                                settings.Properties.NullText = "Todas";
+
+
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.Properties.ClientSideEvents.Init = "WarehouseCombo_Init";
+                            }).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"])).GetHtml()
+                        </td>
+                        <td style="width: 20%">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "warehouseLocationLabel";
+                                settings.Text = "Ubicación:";
+                                settings.AssociatedControlName = "warehouseLocation";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "warehouseLocation";
+                           settings.Properties.ClientInstanceName = "filterWarehouseLocation";
+                           settings.Width = Unit.Percentage(100);
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueType = typeof(int);
+
+                           settings.Properties.NullDisplayText = "Todas";
+                           settings.Properties.NullText = "Todas";
+
+                           settings.Properties.Width = Unit.Percentage(100);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                           settings.Properties.ClientSideEvents.Init = "WarehouseLocationCombo_Init";
+                       }).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="table table-condensed">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="4">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Proceso</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            @Html.DevExpress().LabelFor(m => m.receptionDate, settings =>
+                            {
+                                settings.Name = "startReceptionDateLabel";
+                                settings.Text = "Fecha Proceso:";
+                                settings.AssociatedControlName = "startReceptionDate";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEdit(settings =>
+					   {
+						   settings.Name = "startReceptionDate";
+						   settings.Properties.ClientInstanceName = "startReceptionDate";
+						   settings.Width = Unit.Percentage(100);
+						   //settings.Properties.DropDownButton.Visible = false;
+						   settings.Properties.NullDisplayText = "Desde";
+						   settings.Properties.NullText = "Desde";
+
+						   settings.Properties.DisplayFormatInEditMode = true;
+						   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+						   settings.Properties.EditFormat = EditFormat.Custom;
+						   settings.Properties.EditFormatString = "dd/MM/yyyy";
+						   settings.Date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+						   settings.Properties.CalendarProperties.Columns = 2;
+						   settings.Properties.DateRangeSettings.MinDayCount = 1;
+						   settings.Properties.DateRangeSettings.MaxDayCount = 90;
+						   settings.Properties.NullDisplayText = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("dd/MM/yyyy");
+						   settings.Properties.NullText = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("dd/MM/yyyy");
+
+					   }).GetHtml()
+                        </td>
+                        @*<td style="width: 20%">
+                            @Html.DevExpress().LabelFor(m => m.receptionDate, settings =>
+                            {
+                                settings.Name = "endReceptionDateLabel";
+                                settings.Text = "Fecha Fin:";
+                                settings.AssociatedControlName = "endReceptionDate";
+                            }).GetHtml()
+                        </td>*@
+                        <td>
+                            @Html.DevExpress().DateEdit(settings =>
+					   {
+						   settings.Name = "endReceptionDate";
+						   settings.Properties.ClientInstanceName = "endReceptionDate";
+						   settings.Width = Unit.Percentage(100);
+						   //settings.Properties.DropDownButton.Visible = false;
+
+						   settings.Properties.NullDisplayText = "Hasta";
+						   settings.Properties.NullText = "Hasta";
+
+						   settings.Properties.DisplayFormatInEditMode = true;
+						   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+						   settings.Properties.EditFormat = EditFormat.Custom;
+						   settings.Properties.EditFormatString = "dd/MM/yyyy";
+						   settings.Date = DateTime.Today;
+
+						   settings.Properties.CalendarProperties.Columns = 2;
+						   settings.Properties.DateRangeSettings.StartDateEditID = "startReceptionDate";
+						   settings.Properties.DateRangeSettings.MinDayCount = 1;
+						   settings.Properties.DateRangeSettings.MaxDayCount = 90;
+						   settings.Properties.NullDisplayText = DateTime.UtcNow.ToString("dd/MM/yyyy");
+						   settings.Properties.NullText = DateTime.UtcNow.ToString("dd/MM/yyyy");
+
+					   }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+            <td style="width: 10%">
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td>
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "Search";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Buscar";
+								settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "OnClickSearchProductionLotProcess";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "Clear";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Limpiar";
+								settings.Images.Image.IconID = IconID.ActionsClear16x16;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "OnClickClearFiltersProductionLotProcess";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="btn-group" style="width: 100%;">
+								<button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nueva</span><span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right">
+									<li><a href="javascript:;" onclick="ButtonAddNewProcess_Process();">Proceso</a></li>
+									@*<li><a href="javascript:;" onclick="ButtonAddNewProcess_AddedValue();">Valor Agregado</a></li>*@
+								</ul>
+							</div>
+
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="btn-group" style="width: 100%;">
+								<button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<img src="/Content/image/print_preview.png" alt="" style="margin-right: 4px;" id="PrintReports"><span>Reportes</span><span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right">
+									<li><a href="javascript:;" onclick="ResumeLiquidation();">Resumen Proceso</a></li>
+									<li><a href="javascript:;" onclick="DetailLiquidation();">Detalle Proceso</a></li>
+									<li><a href="javascript:;" onclick="MovimientosCostos();">Movimientos Con Costo</a></li>
+									<li><a href="javascript:;" onclick="InternalProcessesMatrix();">Matriz Procesos Internos</a></li>
+									<li><a href="javascript:;" onclick="InternalProcessesMatrixExcel();">Matriz Procesos Internos 2</a></li>
+									@*-------------------------------------------------------------------------------------------------*@
+									<li><a href="javascript:;" onclick="ResumeReproceso();">Resumen de Reprocesos</a></li>
+									<li><a href="javascript:;" onclick="DetalleReproceso();">Detalle de Reprocesos</a></li>
+								</ul>
+							</div>
+
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="vertical-divider"></div>
+							<div class="btn-group" style="width: 100%;">
+								<button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<img src="~/Content/image/print_preview.png" alt="" style="margin-right: 4px;" id="PrintReports"><span>Reportes Excel</span><span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right">
+									<li><a href="javascript:;" onclick="ResumeLiquidationExcel();">Resumen Proceso</a></li>
+									<li><a href="javascript:;" onclick="DetailLiquidationExcel();">Detalle Proceso</a></li>
+								</ul>
+							</div>
+							<div class="vertical-divider"></div>
+						</td>
+					</tr>
+				</table>
+            </td>
+        </tr>
+    </table>
+}

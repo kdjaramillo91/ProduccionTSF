@@ -1,0 +1,92 @@
+﻿
+
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.SecuritySealState
+
+
+@{
+    SecuritySealState securitySealState = Model ?? new SecuritySealState();
+}
+
+@Html.Hidden("id_securitySealState", securitySealState.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(securitySealState.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(securitySealState.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(securitySealState.description)
+        </td>
+    </tr>
+
+    <td style="width: 10%;">
+        <strong>
+            Creado por:
+        </strong>
+    </td>
+    <td style="width: 10%;">
+        @Html.Raw(GetUserName(securitySealState.id_userCreate))
+    </td>
+    <td style="width: 10%;">
+        <strong>
+            Fecha de Creaci&oacute;n:
+        </strong>
+    </td>
+    <td>
+        @Html.Raw(securitySealState.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+    </td>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(GetUserName(securitySealState.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(securitySealState.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

@@ -1,0 +1,470 @@
+﻿@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ForeignCustomerIdentification>
+
+@{
+	//var id_countryForeignCustomerCurrent = (int?)ViewBag.id_countryForeignCustomerCurrent;
+	var direccion = ViewBag.Direccion;
+}
+
+@{
+	var grid = Html.DevExpress().GridView<ForeignCustomerIdentification>(settings =>
+	{
+
+		settings.Name = "gvForeignCustomerIdentification";
+		settings.CallbackRouteValues = new { Controller = "ForeignCustomer", Action = "FormEditDetailForeignCustomerIdentificationPartial" };
+
+		//settings.ClientSideEvents.BeginCallback = "ProviderPaymentTerm_OnBeginCallback";
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ForeignCustomer", Action = "FormEditDetailForeignCustomerIdentificationAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ForeignCustomer", Action = "FormEditDetailForeignCustomerIdentificationUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ForeignCustomer", Action = "FormEditDetailForeignCustomerIdentificationDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+		//settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowNewButton = false;
+		settings.CommandColumn.ShowDeleteButton = true;
+		settings.CommandColumn.ShowEditButton = true;
+		//settings.CommandColumn.ShowNewButtonInHeader = true;
+
+		settings.Width = Unit.Pixel(950);
+		settings.Height = Unit.Pixel(1600);
+
+		settings.KeyFieldName = "id";
+
+		//settings.SettingsPager.PageSize = 15;
+		settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+		settings.Settings.HorizontalScrollBarMode = ScrollBarMode.Auto;
+		//settings.EnableWrapForAllColumns();
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		//settings.ClientSideEvents.BeginCallback = "OnGridViewForeignCustomerIdentificationBeginCallback";
+		//settings.ClientSideEvents.Init = "OnGridViewForeignCustomerIdentificationInit";
+
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			List<ForeignCustomerIdentification> rows = (Model as List<ForeignCustomerIdentification>);
+			rows = (rows != null) ? rows.ToList() : new List<ForeignCustomerIdentification>();
+
+			e.Properties["cpRowsCount"] = rows.Count;
+		};
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.HideDataCells;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.None;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		//settings.CommandColumn.Visible = true;
+		settings.CommandColumn.Width = Unit.Pixel(100);
+
+		for (int i = 0; i < settings.Columns.Count; i++)
+		{
+			settings.Columns[i].Width = Unit.Percentage(20);
+		}
+
+		//});
+		//Tipo de Direccion
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "AddressType";
+			column.Name = "addressTypeForeignCustomerIdentification";
+			column.Caption = "Tipo Direcci�n";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_AddressType = (int?)DataBinder.Eval(c.DataItem, "AddressType");
+				tbsysCatalogueDetail addressType = DataProvidertbsysCatalogue.TbsysCatalogueDetailById(id_AddressType);
+
+				if (addressType != null)
+				{
+					ViewContext.Writer.Write(addressType.name);
+				}
+				else
+				{
+					ViewContext.Writer.Write("");
+				}
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "addressTypeForeignCustomerIdentification";
+				p.DataSource = DataProvidertbsysCatalogue.AlltbsysCatalogueDetailByCode("TDIR");
+				p.ValueField = "id";
+				p.TextFormatString = "{1}";
+		//settings.Properties.TextField = "name";
+		p.ValueType = typeof(int);
+
+				p.Columns.Add("code", "Cod.", 50);
+				p.Columns.Add("name", "Nombre", 100);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Pais
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_country";
+			column.Name = "id_countryForeignCustomerIdentification";
+			column.Caption = "Pa�s";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_country = (int?)DataBinder.Eval(c.DataItem, "id_country");
+				Country country = DataProviderCountry.CountryById(id_country);
+
+				if (country != null)
+				{
+					ViewContext.Writer.Write(country.name);
+				}
+				else
+				{
+					ViewContext.Writer.Write("");
+				}
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "id_countryForeignCustomerIdentification";
+				p.DataSource = DataProviderCountry.AllContries((int?)ViewData["id_company"]);
+				p.ValueField = "id";
+				p.TextFormatString = "{1}";
+		//settings.Properties.TextField = "name";
+		p.ValueType = typeof(int);
+
+				p.Columns.Add("code", "Cod.", 50);
+				p.Columns.Add("name", "Nombre", 100);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.ClientSideEvents.SelectedIndexChanged = "CountryComboBox_SelectedIndexChanged";
+
+				p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Ciudad
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_city";
+			column.Name = "id_cityForeignCustomerIdentification";
+			column.Caption = "Ciudad";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_city = (int?)DataBinder.Eval(c.DataItem, "id_city");
+				City city = DataProviderCity.CityById(id_city);
+
+				if (city != null)
+				{
+					ViewContext.Writer.Write(city.name);
+				}
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "id_cityForeignCustomerIdentification";
+		//p.DataSource = DataProviderCity.CityCountry((int?)ViewData["id_countryForeignCustomerCurrent"]);
+		//p.TextField = "businessName";
+		p.TextFormatString = "{1}";
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+
+				p.Columns.Add("code", "Cod.", 50);
+				p.Columns.Add("name", "Nombre", 100);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+		//p.EnableSynchronization = DefaultBoolean.False;
+		p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+
+				p.CallbackRouteValues = new { Controller = "ForeignCustomer", Action = "GetCountry_City" };
+				p.ClientSideEvents.BeginCallback = "CityCountry_BeginCallback";
+				p.ClientSideEvents.EndCallback = "CityCountry_EndCallback";
+
+		//p.ClientSideEvents.Validation = "OnCountry_IdentificationTypeComboValidation";
+		p.ClientSideEvents.Init = "Country_CityCombo_Init";
+				p.ClientSideEvents.Validation = "Country_CityCombo_Validation";
+				p.ClientSideEvents.SelectedIndexChanged = "Country_City_SelectedIndexChanged";
+
+				p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Direccion
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "addressForeign";
+			column.Caption = "Direcci�n";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+	//column.Width = Unit.Percentage(15);
+
+	column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "addressForeign";
+
+		//p.ClientSideEvents.Validation = "OnNumberIdentificationForeignCustomerIdentificationComboValidation";
+
+		p.Width = Unit.Percentage(80);
+
+			});
+
+		});
+
+		//Email Interno
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "emailInterno";
+			column.Caption = "Email Interno";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+	//column.Width = Unit.Percentage(14);
+
+	column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "emailInterno";
+
+		//p.ClientSideEvents.Validation = "OnNumberIdentificationForeignCustomerIdentificationComboValidation";
+
+		p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Email Interno CC
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "emailInternoCC";
+			column.Caption = "Email Interno CC";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "emailInternoCC";
+
+		//p.ClientSideEvents.Validation = "OnNumberIdentificationForeignCustomerIdentificationComboValidation";
+
+		p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Tel�fono
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "phone1FC";
+			column.Caption = "Tel�fono";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "phone1FC";
+
+		//p.ClientSideEvents.Validation = "OnNumberIdentificationForeignCustomerIdentificationComboValidation";
+
+		p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Fax
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "fax1FC";
+			column.Caption = "Fax";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "fax1FC";
+
+		//p.ClientSideEvents.Validation = "OnNumberIdentificationForeignCustomerIdentificationComboValidation";
+
+		p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Idioma
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_invoiceLanguage";
+			column.Name = "id_invoiceLanguageForeignCustomerIdentification";
+			column.Caption = "Idioma";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_invoiceLanguage = (int?)DataBinder.Eval(c.DataItem, "id_invoiceLanguage");
+				tbsysCatalogueDetail invoiceLanguage = DataProvidertbsysCatalogue.TbsysCatalogueDetailById(id_invoiceLanguage);
+
+				if (invoiceLanguage != null)
+				{
+					ViewContext.Writer.Write(invoiceLanguage.name);
+				}
+				else
+				{
+					ViewContext.Writer.Write("");
+				}
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "id_invoiceLanguageForeignCustomerIdentification";
+				p.DataSource = DataProvidertbsysCatalogue.AlltbsysCatalogueDetailByCode("LANG");
+				p.ValueField = "id";
+				p.TextFormatString = "{1}";
+		//settings.Properties.TextField = "name";
+		p.ValueType = typeof(int);
+
+				p.Columns.Add("code", "Cod.", 50);
+				p.Columns.Add("name", "Nombre", 100);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+		//Tipo de Documento
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_Country_IdentificationType";
+			column.Name = "id_Country_IdentificationType";
+			column.Caption = "Tipo de Documento";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				Country_IdentificationType country_IdentificationType = (Country_IdentificationType)DataBinder.Eval(c.DataItem, "Country_IdentificationType");
+
+				if (country_IdentificationType != null)
+				{
+					ViewContext.Writer.Write(country_IdentificationType.IdentificationType.name);
+				}
+				else
+				{
+					ViewContext.Writer.Write("");
+				}
+			});
+
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "id_Country_IdentificationType";
+		//p.DataSource = DataProviderCompany.AllCompanies();
+		//p.TextField = "businessName";
+		p.TextFormatString = "{1}";
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+
+				p.Columns.Add("code", "Cod.", 50);
+				p.Columns.Add("name", "Nombre", 100);
+
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+		//p.EnableSynchronization = DefaultBoolean.False;
+		p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				p.CallbackRouteValues = new { Controller = "ForeignCustomer", Action = "GetCountry_IdentificationType"/*, TextField = "CityName"*/ };
+				p.ClientSideEvents.BeginCallback = "PersonCountry_IdentificationType_BeginCallback";
+				p.ClientSideEvents.EndCallback = "PersonCountry_IdentificationType_EndCallback";
+
+				p.ClientSideEvents.Validation = "OnCountry_IdentificationTypeComboValidation";
+				p.ClientSideEvents.Init = "Country_IdentificationTypeCombo_Init";
+				p.ClientSideEvents.SelectedIndexChanged = "Country_IdentificationTypeCombo_SelectedIndexChanged";
+
+				p.Width = Unit.Percentage(80);
+			});
+
+
+		});
+
+		//Identificaci�n
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "numberIdentification";
+			column.Caption = "Identificaci�n";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "numberIdentificationForeignCustomerIdentification";
+
+				p.ClientSideEvents.Validation = "OnNumberIdentificationForeignCustomerIdentificationComboValidation";
+		//p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+		//p.ClientSideEvents.SelectedIndexChanged = "ItemBranchOfficeCombo_SelectedIndexChanged";
+
+		p.Width = Unit.Percentage(80);
+			});
+
+		});
+
+
+		//Imprimir en Factura
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "printInInvoice";
+			column.Caption = "Impr. en Fact. Comercial";
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+
+			column.EditorProperties().CheckBox(p =>
+			{
+				p.ClientInstanceName = "printInInvoiceForeignCustomerIdentification";
+
+			});
+	/*   column.EditorProperties().CheckBox(p =>
+	   {
+		   p.ClientInstanceName = "printInInvoiceForeignCustomerIdentification";
+
+		   //p.ClientSideEvents.Validation = "OnNumberIdentificationForeignCustomerIdentificationComboValidation";
+		   //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+		   //p.ClientSideEvents.SelectedIndexChanged = "ItemBranchOfficeCombo_SelectedIndexChanged";
+
+		   p.Width = Unit.Percentage(100);
+	   });*/
+
+		});
+
+
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()

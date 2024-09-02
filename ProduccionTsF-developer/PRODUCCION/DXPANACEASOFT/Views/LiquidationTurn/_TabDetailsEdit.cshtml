@@ -1,0 +1,58 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.LiquidationTurnDTO
+
+<div>
+	<div class="Etiqueta"></div>
+	<hr style="width: 100%; margin: 0px;">
+	<div class="MyContainer">
+		<div class="row">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Width = Unit.Percentage(100);
+			   settings.Text = "Fecha y Hora de Cierre: ";
+		   }).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().DateEditFor(model => model.liquidationDate,
+	   settings =>
+	   {
+		   settings.Name = "liquidationDate";
+		   settings.Properties.ClientInstanceName = "liquidationDate";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+		   settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+		   settings.ReadOnly = !((bool)ViewBag.enabled);
+		   settings.Properties.ClientSideEvents.Validation = "DateEditLiquidationDate_Validation";
+	   }).GetHtml()
+			</div>
+			<div class="col-sm-2">
+				@*@{
+						var liquidationTime = Model.liquidationTime;
+						var dateTimeAux = (liquidationTime == null) ? new DateTime(2019, 1, 1, 0, 0, 0) :
+								 new DateTime(2019, 1, 1, liquidationTime.Hours, liquidationTime.Minutes, liquidationTime.Seconds);
+					}*@
+				@Html.DevExpress().TimeEditFor(model => model.liquidationDate, timeEdit =>
+		   {
+			   timeEdit.Name = "liquidationTime";
+			   timeEdit.Properties.ClientInstanceName = "liquidationTime";
+			   timeEdit.Width = Unit.Percentage(100);
+			   timeEdit.ReadOnly = !((bool)ViewBag.enabled);
+			   timeEdit.Properties.DisplayFormatInEditMode = true;
+			   timeEdit.Properties.EditFormatString = "HH:mm";
+			   timeEdit.Properties.DisplayFormatString = "HH:mm";
+			   timeEdit.Properties.EditFormat = EditFormat.Custom;
+			   timeEdit.ShowModelErrors = false;
+			   //timeEdit.DateTime = dateTimeAux;
+			   timeEdit.Properties.ClientSideEvents.Validation = "TimeEditLiquidationTime_Validation";
+			   timeEdit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+		   }).GetHtml()
+			</div>
+			<div class="col-sm-5">
+			</div>
+		</div>
+	</div>
+	<div class="MyContainer" id="divGridViewDetails">
+		@Html.Partial("_GridViewDetails", Model.LiquidationTurnDetails)
+	</div>
+</div>

@@ -1,0 +1,625 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InventoryMove
+
+@{
+	InventoryMove inventoryMove = (Model as InventoryMove);
+
+	string code = (inventoryMove != null && inventoryMove.Document != null && inventoryMove.Document.DocumentType != null)
+				  ? inventoryMove.Document.DocumentType.code
+				  : null;
+
+	int? id_documentType = (inventoryMove != null && inventoryMove.Document != null && inventoryMove.Document.DocumentType != null)
+							? (int?)inventoryMove.Document.DocumentType.id
+							: null;
+
+	string natureMove = (string)ViewData["_natureMove"];
+	natureMove = natureMove != null ? natureMove.Trim() : "";
+	string _inventoryReason = (string)ViewData["_inventoryReason"];
+	string customParamOP = (string)ViewData["_customParamOP"];
+	int? idInventoryReason = 0;
+
+	if (customParamOP == "IPXM")
+	{
+		InventoryReason OinventoryReason = DataProviderInventoryMove.InventoryReasonByCode(_inventoryReason);
+		if (OinventoryReason != null)
+		{
+			idInventoryReason = OinventoryReason.id;
+		}
+	}
+
+	idInventoryReason = idInventoryReason != 0 ? idInventoryReason : null;
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formFilterInventoryMove", name = "formFilterinventoryMove" }))
+{
+
+	@Html.Hidden("id_documentType", id_documentType)
+	@Html.Hidden("codeDocumentTypefilter", code)
+	@Html.Hidden("natureMoveFilter", natureMove)
+	@Html.Hidden("customParamOP", customParamOP)
+
+
+
+
+	<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+		<tr>
+			<td style="width: 20%;">
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td colspan="2">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Documento</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().LabelFor(m => m.Document.id_documentState, settings =>
+							{
+								settings.Name = "documentStateLabel";
+								settings.Text = "Estado:";
+								settings.AssociatedControlName = "id_documentState";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBox(settings =>
+							{
+								settings.Name = "id_documentState";
+								settings.Width = Unit.Percentage(100);
+
+								settings.Properties.ValueField = "id";
+								settings.Properties.TextField = "name";
+								settings.Properties.ValueType = typeof(int);
+								settings.Properties.Width = Unit.Percentage(100);
+
+								settings.Properties.NullDisplayText = "Todos";
+								settings.Properties.NullText = "Todos";
+
+								settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+								settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+								settings.Properties.EnableSynchronization = DefaultBoolean.False;
+								settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+							}).BindList(DataProviderDocumentState.DocumentStatesByDocumentType(null, (int?)ViewData["id_company"])).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().LabelFor(m => m.Document.number, settings =>
+							{
+								settings.Name = "numberLabel";
+								settings.Text = "Número:";
+								settings.AssociatedControlName = "number";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().TextBoxFor(m => m.Document.number, settings =>
+							{
+								settings.Name = "number";
+								settings.Width = Unit.Percentage(100);
+
+								settings.Properties.NullDisplayText = "Todos";
+								settings.Properties.NullText = "Todos";
+
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().LabelFor(m => m.Document.reference, settings =>
+							{
+								settings.Name = "referenceLabel";
+								settings.Text = "Referencia:";
+								settings.AssociatedControlName = "reference";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().TextBoxFor(m => m.Document.reference, settings =>
+							{
+								settings.Name = "reference";
+								settings.Width = Unit.Percentage(100);
+
+								settings.Properties.NullDisplayText = "Todas";
+								settings.Properties.NullText = "Todas";
+
+							}).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td style="width: 35%;">
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td colspan="3">
+							@*<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Emisi&oacute;n y Autorizaci&oacute;n</span>*@
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Emisi&oacute;n</span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 20%">
+							@Html.DevExpress().LabelFor(m => m.Document.emissionDate, settings =>
+							{
+								settings.Name = "startEmissionDateLabel";
+								settings.Text = "Fecha Emisión:";
+								settings.AssociatedControlName = "startEmissionDate";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+					   {
+						   settings.Name = "startEmissionDate";
+						   settings.Properties.ClientInstanceName = "startEmissionDate";
+						   settings.Width = Unit.Percentage(100);
+
+						   settings.Properties.NullDisplayText = "Desde";
+						   settings.Properties.NullText = "Desde";
+
+						   settings.Properties.DisplayFormatInEditMode = true;
+						   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+						   settings.Properties.EditFormat = EditFormat.Custom;
+						   settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+						   settings.Properties.ClientSideEvents.Validation = "OnRangeEmissionDateValidation";
+
+					   }).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+					   {
+						   settings.Name = "endEmissionDate";
+						   settings.Properties.ClientInstanceName = "endEmissionDate";
+						   settings.Width = Unit.Percentage(100);
+
+						   settings.Properties.NullDisplayText = "Hasta";
+						   settings.Properties.NullText = "Hasta";
+
+						   settings.Properties.DisplayFormatInEditMode = true;
+						   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+						   settings.Properties.EditFormat = EditFormat.Custom;
+						   settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+						   settings.Properties.ClientSideEvents.Validation = "OnRangeEmissionDateValidation";
+
+					   }).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().LabelFor(m => m.id_inventoryReason, settings =>
+							{
+								settings.Name = "inventoryReasonLabel";
+								settings.Text = "Motivo:";
+								settings.AssociatedControlName = "id_inventoryReason";
+							}).GetHtml()
+						</td>
+						<td colspan="2">
+							@{
+								List<InventoryReason> inventoryReasons = null;
+								if (code == "03" || code == "05")
+								{
+									inventoryReasons = DataProviderInventoryMove.InventoryReasonsByCompanyNatureMoveWithoutTransfer((int?)ViewData["id_company"], natureMove);
+								}
+								else
+								{
+									inventoryReasons = DataProviderInventoryMove.InventoryReasonsByCompanyNatureMoveOnlyTransfer((int?)ViewData["id_company"], natureMove);
+									//if (code == "32" || code == "34" || code == "129" || code == "130" || code == "135" || code == "136" || code == "142" || code == "143")
+									//{
+									//    inventoryReasons = DataProviderInventoryMove.InventoryReasonsByCompanyNatureMoveOnlyTransfer((int?)ViewData["id_company"], natureMove);
+									//}
+									//else {
+									//    inventoryReasons = DataProviderInventoryMove.InventoryReasonsByCompanyCodeDocumentTypeAndCurrent((int?)ViewData["id_company"], code, idInventoryReason, true, false);
+									//}
+								}
+							}
+							@Html.DevExpress().ComboBox(settings =>
+					   {
+						   settings.Name = "id_inventoryReason";
+						   settings.Width = Unit.Percentage(100);
+						   settings.ShowModelErrors = true;
+
+						   settings.Properties.ValueField = "id";
+						   settings.Properties.TextField = "name";
+						   settings.Properties.ValueType = typeof(int);
+
+						   settings.Properties.NullDisplayText = "Todos";
+						   settings.Properties.NullText = "Todos";
+
+						   if (customParamOP == "IPXM")
+						   {
+							   settings.ReadOnly = true;
+						   }
+
+						   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+						   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					   }).BindList(inventoryReasons).Bind(idInventoryReason).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td style="width: 35%;">
+				<table class="table table-condensed" style="border: 0px solid #ffffff">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td colspan="4">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Movimiento de Inventario</span>
+						</td>
+					</tr>
+					@if (natureMove.Equals("E"))
+					{
+						<tr>
+							<td>
+								@Html.DevExpress().Label(settings =>
+								{
+									settings.Name = "warehouseExitLabel";
+									settings.Text = "Bodega Salida:";
+									settings.AssociatedControlName = "id_warehouseExit";
+								}).GetHtml()
+							</td>
+							<td>
+								@{
+									Html.RenderPartial("ComponentsDetail/_ComboBoxWarehouseExit");
+								}
+								@*@Html.DevExpress().ComboBox(settings =>
+									{
+										settings.Name = "id_warehouseExit";
+										settings.Properties.ClientInstanceName = "id_warehouseExit";
+										settings.Width = Unit.Percentage(100);
+
+										settings.Properties.ValueField = "id";
+										settings.Properties.TextField = "name";
+										settings.Properties.ValueType = typeof(int);
+										settings.Properties.Width = Unit.Percentage(100);
+
+										settings.Properties.NullDisplayText = "Todas";
+										settings.Properties.NullText = "Todas";
+
+										settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnWarehouseExitSelectedIndexChanged";
+
+										settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+										settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+										settings.Properties.EnableSynchronization = DefaultBoolean.False;
+										settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+									}).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"])).GetHtml()*@
+							</td>
+							<td>
+								@Html.DevExpress().Label(settings =>
+								{
+									settings.Name = "locationExitLabel";
+									settings.Text = "Ubicación Salida:";
+									settings.AssociatedControlName = "id_locationExit";
+								}).GetHtml()
+							</td>
+							<td>
+								@{
+									Html.RenderPartial("ComponentsDetail/_ComboBoxWarehouseExitLocation");
+								}
+								@*@Html.DevExpress().ComboBox(settings =>
+									{
+										settings.Name = "id_warehouseLocationExit";
+										settings.Properties.ClientInstanceName = "id_warehouseLocationExit";
+										settings.Width = Unit.Percentage(100);
+
+										settings.Properties.ValueField = "id";
+										settings.Properties.TextField = "name";
+										settings.Properties.ValueType = typeof(int);
+										settings.Properties.Width = Unit.Percentage(100);
+
+										settings.Properties.NullDisplayText = "Todas";
+										settings.Properties.NullText = "Todas";
+
+										settings.Properties.ClientSideEvents.Init = "OnWarehouseLocationExitInit";
+
+										settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+										settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+										settings.Properties.EnableSynchronization = DefaultBoolean.False;
+										settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+									}).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"])).GetHtml()*@
+							</td>
+						</tr>
+						<tr>
+							<td>
+								@Html.DevExpress().Label(settings =>
+								{
+									settings.Name = "dispatcherLabel";
+									settings.Text = "Despachador:";
+									settings.AssociatedControlName = "id_dispatcher";
+								}).GetHtml()
+							</td>
+							<td colspan="3">
+								@{
+									var rols = new List<string>() { "Despachador", "Empleado" };
+								}
+								@Html.DevExpress().ComboBox(settings =>
+								{
+									settings.Name = "id_dispatcher";
+									settings.Width = Unit.Percentage(100);
+
+									settings.Properties.ValueField = "id";
+									settings.Properties.TextField = "fullname_businessName";
+									settings.Properties.ValueType = typeof(int);
+									settings.Properties.Width = Unit.Percentage(100);
+
+									settings.Properties.NullDisplayText = "Todos";
+									settings.Properties.NullText = "Todos";
+
+									settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+									settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+									settings.Properties.EnableSynchronization = DefaultBoolean.False;
+									settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+								}).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], null, rols)).GetHtml()
+								@*}).BindList(DataProviderPerson.Employees()).GetHtml()*@
+							</td>
+						</tr>
+					}
+					@if (natureMove.Equals("I"))
+					{
+						<tr>
+							<td>
+								@Html.DevExpress().Label(settings =>
+								{
+									settings.Name = "warehopuseEntryLabel";
+									settings.Text = "Bodega Entrada:";
+									settings.AssociatedControlName = "id_warehopuseEntry";
+								}).GetHtml()
+							</td>
+							<td>
+								@{
+									Html.RenderPartial("ComponentsDetail/_ComboBoxWarehouseEntry");
+								}
+								@*@Html.DevExpress().ComboBox(settings =>
+									{
+										settings.Name = "id_warehouseEntry";
+										settings.Properties.ClientInstanceName = "id_warehouseEntry";
+										settings.Width = Unit.Percentage(100);
+
+										settings.Properties.ValueField = "id";
+										settings.Properties.TextField = "name";
+										settings.Properties.ValueType = typeof(int);
+										settings.Properties.Width = Unit.Percentage(100);
+
+										settings.Properties.NullDisplayText = "Todas";
+										settings.Properties.NullText = "Todas";
+
+										settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnWarehouseEntrySelectedIndexChanged";
+
+										settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+										settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+										settings.Properties.EnableSynchronization = DefaultBoolean.False;
+										settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+									}).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"])).GetHtml()*@
+							</td>
+							<td>
+								@Html.DevExpress().Label(settings =>
+								{
+									settings.Name = "locationEntryLabel";
+									settings.Text = "Ubicación Entrada:";
+									settings.AssociatedControlName = "id_locationEntry";
+								}).GetHtml()
+							</td>
+							<td>
+								@{
+									Html.RenderPartial("ComponentsDetail/_ComboBoxWarehouseEntryLocation");
+								}
+								@*@Html.DevExpress().ComboBox(settings =>
+									{
+										settings.Name = "id_warehouseLocationEntry";
+										settings.Properties.ClientInstanceName = "id_warehouseLocationEntry";
+										settings.Width = Unit.Percentage(100);
+
+										settings.Properties.ValueField = "id";
+										settings.Properties.TextField = "name";
+										settings.Properties.ValueType = typeof(int);
+										settings.Properties.Width = Unit.Percentage(100);
+
+										settings.Properties.NullDisplayText = "Todas";
+										settings.Properties.NullText = "Todas";
+
+										settings.Properties.ClientSideEvents.Init = "OnWarehouseLocationEntryInit";
+
+										settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+										settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+										settings.Properties.EnableSynchronization = DefaultBoolean.False;
+										settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+									}).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"])).GetHtml()*@
+							</td>
+						</tr>
+						<tr>
+							<td>
+								@Html.DevExpress().Label(settings =>
+								{
+									settings.Name = "receiverLabel";
+									settings.Text = "Recibidor:";
+									settings.AssociatedControlName = "id_receiver";
+								}).GetHtml()
+							</td>
+							<td colspan="3">
+								@{
+									var rols = new List<string>() { "Recibidor", "Empleado" };
+								}
+								@Html.DevExpress().ComboBox(settings =>
+								{
+									settings.Name = "id_receiver";
+									settings.Width = Unit.Percentage(100);
+
+									settings.Properties.ValueField = "id";
+									settings.Properties.TextField = "fullname_businessName";
+									settings.Properties.ValueType = typeof(int);
+
+									settings.Properties.NullDisplayText = "Todos";
+									settings.Properties.NullText = "Todos";
+
+									settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+									settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+									settings.Properties.EnableSynchronization = DefaultBoolean.False;
+									settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+								}).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], null, rols)).GetHtml()
+							</td>
+						</tr>
+					}
+				</table>
+			</td>
+			<td>
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td>
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "Search";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Buscar";
+								settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "OnClickSearchInventoryMoves";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "Clear";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Limpiar";
+								settings.Images.Image.IconID = IconID.ActionsClear16x16;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "OnClickClearFiltersInventoryMoves";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@*@if(code == null)
+								{
+									<div class="btn-group" style="width: 100%;">
+									<button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										<img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nuevo</span><span class="caret"></span>
+									</button>
+										<ul class="dropdown-menu dropdown-menu-right">
+											<li><a href="javascript:;" onclick="AddNewEntryManual();">Ingreso</a></li>
+											<li><a href="javascript:;" onclick="AddNewEntryPurchaseOrder();">Ingreso x Orden de Compra</a></li>
+											<li><a href="javascript:;" onclick="AddNewExitManual();">Egreso</a></li>
+											<li><a href="javascript:;" onclick="AddNewTransfer();">Transferencia</a></li>
+										</ul>
+									</div>
+								}
+								else if (code.Equals("03"))
+								{
+									@Html.DevExpress().Button(settings =>
+									{
+										settings.Name = "btnEntryMove";
+										settings.UseSubmitBehavior = false;
+										settings.Text = "Nuevo";
+										settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+										settings.Width = Unit.Percentage(100);
+										settings.ClientSideEvents.Click = "AddNewEntryManual";
+									}).GetHtml()
+								}
+								else if (code.Equals("04"))
+								{
+									@Html.DevExpress().Button(settings =>
+									{
+										settings.Name = "btnEntryMoveOC";
+										settings.UseSubmitBehavior = false;
+										settings.Text = "Nuevo";
+										settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+										settings.Width = Unit.Percentage(100);
+										settings.ClientSideEvents.Click = "AddNewEntryPurchaseOrder";
+									}).GetHtml()
+								}
+								else if (code.Equals("05"))
+								{
+									@Html.DevExpress().Button(settings =>
+									{
+										settings.Name = "btnExitMove";
+										settings.UseSubmitBehavior = false;
+										settings.Text = "Nuevo";
+										settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+										settings.Width = Unit.Percentage(100);
+										settings.ClientSideEvents.Click = "AddNewExitManual";
+									}).GetHtml()
+								}
+								else if (code.Equals("32"))
+								{
+									@Html.DevExpress().Button(settings =>
+									{
+										settings.Name = "btnTransferExitMove";
+										settings.UseSubmitBehavior = false;
+										settings.Text = "Nuevo";
+										settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+										settings.Width = Unit.Percentage(100);
+										settings.ClientSideEvents.Click = "AddNewTransferExit";
+									}).GetHtml()
+								}
+								else if (code.Equals("34"))
+								{
+									@Html.DevExpress().Button(settings =>
+									{
+										settings.Name = "btnTransferEntryMove";
+										settings.UseSubmitBehavior = false;
+										settings.Text = "Nuevo";
+										settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+										settings.Width = Unit.Percentage(100);
+										settings.ClientSideEvents.Click = "AddNewTransferEntry";
+									}).GetHtml()
+								}*@
+
+							@if (string.IsNullOrEmpty(natureMove))
+							{
+								<div class="btn-group" style="width: 100%;">
+									<button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										<img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nuevo</span><span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="javascript:;" onclick="AddNewEntryManual();">Ingreso</a></li>
+										<li><a href="javascript:;" onclick="AddNewEntryPurchaseOrder();">Ingreso x Orden de Compra</a></li>
+										<li><a href="javascript:;" onclick="AddNewExitManual();">Egreso</a></li>
+										<li><a href="javascript:;" onclick="AddNewTransfer();">Transferencia</a></li>
+									</ul>
+								</div>
+							}
+							else if (natureMove.Equals("I"))
+							{
+								@Html.DevExpress().Button(settings =>
+							   {
+								   settings.Name = "btnEntryMove";
+								   settings.UseSubmitBehavior = false;
+								   settings.Text = "Nuevo";
+								   settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+								   settings.Width = Unit.Percentage(100);
+								   settings.ClientSideEvents.Click = "AddNewEntryManual";
+							   }).GetHtml()
+							}
+							else if (natureMove.Equals("E"))
+							{
+								@*<table>
+									<tr>
+										<td>*@
+
+								string labelExitButton = (customParamOP == "IPXM") ? "Nuevo Egreso M. Empaque Manual" : "Nuevo";
+
+
+								@Html.DevExpress().Button(settings =>
+								{
+									settings.Name = "btnEntryMoveOC";
+									settings.UseSubmitBehavior = false;
+									settings.Text = labelExitButton;
+									settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+									settings.Width = Unit.Percentage(100);
+									settings.ClientSideEvents.Click = "AddNewExitManual";
+								}).GetHtml()
+								@*</td>
+										</tr>
+									</table>*@
+
+							}
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+}

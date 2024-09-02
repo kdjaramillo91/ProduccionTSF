@@ -1,0 +1,75 @@
+﻿@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DevExpress.Web.DemoUtils
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.PurchaseRequestDetailItemColor>
+
+
+@{ 
+    string textSeparatorView = ";";
+    string colorText = string.Empty;
+    if (Model != null && Model.Count > 0)
+    {
+        foreach (var v in Model)
+        {
+            colorText += v.ItemColor.name + textSeparatorView;
+        }
+    }
+}
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Name = "checkComboBox";
+        settings.Text = textSeparatorView;
+        settings.Width = 285;
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            @Html.DevExpress().ListBox(
+                listBoxSettings =>
+                {
+                    listBoxSettings.Name = "checkListBox";
+                    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+                    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+                    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+                    listBoxSettings.Height = Unit.Pixel(170);
+                    listBoxSettings.Width = Unit.Percentage(100);
+
+                    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+                    listBoxSettings.Properties.DataSource = DataProviderItemColor.ItemsColors();
+
+
+                    listBoxSettings.Properties.ValueField = "id";
+                    listBoxSettings.Properties.ValueType = typeof(int);
+
+                    listBoxSettings.Properties.Columns.Add("code", "Código", 70);
+                    listBoxSettings.Properties.Columns.Add("name", "Nombre", 200);
+
+                    listBoxSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                   // listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = "OnListBoxSelectionChanged";
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style=\"margin: 6px; overflow: hidden;\">");
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = "buttonClose";
+                    buttonSettings.Text = "Cerrar";
+                    buttonSettings.Style.Add("float", "right");
+                    buttonSettings.ClientSideEvents.Click = "function(s, e){ checkComboBox.HideDropDown(); }";
+                    buttonSettings.Height = 26;
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("</div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+        //settings.Properties.ClientSideEvents.TextChanged = "SynchronizeListBoxValues";
+        //settings.Properties.ClientSideEvents.DropDown = "SynchronizeListBoxValues";
+    }
+).GetHtml()

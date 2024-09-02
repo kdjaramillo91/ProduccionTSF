@@ -1,0 +1,97 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    ItemTrademarkModel ItemTrademarkModel = Model ?? new ItemTrademarkModel();
+}
+
+@Html.Hidden("id_ItemTrademarkModel", ItemTrademarkModel.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(ItemTrademarkModel.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(ItemTrademarkModel.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Marca:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(ItemTrademarkModel.ItemTrademark.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(ItemTrademarkModel.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(ItemTrademarkModel.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(ItemTrademarkModel.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(ItemTrademarkModel.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(ItemTrademarkModel.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

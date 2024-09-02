@@ -1,0 +1,58 @@
+﻿
+@using DXPANACEASOFT.Models
+
+@model AccountLedger
+
+@{
+	string typeAuxiliar="";
+	bool aceptaAuxiliar = false;
+	string cciCuenta = "";
+	if (this.Model != null)
+	{
+		typeAuxiliar = this.Model.typeAuxiliar;
+		aceptaAuxiliar = this.Model.AceptaAuxiliar;
+		using (var dbInt = new DBContextIntegration())
+		{
+			var tmp = dbInt.TblciCuenta.FirstOrDefault(fod => fod.CCiCuenta == Model.code);
+			if (tmp != null)
+			{
+				aceptaAuxiliar = tmp.BSnAceptaAux == null ? false : tmp.BSnAceptaAux.Value;
+			}
+		}
+		cciCuenta = Model.code;
+	}
+	else
+	{
+		typeAuxiliar = null;
+	}
+}
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = "typeAuxiliar";
+		settings.Properties.ClientInstanceName = "typeAuxiliar";
+		settings.Width = Unit.Percentage(92);
+
+		settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		settings.CallbackRouteValues = new { Controller = "AccountingTemplateCost", Action = "GetTypeAuxiliar" };
+		settings.Properties.CallbackPageSize = 10;
+
+		settings.Properties.DisplayFormatString = "{0} - {1}";
+		settings.Properties.ValueField = "id";
+		//settings.Properties.TextField = "name";
+		settings.Properties.ValueType = typeof(string);
+		settings.Properties.Columns.Add("id", "Código", Unit.Percentage(15));
+		settings.Properties.Columns.Add("name", "Descripción", Unit.Percentage(70));
+		settings.Properties.ClientSideEvents.BeginCallback = "OnTypeAuxiliar_BeginCallback";
+		settings.Properties.ClientSideEvents.EndCallback = "OnTypeAuxiliar_EndCallback";
+		settings.Properties.ClientSideEvents.Init = "OnTypeAuxiliarInit";
+		settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboTypeAuxiliarLedger_SelectedIndexChanged";
+		settings.ItemTextCellPrepared = (sender, e) =>
+		{
+			e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+		};		
+	}).BindList(DataProviderAccountingTemplate.AccountingTemplateTypeAuxiliarAll(cciCuenta, aceptaAuxiliar)).Bind(typeAuxiliar).GetHtml()

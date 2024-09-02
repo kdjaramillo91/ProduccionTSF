@@ -1,0 +1,246 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+	var grid = Html.DevExpress().GridView<ClosingMachinesTurnDetailDTO>(settings =>
+	{
+		settings.Name = "GridViewDetails";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "ClosingMachinesTurn",
+			Action = "GridViewDetails",
+			enabled = ViewBag.enabled
+		};
+
+		settings.KeyFieldName = "id";
+
+//settings.SettingsBehavior.AllowFixedGroups = true;
+//settings.SettingsBehavior.AllowSort = false;
+
+//settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+//settings.Settings.VerticalScrollableHeight = 300;
+settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+//settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+//settings.SettingsPager.Visible = true;
+//settings.Settings.ShowGroupPanel = true;
+//settings.Settings.ShowFilterRow = true;
+//settings.Settings.ShowFilterRowMenu = true;
+settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+//settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+//settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+//settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Width = Unit.Percentage(100);
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			var list = (Model as List<ClosingMachinesTurnDetailDTO>) ?? new List<ClosingMachinesTurnDetailDTO>();
+			e.Properties["cpDetailCount"] = list.Count;
+		};
+
+//#region SearchPanel
+
+////Panel de Busqueda
+//settings.SettingsSearchPanel.Visible = true;
+//settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+//#endregion
+
+//settings.Settings.ShowFooter = true;
+
+settings.Columns.Add(m => m.numberLiquidationCartOnCart, column =>
+		{
+			column.Name = "numberLiquidationCartOnCart";
+			column.Caption = "No. de Liquidación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.nameliquidator, column =>
+		{
+			column.Name = "liquidator";
+			column.Caption = "Liquidador";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(13);
+		});
+
+		settings.Columns.Add(m => m.provider, column =>
+		{
+			column.Name = "provider";
+			column.Caption = "Proveedor";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(13);
+		});
+
+		settings.Columns.Add(m => m.nameProviderShrimp, column =>
+		{
+			column.Name = "nameProviderShrimp";
+			column.Caption = "Camaronera";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(12);
+		});
+
+		settings.Columns.Add(m => m.productionUnitProviderPool, column =>
+		{
+			column.Name = "productionUnitProviderPool";
+			column.Caption = "Piscina";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+		});
+
+		settings.Columns.Add(m => m.weight, column =>
+		{
+			column.Name = "weight";
+			column.Caption = "Gr.";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.Width = Unit.Percentage(5);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal weight = (decimal)DataBinder.Eval(c.DataItem, "weight");
+
+				string text = weight.ToString("N2");
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(m => m.proccesType, column =>
+		{
+			column.Name = "proccesType";
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+		});
+
+		settings.Columns.Add(m => m.numberLot, column =>
+		{
+			column.Name = "numberLot";
+			column.Caption = "No.Lote";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.plantProcess, column =>
+		{
+			column.Name = "plantProcess";
+			column.Caption = "Planta Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.poundsRemitted, column =>
+		{
+			column.Name = "poundsRemitted";
+			column.Caption = "Lbs. Remitidas";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Width = Unit.Percentage(7);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal poundsRemitted = (decimal)DataBinder.Eval(c.DataItem, "poundsRemitted");
+
+				string text = poundsRemitted.ToString("#,##0.00");
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(m => m.poundsProcessed, column =>
+		{
+			column.Name = "poundsProcessed";
+			column.Caption = "Lbs. Procesadas";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Width = Unit.Percentage(7);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal poundsProcessed = (decimal)DataBinder.Eval(c.DataItem, "poundsProcessed");
+
+				string text = poundsProcessed.ToString("#,##0.00");
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(m => m.poundsCooling, column =>
+		{
+			column.Name = "poundsCooling";
+			column.Caption = "Lbs. Refrigeración";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Width = Unit.Percentage(7);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal poundsCooling = (decimal)DataBinder.Eval(c.DataItem, "poundsCooling");
+
+				string text = poundsCooling.ToString("#,##0.00");
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(m => m.noOfBox, column =>
+		{
+			column.Name = "noOfBox";
+			column.Caption = "No. Cajas";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Width = Unit.Percentage(5);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int noOfBox = (int)DataBinder.Eval(c.DataItem, "noOfBox");
+
+				string text = noOfBox.ToString("#,##0");
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(m => m.state, column =>
+		{
+			column.Name = "state";
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				string cod_state = (string)DataBinder.Eval(c.DataItem, "cod_state");
+				string state = (string)DataBinder.Eval(c.DataItem, "state");
+
+				string text = state;
+				if (cod_state == "01")//01: Pendiente
+		{
+					text = "<b style='color:#FF0000';>" + text + "</b>"; //<p style='color:#FF0000';>" + text + "</p>";
+		}
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+
+//settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "tail").DisplayFormat = "<b>Cola: {0:#,##0.00}</b>";
+//settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "whole").DisplayFormat = "<b>Entero: {0:#,##0.00}</b>";
+//settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>Total Lbs: {0:#,##0.00}</b>";
+});
+}
+@grid.Bind(Model).GetHtml()

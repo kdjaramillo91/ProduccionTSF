@@ -1,0 +1,29 @@
+﻿@{
+    var dialogAddDocumentState = Html.DevExpress().PopupControl(settings =>
+    {
+        settings.Name = "dialogAddDocumentState";
+        settings.PopupElementID = "maincontent";
+        settings.AllowDragging = true;
+        settings.ShowOnPageLoad = false;
+        settings.PopupAction = PopupAction.None;
+        settings.CloseAction = CloseAction.CloseButton;
+        settings.MinWidth = Unit.Pixel(640);
+        //settings.MinHeight = Unit.Pixel(480);
+        settings.PopupHorizontalAlign = PopupHorizontalAlign.Center;
+        settings.PopupVerticalAlign = PopupVerticalAlign.Middle;
+        settings.HeaderText = "Adicionar Estado de Documento";
+
+        settings.SetContent(() =>
+        {
+            Html.RenderAction("DocumentStateEditForm", "DocumentStates");
+        });
+
+    });
+
+    ViewData["dialogAddDocumentState"] = dialogAddDocumentState;
+}
+
+
+
+@dialogAddDocumentState.GetHtml()
+

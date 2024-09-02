@@ -1,0 +1,116 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using  DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PaymentMethodPaymentTerm
+@using System.Drawing
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_paymentMethod, settings =>
+            {
+                settings.Name = "did_paymentMethodLabel";
+                settings.Text = "Formas de Pago:";
+                settings.AssociatedControlName = "did_paymentMethod";
+            }).GetHtml()
+
+
+        </td>
+        <td>
+            @{
+                int? id_paymentMethod = (Model != null && Model.id_paymentMethod != 0) ? (int?)Model.id_paymentMethod : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_paymentMethod, settings =>
+       {
+           settings.Name = "did_paymentMethod";
+           settings.Properties.ClientInstanceName = "did_paymentMethod";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Columns.Add("name", "Nombre", 200);
+           settings.Width = Unit.Percentage(50);
+           settings.Height = Unit.Percentage(50);
+           settings.Properties.EnableClientSideAPI = true;
+           settings.Properties.CallbackPageSize = 20;
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPaymentMethode";
+
+       }).BindList(DataProviderPaymentMethod.PaymentMethodAll((int?)id_paymentMethod)).Bind(id_paymentMethod).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_paymentTerm, settings =>
+            {
+                settings.Name = "did_paymentTermLabel";
+                settings.Text = "Plazos de Pago:";
+                settings.AssociatedControlName = "did_paymentTerm";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_paymentTerm = (Model != null && Model.id_paymentTerm != 0) ? (int?)Model.id_paymentTerm : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_paymentTerm, settings =>
+       {
+           settings.Name = "did_paymentTerm";
+           settings.Properties.ClientInstanceName = "did_paymentTerm";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Columns.Add("name", "Nombre", 200);
+           settings.Width = Unit.Percentage(50);
+           settings.Height = Unit.Percentage(50);
+           settings.Properties.EnableClientSideAPI = true;
+           settings.Properties.CallbackPageSize = 20;
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnpaymentTerm";
+
+       }).BindList(DataProviderPaymentTerm.PaymentTermAll((int?)id_paymentTerm)).Bind(id_paymentTerm).GetHtml()
+        </td>
+
+    </tr>
+    <tr>
+        <td colspan="2">
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+       {
+           settings.ReadOnly = true;
+           settings.Name = "disActive";
+           settings.Properties.ClientInstanceName = "disActive";
+
+       }).GetHtml()
+        </td>
+        <!--FECHA Inicio-->
+        <td></td>
+        <td></td>
+        <!-- FECHA FIn-->
+        <td></td>
+        <td></td>
+
+    </tr>
+
+    <tr></tr>
+
+</table>
+
+
+
+
+
+    
+
+

@@ -1,0 +1,140 @@
+﻿
+@using System.Globalization
+@model DXPANACEASOFT.Models.PurchaseOrderImportationInformation
+@{
+    string codeState = (Model != null && Model.PurchaseOrder != null && Model.PurchaseOrder.Document.DocumentState.code != "") ? Model.PurchaseOrder.Document.DocumentState.code : "";
+}
+<table class="table table-condensed">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.customsDocumentNumber, settings =>
+            {
+                settings.Text = "No. Doc. Aduanero:";
+                settings.AssociatedControlName = "customsDocumentNumber";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.customsDocumentNumber, settings =>
+       {
+           settings.Name = "customsDocumentNumber";
+           settings.Properties.ClientInstanceName = "customsDocumentNumber";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnCustomsDocumentNumberValidation";
+       }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.referendumNumber, settings =>
+            {
+                settings.Text = "No. de Referendo:";
+                settings.AssociatedControlName = "referendumNumber";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.referendumNumber, settings =>
+       {
+           settings.Name = "referendumNumber";
+           settings.Properties.ClientInstanceName = "referendumNumber";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnReferendumNumberValidation";
+       }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.shipmentDate, settings =>
+            {
+                settings.Text = "Fecha de Embarque:";
+                settings.AssociatedControlName = "shipmentDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                DateTime shipmentDate = DateTime.Now;
+                if (Model != null && !string.IsNullOrEmpty(Model.shipmentDate))
+                {
+                    shipmentDate = DateTime.Parse(Model.shipmentDate, new CultureInfo("es-EC"));
+                }
+            }
+            @Html.DevExpress().DateEditFor(m => m.shipmentDate, settings =>
+            {
+                settings.Name = "shipmentDate";
+                settings.Properties.ClientInstanceName = "shipmentDate";
+                settings.Properties.UseMaskBehavior = true;
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = codeState != "01";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnShipmentDateValidation";
+            }).Bind(shipmentDate).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.shipmentDate, settings =>
+            {
+                settings.Text = "Fecha de Salida de Aduana:";
+                settings.AssociatedControlName = "departureCustomsDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                DateTime departureCustomsDate = DateTime.Now;
+                if (Model != null && !string.IsNullOrEmpty(Model.departureCustomsDate))
+                {
+                    departureCustomsDate = DateTime.Parse(Model.departureCustomsDate, new CultureInfo("es-EC"));
+                }
+            }
+            @Html.DevExpress().DateEditFor(m => m.departureCustomsDate, settings =>
+            {
+                settings.Name = "departureCustomsDate";
+                settings.Properties.ClientInstanceName = "departureCustomsDate";
+                settings.Properties.UseMaskBehavior = true;
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = codeState != "01";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnDepartureCustomsDateValidation";
+            }).Bind(shipmentDate).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.arrivalDate, settings =>
+            {
+                settings.Text = "Fecha de Arribo:";
+                settings.AssociatedControlName = "arrivalDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                DateTime arrivalDate = DateTime.Now;
+                if (Model != null && !string.IsNullOrEmpty(Model.arrivalDate))
+                {
+                    arrivalDate = DateTime.Parse(Model.arrivalDate, new CultureInfo("es-EC"));
+                }
+            }
+            @Html.DevExpress().DateEditFor(m => m.arrivalDate, settings =>
+            {
+                settings.Name = "arrivalDate";
+                settings.Properties.ClientInstanceName = "arrivalDate";
+                settings.Properties.UseMaskBehavior = true;
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = codeState != "01";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnArrivalDateValidation";
+            }).Bind(arrivalDate).GetHtml()
+        </td>
+    </tr>
+</table>

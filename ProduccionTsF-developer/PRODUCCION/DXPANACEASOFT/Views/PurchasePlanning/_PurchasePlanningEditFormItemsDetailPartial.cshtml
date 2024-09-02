@@ -1,0 +1,399 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.PurchasePlanningDetail>
+@{ 
+    var metricUnitUMTPAux = DataProviderSetting.ValueSetting("UMTP");
+    var id_metricUnitUMTPValueAux = int.Parse(metricUnitUMTPAux != null ? metricUnitUMTPAux : "0");
+    var metricUnitUMTP = DataProviderMetricUnit.MetricUnitById(id_metricUnitUMTPValueAux);
+}
+
+
+@{
+    var grid = Html.DevExpress().GridView<PurchasePlanningDetail>(settings =>
+    {
+        settings.Name = "gvPurchasePlanningEditFormItemsDetail";
+        settings.CallbackRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningEditFormItemsDetailPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "PurchasePlanningItemsDetail_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningEditFormItemsDetailAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningEditFormItemsDetailUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningEditFormItemsDetailDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId"; 
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewInitDetail";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedDetail";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackDetail";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackDetail";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<PurchasePlanningDetail> rows = (Model as List<PurchasePlanningDetail>);
+            rows = (rows != null) ? rows.ToList() : new List<PurchasePlanningDetail>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfoItems""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRowsItems"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelectionItems"" style=""cursor: pointer;"" onclick=""gvEditClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["quantity"] = 0.00M;
+        };
+
+        #region ColumnsAdd
+
+        //settings.Columns.Add(m => m.id, column =>
+        //{
+        //    column.Name = "id";
+        //    column.Caption = "ID";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //    column.Width = Unit.Percentage(0);
+        //    //column.Visible = false;
+        //    //column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        //    column.EditorProperties().TextBox(p =>
+        //    {
+        //        p.ClientInstanceName = "id";
+        //        //p.DataSource = DataProviderItem.PurchaseItemsByCompany((int?)ViewData["id_company"]);
+        //        //p.ValueField = "id";
+        //        //p.TextField = "name";
+        //        p.Width = Unit.Percentage(100);
+        //        //p.ValueType = typeof(int);
+        //        //p.DropDownStyle = DropDownStyle.DropDownList;
+        //        //p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+        //        //p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+        //        //p.ClientSideEvents.DropDown = "ItemDetailCombo_DropDown";
+        //        //p.ClientSideEvents.SelectedIndexChanged = "ItemDetailCombo_SelectedIndexChanged";
+        //        //p.ClientSideEvents.Validation = "OnItemDetailValidation";
+        //    });
+        //});
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "datePlanning";
+            //column.Name = "datePlanning";
+            column.Caption = "Fecha Planificada";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                PurchasePlanningDetail purchasePlanningDetail = (PurchasePlanningDetail)Model[c.ItemIndex];
+                //var provider = DataProviderPerson.GetProviderFromRemissionGuide(remission.id);
+                var text = purchasePlanningDetail.datePlanning.ToString("ddd", CultureInfo.CreateSpecificCulture("es-US")).ToUpper() +
+                           purchasePlanningDetail.datePlanning.ToString("_dd");
+                ViewContext.Writer.Write(text);
+                //var text = purchasePlanningDetail.datePlanning.ToString("dd/MM/yyyy");
+                //ViewContext.Writer.Write(text);
+                //ViewContext.Writer.Write(remission?.RemissionGuideDetail?.FirstOrDefault().RemissionGuideDetailPurchaseOrderDetail?.FirstOrDefault().PurchaseOrderDetail?.PurchaseOrder.Provider.Person.fullname_businessName ?? "");
+            });
+            column.Width = Unit.Percentage(12);
+            column.EditorProperties().DateEdit(p =>
+            {
+                p.ClientInstanceName = "datePlanning";
+                p.Width = Unit.Percentage(100);
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.ClientSideEvents.DropDown = "ItemDetailCombo_DropDown";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnDatePlanningDetailValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_provider";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_provider = (int?)DataBinder.Eval(c.DataItem, "id_provider");
+                Provider provider = DataProviderPerson.Provider(id_provider);
+
+                string text = (provider != null) ? provider.Person.fullname_businessName : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_provider";
+                p.DataSource = DataProviderPerson.ProviderByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.Width = Unit.Percentage(100);
+                p.ValueType = typeof(int);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.DropDown = "ItemDetailCombo_DropDown";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnProviderDetailValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_buyer";
+            column.Caption = "Comprador";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_buyer = (int?)DataBinder.Eval(c.DataItem, "id_buyer");
+                Person person = DataProviderPerson.Person(id_buyer);
+
+                string text = (person != null) ? person.fullname_businessName : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_buyer";
+                p.DataSource = DataProviderPerson.PersonsByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "fullname_businessName";
+                p.Width = Unit.Percentage(100);
+                p.ValueType = typeof(int);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.DropDown = "ItemDetailCombo_DropDown";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnBuyerDetailValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+
+                string text = (item != null) ? item.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_item";
+                p.DataSource = DataProviderItem.PurchaseItemsByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.Width = Unit.Percentage(100);
+                p.ValueType = typeof(int);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.DropDown = "ItemDetailCombo_DropDown";
+                p.ClientSideEvents.SelectedIndexChanged = "ItemDetailCombo_SelectedIndexChanged";
+                //p.ClientSideEvents.Validation = "OnItemDetailValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_itemTypeCategory";
+            column.Caption = "Categoría";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_itemTypeCategory = (int?)DataBinder.Eval(c.DataItem, "id_itemTypeCategory");
+                ItemTypeCategory itemTypeCategory = DataProviderItemTypeCategory.ItemTypeCategoryById(id_itemTypeCategory);
+
+                string text = (itemTypeCategory != null) ? itemTypeCategory.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_itemTypeCategory";
+                p.DataSource = DataProviderItemTypeCategory.ItemsTypesCategories((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.Width = Unit.Percentage(100);
+                p.ValueType = typeof(int);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.DropDown = "ItemDetailCombo_DropDown";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnItemTypeCategoryDetailValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantity";
+            column.Name = "quantity";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "quantity";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.SpinButtons.ShowIncrementButtons = true;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Number;
+
+                //p.ClientSideEvents.NumberChanged = "QuantityRemitted_NumberChange";
+                p.ClientSideEvents.Validation = "OnQuantityValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.UnboundType = UnboundColumnType.String;
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+                //Item item = DataProviderItem.Item(id_item);
+
+                //string text = "Lbs";
+
+                //if (item != null && item.ItemPurchaseInformation != null)
+                //{
+                //    text = item.ItemPurchaseInformation.MetricUnit.code;
+                //}
+
+
+                ViewContext.Writer.Write(metricUnitUMTP != null ? metricUnitUMTP.code : ""/*"Lbs"*/);
+            });
+            column.EditorProperties().TextBox(e =>
+            {
+                e.ClientInstanceName = "UM";
+                e.Width = Unit.Percentage(100);
+                e.NullDisplayText = (metricUnitUMTP != null ? metricUnitUMTP.code : ""/*"Lbs"*/);
+                e.NullText = (metricUnitUMTP != null ? metricUnitUMTP.code : ""/*"Lbs"*/);
+            });
+        });
+
+
+
+        //Botones de comandos para registros de la tabla
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 20,
+            Caption = "Acciones"
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.Width = Unit.Percentage(11);
+
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+        #region ColumnsEdit
+
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+
+<script src="~/Scripts/purchaseplanning/_purchasePlanningDetailsEditForm.js"></script>

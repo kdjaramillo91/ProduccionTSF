@@ -1,0 +1,32 @@
+﻿@{ 
+	var maxValueSetting = DataProviderSetting.SettingByCode("DUPELEM");
+	var maxValue = maxValueSetting != null
+		? Convert.ToInt32(maxValueSetting.value)
+		: 0;
+}
+<div id="duplicateDialogForm" style="padding-left: 5px;">
+	<table style="width: 100%;">
+		<tr>
+			<td style="width: 15%;" rowspan="2">
+				<span class="glyphicon glyphicon-warning-sign warning" style="color: #ff8800; font-size: 30px;"></span>
+			</td>
+			<td style="text-align: left; vertical-align: middle;">
+				<p>Escriba la cantidad de elementos a duplicar</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().SpinEdit(spin =>
+				{
+					spin.Name = "SpinDuplicate";
+					spin.Properties.ClientInstanceName = "SpinDuplicate";
+					spin.Properties.AllowMouseWheel = false;
+					spin.Properties.NumberType = SpinEditNumberType.Integer;
+					spin.Properties.NumberFormat = SpinEditNumberFormat.Number;
+					spin.Properties.MaxValue = maxValue;
+					spin.Properties.ClientSideEvents.Validation = "SpinValidate";
+				}).GetHtml()
+			</td>
+		</tr>
+	</table>
+</div>

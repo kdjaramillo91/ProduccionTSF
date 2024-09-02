@@ -1,0 +1,111 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.UserEntityDetail
+@using System.Drawing
+
+@{
+	DBContext db = null;
+	int id_UserEntityDetailPermission = (Model != null) ? Model.id : 0;
+	db = new DBContext();
+}
+
+
+<table class="table table-condenced" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+		</td>
+	</tr>
+
+	<tr>
+
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "did_UserLabel";
+				settings.Text = "Usuario:";
+				settings.AssociatedControlName = "did_User";
+			}).GetHtml()
+
+
+		</td>
+		<td>
+			@{
+				//int? id_Category = (Model != null && Model.id_Category != 0) ? (int?)Model.id_Category : null;
+
+				int? id_userEntityDetail = (Model != null && Model.id_userEntity != 0) ? (int?)Model.id_userEntity: null;
+				var id_UED = db.UserEntityDetail.Where(e => e.id == id_userEntityDetail).FirstOrDefault();
+				var id_userEntity = db.UserEntity.Where(e => e.id == id_UED.id_userEntity).FirstOrDefault();
+				int? id_user = db.User.Where(e => e.id == id_userEntity.id_user).FirstOrDefault().id;
+			}
+			@Html.DevExpress().ComboBox(settings =>
+	   {
+		   settings.Name = "did_Category";
+		   settings.Properties.ClientInstanceName = "did_Category";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Properties.Columns.Add("name", "Nombre", 200);
+		   settings.Width = Unit.Percentage(50);
+		   settings.Height = Unit.Percentage(50);
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Properties.CallbackPageSize = 20;
+		   settings.ReadOnly = true;
+		   settings.ShowModelErrors = true;
+
+
+	   }).BindList(DataProviderUser.UserAll((int?)id_user)).Bind(id_user).GetHtml()
+
+		</td>
+		<!-- FECHA FIn-->
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "did_CustomerTypeLabel";
+				settings.Text = "Bodega:";
+				settings.AssociatedControlName = "did_CustomerType";
+			}).GetHtml()
+		</td>
+		<td>
+			@*@{
+				int? id_CustomerType = (Model != null && Model.id_CustomerType != 0) ? (int?)Model.id_CustomerType : null;
+			}*@
+			@Html.DevExpress().ComboBox(settings =>
+	   {
+		   settings.Name = "did_CustomerType";
+		   settings.Properties.ClientInstanceName = "did_CustomerType";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Properties.Columns.Add("name", "Nombre", 200);
+		   settings.Width = Unit.Percentage(50);
+		   settings.Height = Unit.Percentage(50);
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Properties.CallbackPageSize = 20;
+		   settings.ReadOnly = true;
+		   settings.ShowModelErrors = true;
+
+
+	   }).BindList(DataProviderWarehouse.WarehouseByCompany((int)ViewData["id_company"])).GetHtml()
+		</td>
+
+	</tr>
+
+	<tr></tr>
+
+</table>
+
+
+
+
+
+
+
+

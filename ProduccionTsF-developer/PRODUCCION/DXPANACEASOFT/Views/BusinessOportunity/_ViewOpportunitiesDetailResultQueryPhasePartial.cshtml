@@ -1,0 +1,147 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<QueryPhase>(settings =>
+    {
+        settings.Name = "gvQueryPhaseDetail" /*+ ViewData["id_branchOffice"]*/;
+        //settings.SettingsDetail.MasterGridName = "gvCompanies";
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "ViewOpportunitiesDetailResultsPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "GridViewQueryPhaseDetails_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        //settings.Settings.ShowTitlePanel = true;
+        //settings.Styles.TitlePanel.CssClass = "titleContainer";
+        //settings.SetTitlePanelTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Divisiones</span>");
+        //});
+
+        settings.KeyFieldName = "id_phase";
+
+        settings.SettingsPager.Visible = true;
+        //settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "name").DisplayFormat = "<b>{0}</b>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quantity").DisplayFormat = "<b>{0}</b>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountExpected").DisplayFormat = "<b>{0:c2}</b>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "weightedAmount").DisplayFormat = "<b>{0:c2}</b>";
+        // Total summaries are displayed within the grid footer. So, the grid footer must be enabled.  
+        settings.Settings.ShowFooter = true;
+
+        settings.Columns.Add(m => m.listId_BusinessOportunity, column =>
+        {
+            column.Name = "listId_BusinessOportunity";
+            column.Caption = "listId_BusinessOportunity";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(0);
+            column.Visible = false;
+            //column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        });
+
+        settings.Columns.Add(m => m.phase.name, column =>
+        {
+            column.Caption = "Etapas";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(12);
+        });
+
+        settings.Columns.Add(m => m.quantity, column =>
+        {
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(5);
+
+            column.EditorProperties().SpinEdit(spinEdit =>
+            {
+                ////spinEdit.DecimalPlaces = 2;
+                spinEdit.DisplayFormatInEditMode = true;
+                spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+                //spinEdit.DisplayFormatString = "C2";
+            });
+
+        });
+
+
+        settings.Columns.Add(m => m.amountExpected, column =>
+        {
+            column.Caption = "Monto Previsto";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(5);
+
+            column.EditorProperties().SpinEdit(spinEdit =>
+            {
+                spinEdit.DecimalPlaces = 2;
+                spinEdit.DisplayFormatInEditMode = true;
+                spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+                spinEdit.DisplayFormatString = "C2";
+            });
+
+        });
+        settings.Columns.Add(m => m.weightedAmount, column =>
+        {
+            column.Caption = "Monto Ponderado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(5);
+
+            column.EditorProperties().SpinEdit(spinEdit =>
+            {
+                spinEdit.DecimalPlaces = 2;
+                spinEdit.DisplayFormatInEditMode = true;
+                spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+                spinEdit.DisplayFormatString = "C2";
+            });
+
+        });
+
+        settings.Columns.Add(m => m.percent, column =>
+        {
+            column.Caption = "%";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal percent = (decimal)DataBinder.Eval(c.DataItem, "percent");
+
+                string text = percent.ToString() + "%";//string.Empty;
+
+                //if (item != null)
+                //{
+                //    text = item.name;
+                //}
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            //int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+            string listId_BusinessOportunity = (string)DataBinder.Eval(c.DataItem, "listId_BusinessOportunity");
+            //int[] listInt = (int[])JsonConvert.DeserializeObject(listId_BusinessOportunity);
+            List <BusinessOportunity> listBusinessOportunity = DataProviderBusinessOportunity.BusinessOportunityInList(listId_BusinessOportunity);
+            Html.RenderPartial("_BusinessOportunityResultsPartial", listBusinessOportunity);
+        });
+    });
+}
+
+@grid.Bind(Model).GetHtml()

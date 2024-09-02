@@ -1,0 +1,158 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.QualityControls;
+@using DevExpress.Web.DemoUtils
+
+@model List<QualityControlTallaDto>
+
+@{
+	var grid = Html.DevExpress().GridView<QualityControlTallaDto>(settings =>
+	{
+		settings.Name = "gvQualityControlDetail";
+		settings.CallbackRouteValues = new { Controller = "QualityControl", Action = "GetDetailQualityControl" };
+
+
+		settings.Width = Unit.Percentage(100);
+		settings.CommandColumn.Visible = false;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+
+		settings.SettingsPager.PageSize = 20;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = false;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.SettingsExport.EnableClientSideExportAPI = true;
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Toolbars.Add(t =>
+		{
+			t.EnableAdaptivity = true;
+			t.Items.Add(GridViewToolbarCommand.ExportToXls).Text = "Exportar a Excel (2003)";
+		});
+
+		settings.PreRender = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv != null)
+				gv.ExpandAll();
+		};
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+		};
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "sProcessType";
+			column.Name = "sProcessType";
+			column.Caption = "Proceso";
+			column.GroupIndex = 0;
+			column.Width = Unit.Percentage(12);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "nameClass";
+			column.Name = "nameClass";
+			column.Caption = "Categoría";
+			column.Width = Unit.Percentage(12);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.GroupIndex = 1;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(m => m.sItemSize, column =>
+		{
+			column.FieldName = "sItemSize";
+			column.Name = "sItemSize";
+			column.Caption = "Talla";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(m => m.poundsDetail, column =>
+		{
+			column.FieldName = "poundsDetail";
+			column.Name = "poundsDetail";
+			column.Caption = "Libras";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.PropertiesEdit.DisplayFormatString = "N2";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(m => m.porcentaje, column =>
+		{
+			column.FieldName = "porcentaje";
+			column.Name = "porcentaje";
+			column.Caption = "Porcentaje";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.PropertiesEdit.DisplayFormatString = "N3";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.ReadOnly = true;
+		});
+
+		DXPANACEASOFT.Helper.GridViewFeaturesHelper.SetupGlobalGridViewBehavior(settings);
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+<div class="row" style="text-align: right; padding: 13px 35px 5px 0px; margin-bottom: 20px; margin-right: 20px;">
+
+	@Html.DevExpress().Button(settings =>
+	{
+		settings.Name = "btnCancelPopupTallasList";
+		settings.Text = "Cancelar";
+		settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+		settings.UseSubmitBehavior = false;
+		settings.ClientSideEvents.Click = "OnBtnCancelPopupTallasList_Click";
+	}).GetHtml()
+
+</div>
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+	String GetUserName(int id)
+	{
+		var user = DataProviderUser.UserById(id);
+		return user.username;
+	}
+}

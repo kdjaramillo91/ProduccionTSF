@@ -1,0 +1,135 @@
+﻿@model DXPANACEASOFT.Models.AccountPlan
+
+@Html.HiddenFor(model => model.id)
+
+@Html.DevExpress().FormLayout(settings =>
+{
+    settings.Name = "FormAccountPlan";
+
+    settings.ColCount = 3;
+
+    settings.Width = Unit.Percentage(100);
+
+    settings.Items.AddGroupItem(groupSettings =>
+    {
+        groupSettings.Caption = "Plan de Cuentas";
+        groupSettings.ShowCaption = DefaultBoolean.True;
+        groupSettings.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+        groupSettings.SettingsItemCaptions.Location = LayoutItemCaptionLocation.Left;
+        groupSettings.HorizontalAlign = FormLayoutHorizontalAlign.Center;
+
+        groupSettings.Width = Unit.Percentage(50);
+
+        groupSettings.Items.Add(m => m.name, item =>
+        {
+            item.Name = "name";
+            item.Caption = "Plan de Cuentas";
+            item.NestedExtensionType = FormLayoutNestedExtensionItemType.TextBox;
+            var textBoxSettings = (TextBoxSettings)item.NestedExtensionSettings;
+            textBoxSettings.Properties.Width = Unit.Percentage(100);
+            textBoxSettings.ClientEnabled = !(Model != null && Model.id != 0);
+        });
+
+        groupSettings.Items.Add(m => m.Company.businessName, item =>
+        {
+            item.Name = "businessName";
+            item.Caption = "Compañía";
+            item.NestedExtensionType = FormLayoutNestedExtensionItemType.TextBox;
+            var textBoxSettings = (TextBoxSettings)item.NestedExtensionSettings;
+            textBoxSettings.Properties.Width = Unit.Percentage(100);
+            textBoxSettings.ClientEnabled = !(Model != null && Model.id != 0);
+        });
+    });
+
+    settings.Items.AddGroupItem(groupSettings =>
+    {
+        groupSettings.Caption = "Información";
+        groupSettings.ShowCaption = DefaultBoolean.True;
+        groupSettings.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+        groupSettings.SettingsItemCaptions.Location = LayoutItemCaptionLocation.Left;
+        groupSettings.HorizontalAlign = FormLayoutHorizontalAlign.Center;
+
+        groupSettings.ColCount = 2;
+
+        groupSettings.Width = Unit.Percentage(48);
+
+        groupSettings.Items.Add(m => m.Account.Count, item =>
+        {
+            item.Name = "accountCount";
+            item.Caption = "Cantidad de Cuentas";
+            item.NestedExtensionType = FormLayoutNestedExtensionItemType.TextBox;
+            var textBoxSettings = (TextBoxSettings)item.NestedExtensionSettings;
+            textBoxSettings.Properties.Width = Unit.Percentage(100);
+            textBoxSettings.ClientEnabled = !(Model != null && Model.id != 0);
+        });
+
+        groupSettings.Items.Add(m => m.separator, item =>
+        {
+            item.Name = "separator";
+            item.Caption = "Separador";
+            item.NestedExtensionType = FormLayoutNestedExtensionItemType.TextBox;
+            var textBoxSettings = (TextBoxSettings)item.NestedExtensionSettings;
+            textBoxSettings.Properties.Width = Unit.Percentage(100);
+            textBoxSettings.ClientEnabled = !(Model != null && Model.id != 0);
+        });
+
+        groupSettings.Items.Add(m => m.dateCreate, item =>
+        {
+            item.Name = "dateCreate";
+            item.Caption = "Fecha de Creación";
+            item.NestedExtensionType = FormLayoutNestedExtensionItemType.TextBox;
+            var textBoxSettings = (TextBoxSettings)item.NestedExtensionSettings;
+            textBoxSettings.Properties.Width = Unit.Percentage(100);
+            textBoxSettings.ClientEnabled = !(Model != null && Model.id != 0);
+        });
+    });
+
+    settings.Items.AddGroupItem(groupSettings =>
+    {
+        groupSettings.Caption = "Acciones";
+        groupSettings.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+        groupSettings.HorizontalAlign = FormLayoutHorizontalAlign.Center;
+
+        groupSettings.Width = Unit.Percentage(2);
+
+        groupSettings.Items.Add(itemSettings =>
+        {
+            itemSettings.NestedExtensionType = FormLayoutNestedExtensionItemType.Button;
+            itemSettings.ShowCaption = DefaultBoolean.False;
+            var btnSettigns = (ButtonSettings)itemSettings.NestedExtensionSettings;
+            btnSettigns.Name = "btnConsultar";
+            btnSettigns.UseSubmitBehavior = true;
+            btnSettigns.Text = "Consultar";
+            btnSettigns.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+            btnSettigns.Width = Unit.Percentage(100);
+            btnSettigns.ClientSideEvents.Click = "ButtonConsultar_Click";
+        });
+        groupSettings.Items.Add(itemSettings =>
+        {
+            itemSettings.NestedExtensionType = FormLayoutNestedExtensionItemType.Button;
+            itemSettings.ShowCaption = DefaultBoolean.False;
+            var btnSettigns = (ButtonSettings)itemSettings.NestedExtensionSettings;
+            btnSettigns.Name = "btnImport";
+            btnSettigns.UseSubmitBehavior = true;
+            btnSettigns.Text = "Importar";
+            btnSettigns.Images.Image.IconID = IconID.ActionsLoadfrom16x16office2013;
+            btnSettigns.Width = Unit.Percentage(100);
+            btnSettigns.ClientEnabled = !(Model != null && Model.id != 0);
+        });
+
+        groupSettings.Items.Add(itemSettings =>
+        {
+            itemSettings.NestedExtensionType = FormLayoutNestedExtensionItemType.Button;
+            itemSettings.ShowCaption = DefaultBoolean.False;
+            var btnSettigns = (ButtonSettings)itemSettings.NestedExtensionSettings;
+            btnSettigns.Name = "btnClear";
+            btnSettigns.UseSubmitBehavior = true;
+            btnSettigns.Text = "Eliminar";
+            btnSettigns.Images.Image.IconID = IconID.ActionsTrash16x16;
+            btnSettigns.Width = Unit.Percentage(100);
+            btnSettigns.ClientEnabled = (Model != null && Model.id != 0);
+        });
+
+    });
+
+}).GetHtml()

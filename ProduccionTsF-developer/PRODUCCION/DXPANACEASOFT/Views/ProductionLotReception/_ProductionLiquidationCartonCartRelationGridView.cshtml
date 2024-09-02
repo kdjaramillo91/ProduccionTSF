@@ -1,0 +1,149 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+	var grid = Html.DevExpress().GridView<LiquidationCartOnCartDetail>(settings =>
+	{
+		settings.Name = "gvLiquidationCartOnCart";
+		settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "LiquidationOrderRelationList" };
+		settings.Width = Unit.Percentage(100);
+
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowFilterRow = false;
+
+		settings.Settings.ShowTitlePanel = false;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Liquidaciones Carro por Carro Relacionadas</span>");
+		});
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(m => m.LiquidationCartOnCart.Document.number, column =>
+		{
+			column.Name = "number";
+			column.Caption = "No. Liq.";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.LiquidationCartOnCart.Document.emissionDate, column =>
+		{
+			column.Caption = "Fecha de Documento";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+			column.EditorProperties().DateEdit(editorDate =>
+			{
+				editorDate.DisplayFormatInEditMode = true;
+				editorDate.DisplayFormatString = "dd/MM/yyyy";
+				editorDate.EditFormat = EditFormat.Custom;
+				editorDate.EditFormatString = "dd/MM/yyyy";
+			});
+			column.Width = Unit.Percentage(4);
+		});
+		settings.Columns.Add(m => m.LiquidationCartOnCart.MachineForProd.name, column =>
+		{
+			column.Name = "MachineForProd";
+			column.Caption = "Máquina";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+		settings.Columns.Add(m => m.LiquidationCartOnCart.MachineProdOpening.Turn.name, column =>
+		{
+			column.Name = "Turn";
+			column.Caption = "Turno";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+		});
+
+		//camaronera 15
+		settings.Columns.Add(m => m.LiquidationCartOnCart.ProductionLot.number, column =>
+		{
+			column.Name = "numberLot";
+			column.Caption = "Sec. Transaccional";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(4);
+		});
+
+		//camaronera 15
+		settings.Columns.Add(m => m.LiquidationCartOnCart.ProductionLot.internalNumber, column =>
+		{
+			column.Name = "internalNumber";
+			column.Caption = "No. Lote";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.LiquidationCartOnCart.ProductionLot.Person1.processPlant, column =>
+		{
+			column.Name = "process";
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		//Proceso
+		settings.Columns.Add(m => m.LiquidationCartOnCart.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_liquidator";
+			column.Caption = "Liquidador";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		//provider 15
+		settings.Columns.Add(m => m.LiquidationCartOnCart.ProductionLot.Provider.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_provider";
+			column.Caption = "Proveedor";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(25);
+		});
+
+		//camaronera 10
+		settings.Columns.Add(m => m.LiquidationCartOnCart.ProductionLot.ProductionUnitProvider.name, column =>
+		{
+			column.Name = "id_productionUnitProvider";
+			column.Caption = "Camaronera";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(25);
+		});
+
+		//camaronera 10
+		settings.Columns.Add(m => m.LiquidationCartOnCart.ProductionLot.ProductionUnitProviderPool.name, column =>
+		{
+			column.Name = "id_productionUnitProviderPool";
+			column.Caption = "Piscina";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(7);
+		});
+
+		//documentState 10
+		settings.Columns.Add(m => m.LiquidationCartOnCart.Document.DocumentState.name, column =>
+		{
+			column.Name = "documentState";
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		});
+
+	}
+);
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+
+}@grid.Bind(Model).GetHtml()

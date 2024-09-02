@@ -1,0 +1,74 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using ValidationSettings = System.Web.UI.ValidationSettings
+@model DXPANACEASOFT.Models.Invoice
+
+<div id="invoiceMetricUnitBlock" class="ps_block1">
+    <span class="xfloat">Seleccione la Unidad de Medida de la Factura: </span>
+    @{
+        int? id_metricUnitInvoice = (Model != null && Model.InvoiceExterior.id_metricUnitInvoice != 0) ? (int?)Model.InvoiceExterior.id_metricUnitInvoice : null;
+        if(id_metricUnitInvoice ==  null)
+        {
+
+            /*string settingDefaultmetricUnitInvoiceCode = DataProviderSetting.ValueSetting("FXUMPR");
+            if (settingDefaultmetricUnitInvoiceCode == null)
+            {
+                ViewData["EditError"] = "Unidad de Medida Predeterminada no definida";
+                return;
+            }
+
+            MetricUnit metricUnitInvoice = DataProviderMetricUnit.MetricUnitByCode(settingDefaultmetricUnitInvoiceCode);
+            id_metricUnitInvoice = metricUnitInvoice.id;*/
+
+            id_metricUnitInvoice = 999;
+
+        }
+        DocumentState documentState = (Model != null && Model.Document != null && Model.Document.id_documentState != 0) ? DataProviderDocumentState.DocumentStateById(Model.Document.id_documentState) : DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+        tbsysDocumentDocumentStateControlsState _ControlState = DataProviderControlState.ControlStateByDocumentByStateByControl("07", documentState.code, "gvInvoiceDetail");
+
+    }
+    <span class="xfloat">
+        @Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_metricUnitInvoice, settings =>
+       {
+           settings.Name = "id_metricUnitInvoice";
+
+
+           settings.Properties.ClientInstanceName = "id_metricUnitInvoice";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 60);
+           settings.Properties.Columns.Add("name", "U.M.", 80);
+           //settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Init = "onInitInvoiceExteriorMetricUnitInvoice";
+           //settings.Properties.CreateEdit().edi
+           //settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+
+           settings.Properties.AllowNull = false;
+           settings.ReadOnly = _ControlState.isReadOnly;
+
+
+           settings.Properties.ClientSideEvents.Validation = "validationInvoiceExteriorMetricUnitInvoice";
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "onChangeInvoiceExteriorMetricUnitInvoice";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+
+           //    e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpTabControl"] = "tabControl";
+
+           //};
+
+
+
+           settings.ToolTip = "Seleccionar Unidad de Medida Factura";
+       }).BindList(DataProviderMetricUnit.WeightMetriUnitInvoiceExterior((int?)ViewData["id_company"])).Bind(id_metricUnitInvoice).GetHtml()
+
+    </span>
+</div>

@@ -1,0 +1,29 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "id_warehouseEntry";
+    settings.Properties.ClientInstanceName = "id_warehouseEntry";
+    settings.Width = Unit.Percentage(120);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "GetWarehouseEntry"};
+    settings.Properties.CallbackPageSize = 10;
+
+    settings.Properties.NullDisplayText = "Todas";
+    settings.Properties.NullText = "Todas";
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.ShowModelErrors = true;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnWarehouseEntry_SelectedIndexChanged";
+}).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"])).GetHtml()

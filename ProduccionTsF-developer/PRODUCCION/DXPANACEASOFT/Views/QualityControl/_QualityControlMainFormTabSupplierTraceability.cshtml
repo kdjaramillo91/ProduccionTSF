@@ -1,0 +1,577 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ShrimpSupplierTraceability
+
+@{
+    string codeState = (Model != null && Model.QualityControl != null && Model.QualityControl.Document != null && Model.QualityControl.Document.DocumentState != null) ? Model.QualityControl.Document.DocumentState.code : "";
+    var aReceptionDate = (Model != null && Model.QualityControl != null && Model.QualityControl.Lot != null && Model.QualityControl.Lot.ProductionLot != null) ? Model.QualityControl.Lot.ProductionLot.receptionDate : (DateTime?)null;
+    //bool isSystem = (Model != null && Model.QualityControlConfiguration != null) ? Model.QualityControlConfiguration.isSystem : false;
+    //int id_QualityControlResultConformity = 0;
+    //bool isConformityOnHeader = (Model.id == 0) ? (Model.isConformityOnHeader != null ? (bool)Model.isConformityOnHeader : false) : (bool)Model.QualityControlConfiguration.QualityControlConfigurationConformity.isConformityOnHeader;
+
+    //if (isConformityOnHeader)
+    //{
+    //    id_QualityControlResultConformity = (Model.QualityControlResultConformityOnHeaderValue.QualityControlResultConformity != null) ? (int)Model.QualityControlResultConformityOnHeaderValue.QualityControlResultConformity.id : 0;
+    //}
+    //var qct = Model.qualityControlDate;
+}
+@Html.Hidden("aReceptionDate", aReceptionDate != null? aReceptionDate.Value.ToString("yyyy-M-d"): "")
+
+<table id="mainTabSupplierTraceability" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Siembra y Cosecha</span>
+        </td>
+    </tr>
+    <!--Información de Siembra y Cosecha-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "sowingDateDateLabel";
+            settings.Text = "Fecha de Siembra*:";
+            settings.AssociatedControlName = "sowingDate";
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.sowingDate, settings =>
+       {
+           settings.Name = "sowingDate";
+           settings.Properties.ClientInstanceName = "sowingDate";
+           settings.Properties.UseMaskBehavior = true;
+           settings.Properties.EditFormat = EditFormat.Custom;
+           settings.Properties.EditFormatString = "dd/MM/yyyy";
+           settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "SowingDate_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpTabContainer"] = "tabDetail";
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpTabControl"] = "tabControl";
+           //};
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "harvestDateLabel";
+            settings.Text = "Fecha de Cosecha*:";
+            settings.AssociatedControlName = "harvestDate";
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.harvestDate, settings =>
+       {
+           settings.Name = "harvestDate";
+           settings.Properties.ClientInstanceName = "harvestDate";
+           settings.Properties.UseMaskBehavior = true;
+           settings.Properties.EditFormat = EditFormat.Custom;
+           settings.Properties.EditFormatString = "dd/MM/yyyy";
+           settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "HarvestDate_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpTabContainer"] = "tabDetail";
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpTabControl"] = "tabControl";
+           //};
+       }).GetHtml()
+        </td>
+        <td colspan="2"></td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n del Nauplio</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_suppliesNaupliusLabel";
+           settings.Text = "Insumos*:";
+           settings.AssociatedControlName = "id_suppliesNauplius";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_suppliesNauplius, settings =>
+       {
+           settings.Name = "id_suppliesNauplius";
+           settings.Properties.ClientInstanceName = "id_suppliesNauplius";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderItem.ItemsByCompanyInventoryLineItemTypeAndCurrent((int?)ViewData["id_company"], "MI", "INS", Model.id_suppliesNauplius)).Bind(Model.id_suppliesNauplius != 0 ? Model.id_suppliesNauplius : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_providerNaupliusLabel";
+           settings.Text = "Proveedor*:";
+           settings.AssociatedControlName = "id_providerNauplius";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_providerNauplius, settings =>
+       {
+           settings.Name = "id_providerNauplius";
+           settings.Properties.ClientInstanceName = "id_providerNauplius";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "fullname_businessName";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], Model.id_providerNauplius, "Proveedor")).Bind(Model.id_providerNauplius != 0 ? Model.id_providerNauplius : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Observaciones:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.observationNauplius, settings =>
+            {
+                settings.Name = "observationNauplius";
+                settings.Properties.ClientInstanceName = "observationNauplius";
+                settings.ReadOnly = (codeState != "01");
+                settings.ShowModelErrors = true;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Larva</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_suppliesLarvaLabel";
+           settings.Text = "Insumos*:";
+           settings.AssociatedControlName = "id_suppliesLarva";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_suppliesLarva, settings =>
+       {
+           settings.Name = "id_suppliesLarva";
+           settings.Properties.ClientInstanceName = "id_suppliesLarva";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderItem.ItemsByCompanyInventoryLineItemTypeAndCurrent((int?)ViewData["id_company"], "MI", "INS", Model.id_suppliesLarva)).Bind(Model.id_suppliesLarva != 0 ? Model.id_suppliesLarva : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_providerLarvaLabel";
+           settings.Text = "Proveedor*:";
+           settings.AssociatedControlName = "id_providerLarva";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_providerLarva, settings =>
+       {
+           settings.Name = "id_providerLarva";
+           settings.Properties.ClientInstanceName = "id_providerLarva";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "fullname_businessName";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], Model.id_providerLarva, "Proveedor")).Bind(Model.id_providerLarva != 0 ? Model.id_providerLarva : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Observaciones:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.observationLarva, settings =>
+            {
+                settings.Name = "observationLarva";
+                settings.Properties.ClientInstanceName = "observationLarva";
+                settings.ReadOnly = (codeState != "01");
+                settings.ShowModelErrors = true;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Balanceado</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_suppliesBalancedLabel";
+           settings.Text = "Insumos*:";
+           settings.AssociatedControlName = "id_suppliesBalanced";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_suppliesBalanced, settings =>
+       {
+           settings.Name = "id_suppliesBalanced";
+           settings.Properties.ClientInstanceName = "id_suppliesBalanced";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderItem.ItemsByCompanyInventoryLineItemTypeAndCurrent((int?)ViewData["id_company"], "MI", "INS", Model.id_suppliesBalanced)).Bind(Model.id_suppliesBalanced != 0 ? Model.id_suppliesBalanced : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_providerBalancedLabel";
+           settings.Text = "Proveedor*:";
+           settings.AssociatedControlName = "id_providerBalanced";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_providerBalanced, settings =>
+       {
+           settings.Name = "id_providerBalanced";
+           settings.Properties.ClientInstanceName = "id_providerBalanced";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "fullname_businessName";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], Model.id_providerBalanced, "Proveedor")).Bind(Model.id_providerBalanced != 0 ? Model.id_providerBalanced : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Observaciones:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.observationBalanced, settings =>
+            {
+                settings.Name = "observationBalanced";
+                settings.Properties.ClientInstanceName = "observationBalanced";
+                settings.ReadOnly = (codeState != "01");
+                settings.ShowModelErrors = true;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Fertilizante</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_suppliesFertilizerLabel";
+           settings.Text = "Insumos*:";
+           settings.AssociatedControlName = "id_suppliesFertilizer";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_suppliesFertilizer, settings =>
+       {
+           settings.Name = "id_suppliesFertilizer";
+           settings.Properties.ClientInstanceName = "id_suppliesFertilizer";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderItem.ItemsByCompanyInventoryLineItemTypeAndCurrent((int?)ViewData["id_company"], "MI", "INS", Model.id_suppliesFertilizer)).Bind(Model.id_suppliesFertilizer != 0 ? Model.id_suppliesFertilizer : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_providerFertilizerLabel";
+           settings.Text = "Proveedor*:";
+           settings.AssociatedControlName = "id_providerFertilizer";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_providerFertilizer, settings =>
+       {
+           settings.Name = "id_providerFertilizer";
+           settings.Properties.ClientInstanceName = "id_providerFertilizer";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "fullname_businessName";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], Model.id_providerFertilizer, "Proveedor")).Bind(Model.id_providerFertilizer != 0 ? Model.id_providerFertilizer : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Observaciones:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.observationFertilizer, settings =>
+            {
+                settings.Name = "observationFertilizer";
+                settings.Properties.ClientInstanceName = "observationFertilizer";
+                settings.ReadOnly = (codeState != "01");
+                settings.ShowModelErrors = true;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Aditivos u Otros</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_suppliesFilesOrOthersLabel";
+           settings.Text = "Insumos*:";
+           settings.AssociatedControlName = "id_suppliesFilesOrOthers";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_suppliesFilesOrOthers, settings =>
+       {
+           settings.Name = "id_suppliesFilesOrOthers";
+           settings.Properties.ClientInstanceName = "id_suppliesFilesOrOthers";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderItem.ItemsByCompanyInventoryLineItemTypeAndCurrent((int?)ViewData["id_company"], "MI", "INS", Model.id_suppliesFilesOrOthers)).Bind(Model.id_suppliesFilesOrOthers != 0 ? Model.id_suppliesFilesOrOthers : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "id_providerFilesOrOthersLabel";
+           settings.Text = "Proveedor*:";
+           settings.AssociatedControlName = "id_providerFilesOrOthers";
+       }).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.id_providerFilesOrOthers, settings =>
+       {
+           settings.Name = "id_providerFilesOrOthers";
+           settings.Properties.ClientInstanceName = "id_providerFilesOrOthers";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "fullname_businessName";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.ReadOnly = (codeState != "01");
+           //Es de Sistema el Tipo de Analisis
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "ShrimpSupplierTraceability_Validation";
+           //settings.CustomJSProperties = (s, e) =>
+           //{
+           //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //    e.Properties["cpIsRequired"] = "true";
+           //    e.Properties["cpHasTab"] = "false";
+           //    e.Properties["cpInitialCondition"] = "0";
+           //};
+       }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], Model.id_providerFilesOrOthers, "Proveedor")).Bind(Model.id_providerFilesOrOthers != 0 ? Model.id_providerFilesOrOthers : (int?)null).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Observaciones:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.observationFilesOrOthers, settings =>
+            {
+                settings.Name = "observationFilesOrOthers";
+                settings.Properties.ClientInstanceName = "observationFilesOrOthers";
+                settings.ReadOnly = (codeState != "01");
+                settings.ShowModelErrors = true;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+
+

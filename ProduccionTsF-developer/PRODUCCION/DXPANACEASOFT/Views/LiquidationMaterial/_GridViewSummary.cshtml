@@ -1,0 +1,141 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<SummaryLiquidationMaterialDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewSummary";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "LiquidationMaterial",
+            Action = "GridViewSummary",
+        };
+
+        settings.KeyFieldName = "id_item";
+
+        settings.SettingsBehavior.AllowFixedGroups = true;
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        //settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        //settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        //settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //settings.CustomJSProperties = (s, e) =>
+        //{
+        //    var list = (Model as List<DrainingTestDetailsDTO>) ?? new List<DrainingTestDetailsDTO>();
+        //    e.Properties["cpPriceListPenaltyCount"] = list.Count;
+        //};
+        settings.Settings.ShowFooter = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Name = "id_item";
+            column.Caption = "id_item";
+            column.Width = Unit.Percentage(0);
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "codigo";
+            column.Name = "codigo";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Name = "name";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "metricUnit";
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantity";
+            column.Name = "quantity";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? quantity = (decimal?)DataBinder.Eval(c.DataItem, "quantity");
+                ViewContext.Writer.Write(quantity == null ? "0.00" : quantity.Value.ToString("N2"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "unitCost";
+            column.Name = "unitCost";
+            column.Caption = "Costo Unitario";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? unitCost = (decimal?)DataBinder.Eval(c.DataItem, "unitCost");
+                ViewContext.Writer.Write(unitCost == null ? "$0.000" : unitCost.Value.ToString("C3"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "subTotal";
+            column.Name = "subTotal";
+            column.Caption = "SubTotal";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? subTotal = (decimal?)DataBinder.Eval(c.DataItem, "subTotal");
+                ViewContext.Writer.Write(subTotal == null ? "$0.00" : subTotal.Value.ToString("C2"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "subTotalIva";
+            column.Name = "subTotalIva";
+            column.Caption = "Iva";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? subTotalIva = (decimal?)DataBinder.Eval(c.DataItem, "subTotalIva");
+                ViewContext.Writer.Write(subTotalIva == null ? "$0.00" : subTotalIva.Value.ToString("C2"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "total";
+            column.Name = "total";
+            column.Caption = "Total";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? total = (decimal?)DataBinder.Eval(c.DataItem, "total");
+                ViewContext.Writer.Write(total == null ? "$0.00" : total.Value.ToString("C2"));
+            });
+        });
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "subTotal").DisplayFormat = "<b>{0:c2}<b/>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "subTotalIva").DisplayFormat = "<b>{0:c2}<b/>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>{0:c2}<b/>";
+    });
+}
+@grid.Bind(Model).GetHtml()

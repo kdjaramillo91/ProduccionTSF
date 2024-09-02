@@ -1,0 +1,869 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuide
+
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+    int id_purchaseOrderDetail = 0;
+
+    id_purchaseOrderDetail = (int)(TempData["isRemissionGuidePurchOrder"] != null ? TempData["isRemissionGuidePurchOrder"] : 0);
+
+    string labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+
+}
+@{
+
+    string exitDateProductionBuilding = "";
+    string exitTimeProductionBuilding = "";
+
+    string entranceDateProductionUnitProviderBuilding = "";
+    string entranceTimeProductionUnitProviderBuilding = "";
+
+
+    string exitDateProductionUnitProviderBuilding = "";
+    string exitTimeProductionUnitProviderBuilding = "";
+
+
+    string entranceDateProductionBuilding = "";
+    string entranceTimeProductionBuilding = "";
+
+    DateTime dtime = DateTime.Today;
+
+    var tempRemissionGuideControlVehicle = DataProviderRemissionGuide.RemissionGuideControlVehicle(Model.id);
+
+    if (tempRemissionGuideControlVehicle != null)
+    {
+
+        exitDateProductionBuilding = tempRemissionGuideControlVehicle.exitDateProductionBuilding != null ? tempRemissionGuideControlVehicle.exitDateProductionBuilding.Value.ToString("dd/MM/yyyy") : "";
+        exitTimeProductionBuilding = tempRemissionGuideControlVehicle.exitTimeProductionBuilding != null ? dtime.Add(tempRemissionGuideControlVehicle.exitTimeProductionBuilding.Value).ToString("HH:mm tt") : "";
+
+
+        entranceDateProductionUnitProviderBuilding = tempRemissionGuideControlVehicle.entranceDateProductionUnitProviderBuilding != null ? tempRemissionGuideControlVehicle.entranceDateProductionUnitProviderBuilding.Value.ToString("dd/MM/yyyy") : "";
+        entranceTimeProductionUnitProviderBuilding = tempRemissionGuideControlVehicle.entranceTimeProductionUnitProviderBuilding != null ? dtime.Add(tempRemissionGuideControlVehicle.entranceTimeProductionUnitProviderBuilding.Value).ToString("HH: mm tt") : "";
+        exitDateProductionUnitProviderBuilding = tempRemissionGuideControlVehicle.exitDateProductionUnitProviderBuilding != null ? tempRemissionGuideControlVehicle.exitDateProductionUnitProviderBuilding.Value.ToString("dd/MM/yyyy") : "";
+        exitTimeProductionUnitProviderBuilding = tempRemissionGuideControlVehicle.exitTimeProductionUnitProviderBuilding != null ? dtime.Add(tempRemissionGuideControlVehicle.exitTimeProductionUnitProviderBuilding.Value).ToString("HH:mm tt") : "";
+        entranceDateProductionBuilding = tempRemissionGuideControlVehicle.entranceDateProductionBuilding != null ? tempRemissionGuideControlVehicle.entranceDateProductionBuilding.Value.ToString("dd/MM/yyyy") : "";
+        entranceTimeProductionBuilding = tempRemissionGuideControlVehicle.entranceTimeProductionBuilding != null ? dtime.Add(tempRemissionGuideControlVehicle.entranceTimeProductionBuilding.Value).ToString("HH:mm tt") : "";
+    }
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Fechas</span>
+        </td>
+    </tr>
+    <!--FILA 1 Fechas DESPACHO, ARRIBO, RETORNO -->
+    <tr>
+        <!--FECHA DESPACHO-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.despachureDate, settings =>
+            {
+                settings.Name = "despachureDateLabel";
+                settings.Properties.ClientInstanceName = "despachureDateLabel";
+                settings.Text = "Fecha Despacho:";
+                settings.AssociatedControlName = "despachureDate";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            <div class="row">
+                <div class="col-md-6">
+                    @Html.DevExpress().DateEditFor(m => m.despachureDate, settings =>
+               {
+                   settings.Name = "despachureDate";
+                   settings.Properties.ClientInstanceName = "despachureDate";
+                   settings.Properties.UseMaskBehavior = true;
+                   settings.Properties.EditFormat = EditFormat.Custom;
+                   settings.Properties.EditFormatString = "dd/MM/yyyy";
+                   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                   settings.ShowModelErrors = true;
+                   settings.ReadOnly = codeState != "01";
+                   settings.Properties.ClientSideEvents.Validation = "OnDespachureDateValidation";
+                   settings.Properties.ClientSideEvents.ValueChanged= "DespachureDate_ValueChanged";
+               }).GetHtml()
+                </div>
+                <div class="col-md-6">
+                    @{
+                        TimeSpan? despachurehour =   (Model != null) ? (TimeSpan?)Model.despachurehour : null;
+                    }
+
+                    @Html.DevExpress().TimeEdit( settings =>
+               {
+                   settings.Name = "despachurehour";
+                   settings.Properties.ClientInstanceName = "despachurehour";
+                   settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                   settings.Properties.EditFormat = EditFormat.Time;
+                   settings.Properties.EditFormatString = "HH:mm";
+                   settings.Properties.DisplayFormatString = "HH:mm";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = codeState != "01";
+                   if (despachurehour != null)
+                   {
+                       settings.DateTime = new DateTime(2014, 1, 1, despachurehour.Value.Hours, despachurehour.Value.Minutes, 0);
+                   }
+                   settings.ShowModelErrors = false;
+                   settings.Properties.ClientSideEvents.Validation = "OndespachurehourValidation";
+               }).GetHtml()
+                </div>
+                </div>
+</td>
+        <!-- FECHA ARRIBO-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.arrivalDate, settings =>
+            {
+                settings.Name = "arrivalDateLabel";
+                settings.Text = "Fecha Salida de la Planta:";
+                settings.AssociatedControlName = "exitDateProductionBuilding";
+            }).GetHtml()
+        </td>
+        <td>
+            <div class="row">
+                <div class="col-md-6">
+
+                    @Html.DevExpress().TextBox(settings =>
+               {
+                   settings.Properties.ClientInstanceName = "exitDateProductionBuilding";
+                   settings.Name = "exitDateProductionBuilding";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Text = exitDateProductionBuilding;
+                   settings.ReadOnly = true;
+
+               }).GetHtml()
+
+
+                </div>
+                <div class="col-md-6">
+
+
+                    @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Properties.ClientInstanceName = "exitTimeProductionBuilding";
+                settings.Name = "exitTimeProductionBuilding";
+                settings.Width = Unit.Percentage(100);
+                settings.Text = exitTimeProductionBuilding;
+
+                settings.ReadOnly = true;
+
+            }).GetHtml()
+
+
+                </div>
+            </div>
+
+
+            @Html.DevExpress().DateEditFor(m => m.arrivalDate, settings =>
+       {
+           settings.Name = "arrivalDate";
+           settings.Properties.ClientInstanceName = "arrivalDate";
+           settings.Properties.UseMaskBehavior = true;
+           settings.Properties.EditFormat = EditFormat.Custom;
+           settings.Properties.EditFormatString = "dd/MM/yyyy";
+           settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+           settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+           settings.Properties.ClientSideEvents.Validation = "OnArrivalDateValidation";
+           settings.ClientVisible = false;
+       }).GetHtml()
+        </td>
+        <!--FECHA RETORNO-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.returnDate, settings =>
+            {
+                settings.Name = "returnDateLabel";
+                settings.Text = "Fecha Retorno:";
+                settings.AssociatedControlName = "returnDate";
+                settings.ClientVisible = false;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.returnDate, settings =>
+            {
+                settings.Name = "returnDate";
+                settings.Properties.ClientInstanceName = "returnDate";
+                settings.Properties.UseMaskBehavior = true;
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = true;
+                settings.Properties.ClientSideEvents.Validation = "OnReturnDateValidation";
+                settings.ClientVisible = false;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n General</span>
+        </td>
+    </tr>
+    <!--FILA 2 MOTIVO, COMPRADOR, RECIBE-->
+    <tr>
+        <!--MOTIVO-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_reason, settings =>
+        {
+            settings.Name = "id_reasonLabel";
+            settings.Text = "Motivo:";
+            settings.AssociatedControlName = "id_reason";
+        }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_reason = (Model != null && Model.id_reason != 0) ? (int?)Model.id_reason : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_reason, settings =>
+            {
+                settings.Name = "id_reason";
+                settings.Properties.ClientInstanceName = "id_reason";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextFormatString = "{1}";
+                //settings.Properties.TextField = "name";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Columns.Add("code", "Cod.", 50);
+                settings.Properties.Columns.Add("name", "Nombre", 200);
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnReasonValidation";
+            }).BindList(DataProviderRemissionGuideReason.RemisisonGuideReasonsByCompanyAndCurrent((int?)ViewData["id_company"], id_reason)).Bind(id_reason).GetHtml()
+        </td>
+        <!--COMPRADOR-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_buyer, settings =>
+            {
+                settings.Name = "id_buyerLabel";
+                settings.Text = "Comprador:";
+                settings.AssociatedControlName = "id_buyer";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+
+            @{
+                int? id_buyer = (Model != null && Model.id_buyer != 0) ? (int?)Model.id_buyer : null;
+            }
+
+            @Html.DevExpress().ComboBoxFor(m => m.id_priceList, settings =>
+            {
+                settings.Name = "id_buyer";
+                settings.Properties.ClientInstanceName = "id_buyer";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "fullname_businessName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = codeState != "01" || id_purchaseOrderDetail > 0; ;
+                settings.ShowModelErrors = true;
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ClientSideEvents.Validation = "OnReasonValidation";
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+            }).BindList(DataProviderPerson.BuyersByCompanyAndCurrent((int?)ViewData["id_company"], id_buyer)).Bind(id_buyer).GetHtml()
+
+
+        </td>
+        
+  
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <!--RECIBE-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_reciver, settings =>
+            {
+                settings.Name = "id_reciverLabel";
+                settings.Text = "Recibe:";
+                settings.AssociatedControlName = "id_reciver";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_reciver = (Model != null && Model.id_reciver != 0) ? (int?)Model.id_reciver : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_reciver, settings =>
+            {
+                settings.Name = "id_reciver";
+                settings.Properties.ClientInstanceName = "id_reciver";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "fullname_businessName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnReciverValidation";
+            }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], id_reciver, "Recibidor")).Bind(id_reciver).GetHtml()
+        </td>
+        <!--COMPRADOR-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "hasSecurityLbl";
+                settings.Text = "¿Requiere Seguridad?";
+                settings.AssociatedControlName = "id_reciver";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.RemissionGuideCustomizedInformation.hasSecurity, settings =>
+            {
+                settings.Name = "hasSecurity";
+                settings.Properties.ClientInstanceName = "hasSecurity";
+                settings.ReadOnly = true;
+                //settings.ShowModelErrors = true;
+                //settings.Checked = true;
+                //settings.Properties.ClientSideEvents.Validation = "OnLogisticValidation";
+            }).GetHtml()
+        </td>
+        
+        <td>
+           
+        </td>
+        <td>
+          
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.descriptionpurchaseorder, settings =>
+            {
+                settings.Name = "descriptionpurchaseorderLabel";
+                settings.Text = "Descripción Compra:";
+                settings.AssociatedControlName = "descriptionpurchaseorder";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().MemoFor(m => m.descriptionpurchaseorder, settings =>
+            {
+                settings.Name = "descriptionpurchaseorder";
+                settings.Properties.ClientInstanceName = "descriptionpurchaseorder";
+                settings.ReadOnly = true;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <!--INFORMACIÓN PROVEEDOR UNIDAD DE PRODUCCIÓN-->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n Proveedor</span>
+        </td>
+    </tr>
+
+    <!--FILA 3-->
+    <tr>
+        <!--PROVEEDOR-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.startAdress, settings =>
+            {
+                settings.Name = "ProviderLabel";
+                settings.Text = "Proveedor:";
+                settings.AssociatedControlName = "provieder";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_proviederGuia = (Model != null && Model.id_providerRemisionGuide != 0) ? (int?)Model.id_providerRemisionGuide : null;
+
+
+
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_providerRemisionGuide, settings =>
+            {
+                settings.Name = "id_providerRemisionGuide";
+                settings.Properties.ClientInstanceName = "id_providerRemisionGuide";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Columns.Add("name", "Nombre", 200);
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProviderRemisionGuide_SelectedIndexChanged";
+
+                settings.Properties.EnableClientSideAPI = true;
+                settings.Properties.CallbackPageSize = 20;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01" || id_purchaseOrderDetail > 0;
+                settings.Properties.ClientSideEvents.Validation = "OnReasonValidation";
+                settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { id_productionUnitProvider.PerformCallback();  id_productionUnitProviderPool.PerformCallback();   }";
+            }).BindList(DataProviderPerson.ProviderByCompany((int?)ViewData["id_company"])).Bind(id_proviederGuia).GetHtml()
+        </td>
+        <!--UNIDAD DE PRODUCCIÓN-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_productionUnitProvider, settings =>
+            {
+                settings.Name = "id_productionUnitProviderLabel";
+                settings.Text = labelPup !="" ? labelPup + ":" : "Unidad de Producción:";
+                settings.AssociatedControlName = "id_productionUnitProviderPool";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                Html.RenderPartial("comboboxcascading/_cmbProviderProductionUnitPartial", Model);
+            }
+        </td>
+        <!--UNIDAD DE PRODUCCIÓN CONTENEDORA-->
+        <td>
+            @*@Html.DevExpress().LabelFor(m => m.productionUnitProviderPoolreference, settings =>
+            {
+                settings.Name = "productionUnitProviderPoolreferenceLabel";
+                settings.Text = "Piscina:";
+                settings.AssociatedControlName = "productionUnitProviderPoolreference";
+            }).GetHtml()*@
+        </td>
+        <td>
+
+            @*@Html.DevExpress().TextBoxFor(m => m.productionUnitProviderPoolreference, settings =>
+            {
+                settings.Name = "productionUnitProviderPoolreference";
+                settings.Properties.ClientInstanceName = "productionUnitProviderPoolreference";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = codeState != "01";
+                settings.ShowModelErrors = true;
+                settings.Properties.MaxLength = 100;
+            }).GetHtml()*@
+        </td>
+
+    </tr>
+    <!--FILA 4-->
+    <tr>
+        <!--PROVEEDOR AMPARANTE-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_protectiveProvider, settings =>
+            {
+                settings.Name = "id_providerapparentLabel";
+                settings.Text = "Proveedor Amparante:";
+                settings.AssociatedControlName = "id_protectiveProvider";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_protectiveProvider = (Model != null && Model.id_protectiveProvider != 0) ? (int?)Model.id_protectiveProvider : null;
+
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_protectiveProvider, settings =>
+            {
+                settings.Name = "id_protectiveProvider";
+                settings.Properties.ClientInstanceName = "id_protectiveProvider";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = codeState != "01";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnProviderValidation";
+            }).BindList(DataProviderPerson.ProviderByCompanyAndCurrent((int?)ViewData["id_company"], id_protectiveProvider)).Bind(id_protectiveProvider).GetHtml()
+        </td>
+        <td >
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Sitio:";
+                settings.AssociatedControlName = "nameFishingSite";
+            }).GetHtml()
+        </td>
+        <td>
+            @{ 
+                var pup = DataProviderProductionUnitProvider.ProductionUnitProviderById(Model.id_productionUnitProvider);
+
+                string zon = "";
+                if (pup != null)
+                {
+                    var fisSite = DataProviderFishingSite.FishingSiteById(pup.id_FishingSite);
+                    if (fisSite != null)
+                    {
+                        var fisZo = DataProviderFishingZone.FishingZoneById(fisSite.id_FishingZone);
+                        if (fisZo != null)
+                        {
+                            zon = fisZo.name;
+                        }
+                    }
+                }
+            }
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Properties.ClientInstanceName = "nameFishingSite";
+                settings.Name = "nameFishingSite";
+                settings.Text = (pup != null && pup.FishingSite != null) ? pup.FishingSite.name : "";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td >
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Zona:";
+                settings.AssociatedControlName = "nameFishingZone";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(settings =>
+           {
+               settings.Properties.ClientInstanceName = "nameFishingZone";
+               settings.Name = "nameFishingZone";
+               settings.Text = zon;
+               settings.Width = Unit.Percentage(100);
+
+               settings.ReadOnly = true;
+
+           }).GetHtml()
+        </td>
+
+    </tr>
+
+    <!--DIRECCIONES -->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Direcciones y tipo de Viaje</span>
+        </td>
+    </tr>
+    <!--FILA 5-->
+    <tr>
+        <!--DIRECCIÓN DE PARTIDA-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.startAdress, settings =>
+            {
+                settings.Name = "startAdressLabel";
+                settings.Text = "Dirección Partida:";
+                settings.AssociatedControlName = "startAdress";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.startAdress, settings =>
+            {
+                settings.Name = "startAdress";
+                settings.Properties.ClientInstanceName = "startAdress";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnStartAddressValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <!--FILA 6-->
+    <tr>
+        <!--DIRECCIÓN DE DESTINO-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.route, settings =>
+            {
+                settings.Name = "routeLabel";
+                settings.Text = "Dirección de Destino:";
+                settings.AssociatedControlName = "route";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.route, settings =>
+            {
+                settings.Name = "route";
+                settings.Properties.ClientInstanceName = "route";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.Validation = "OnRouteValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <!--VÍA DE TRANSPORTE-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_shippingType, settings =>
+            {
+                settings.Name = "shippingType";
+                settings.Text = "Vía de Transporte:";
+                settings.AssociatedControlName = "shippingType";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? shippingtype = (Model != null && Model.id_shippingType != 0) ? (int?)Model.id_shippingType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_shippingType, settings =>
+       {
+           settings.Name = "id_shippingType";
+           settings.Properties.ClientInstanceName = "id_shippingType";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { id_TransportTariffType.PerformCallback(); id_vehicle.PerformCallback(); mark.SetValue(null);  model.SetValue(null);}";
+           settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { id_TransportTariffType.PerformCallback(); id_vehicle.PerformCallback(); mark.SetValue(null);  model.SetValue(null);}";
+           //settings.Properties.ClientSideEvents.Validation = "OnShippingTypeValidation";
+       }).BindList(DataProviderPurchaseOrder.PurchaseOrderShippingType()).Bind(shippingtype).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="7">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n Complementaria</span>
+        </td>
+    </tr>
+    <!--FILA 7-->
+    <tr>
+        <!--ES INTERNA-->
+        @*<td>
+            @Html.DevExpress().LabelFor(m => m.isInternal, settings =>
+            {
+                settings.Name = "isInternalLabel";
+                settings.Text = "¿Es Interna?:";
+                settings.AssociatedControlName = "isInternal";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isInternal, settings =>
+            {
+                settings.Name = "isInternal";
+                settings.Properties.ClientInstanceName = "isInternal";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.CheckedChanged = "CheckedIsInterna_CheckedChange";
+            }).GetHtml()
+        </td>*@
+        <!--ES DE EXPORTACION-->
+        @*<td>
+            @Html.DevExpress().LabelFor(m => m.isExport, settings =>
+            {
+                settings.Name = "isExportLabel";
+                settings.Text = "¿Es de exportación?:";
+                settings.AssociatedControlName = "isExport";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isExport, settings =>
+            {
+                settings.Name = "isExport";
+                settings.Properties.ClientInstanceName = "isExport";
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = codeState != "01";
+                settings.Properties.ClientSideEvents.CheckedChanged = "CheckedIsExport_CheckedChange";
+            }).GetHtml()
+        </td>*@
+        <!--LISTA DE PRECIOS-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.startAdress, settings =>
+                {
+                    settings.Name = "id_priceListLabel";
+                    settings.Text = "Lista de Precio/Cotización::";
+                    settings.AssociatedControlName = "id_priceList";
+                }).GetHtml()
+        </td>
+        <td colspan="7">
+            @{
+                 int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+            }
+
+            @Html.DevExpress().ComboBoxFor(m => m.id_priceList, settings =>
+            {
+                settings.Name = "id_priceList";
+                settings.Properties.ClientInstanceName = "id_priceList";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = codeState != "01" || id_purchaseOrderDetail > 0; ;
+                settings.ShowModelErrors = true;
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValidationSettings.ValidationGroup = "tabRemissionGuide";
+            }).BindList(DataProviderPriceList.PurchaseApprovedPriceLists((int?)ViewData["id_company"], id_priceList, id_proviederGuia)).Bind(id_priceList).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Fechas Control de vehiculo</span>
+        </td>
+    </tr>
+    <!--FILA 1 Fechas DESPACHO, ARRIBO, RETORNO -->
+    <tr>
+        <!--FECHA DESPACHO-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.despachureDate, settings =>
+           {
+               settings.Name = "entranceDateProductionUnitProviderBuildingLabel";
+               settings.Text = (labelPup != "") ? "LLegada a " + labelPup + ": " : "Llegada a Unidad de Producción:";
+               settings.AssociatedControlName = "entranceDateProductionUnitProviderBuilding";
+           }).GetHtml()
+        </td>
+        <td>
+            <div class="row">
+                <div class="col-md-6">
+
+                    @Html.DevExpress().TextBox( settings =>
+               {
+                   settings.Properties.ClientInstanceName = "entranceDateProductionUnitProviderBuilding";
+                   settings.Name = "entranceDateProductionUnitProviderBuilding";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Text = entranceDateProductionUnitProviderBuilding;
+                   settings.ReadOnly = true;
+
+               }).GetHtml()
+              
+                </div>
+                <div class="col-md-6">
+                   
+
+                    @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Properties.ClientInstanceName = "entranceTimeProductionUnitProviderBuilding";
+                settings.Name = "entranceTimeProductionUnitProviderBuilding";
+                settings.Width = Unit.Percentage(100);
+                settings.Text = entranceTimeProductionUnitProviderBuilding;
+
+                settings.ReadOnly = true;
+
+            }).GetHtml()
+
+                  
+                </div>
+            </div>
+        </td>
+        <!-- FECHA ARRIBO-->
+        <td>
+            @Html.DevExpress().Label( settings =>
+            {
+                settings.Name = "exitDateProductionUnitProviderBuildingLabel";
+                settings.Text = settings.Text = (labelPup != "") ? "Salida a " + labelPup + ": " : "Llegada a Unidad de Producción:";
+                settings.AssociatedControlName = "exitDateProductionUnitProviderBuilding";
+            }).GetHtml()
+        </td>
+        <td>
+            <div class="row">
+                <div class="col-md-6">
+
+                    @Html.DevExpress().TextBox(settings =>
+               {
+                   settings.Properties.ClientInstanceName = "exitDateProductionUnitProviderBuilding";
+                   settings.Name = "exitDateProductionUnitProviderBuilding";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Text = exitDateProductionUnitProviderBuilding;
+                   settings.ReadOnly = true;
+
+               }).GetHtml()
+
+
+                </div>
+                <div class="col-md-6">
+               
+
+                    @Html.DevExpress().TextBox(settings =>
+               {
+                   settings.Properties.ClientInstanceName = "exitTimeProductionUnitProviderBuilding";
+                   settings.Name = "exitTimeProductionUnitProviderBuilding";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Text = exitTimeProductionUnitProviderBuilding;
+                   settings.ReadOnly = true;
+
+               }).GetHtml()
+
+
+                </div>
+            </div>
+        </td>
+        <!--FECHA RETORNO-->
+        <td>
+          
+        </td>
+        <td>
+            
+        </td>
+    </tr>
+
+
+    <tr>
+        <!--FECHA DESPACHO-->
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "entranceDateProductionBuildingLabel";
+                settings.Text = "Entrada a Planta:";
+                settings.AssociatedControlName = "entranceDateProductionBuilding";
+            }).GetHtml()
+        </td>
+        <td>
+            <div class="row">
+                <div class="col-md-6">
+
+                    @Html.DevExpress().TextBox(settings =>
+               {
+                   settings.Properties.ClientInstanceName = "entranceDateProductionBuilding";
+                   settings.Name = "entranceDateProductionBuilding";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Text = entranceDateProductionBuilding;
+                   settings.ReadOnly = true;
+               }).GetHtml()
+                </div>
+                <div class="col-md-6">
+                    @Html.DevExpress().TextBox(settings =>
+               {
+                   settings.Properties.ClientInstanceName = "entranceTimeProductionBuilding";
+                   settings.Name = "entranceTimeProductionBuilding";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Text = entranceTimeProductionBuilding;
+                   settings.ReadOnly = true;
+               }).GetHtml()
+                </div>
+            </div>
+        </td>
+        <!-- FECHA ARRIBO-->
+        <td>
+    
+        </td>
+        <td>
+            
+        </td>
+        <!--FECHA RETORNO-->
+        <td>
+           
+        </td>
+        <td>
+      
+        </td>
+    </tr>
+
+    <!--FILA 8-->
+    @*<tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="7">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Observaciones</span>
+        </td>
+    </tr>*@
+    <!--DESCRIPCIÓN-->
+    @*<tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.descriptionpurchaseorder, settings =>
+            {
+                settings.Name = "descriptionpurchaseorderLabel";
+                settings.Text = "Descripción Compra:";
+                settings.AssociatedControlName = "descriptionpurchaseorder";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().MemoFor(m => m.descriptionpurchaseorder, settings =>
+            {
+                settings.Name = "descriptionpurchaseorder";
+                settings.Properties.ClientInstanceName = "descriptionpurchaseorder";
+                settings.ReadOnly = true;
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>*@
+
+</table>

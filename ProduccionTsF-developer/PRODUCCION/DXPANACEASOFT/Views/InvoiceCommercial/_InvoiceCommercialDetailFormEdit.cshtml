@@ -1,0 +1,418 @@
+﻿
+@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InvoiceCommercialDetail
+
+@{
+	Html.DevExpress<InvoiceCommercialDetail>().FormLayout(settings =>
+	{
+		settings.Name = "formLayoutEditInvoiceCommercialDetail";
+		settings.ColCount = 3;
+
+		#region groupInvoiceCommercial
+
+		var groupInvoiceCommercial = settings.Items.AddGroupItem(i =>
+		{
+			i.Caption = "Información Factura Comercial";
+			i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+			i.ColSpan = 3;
+			i.ColCount = 3;
+			i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+		});
+
+		#region Fila 1
+
+		//id_itemOrigen
+		groupInvoiceCommercial.Items.Add(m => m.id_item, item =>
+		{
+			item.Name = "id_item";
+			item.Caption = "Nombre del Producto";
+			item.ColSpan = 3;
+
+			item.NestedExtension().ComboBox(comboBox =>
+			{
+				comboBox.Width = Unit.Percentage(100);
+				comboBox.Properties.ClientInstanceName = "id_item";
+
+				comboBox.Properties.TextFormatString = "{0} | {1}";
+				comboBox.Properties.ValueField = "id";
+				comboBox.Properties.ValueType = typeof(int);
+
+				comboBox.Properties.Columns.Add("masterCode", "Cod.", 80);
+				comboBox.Properties.Columns.Add("name", "Nombre", 200);
+				comboBox.Properties.Columns.Add("auxCode", "Cod. Aux.", 100);
+
+				comboBox.ShowModelErrors = true;
+				comboBox.Properties.CallbackPageSize = 20;
+				comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+				comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				comboBox.Properties.ValidationSettings.CausesValidation = true;
+				comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+				comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+				comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+				comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+				comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				List<int> _id_items = (List<int>)TempData["id_Items"];
+				comboBox.Properties.DataSource = ViewBag.DocumentOrigen != null ? null : DataProviderItem.SalesItemsByCompany((int?)ViewData["id_company"], _id_items);
+				comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "ItemComboBox_SelectedIndexChanged";
+				comboBox.Properties.ClientSideEvents.Init = "ItemComboBox_Init";
+				comboBox.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "LoadItemCombobox" };
+				comboBox.Properties.ClientSideEvents.BeginCallback = "ItemComboBox_BeginCallback";
+				comboBox.Properties.ClientSideEvents.Validation = "OnItemComboBoxValidation";
+			});
+		});
+
+		#endregion
+
+		#region Fila 2
+
+		//id_itemOrigen
+		groupInvoiceCommercial.Items.Add(m => m.id_itemMarked, item =>
+		{
+			item.Name = "id_itemMarked";
+			item.Caption = "Producto Marcado";
+
+			item.ColSpan = 3;
+
+			item.NestedExtension().ComboBox(comboBox =>
+			{
+				comboBox.Width = Unit.Percentage(100);
+				comboBox.Properties.ClientInstanceName = "id_itemMarked";
+
+				comboBox.Properties.TextFormatString = "{0} | {1}";
+				comboBox.Properties.ValueField = "id";
+				comboBox.Properties.ValueType = typeof(int);
+
+				comboBox.Properties.Columns.Add("masterCode", "Cod.", 80);
+				comboBox.Properties.Columns.Add("name", "Nombre", 200);
+				comboBox.Properties.Columns.Add("auxCode", "Cod. Aux.", 100);
+
+
+				comboBox.ShowModelErrors = true;
+				comboBox.Properties.CallbackPageSize = 20;
+				comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+				comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				comboBox.Properties.ValidationSettings.CausesValidation = true;
+				comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+				comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+				comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+				comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+				comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "ItemMarkedComboBox_SelectedIndexChanged";
+				comboBox.Properties.ClientSideEvents.Init = "ItemMarkedComboBox_Init";
+				comboBox.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "GetDetailItemMarkedInvoiceCommercial" };
+				comboBox.Properties.ClientSideEvents.BeginCallback = "ItemMarkedComboBox_BeginCallback";
+				comboBox.Properties.ClientSideEvents.Validation = "OnItemMarkedComboBoxValidation";
+
+				comboBox.Properties.DataSource = DataProviderItem.ItemInvoiceCommercial((int?)ViewData["id_company"]);
+
+			});
+		});
+
+		#endregion
+
+
+		#region Fila 2
+
+		//itemInvoiceCommercialAuxCode
+		groupInvoiceCommercial.Items.Add(m => m.Item1.auxCode, item =>
+		{
+			item.Name = "itemInvoiceCommercialAuxCode";
+			//item.ClientVisible = false;
+			item.Caption = "Código Aux.";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; 
+
+			item.NestedExtension().TextBox(textBox =>
+			{
+				textBox.Width = Unit.Percentage(100);
+
+				textBox.ReadOnly = true;
+				textBox.Properties.ClientInstanceName = "itemInvoiceCommercialAuxCode";
+			});
+		});
+
+		//itemInvoiceCommercialForeignName
+		groupInvoiceCommercial.Items.Add(m => m.Item1.foreignName, item =>
+		{
+			item.Name = "itemInvoiceCommercialForeignName";
+			//item.ClientVisible = false;
+			item.Caption = "Nombre Extranjero";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+			item.NestedExtension().TextBox(textBox =>
+			{
+				textBox.Width = Unit.Percentage(100);
+
+				textBox.ReadOnly = true;
+				textBox.Properties.ClientInstanceName = "itemInvoiceCommercialForeignName";
+			});
+		});
+
+		groupInvoiceCommercial.Items.Add(m => m.Item1.masterCode, item =>
+		{
+			item.Name = "itemInvoiceCommercialMasterCode";
+			item.Caption = "Código Aux.";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+			item.NestedExtension().TextBox(textBox =>
+			{
+				textBox.Width = Unit.Percentage(100);
+				textBox.ReadOnly = true;
+				textBox.Properties.ClientInstanceName = "itemInvoiceCommercialMasterCode";
+				textBox.ShowModelErrors = true;
+			});
+		});
+
+		#endregion
+
+		#region Fila 3
+
+		//  Peso Item
+		groupInvoiceCommercial.Items.Add(m => m.weightBox, item =>
+		{
+			item.Name = "weightBox";
+
+			item.Caption = "Peso Item";
+
+
+			item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(80);
+				spinedit.Properties.DisplayFormatString = "N2";
+				spinedit.Properties.DecimalPlaces = 2;
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "weightBox";
+
+				spinedit.Properties.MaxLength = 5;
+				spinedit.Properties.MinValue = 0.00M;
+				spinedit.Properties.MaxValue = 99.99M;
+				spinedit.Properties.SpinButtons.ShowIncrementButtons = true;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.ReadOnly = true;
+
+				spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+				spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				spinedit.Properties.ValidationSettings.CausesValidation = true;
+				spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+				spinedit.ShowModelErrors = true;
+
+			});
+		});
+
+		// Unidad de Medidad Peso Item
+		groupInvoiceCommercial.Items.Add(m => m.weightBoxUM, item =>
+		{
+			item.Name = "weightBoxUM";
+			//item.ClientVisible = false;
+			item.Caption = "UM Item:";
+
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+			item.NestedExtension().TextBox(textBox =>
+			{
+				textBox.Width = Unit.Percentage(100);
+				textBox.ReadOnly = true;
+				textBox.Properties.ClientInstanceName = "weightBoxUM";
+				textBox.ShowModelErrors = true;
+			});
+		});
+
+
+		//numBoxes
+		groupInvoiceCommercial.Items.Add(m => m.numBoxes, item =>
+		{
+			item.Name = "numBoxes";
+			item.Caption = "Cartones";
+			item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+				spinedit.Properties.DisplayFormatString = "#,##0";
+				spinedit.Properties.NumberType = SpinEditNumberType.Integer;
+				spinedit.Properties.ClientInstanceName = "numBoxes";
+				spinedit.Properties.MaxLength = 17;
+				spinedit.Properties.MinValue = 0M;
+				spinedit.Properties.MaxValue = 99999999999999999M;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+				spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+				spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				spinedit.Properties.ValidationSettings.CausesValidation = true;
+				spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				spinedit.Properties.ClientSideEvents.Validation = "ValidateRequired";
+				spinedit.Properties.ClientSideEvents.GotFocus = "OnSelectText";
+
+				spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+				spinedit.Properties.ClientSideEvents.NumberChanged = "NumBoxes_NumberChange";
+				spinedit.ShowModelErrors = true;
+				spinedit.ReadOnly = true;
+			});
+		});
+
+		//amount
+		groupInvoiceCommercial.Items.Add(m => m.amountInvoice, item =>
+		{
+
+			item.Name = "amountInvoice";
+			item.Caption = "Cantidad";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+			item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+				spinedit.Properties.DisplayFormatString = "N2";
+				spinedit.Properties.DecimalPlaces = 2;
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "amountInvoice";
+				spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+				spinedit.ReadOnly = true;
+				spinedit.ShowModelErrors = true;
+			});
+		});
+
+		//itemInvoiceCommercialUM
+		groupInvoiceCommercial.Items.Add(m => m.codeMetricUnitOrigin_Inf, item =>
+		{
+			item.Name = "itemInvoiceCommercialUM";
+			item.Caption = "UM";
+
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; 
+
+			item.NestedExtension().TextBox(textBox =>
+			{
+				textBox.Width = Unit.Percentage(100);
+				textBox.ReadOnly = true;
+				textBox.Properties.ClientInstanceName = "itemInvoiceCommercialUM";
+				textBox.ShowModelErrors = true;
+			});
+		});
+
+		#endregion
+
+		#region Fila 4
+
+		//unitPrice
+		groupInvoiceCommercial.Items.Add(m => m.unitPrice, item =>
+		{
+
+			item.Name = "unitPrice";
+			item.Caption = "Precio";
+			item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+				spinedit.Properties.DisplayFormatString = "C6";
+				spinedit.Properties.DecimalPlaces = 6;
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "unitPrice";
+				spinedit.Properties.MaxLength = 17;
+				spinedit.Properties.MinValue = 0.00M;
+				spinedit.Properties.MaxValue = 99999999999999.99M;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+				spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				spinedit.Properties.ValidationSettings.CausesValidation = true;
+				spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				spinedit.Properties.ClientSideEvents.Validation = "ValidateRequired";
+				spinedit.Properties.ClientSideEvents.GotFocus = "OnSelectText";
+				spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+				spinedit.Properties.ClientSideEvents.NumberChanged = "UnitPrice_NumberChange";
+				spinedit.ShowModelErrors = true;
+
+			});
+		});
+
+		//invoiceCommercialTotal
+		groupInvoiceCommercial.Items.Add(m => m.discount, item =>
+		{
+			item.Name = "invoiceCommercialDiscount";
+			item.Caption = "Descuento";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+			item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+				spinedit.Properties.DisplayFormatString = "C2";
+				spinedit.Properties.DecimalPlaces = 2;
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "invoiceCommercialDiscount";
+				spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.ReadOnly = true;
+				spinedit.ShowModelErrors = true;
+
+				var p = spinedit.Properties;
+				//p.ClientSideEvents.Init = "InvoiceCommercialDiscount_Init";
+			});
+		});
+
+		groupInvoiceCommercial.Items.Add(m => m.total, item =>
+		{
+			item.Name = "invoiceCommercialTotal";
+			item.Caption = "Total";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+			item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+				spinedit.Properties.DisplayFormatString = "C2";
+				spinedit.Properties.DecimalPlaces = 2;
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "invoiceCommercialTotal";
+				spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.ReadOnly = true;
+				spinedit.ShowModelErrors = true;
+			});
+		});
+		#endregion
+
+		#endregion
+
+	}).Render();
+}
+
+<table class="table table-condensed" style="margin: 0; padding: 0">
+    <tr>
+        <td style="text-align: right;">
+            @Html.DevExpress().Button(settings =>
+           {
+               settings.Name = "btnUpdateItemDetail";
+               settings.Text = "Actualizar";
+               settings.RenderMode = ButtonRenderMode.Button;
+               settings.UseSubmitBehavior = false;
+               settings.ImagePosition = ImagePosition.Left;
+               settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+
+               settings.ValidateInvisibleEditors = true;
+               settings.ClientSideEvents.Click = "ButtonUpdateItemDetail_Click";
+           }).GetHtml()
+            @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancelItemDetail";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.ClientSideEvents.Click = "BtnCancelItemDetail_Click";
+                }).GetHtml()
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,31 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string _id_InventoryReasonEntry = Model.id_InventoryReasonEntry != null ? Model.id_InventoryReasonEntry.ToString() : "";
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+}
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxReasonEntryEdit";
+	settings.Properties.ClientInstanceName = "ComboBoxReasonEntryEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxReasonEntryEdit",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	//settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.TextFormatString = "{1}";
+	settings.Properties.Columns.Add("Value", "Código", Unit.Percentage(1));
+	settings.Properties.Columns.Add("Text", "Descripción", Unit.Percentage(90));
+	settings.Properties.Columns.Add("UsoUsuarioLote", "Usuario Requiere Lote", Unit.Percentage(1));
+	settings.Properties.Columns.Add("UsoSistemaLote", "Sistema Requiere Lote", Unit.Percentage(1));
+	settings.Properties.Columns.Add("valorization", "valorization", Unit.Percentage(1));
+	settings.ReadOnly = !(this.ViewBag.Editable);
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}).BindList(ViewData["CmbBoxReasonEntryEdit"]).Bind(_id_InventoryReasonEntry).GetHtml()

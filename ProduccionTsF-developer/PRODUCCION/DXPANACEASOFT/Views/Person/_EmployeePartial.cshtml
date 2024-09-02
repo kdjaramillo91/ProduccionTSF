@@ -1,0 +1,42 @@
+﻿
+
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.Employee
+
+<div style="width: 100%; overflow: auto;">
+    <table id="tabEmployeeTable" class="table table-condensed">
+        <tr>
+            <td style="width: 15%;">
+                @Html.DevExpress().LabelFor(m => m.id_department, settings =>
+                {
+                    settings.Text = "Departamento:";
+                    settings.AssociatedControlName = "id_department";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().ComboBoxFor(m => m.id_department, settings =>
+                {
+                    settings.Name = "id_department";
+                    settings.Properties.ClientInstanceName = "id_department";
+
+                    settings.ControlStyle.CssClass = "editor";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.ValueType = typeof(int);
+
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnEmployeeDepartmentValidation";
+
+                }).BindList(DataProviderDepartment.Departments((int?)ViewData["id_company"])).Bind((Model != null && Model.id_department != 0) ? (int?)Model.id_department : null).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>
+
+

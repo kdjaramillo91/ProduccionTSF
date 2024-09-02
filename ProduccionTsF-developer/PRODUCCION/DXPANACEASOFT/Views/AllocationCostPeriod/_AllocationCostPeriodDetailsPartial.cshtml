@@ -1,0 +1,266 @@
+﻿
+@model IEnumerable<ProductionCostAllocationPeriodDetail>
+
+@{
+	var puedeEditarseDetalles = (bool)this.ViewBag.DetailsEditable;
+	var accountingValue = (bool)this.ViewBag.AccountingValue;
+
+	var gridView = Html.DevExpress().GridView<ProductionCostAllocationPeriodDetail>(
+		grid =>
+		{
+			grid.Name = "gvAllocationProductionCostDetail";
+			grid.KeyFieldName = "id";
+			grid.Width = Unit.Percentage(100);
+
+			grid.CallbackRouteValues = new
+			{
+				Controller = "AllocationCostPeriod",
+				Action = "AllocationCostPeriodDetail",
+			};
+
+			if (puedeEditarseDetalles)
+			{
+				grid.SettingsEditing.UpdateRowRouteValues = new { Controller = "AllocationCostPeriod", Action = "AllocationCostPeriodDetailUpdate" };
+
+				if (!accountingValue)
+				{
+					grid.SettingsEditing.AddNewRowRouteValues = new { Controller = "AllocationCostPeriod", Action = "AllocationCostPeriodDetailAddNew" };
+					grid.SettingsEditing.DeleteRowRouteValues = new { Controller = "AllocationCostPeriod", Action = "AllocationCostPeriodDetailDelete" };
+				}
+			}
+
+			#region GridView Behavior
+
+			grid.SettingsBehavior.AllowSelectByRowClick = false;
+
+			grid.CustomJSProperties = (s, e) =>
+			{
+				e.Properties["cpPuedeEditarse"] = puedeEditarseDetalles;
+
+				if (ViewData["EditMessage"] != null)
+				{
+					e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+				}
+			};
+
+			#endregion
+
+			#region Edit Form
+
+			grid.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+			grid.SettingsText.PopupEditFormCaption = "Editar Detalle de Asignación de Costos";
+
+			grid.SettingsPopup.EditForm.Modal = true;
+			grid.SettingsPopup.EditForm.Width = 800;
+			grid.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+			grid.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+			grid.SettingsBehavior.ConfirmDelete = true;
+
+			#endregion
+
+			#region Pager
+
+			grid.SettingsPager.Visible = true;
+
+			#endregion
+
+			#region Client Side Events
+
+			grid.ClientSideEvents.BeginCallback = "AllocationProductionCostDetails_OnBeginCallback";
+
+			#endregion
+
+			#region Search Panel
+
+			grid.SettingsSearchPanel.Visible = true;
+			grid.Styles.SearchPanel.CssClass = "searchPanel";
+
+			#endregion
+
+			#region Title Panel
+
+			grid.Settings.ShowTitlePanel = true;
+			grid.Styles.TitlePanel.CssClass = "titleContainer";
+
+			#endregion
+
+			#region Group Panel
+
+			grid.Settings.ShowGroupPanel = false;
+
+			#endregion
+
+			#region Filter Row
+
+			grid.Settings.ShowFilterRow = false;
+			grid.Settings.ShowFilterRowMenu = false;
+			grid.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+			#endregion
+
+			#region Command Column
+
+			if (puedeEditarseDetalles)
+			{
+				grid.CommandColumn.Width = Unit.Percentage(8);
+				grid.CommandColumn.Visible = true;
+				grid.CommandColumn.ShowNewButton = false;
+				grid.CommandColumn.ShowEditButton = true;
+
+				if (!accountingValue)
+				{
+					grid.CommandColumn.ShowDeleteButton = true;
+					grid.CommandColumn.ShowNewButtonInHeader = true;
+				}
+			}
+
+			#endregion
+
+			#region Master-Details View
+
+			grid.SettingsDetail.ShowDetailRow = false;
+
+			#endregion
+
+			#region Adaptivity Settings
+
+			grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+			grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+			grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+			grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+			grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+			#endregion
+
+			#region Custom Unbound Columns
+
+			grid.CustomUnboundColumnData = (s, e) =>
+			{
+				if (e.Column.FieldName == "name_productionCost")
+				{
+					var idProductionCost = (int)e.GetListSourceFieldValue("id_productionCost");
+					var productionCost = DataProviderProductionCost.ProductionCostById(idProductionCost);
+					if (productionCost != null)
+					{
+						e.Value = productionCost.name;
+					}
+				}
+				else if (e.Column.FieldName == "name_productionCostDetail")
+				{
+					var idProductionCostDetail = (int)e.GetListSourceFieldValue("id_productionCostDetail");
+					var productionCostDetail = DataProviderProductionCost.ProductionCostDetailById(idProductionCostDetail);
+					if (productionCostDetail != null)
+					{
+						e.Value = productionCostDetail.name;
+					}
+				}
+				else if (e.Column.FieldName == "name_productionPlant")
+				{
+					var id_productionPlant = (int?)e.GetListSourceFieldValue("id_productionPlant");
+					var productionPlant = DataProviderAllocationCostPeriod.GetPersonById(id_productionPlant);
+					if (productionPlant != null)
+					{
+						e.Value = !String.IsNullOrEmpty(productionPlant.processPlant)
+							? productionPlant.processPlant
+							: productionPlant.fullname_businessName;
+					}
+				}
+			};
+
+			#endregion
+
+			#region Columns
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "id_productionCost";
+				column.Name = "id_productionCost";
+				column.Caption = "Código de Costo";
+				column.Visible = false;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "name_productionCost";
+				column.Caption = "Costo";
+				column.Width = Unit.Percentage(12);
+				column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "id_productionCostDetail";
+				column.Name = "id_productionCostDetail";
+				column.Caption = "Código de Subcosto";
+				column.Visible = false;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "name_productionCostDetail";
+				column.Caption = "Subcosto";
+				column.Width = Unit.Percentage(12);
+				column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "id_productionPlant";
+				column.Name = "id_productionPlant";
+				column.Caption = "Código de Planta";
+				column.Visible = false;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "name_productionPlant";
+				column.Caption = "Planta Proceso";
+				column.Width = Unit.Percentage(12);
+				column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "coeficiente";
+				column.Name = "coeficiente";
+				column.Caption = "¿Coeficiente?";
+				column.Width = Unit.Percentage(3);
+				column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "valor";
+				column.Caption = "Valor";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.PropertiesEdit.DisplayFormatString = "N2";
+				column.Width = Unit.Percentage(8);
+			});
+
+			#endregion
+
+			#region Editor Form Layout
+
+			grid.SetEditFormTemplateContent(content =>
+			{
+				var idAllocationCostPeriodDetail = (int?)DataBinder.Eval(content.DataItem, "id");
+
+				var allocationCostPeriodDetail = (idAllocationCostPeriodDetail.HasValue && idAllocationCostPeriodDetail.Value > 0)
+					? this.Model.First(d => d.id == idAllocationCostPeriodDetail.Value)
+					: new ProductionCostAllocationPeriodDetail();
+
+				Html.RenderPartial("_AllocationCostPeriodDetailEditForm", allocationCostPeriodDetail);
+			});
+
+			#endregion
+		});
+
+	if (ViewData["EditError"] != null)
+	{
+		gridView.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@gridView.Bind(this.Model).GetHtml()

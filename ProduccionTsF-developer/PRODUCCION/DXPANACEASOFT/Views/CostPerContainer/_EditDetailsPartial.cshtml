@@ -1,0 +1,632 @@
+﻿@using CostContenedorModel = DXPANACEASOFT.Controllers.CostPerContainerController.CostoContenedorCustomModel;
+@model IList<CostContenedorModel>
+@{ 
+	var costosAdicionales = (string[])this.ViewBag.CodigosCostoAdicionles;
+}
+@Html.DevExpress().GridView(
+	gridView =>
+	{
+		gridView.Name = "gvCostContenedor";
+		gridView.KeyFieldName = "Orden";
+		gridView.Width = Unit.Percentage(100);
+		gridView.SettingsSearchPanel.Visible = false;
+
+		gridView.SettingsSearchPanel.Visible = true;
+		gridView.Styles.SearchPanel.CssClass = "searchPanel";
+
+		var header = gridView.Styles.Header;
+		header.BackColor = System.Drawing.Color.FromArgb(255, 255, 191, 102);
+		header.Font.Bold = true;
+		header.ForeColor = System.Drawing.Color.Black;
+
+		var settings = gridView.Settings;
+		settings.ShowGroupPanel = true;
+		settings.ShowTitlePanel = false;
+		settings.HorizontalScrollBarMode = ScrollBarMode.Visible;
+		settings.VerticalScrollBarMode = ScrollBarMode.Hidden;
+		settings.VerticalScrollableHeight = 600;
+		settings.VerticalScrollBarStyle = GridViewVerticalScrollBarStyle.Virtual;
+
+		settings.ShowFilterRow = false;
+		settings.ShowFilterRowMenu = false;
+		settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+		var behavior = gridView.SettingsBehavior;
+		behavior.AllowSelectByRowClick = true;
+		behavior.AllowEllipsisInText = true;
+		behavior.AllowDragDrop = true;
+		behavior.AllowSort = true;
+		behavior.EnableRowHotTrack = true;
+
+		var pager = gridView.SettingsPager;
+		pager.Visible = true;
+		pager.PageSize = 40;
+		pager.Mode = GridViewPagerMode.EndlessPaging;
+
+		var loading = gridView.SettingsLoadingPanel;
+		loading.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+		loading.Text = "Cargando...";
+
+		var adaptivity = gridView.SettingsAdaptivity;
+		adaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+
+
+		// Parámetros de Exportación
+		var exportSettings = gridView.SettingsExport;
+
+		exportSettings.EnableClientSideExportAPI = true;
+		exportSettings.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+
+		exportSettings.FileName = String.Format("{0}. {1:yyyyMMdd HHmm}", "CostosPorContenedor", DateTime.Now);
+
+		exportSettings.Styles.Header.Font.Name = "Verdana";
+		exportSettings.Styles.Header.Font.Size = FontUnit.Point(10);
+
+		exportSettings.Styles.Default.Font.Name = "Verdana";
+		exportSettings.Styles.Default.Font.Size = FontUnit.Point(8);
+
+		gridView.Toolbars.Add(toolbar =>
+		{
+			toolbar.Items.Add(new MVCxGridViewToolbarItem()
+			{
+				Name = "ExportToXlsx",
+				Text = "Exportar datos a Excel (2003)",
+				Command = GridViewToolbarCommand.ExportToXlsx,
+			});
+		});
+
+
+		// Eventos y callbacks
+		gridView.CallbackRouteValues = new { Controller = "CostPerContainer", Action = "CostPerContainerDetails" };
+
+		var events = gridView.ClientSideEvents;
+		//events.BeginCallback = "onQueryMovimientosValorizacionDetailsBeginCallback";
+
+		// Pie de página
+		gridView.Settings.ShowFooter = true;
+		gridView.SetFooterRowTemplateContent(content =>
+		{
+			this.ViewContext.Writer.Write(@"<span id=""lblCostosPorContenedorGridViewInfo""></span>");
+		});
+
+		// Agregamos formatos condicionales
+		gridView.FormatConditions.AddHighlight(m =>
+		{
+			m.FieldName = "Utilidad";
+			m.ApplyToRow = false;
+			m.Expression = "[EsPerdida]";
+			m.Format = GridConditionHighlightFormat.RedText;
+		});
+		gridView.FormatConditions.AddHighlight(m =>
+		{
+			m.FieldName = "UtilidadFOB";
+			m.ApplyToRow = false;
+			m.Expression = "[EsPerdidaFOB]";
+			m.Format = GridConditionHighlightFormat.RedText;
+		});
+
+		// Preparación de columnas calculadas
+		gridView.CustomUnboundColumnData = (s, e) =>
+		{
+			if (e.Column.FieldName.StartsWith("Costo_") || e.Column.FieldName.StartsWith("CostoTotal_"))
+			{
+				for (int i = 0; i < costosAdicionales.Length; i++)
+				{
+					var costoAdicional = costosAdicionales[i];
+					if (e.Column.FieldName == string.Concat("Costo_", i.ToString()))
+					{
+						var costosAdicionalesDetalle = (CostContenedorModel.CostoAdicional[])e.GetListSourceFieldValue("CostosAdicionales");
+						var detalle = costosAdicionalesDetalle.FirstOrDefault(x => x.Nombre == costoAdicional);
+
+						var valor = ((detalle != null) && (detalle.Valor != 0m))
+							? (decimal?)detalle.Valor : null;
+
+						e.Value = valor;
+					}
+					else if (e.Column.FieldName == string.Concat("CostoTotal_", i.ToString()))
+					{
+						var costosAdicionalesDetalle = (CostContenedorModel.CostoAdicional[])e.GetListSourceFieldValue("CostosAdicionales");
+						var detalle = costosAdicionalesDetalle.FirstOrDefault(x => x.Nombre == costoAdicional);
+
+						var valor = ((detalle != null) && (detalle.Total != 0m))
+							? (decimal?)detalle.Total : null;
+
+						e.Value = valor;
+					}
+				}
+			}
+		};
+
+		#region Agregamos los totales generales
+		if (this.Model.Count() > 0)
+		{
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "NumCartones",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "LibrasNetas",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "ValorTotal",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "ValorTotalFOB",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "ValorFlete",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "ValorSeguro",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "ValorMateriaPrima",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "TotalMateriaPrima",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "MaterialesEmpaque",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "TotalMaterialesEmpaque",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "CostoTotal",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "Utilidad",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+
+			gridView.TotalSummary.Add(new ASPxSummaryItem()
+			{
+				FieldName = "UtilidadFOB",
+				DisplayFormat = GlobalUtils.Currency4Format,
+				SummaryType = DevExpress.Data.SummaryItemType.Sum,
+			});
+		}
+		#endregion
+
+		#region Columns
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Orden";
+			column.Caption = "Nº";
+			column.Width = Unit.Pixel(50);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NumSerie";
+			column.Caption = "NRO SERIE";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(80);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NumFactura";
+			column.Caption = "NRO FACTURA";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(110);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "FechaEmision";
+			column.Caption = "FECHA EMISION";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(110);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.DateFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NumContenedor";
+			column.Caption = "CONTENEDOR";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(120);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "PasiDestino";
+			column.Caption = "PAIS DESTINO";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(150);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Cliente";
+			column.Caption = "CLIENTE";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(150);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "CodProducto";
+			column.Caption = "CÓD. PRODUCTO";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(110);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NombreProducto";
+			column.Caption = "NOMBRE PRODUCTO";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(200);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Talla";
+			column.Caption = "TALLA";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(100);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NumCartones";
+			column.Caption = "CARTONES";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(80);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.IntegerFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "PrecioUnitCartones";
+			column.Caption = "PRE UNI CRT";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(80);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "LibrasNetas";
+			column.Caption = "LBRS NETA";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(100);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "PrecioLibra";
+			column.Caption = "PRE LB";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(80);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "ValorTotalFOB";
+			column.Caption = "VALOR FOB";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "ValorFlete";
+			column.Caption = "FLETE";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "ValorSeguro";
+			column.Caption = "SEGURO";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "ValorTotal";
+			column.Caption = "VALOR TOTAL";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "VentaPorLibras";
+			column.Caption = "VENTA X LB";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "ValorMateriaPrima";
+			column.Caption = "COSTO MP X LB";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(90);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "TotalMateriaPrima";
+			column.Caption = "COSTO TOTAL MP";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(90);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "MaterialesEmpaque";
+			column.Caption = "COSTO MATERIAL EMPAQUE X LB";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(90);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "TotalMaterialesEmpaque";
+			column.Caption = "COSTO TOTAL MATERIAL EMPAQUE";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(90);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		if (costosAdicionales.Any())
+		{
+			gridView.Columns.AddBand(band =>
+			{
+				band.Caption = "OTROS COSTOS";
+				band.Width = Unit.Percentage(100);
+				band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				band.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+				// Detalles de costos
+				for (int i = 0; i < costosAdicionales.Length; i++)
+				{
+					var costoAdicional = costosAdicionales[i];
+
+					band.Columns.AddBand(band1 =>
+					{
+						band1.Caption = costoAdicional.ToUpper();
+						band1.Width = Unit.Percentage(100);
+						band1.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+						band1.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+						band1.Columns.Add(column =>
+						{
+							column.FieldName = string.Concat("Costo_", i.ToString());
+							column.Caption = "COSTO X LB";
+							column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+							column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+							column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+							column.Width = Unit.Pixel(80);
+							column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+							column.CellStyle.Wrap = DefaultBoolean.True;
+							column.HeaderStyle.Wrap = DefaultBoolean.True;
+							column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+						});
+
+						band1.Columns.Add(column =>
+						{
+							column.FieldName = string.Concat("CostoTotal_", i.ToString());
+							column.Caption = "TOTAL";
+							column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+							column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+							column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+							column.Width = Unit.Pixel(80);
+							column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+							column.CellStyle.Wrap = DefaultBoolean.True;
+							column.HeaderStyle.Wrap = DefaultBoolean.True;
+							column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+						});
+					});
+				}
+			});
+		}
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "CostoUnitario";
+			column.Caption = "COSTO UNITARIO";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(80);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "CostoTotal";
+			column.Caption = "COSTO TOTAL";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "UtilidadFOB";
+			column.Caption = "UTILIDAD FOB";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Utilidad";
+			column.Caption = "UTILIDAD CFR";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+		#endregion
+
+	}).Bind(this.Model).GetHtml()

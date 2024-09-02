@@ -1,0 +1,44 @@
+﻿<br />
+
+@{ 
+    Html.DevExpress().FormLayout(settings =>
+    {
+
+        settings.Name = "formLayoutFilterItem";
+        settings.Width = Unit.Percentage(100);
+        settings.ColCount = 3;
+
+        settings.Items.Add(item =>
+        {
+            item.Name = "txtItemsFilter";
+            item.Caption = "Filtro Código Auxiliar Producto:";
+
+            item.NestedExtension().TextBox(txt =>
+            {
+                txt.Properties.ClientInstanceName = "txtItemsFilter";
+                txt.Properties.MaxLength = 100;
+                txt.Properties.ClientSideEvents.TextChanged = "OnTxtChanged";
+            });
+
+        });
+
+        settings.Items.Add(item =>
+        {
+            item.Name = "txtItemsFilterCode";
+            item.Caption = "Filtro Código Principal Producto:";
+
+            item.NestedExtension().TextBox(txt =>
+            {
+                txt.Properties.ClientInstanceName = "txtItemsFilterCode";
+                txt.Properties.MaxLength = 100;
+                txt.Properties.ClientSideEvents.TextChanged = "OnTxtChanged";
+            });
+
+        });
+
+    }).Render();
+
+}
+    <br />
+    <br />
+    <hr style="margin-top: 2px; margin-bottom: 2px;" />

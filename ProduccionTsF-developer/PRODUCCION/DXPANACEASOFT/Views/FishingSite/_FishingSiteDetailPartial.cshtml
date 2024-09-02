@@ -1,0 +1,102 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    FishingSite fishingSite = Model ?? new FishingSite();
+}
+
+@Html.Hidden("id_fishingSite", fishingSite.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(fishingSite.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(fishingSite.code)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 20%;">
+            <strong>
+                Zona de Cosecha:
+            </strong>
+        </td>
+        <td colspan="4">
+            @{
+                string text = (fishingSite.id_FishingZone != null) ? fishingSite.FishingZone.name : "";
+            }
+            @Html.Raw(text)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(fishingSite.description)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(fishingSite.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(fishingSite.dateCreate)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(((int) fishingSite.id_userUpdate)))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(fishingSite.dateUpdate)
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

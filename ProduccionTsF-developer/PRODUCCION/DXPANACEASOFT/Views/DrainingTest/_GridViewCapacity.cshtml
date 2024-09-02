@@ -1,0 +1,199 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{  string idDrainingTestSampling = "0";
+
+    
+}
+
+@{
+
+    var grid = Html.DevExpress().GridView<DrainingTestSamplingDTO>(settings =>
+    {
+        settings.Name = "GridViewDrainingTestSampling";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "DrainingTest",
+            Action = "GridViewDrainingTestSampling",
+            //drawersNumberSampling = ((List<DrainingTestDetail>)Model).Count
+        };
+
+        settings.KeyFieldName = "id";
+        settings.ClientSideEvents.BatchEditEndEditing= "onValidateDrawersNumber";
+        //settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+        settings.Enabled = ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+        settings.SettingsBehavior.AllowFixedGroups = false;
+        settings.SettingsBehavior.AllowSort = false;
+
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 70;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.DblClick;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            var list = (Model as List<DrainingTestSamplingDTO>) ?? new List<DrainingTestSamplingDTO>();
+            e.Properties["cpDetailCount"] = list.Count();
+        };
+        //0
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id";
+            column.Name = "id";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+        // 1
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "order";
+            column.Name = "order";
+            column.Caption = "#";
+            column.Width = Unit.Percentage(5);
+            column.Settings.ShowEditorInBatchEditMode = false;
+            column.ReadOnly = true;
+        });
+        //2
+        settings.Columns.Add(column =>
+        {
+
+            column.FieldName = "drawersNumber";
+            column.Name = "drawersNumber";
+
+            column.Caption = "# Bines:";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.MinValue = 0;
+            prop.MaxValue = 9999;
+
+            //prop.DisplayFormatString = "n";
+            //prop.DecimalPlaces = 0;
+            // prop.ClientSideEvents.Validation = "onValidateDrawersNumber";
+
+        });
+        //3
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "capacity";
+            column.Name = "capacity";
+            column.Caption = "Capacidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.MinValue = 0;
+            prop.MaxValue = 9999;
+            prop.DisplayFormatString = "n";
+            prop.DecimalPlaces = 1;
+            prop.ClientSideEvents.LostFocus = "UpdateCapacity";
+        });
+        //4
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "idMetricUnitCapacity";
+            column.Name = "idMetricUnitCapacity";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+            column.ReadOnly = true;
+
+        });
+        //namemetricunit
+        //5
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "codeMetricUnitCapacity";
+            column.Name = "codeMetricUnitCapacity";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+            column.ReadOnly = true;
+        });
+        //6
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "U.M.";
+            column.FieldName = "nameMetricUnitCapacity";
+            column.Name = "nameMetricUnitCapacity";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.ReadOnly = true;
+
+        });
+
+
+
+
+
+
+        settings.Columns.Add(column =>
+        {
+
+
+            column.Caption = "Total Muestreo";
+            column.FieldName = "poundsDrained";
+            column.Name = "poundsDrained";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+
+
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.DisplayFormatString = "n";
+            prop.DecimalPlaces = 1;
+            prop.AllowUserInput = false;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+
+
+            column.Caption = "Lbs. Promedio";
+            column.FieldName = "poundsAverage";
+            column.Name = "poundsAverage";
+
+
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.DisplayFormatString = "n";
+            prop.DecimalPlaces = 1;
+            prop.AllowUserInput = false;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+
+            column.Caption = "Lbs. Proyectadas";
+            column.FieldName = "poundsProjected";
+            column.Name = "poundsProjected";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.DisplayFormatString = "n";
+            prop.DecimalPlaces = 0;
+            prop.AllowUserInput = false;
+
+        });
+
+    });
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,24 @@
+﻿@using DXPANACEASOFT.DataProviders
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "id_subgroup";
+    settings.Properties.ClientInstanceName = "id_subgroup";
+
+    settings.CallbackRouteValues = new { Controller = "Item", Action = "ComboBoxItemSubGroupPartial" };
+
+    settings.Properties.ClientSideEvents.BeginCallback = "ItemSubGroupsCombo_BeginCallback";
+    settings.Properties.ClientSideEvents.EndCallback = "ItemSubGroupsCombo_EndCallback";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemSubGroupsCombo_SelectedIndexChanged";
+
+    settings.ControlStyle.CssClass = "editor";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.ClientSideEvents.Validation = "OnSubGroupValidation";
+}).BindList(Model).Bind(ViewData["id_subgroup"]).GetHtml()

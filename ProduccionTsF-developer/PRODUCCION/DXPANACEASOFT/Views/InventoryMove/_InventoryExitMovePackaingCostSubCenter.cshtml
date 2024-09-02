@@ -1,0 +1,30 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryMove
+
+@{
+
+    int? id_CostCenter =(Model==null)?null: Model.idCostCenterPackagingMaterials;
+    int? idSubCostCenter = (Model == null) ? null : Model.idSubCostCenterPackagingMaterials;
+
+}
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "idCostSubCenter";
+    settings.Properties.ClientInstanceName = "idCostSubCenter";
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextFormatString = "{1}";
+    settings.Properties.ValueType = typeof(int);
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "GetCostSubCenterFilter"/*, TextField = "CityName"*/ };
+    //settings.Properties.CallbackPageSize = 15;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "SubCostCenter_OnSelectedIndexChanged";
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.Columns.Add("code", "Cod.", 50);
+    settings.Properties.Columns.Add("name", "Descripcion", 210);
+    settings.ShowModelErrors = true;
+
+
+}).BindList(DataProviderCostCenter.SubCostCentersByCostCenter( id_CostCenter) ).Bind(idSubCostCenter).GetHtml()

@@ -1,0 +1,48 @@
+﻿
+@using DXPANACEASOFT.Models
+
+@model BusinessOportunityPhaseAttachment
+@*@{
+    var esNuevoAdjunto = (Model.IdAdjunto < 1);
+}*@
+<table id="attachment-form-upLoad" class="table table-condensed">
+    <tr>
+        <td style="width:8%;">
+            @using (Html.BeginForm("upload-attachmentPhase", "BusinessOportunity", FormMethod.Post))
+            {
+                @Html.DevExpress().UploadControl(
+                settings =>
+                {
+                    settings.Name = "attachmentPhaseUploadControl";
+                    settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "upload-attachmentPhase", };
+                    settings.AutoStartUpload = true;
+                    settings.ShowTextBox = false;
+                    settings.ShowProgressPanel = true;
+                    settings.Height = Unit.Pixel(20);
+                    settings.Width = Unit.Percentage(100);
+                    settings.ValidationSettings.Assign(DXPANACEASOFT.Controllers.BusinessOportunityController.UploadControlSettings.UploadValidationSettings);
+                    settings.ClientSideEvents.FileUploadComplete = "AttachedPhaseUploadComplete";
+                }).GetHtml()
+            }
+        </td>
+        <td style="vertical-align:bottom;">
+            @Html.HiddenFor(a => a.guidPhase)
+            @Html.HiddenFor(a => a.urlPhase)
+            @Html.DevExpress().TextBoxFor(
+            a => a.attachmentPhase,
+            settings =>
+            {
+                settings.Properties.ClientInstanceName = "attachmentPhaseName";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.Properties.ClientSideEvents.Validation = "AttachedPhaseNameValidate";
+                settings.Properties.ClientSideEvents.Init = "AttachedPhaseName_OnInit";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.CausesValidation = true;
+                //settings.Properties.DateOnError = DateOnError.Null;
+                settings.Properties.ValidationSettings.ValidateOnLeave = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

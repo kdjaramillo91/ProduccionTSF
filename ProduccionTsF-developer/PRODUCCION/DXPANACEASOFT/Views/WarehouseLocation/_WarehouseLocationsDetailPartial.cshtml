@@ -1,0 +1,110 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    WarehouseLocation warehouseLocation = Model ?? new WarehouseLocation();
+}
+
+@Html.Hidden("id_warehouseLocation", warehouseLocation.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(warehouseLocation.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(warehouseLocation.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Bodega:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(warehouseLocation.Warehouse.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                ¿Es Rodante?:
+            </strong>
+        </td>
+        <td colspan="4">
+            @{
+                string isRolling = (warehouseLocation.isRolling == true) ? "Si" : "No";
+            }
+            @Html.Raw(isRolling)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(warehouseLocation.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(warehouseLocation.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(warehouseLocation.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(warehouseLocation.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(warehouseLocation.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

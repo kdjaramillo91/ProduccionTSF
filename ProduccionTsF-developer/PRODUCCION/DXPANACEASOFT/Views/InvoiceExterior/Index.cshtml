@@ -1,0 +1,29 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    Layout = null;
+}
+
+<h4>Factura Fiscal - Cliente del Exterior </h4>
+
+@{
+    @Html.Hidden("codeAdvancedFiltersConfiguration", "FX")
+    ViewData["Model"] = new Invoice
+    {
+        Document = new Document
+        {
+            DocumentType = DataProviderDocumentType.DocumentTypeByCode("07")
+        }
+    };
+    Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_InvoiceExteriorFilterFormPartial");
+
+}
+
+<div id="results">
+
+</div>
+
+<script src="~/Scripts/invoiceeexterior/index.js"></script>
+<script src="~/Scripts/shared/ps.genericfunctions.js"></script>
+

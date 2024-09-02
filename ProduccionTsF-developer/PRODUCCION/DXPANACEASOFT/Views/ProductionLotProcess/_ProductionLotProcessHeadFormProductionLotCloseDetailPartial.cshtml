@@ -1,0 +1,179 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProductionLot
+
+<table class="table table-condenced" style="margin: 0px;">
+    @*<tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.totalQuantityOrdered, settings =>
+                {
+                    settings.Text = "Libras Compradas:";
+                    settings.AssociatedControlName = "totalQuantityOrdered";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalQuantityOrdered, settings =>
+                {
+                    settings.Name = "totalQuantityOrderedClose";
+                    settings.Properties.ClientInstanceName = "totalQuantityOrderedClose";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.DisplayFormatString = "N2";
+
+                    settings.ClientEnabled = false;
+                    settings.ShowModelErrors = true;
+
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.totalQuantityRemitted, settings =>
+                {
+                    settings.Text = "Libras Enviadas/Remitidas:";
+                    settings.AssociatedControlName = "totalQuantityRemitted";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalQuantityRemitted, settings =>
+                {
+                    settings.Name = "totalQuantityRemittedClose";
+                    settings.Properties.ClientInstanceName = "totalQuantityRemittedClose";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.DisplayFormatString = "N2";
+
+                    settings.ClientEnabled = false;
+                    settings.ShowModelErrors = true;
+
+                }).GetHtml()
+        </td>
+    </tr>*@
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.totalQuantityRecived, settings =>
+            {
+                settings.Text = DataProviderSetting.ValueSetting("URE") + ":";//"Libras Recibidas:";
+                settings.AssociatedControlName = "totalQuantityRecived";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalQuantityRecived, settings =>
+            {
+                settings.Name = "totalQuantityRecivedClose";
+                settings.Properties.ClientInstanceName = "totalQuantityRecivedClose";
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.DisplayFormatString = "N2";
+
+                settings.ClientEnabled = false;
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.totalQuantityTrash, settings =>
+            {
+                settings.Text = DataProviderSetting.ValueSetting("UDE") + ":";//"Libras de Desperdicio:";
+                settings.AssociatedControlName = "totalQuantityTrash";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalQuantityTrash, settings =>
+            {
+                settings.Name = "totalQuantityTrashClose";
+                settings.Properties.ClientInstanceName = "totalQuantityTrashClose";
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.DisplayFormatString = "N2";
+
+                settings.ClientEnabled = false;
+                settings.ShowModelErrors = true;
+
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label( settings =>
+            {
+                settings.Text = DataProviderSetting.ValueSetting("UREN") + ":";//"Libras Recibidas Netas:";
+                settings.AssociatedControlName = "totalQuantityRecivedNet";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEdit(settings =>
+            {
+                settings.Name = "totalQuantityRecivedNet";
+                settings.Properties.ClientInstanceName = "totalQuantityRecivedNet";
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.DisplayFormatString = "N2";
+
+                settings.ClientEnabled = false;
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+    </tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Text = DataProviderSetting.ValueSetting("UPRO") + ":";//"Libras Procesadas:";
+			   settings.AssociatedControlName = "totalQuantityLiquidationAdjust";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.totalQuantityLiquidation, settings =>
+			{
+				settings.Name = "totalQuantityLiquidationClose";
+				settings.Properties.ClientInstanceName = "totalQuantityLiquidationClose";
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.DisplayFormatString = "N2";
+
+				settings.ClientEnabled = false;
+				settings.ShowModelErrors = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Text = "Rendimiento:";
+			   settings.AssociatedControlName = "performance";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEdit(settings =>
+			{
+				settings.Name = "performance";
+				settings.Properties.ClientInstanceName = "performance";
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.DisplayFormatString = "P";
+
+				settings.ClientEnabled = false;
+				settings.ShowModelErrors = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.totalQuantityLoss, settings =>
+			{
+				settings.Text = "Libras Merma";
+				settings.AssociatedControlName = "totalQuantityLoss";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.totalQuantityLoss, settings =>
+			{
+				settings.Name = "totalQuantityLoss";
+				settings.Properties.ClientInstanceName = "totalQuantityLoss";
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.DisplayFormatString = "N2";
+
+				settings.ClientEnabled = false;
+				settings.ShowModelErrors = true;
+
+			}).GetHtml()
+		</td>
+	</tr>
+
+</table>
+
+<script src="~/Scripts/productionlotprocess/_productionLotProcessHeadFormProductionLotClose.js"></script>

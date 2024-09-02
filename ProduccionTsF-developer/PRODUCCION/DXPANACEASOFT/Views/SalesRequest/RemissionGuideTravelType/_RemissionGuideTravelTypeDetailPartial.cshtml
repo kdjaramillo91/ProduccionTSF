@@ -1,0 +1,91 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuideTravelType
+
+
+@{
+    RemissionGuideTravelType remissionGuideTravelType = Model ?? new RemissionGuideTravelType();
+}
+
+@Html.Hidden("id_remissionGuideTravelType", remissionGuideTravelType.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(remissionGuideTravelType.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(remissionGuideTravelType.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(remissionGuideTravelType.description)
+        </td>
+    </tr>
+
+    <td style="width: 10%;">
+        <strong>
+            Creado por:
+        </strong>
+    </td>
+    <td style="width: 10%;">
+        @Html.Raw(GetUserName(remissionGuideTravelType.id_userCreate))
+    </td>
+    <td style="width: 10%;">
+        <strong>
+            Fecha de Creaci&oacute;n:
+        </strong>
+    </td>
+    <td>
+        @Html.Raw(remissionGuideTravelType.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+    </td>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(GetUserName(remissionGuideTravelType.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(remissionGuideTravelType.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

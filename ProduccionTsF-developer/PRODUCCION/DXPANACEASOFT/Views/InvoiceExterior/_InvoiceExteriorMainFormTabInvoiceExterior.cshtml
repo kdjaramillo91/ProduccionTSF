@@ -1,0 +1,1343 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Invoice
+
+@{
+	int id_invoice = (Model != null) ? Model.id : 0;
+	var documentState = (Model != null && Model.Document != null && Model.Document.id_documentState != 0) ? DataProviderDocumentState.DocumentStateById(Model.Document.id_documentState) : DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+	var _ControlsState = DataProviderControlState
+		.ControlStateByDocumentByState("07", documentState.code);
+
+	this.ViewBag.CanEditPaymentTerm = (this.Model.Document.DocumentState.code == "01") || (this.Model.Document.DocumentState.code == "02");
+	var puedeModificarInfoProforma = DataProviderSetting.SettingByCode("MODINFP").value == "SI";
+	var valInvFact = DataProviderSetting.ValueSetting("INVFACT");
+	var movimientoInventario = this.ViewBag.MovimientoInventario;
+}
+
+<table id="mainTabInvoiceExterior" class="table table-condensed" style="margin: 0px;">
+	<tr class="ps-header">
+		<td colspan="4" class="ps-bar-collapse" dtx="psn-invclgen">
+			<span class="dxflGroupBoxCaption_Metropolis">Inf. General</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-invclgen">
+		<td>Consignatario: </td>
+		<td colspan="2">
+			@{
+				int? id_consignee = (Model != null && Model.InvoiceExterior != null) ? ((Model.InvoiceExterior.id_consignee != 0) ? (int?)Model.InvoiceExterior.id_consignee : null) : null;
+			}
+
+
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_consignee, settings =>
+	   {
+		   settings.Name = "id_consignee";
+		   settings.Properties.ClientInstanceName = "id_consignee";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{2}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("id", "Cod.", 40);
+		   settings.Properties.Columns.Add("identification_number", "Doc. Identidad", 120);
+		   settings.Properties.Columns.Add("fullname_businessName", "Consignatario", 200);
+
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnChangeBuyer";
+
+		   settings.ReadOnly = (Model.Document.id_documentOrigen == null)
+			? _ControlsState.FirstOrDefault(r => r.controlName == "id_consignee").isReadOnly
+			: true;
+
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField2";
+		   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+		   settings.Properties.ValidationSettings.ErrorText = "Debe seleccionar Consignatario";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_consignee").isRequired)
+			   {
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+			   }
+			   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+			   e.Properties["cpTabControl"] = "tabControl";
+			   e.Properties["cpCallBack"] = "personValidation";
+			   e.Properties["cpMessageErrorFormart"] = "Debe seleccionar Consignatario";
+
+		   };
+
+	   }).BindList(DataProviderPerson.CustomersExteriorByCompany((int)ViewData["id_company"])).Bind(id_consignee).GetHtml()
+		</td>
+		<td>Razón Social: </td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.Person1.fullname_businessName, settings =>
+	   {
+		   settings.Name = "fullname_businessName";
+		   settings.Properties.ClientInstanceName = "fullname_businessName";
+		   settings.ReadOnly = true;
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-invclgen">
+		<td>Ruc/C.I.: </td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.Person1.identification_number, settings =>
+		   {
+			   settings.Name = "identification_number";
+			   settings.Properties.ClientInstanceName = "identification_number";
+			   settings.ReadOnly = true;
+		   }).GetHtml()
+		</td>
+		<td></td>
+		<td>E-mail</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.ForeignCustomerIdentification.emailInterno, settings =>
+	   {
+		   settings.Name = "email";
+		   settings.Properties.ClientInstanceName = "email";
+		   settings.ReadOnly = true;
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-invclgen">
+		<td>Dirección:</td>
+		<td colspan="2">
+
+			@{
+				int? id_personDireccionConsignatario = (Model != null && Model.InvoiceExterior != null) ? (int?)Model.InvoiceExterior.id_consignee : null;
+				int? id_addressCustomer = (Model != null && Model.InvoiceExterior != null) ? (int?)Model.InvoiceExterior.id_addressCustomer : null;
+			}
+
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_addressCustomer, settings =>
+	   {
+		   settings.Name = "id_addressCustomer";
+		   settings.Properties.ClientInstanceName = "id_addressCustomer";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.ReadOnly = (Model.Document.id_documentOrigen == null) ? false : true;
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("tipoDireccion", "Tipo", 50);
+		   settings.Properties.Columns.Add("name", "Dirección", 160);
+		   settings.Properties.Columns.Add("emailInterno", "Email Interno", 70);
+		   settings.Properties.Columns.Add("emailInternoCC", "Email Interno CC", 70);
+		   settings.Properties.Columns.Add("phone1FC", "Teléfono", 70);
+		   settings.Properties.Columns.Add("fax1FC", "Fax", 70);
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnIdAddressCustomerSelectedIndexChanged";
+		   settings.ShowModelErrors = true;
+
+
+		   if (_ControlsState.Count > 0 && _ControlsState.FirstOrDefault(r => r.controlName == "id_addressCustomer").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+				   e.Properties["cpCallBack"] = "validateItemContainer";
+			   };
+		   }
+
+	   }).BindList(DataProviderPerson.CustomerByCompanyWithForeignCustomerIdentification(id_personDireccionConsignatario, id_addressCustomer)).Bind(id_addressCustomer).GetHtml()
+
+		</td>
+
+		<td>E-mail Interno</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.ForeignCustomerIdentification.emailInternoCC, settings =>
+		   {
+			   settings.Name = "emailInterno";
+			   settings.Properties.ClientInstanceName = "emailInterno";
+			   settings.ReadOnly = true;
+		   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-invclgen">
+		<td>Cliente del Exterior: </td>
+		<td colspan="3">
+			@{
+				int? id_buyer = (Model != null && Model.id_buyer != 0) ? (int?)Model.id_buyer : id_consignee;
+			}
+
+
+			@Html.DevExpress().ComboBoxFor(m => m.id_buyer, settings =>
+	   {
+		   settings.Name = "id_buyer";
+		   settings.Properties.ClientInstanceName = "id_buyer";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{2}";
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("id", "Cod.", 40);
+		   settings.Properties.Columns.Add("identification_number", "Doc. Identidad", 120);
+		   settings.Properties.Columns.Add("fullname_businessName", "Cliente Exterior", 200);
+
+		   settings.ReadOnly = (Model.Document.id_documentOrigen == null)
+			? _ControlsState.FirstOrDefault(r => r.controlName == "id_buyer").isReadOnly
+			: true;
+
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_buyer").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+	   }).BindList(DataProviderPerson.CustomersExteriorByCompany((int)ViewData["id_company"])).Bind(id_buyer).GetHtml()
+		</td>
+
+
+
+	</tr>
+
+	<tr class="psn-invclgen">
+		<td>Notificador: </td>
+		<td colspan="3">
+			@{
+				int? id_notifier = (Model != null && Model.InvoiceExterior != null) ? ((Model.InvoiceExterior.id_notifier != 0) ? (int?)Model.InvoiceExterior.id_notifier : id_buyer) : id_buyer;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_notifier, settings =>
+	   {
+		   settings.Name = "id_notifier";
+		   settings.Properties.ClientInstanceName = "id_notifier";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{2}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("id", "Cod.", 40);
+		   settings.Properties.Columns.Add("identification_number", "Doc. Identidad", 120);
+		   settings.Properties.Columns.Add("fullname_businessName", "Notificador", 200);
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_notifier").isReadOnly;
+
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField2";
+		   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+		   settings.Properties.ValidationSettings.ErrorText = "Debe seleccionar Consignatario Notificador";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_notifier").isRequired)
+			   {
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+			   }
+			   e.Properties["cpTabControl"] = "tabControl";
+			   e.Properties["cpCallBack"] = "personValidation";
+			   e.Properties["cpMessageErrorFormart"] = "Debe seleccionar Consignatario Notificador";
+		   };
+
+	   }).BindList(DataProviderPerson.CustomersExteriorByCompany((int)ViewData["id_company"])).Bind(id_notifier).GetHtml()
+		</td>
+
+	</tr>
+
+
+	<tr class="ps-header">
+		<td colspan="4" class="ps-bar-collapse" dtx="psn-invclneg">
+			<span class="dxflGroupBoxCaption_Metropolis">Inf. Negociación</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-invclneg">
+		<td>Orden de Pedido: </td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.purchaseOrder, settings =>
+	   {
+		   settings.Name = "purchaseOrder";
+		   settings.Properties.ClientInstanceName = "purchaseOrder";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+		   settings.Properties.MaxLength = 20;
+
+
+		   settings.ShowModelErrors = false;
+
+		   settings.ReadOnly = (Model.Document.id_documentOrigen == null)
+			? _ControlsState.FirstOrDefault(r => r.controlName == "purchaseOrder").isReadOnly
+			: true;
+
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "purchaseOrder").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+			   };
+		   }
+
+	   }).GetHtml()
+
+		</td>
+		<td>Guia de Remision: </td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.numberRemissionGuide, settings =>
+			{
+				settings.Name = "numberRemissionGuide";
+				settings.Properties.ClientInstanceName = "numberRemissionGuide";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.ValidationSettings.Display = Display.Dynamic;
+
+				settings.Properties.NullText = "Ej: 001-005-000000001";
+				settings.ShowModelErrors = false;
+				settings.Properties.ClientSideEvents.Validation = "OnInvoiceExteriorRemissionGuideCodeValidation";
+				settings.Properties.MaxLength = 17;
+
+				settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "numberRemissionGuide").isReadOnly;
+				if (_ControlsState.FirstOrDefault(r => r.controlName == "numberRemissionGuide").isRequired)
+				{
+					settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+					settings.CustomJSProperties = (s, e) =>
+					{
+						e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+						e.Properties["cpMessageError"] = "Campo Obligatorio.";
+						e.Properties["cpIsRequired"] = "true";
+						e.Properties["cpTabControl"] = "tabControl";
+					};
+				}
+			}).GetHtml()
+		</td>
+	</tr>
+
+	<tr class="psn-invclneg">
+		<td>Término de Negociación: </td>
+		<td>
+			@{
+				int? id_termsNegotiationDefault = 0;
+				TermsNegotiation termsNegotiation = DataProviderTermsNegotiation.TermsNegotiationDefault();
+
+				if (termsNegotiation != null)
+				{
+					id_termsNegotiationDefault = termsNegotiation.id;
+				}
+
+				int? id_termsNegotiation = (Model != null && Model.InvoiceExterior != null && Model.InvoiceExterior.id_termsNegotiation != null) ? (int?)Model.InvoiceExterior.id_termsNegotiation : id_termsNegotiationDefault;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_termsNegotiation, settings =>
+	   {
+		   settings.Name = "id_termsNegotiation";
+		   settings.Properties.ClientInstanceName = "id_termsNegotiation";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 20);
+		   settings.Properties.Columns.Add("name", "Términos", 120);
+		   settings.Properties.ClientSideEvents.Init = "InvoiceExteriorTermsNegotiation_SelectedIndexChanged";
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "InvoiceExteriorTermsNegotiation_SelectedIndexChanged";
+		   settings.ShowModelErrors = true;
+
+		   settings.ReadOnly = (Model.Document.id_documentOrigen == null)
+			? _ControlsState.FirstOrDefault(r => r.controlName == "id_termsNegotiation").isReadOnly
+			: true;
+
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_termsNegotiation").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+	   }).BindList(DataProviderTermsNegotiation.TermsNegotiation()).Bind(id_termsNegotiation).GetHtml()
+		</td>
+
+		@if (!String.IsNullOrEmpty(this.ViewBag.EtiquetaExterna))
+		{
+			<td> @this.ViewBag.EtiquetaExterna: </td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.Document.Document2.number, settings =>
+				{
+					settings.Name = "numberProforma";
+					settings.Properties.ClientInstanceName = "numberProforma";
+					settings.Width = Unit.Percentage(100);
+					settings.Properties.ValidationSettings.Display = Display.Dynamic;
+
+					settings.Properties.NullText = "0";
+					settings.ShowModelErrors = false;
+					settings.Properties.ClientSideEvents.Validation = "OnInvoiceExteriorRemissionGuideCodeValidation";
+
+					settings.ReadOnly = true;
+				}).GetHtml()
+			</td>
+        }
+        else
+        {
+			<td></td>
+			<td></td>
+        }
+
+	</tr>
+	<tr>
+		<td>Financiamiento de Cartera: </td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.idPortfolioFinancing, settings =>
+			{
+			   settings.Name = "idPortfolioFinancing";
+			   settings.Properties.ClientInstanceName = "idPortfolioFinancing";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextFormatString = "{1}";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.Columns.Add("code", "Cod.", 20);
+			   settings.Properties.Columns.Add("name", "Financiamientos", 120);
+			   settings.ShowModelErrors = true;
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "idPortfolioFinancing").isReadOnly;
+
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "idPortfolioFinancing").isRequired && puedeModificarInfoProforma)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				   settings.CustomJSProperties = (s, e) =>
+				   {
+					   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+					   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					   e.Properties["cpIsRequired"] = "true";
+					   e.Properties["cpTabControl"] = "tabControl";
+
+				   };
+			   }
+
+			}).BindList(DataProvidertbsysCatalogue.AlltbsysCatalogueDetailByCode("PFN")).Bind(this.Model.InvoiceExterior.idPortfolioFinancing).GetHtml()
+		</td>
+		@if (valInvFact == "SI")
+		{
+			<td>Egreso: </td>
+			<td>
+				@Html.DevExpress().TextBox(settings =>
+		   {
+			   settings.Name = "movimiento";
+			   settings.Text = movimientoInventario;
+			   settings.Properties.ClientInstanceName = "movimiento";
+			   settings.Width = Unit.Percentage(100);
+			   settings.ShowModelErrors = false;
+			   settings.ReadOnly = true;
+		   }).GetHtml()
+			</td>
+		}
+		else
+		{
+			<td></td>
+			<td></td>
+		}
+
+	</tr>
+	<tr class="psn-invclneg">
+		<td>Forma de Pago: </td>
+		<td>
+
+			@{
+				int? id_PaymentMethod = (Model != null && Model.InvoiceExterior.id_PaymentMethod != null) ? (int?)Model.InvoiceExterior.id_PaymentMethod : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_PaymentMethod, settings =>
+	   {
+		   settings.Name = "id_PaymentMethod";
+		   settings.Properties.ClientInstanceName = "id_PaymentMethod";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 20);
+		   settings.Properties.Columns.Add("name", "Forma/Pago", 120);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "InvoiceExteriorPaymentMethod_SelectedIndexChanged";
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_PaymentMethod").isReadOnly;
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_PaymentMethod").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+
+	   }).BindList(DataProviderPaymentMethod.FXPaymentMethods()).Bind(id_PaymentMethod).GetHtml()
+		</td>
+		<td>Nº de Contrato:</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.noContrato, settings =>
+	   {
+		   settings.Name = "noContrato";
+		   settings.Properties.ClientInstanceName = "noContrato";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ShowModelErrors = false;
+		   settings.ReadOnly = documentState.code != "01";
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-invclneg">
+		<td>Plazo: </td>
+		<td>
+
+			@{
+				int? id_PaymentMethod2 = (Model != null && Model.InvoiceExterior.id_PaymentMethod != null) ? (int?)Model.InvoiceExterior.id_PaymentMethod : null;
+				int? id_PaymentTerm = (Model != null && Model.InvoiceExterior.id_PaymentTerm != null) ? (int?)Model.InvoiceExterior.id_PaymentTerm : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_PaymentTerm, settings =>
+	   {
+		   settings.Name = "id_PaymentTerm";
+		   settings.Properties.ClientInstanceName = "id_PaymentTerm";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.CallbackRouteValues = new { Controller = "InvoiceExterior", Action = "GetPaymentTerm"/*, TextField = "CityName"*/ };
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 50);
+		   settings.Properties.Columns.Add("description", "Plazo", 160);
+		   settings.ShowModelErrors = true;
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_PaymentTerm").isReadOnly;
+
+		   if (!settings.ReadOnly)
+		   {
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnIdPaymentTermSelectedIndexChanged";
+		   }
+
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_PaymentTerm").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+			   };
+		   }
+
+	   }).BindList(DataProviderPaymentTerm.InvoiceExteriorPaymentsTermsByPaymentsMethodandCurrent(id_PaymentMethod2, id_PaymentTerm)).Bind(id_PaymentTerm).GetHtml()
+
+
+		</td>
+		<td>PO:</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.PO, settings =>
+	   {
+		   settings.Name = "PO";
+		   settings.Properties.ClientInstanceName = "PO";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ShowModelErrors = false;
+		   settings.ReadOnly = documentState.code != "01";
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>Banco de Transferencia:</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_BankTransfer, settings =>
+			{
+			   settings.Name = "id_BankTransfer";
+			   settings.Properties.ClientInstanceName = "id_BankTransfer";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextFormatString = "{1}";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.Columns.Add("code", "Cod.", 20);
+			   settings.Properties.Columns.Add("name", "Bancos", 120);
+			   settings.ShowModelErrors = true;
+
+			   settings.ReadOnly = (Model.Document.id_documentOrigen == null)
+				? _ControlsState.FirstOrDefault(r => r.controlName == "id_BankTransfer").isReadOnly
+				: true;
+
+				
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "BankTransfer_SelectedIndexChanged";
+
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_BankTransfer").isRequired && puedeModificarInfoProforma)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				   settings.CustomJSProperties = (s, e) =>
+				   {
+					   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+					   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					   e.Properties["cpIsRequired"] = "true";
+					   e.Properties["cpTabControl"] = "tabControl";
+
+				   };
+			   }
+
+			}).BindList(DataProviderCatalogue.GetTbsysCatalogueDetailBySetting("DBK")).Bind(this.Model.InvoiceExterior.id_BankTransfer).GetHtml()
+		</td>
+		<td>Información Transferencia:</td>
+		<td>
+
+			@Html.DevExpress().Memo(memoD =>
+			   {
+				   /* incluir si id_BankTransfer != null seccion */
+					string htmlBankInfo = "";
+					if (Model.InvoiceExterior.id_BankTransfer != null)
+					{
+						tbsysCatalogueDetail _catalogueDetail = DataProviderCatalogue.GetCatalogueDetailById((int)Model.InvoiceExterior.id_BankTransfer);
+						if (_catalogueDetail != null)
+						{
+							htmlBankInfo = @_catalogueDetail.fldFullText;
+						}
+					}
+
+				   memoD.Name = "infoBankTransfer";
+				   memoD.Width = Unit.Percentage(100);
+				   memoD.Text = htmlBankInfo;
+
+				   memoD.ReadOnly = true;
+				   memoD.Properties.ClientInstanceName = "infoBankTransfer";
+				   memoD.Properties.Rows = (Model.InvoiceExterior.id_BankTransfer == null) ? 1 : 10;
+			   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-invclneg">
+		<td>Banco Beneficiario: </td>
+		<td>
+
+			@{
+				int? id_bank = (Model != null && Model.InvoiceExterior.id_bank != 0) ? (int?)Model.InvoiceExterior.id_bank : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_bank, settings =>
+	   {
+		   settings.Name = "id_bank";
+		   settings.Properties.ClientInstanceName = "id_bank";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 60);
+		   settings.Properties.Columns.Add("name", "Banco", 180);
+		   settings.ShowModelErrors = true;
+
+	   }).BindList(DataProviderBank.GetAllBankActive()).GetHtml()
+		</td>
+		<td>Transporte: </td>
+		<td>
+			@{
+				string transport = (Model != null && Model.InvoiceExterior != null) ? (string)Model.InvoiceExterior.transport : string.Empty;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.transport, settings =>
+	   {
+		   settings.Name = "transport";
+		   settings.Properties.ClientInstanceName = "transport";
+		   settings.Properties.ValueField = "Value";
+		   settings.Properties.TextField = "Text";
+		   settings.Properties.ValueType = typeof(string);
+		   settings.Width = Unit.Percentage(100);
+		   settings.ReadOnly = documentState.code != "01";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+	   }).BindList(DataProviderTransportSize.Transports()).Bind(transport).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="2">
+			<div id="div_InvoiceExteriorPaymentTerm">
+				@Html.Partial("_InvoiceExteriorMainFormTabInvoiceExteriorPaymentTermDetails", this.Model.InvoiceExteriorPaymentTerm)
+			</div>
+		</td>
+		<td></td>
+	</tr>
+	<tr class="ps-header">
+		<td colspan="4" class="ps-bar-collapse" dtx="psn-invcldemb">
+			<span class="dxflGroupBoxCaption_Metropolis">Datos del Embarque</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-invcldemb">
+		<td>Fecha de Embarque: </td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.InvoiceExterior.dateShipment, settings =>
+		{
+			settings.Name = "dateShipment";
+			settings.Properties.ClientInstanceName = "dateShipment";
+			settings.Properties.ClientSideEvents.Init = "InvoiceExteriordateShipmentInit";
+
+			settings.Width = Unit.Percentage(100);
+
+			settings.Properties.UseMaskBehavior = true;
+			settings.Properties.EditFormat = EditFormat.Custom;
+			settings.Date = DateTime.Now;
+
+			settings.ShowModelErrors = true;
+
+			settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "dateShipment").isReadOnly;
+			if (_ControlsState.FirstOrDefault(r => r.controlName == "dateShipment").isRequired)
+			{
+				settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				settings.CustomJSProperties = (s, e) =>
+				{
+
+					e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "true";
+					e.Properties["cpTabControl"] = "tabControl";
+
+				};
+			}
+
+
+		}).GetHtml()
+		</td>
+		<td>Puerto de Embarque: </td>
+		<td>
+
+			@{
+				int? id_portShipment = (Model != null && Model.InvoiceExterior.id_portShipment != 0) ? (int?)Model.InvoiceExterior.id_portShipment : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_portShipment, settings =>
+	   {
+		   settings.Name = "id_portShipment";
+		   settings.Properties.ClientInstanceName = "id_portShipment";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 40);
+		   settings.Properties.Columns.Add("name", "Nombre Puerto", 160);
+		   settings.Properties.Columns.Add("cityName", "Ciudad", 100);
+		   settings.Properties.Columns.Add("countryName", "País", 100);
+		   settings.ShowModelErrors = true;
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_portShipment").isReadOnly;
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_portShipment").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+	   }).BindList(DataProviderPort.PortAllCityCountry((int)ViewData["id_company"], true)).Bind(id_portShipment).GetHtml()
+
+		</td>
+	</tr>
+	<tr class="psn-invcldemb">
+
+		<td>Puerto Descarga: </td>
+		<td>
+			@{
+				int? id_portDischarge = (Model != null && Model.InvoiceExterior.id_portDischarge != 0) ? (int?)Model.InvoiceExterior.id_portDischarge : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_portDischarge, settings =>
+	   {
+		   settings.Name = "id_portDischarge";
+		   settings.Properties.ClientInstanceName = "id_portDischarge";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 40);
+		   settings.Properties.Columns.Add("name", "Nombre Puerto", 160);
+		   settings.Properties.Columns.Add("cityName", "Ciudad", 100);
+		   settings.Properties.Columns.Add("countryName", "País", 100);
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "PortDischarge_SelectedIndexChanged";
+		   settings.ShowModelErrors = true;
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_portDischarge").isReadOnly;
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_portDischarge").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+	   }).BindList(DataProviderPort.PortAllCityCountry((int)ViewData["id_company"])).Bind(id_portDischarge).GetHtml()
+		</td>
+		<td>Puerto Destino: </td>
+		<td>
+			@{
+				int? id_portDestination = (Model != null && Model.InvoiceExterior.id_portDestination != 0) ? (int?)Model.InvoiceExterior.id_portDestination : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_portDestination, settings =>
+	   {
+		   settings.Name = "id_portDestination";
+		   settings.Properties.ClientInstanceName = "id_portDestination";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 40);
+		   settings.Properties.Columns.Add("name", "Nombre Puerto", 160);
+		   settings.Properties.Columns.Add("cityName", "Ciudad", 100);
+		   settings.Properties.Columns.Add("countryName", "País", 100);
+		   settings.ShowModelErrors = true;
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_portDestination").isReadOnly;
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_portDestination").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+	   }).BindList(DataProviderPort.PortAllCityCountry((int)ViewData["id_company"])).Bind(id_portDestination).GetHtml()
+		</td>
+
+	</tr>
+	<tr class="psn-invcldemb">
+		<td>Ciudad de Entrega:</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_CityDelivery, settings =>
+			{
+			   settings.Name = "id_CityDelivery";
+			   settings.Properties.ClientInstanceName = "id_CityDelivery";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextFormatString = "{2}";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.Columns.Add("code", "Cod.", 20);
+			   settings.Properties.Columns.Add("nombrePais", "País", 120);
+			   settings.Properties.Columns.Add("nombreCiudad", "Ciudad", 120);
+			   settings.ShowModelErrors = true;
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_CityDelivery").isReadOnly;
+
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_CityDelivery").isRequired && puedeModificarInfoProforma)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				   settings.CustomJSProperties = (s, e) =>
+				   {
+					   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+					   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					   e.Properties["cpIsRequired"] = "true";
+					   e.Properties["cpTabControl"] = "tabControl";
+				   };
+			   }
+
+			}).BindList(DataProviderCountry.ContriesCities((int)ViewData["id_company"])).Bind(this.Model.InvoiceExterior.id_CityDelivery).GetHtml()
+
+		</td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr class="psn-invcldemb">
+		<td>Agencia Naviera: </td>
+		<td>
+			@{
+				int? id_shippingAgency = (Model != null && Model.InvoiceExterior.id_shippingAgency != 0) ? (int?)Model.InvoiceExterior.id_shippingAgency : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_shippingAgency, settings =>
+	   {
+		   settings.Name = "id_shippingAgency";
+		   settings.Properties.ClientInstanceName = "id_shippingAgency";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 60);
+		   settings.Properties.Columns.Add("name", "Agencia Naviera", 180);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "InvoiceExteriorShippingAgency_SelectedIndexChanged";
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_shippingAgency").isReadOnly;
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_shippingAgency").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+	   }).BindList(DataProviderShippingAgency.ShippingAgencyAll()).Bind(id_shippingAgency).GetHtml()
+		</td>
+		<td>Línea Naviera: </td>
+		<td class="ps-tdspace">
+			@{
+				int? id_ShippingAgency2 = (Model != null && Model.InvoiceExterior.id_shippingAgency != null) ? (int?)Model.InvoiceExterior.id_shippingAgency : null;
+				int? id_ShippingLine = (Model != null && Model.InvoiceExterior.id_ShippingLine != 0) ? (int?)Model.InvoiceExterior.id_ShippingLine : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_ShippingLine, settings =>
+	   {
+		   settings.Name = "id_ShippingLine";
+		   settings.Properties.ClientInstanceName = "id_ShippingLine";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.CallbackRouteValues = new { Controller = "InvoiceExterior", Action = "GetShippingLine"/*, TextField = "CityName"*/ };
+		   //settings.Properties.CallbackPageSize = 15;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 50);
+		   settings.Properties.Columns.Add("description", "Linea Naviera", 160);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.EndCallback = "OnshippingLine_EndCallback";
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_ShippingLine").isReadOnly;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField2";
+		   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+
+			   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_ShippingLine").isRequired)
+			   {
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+			   }
+			   e.Properties["cpTabControl"] = "tabControl";
+			   e.Properties["cpCallBack"] = "validateShippingLine";
+			   e.Properties["cpMessageErrorFormart"] = "Debe ingresar Línea Naviera";
+		   };
+
+
+
+	   }).BindList(DataProviderShippingLine.InvoiceExteriorShippingLineByShippingAgencyandCurrent(id_ShippingAgency2, id_ShippingLine)).Bind(id_ShippingLine).GetHtml()
+
+		</td>
+	</tr>
+	<tr class="psn-invcldemb">
+		<td>Buque: </td>
+		<td class="ps-control-90">
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.shipName, settings =>
+	   {
+		   settings.Name = "shipName";
+		   settings.Properties.ClientInstanceName = "shipName";
+		   settings.Width = Unit.Percentage(105);
+		   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.MaxLength = 80;
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "shipName").isReadOnly;
+		   if (_ControlsState.FirstOrDefault(r => r.controlName == "shipName").isRequired)
+		   {
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+
+			   };
+		   }
+
+	   }).GetHtml()
+		</td>
+		<td>Viaje:</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.shipNumberTrip, settings =>
+	   {
+		   settings.Name = "shipNumberTrip";
+		   settings.Properties.ClientInstanceName = "shipNumberTrip";
+		   settings.Width = Unit.Percentage(80);
+		   //settings.Properties.DisplayFormatString = "N0";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.MaxLength = 20;
+
+		   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "shipNumberTrip").isReadOnly;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField2";
+		   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+
+			   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "shipNumberTrip").isRequired)
+			   {
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+			   }
+			   e.Properties["cpTabControl"] = "tabControl";
+			   e.Properties["cpCallBack"] = "validateShipNumberTrip";
+			   e.Properties["cpMessageErrorFormart"] = "Debe ingresar número de viaje";
+
+		   };
+
+
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-invcldemb">
+		<td>Partida Arancelaria: </td>
+		<td>
+			@Html.DevExpress().MemoFor(m => m.InvoiceExterior.tariffHeadingDescription, settings =>
+		   {
+			   settings.Name = "tariffHeadingDescription";
+			   settings.Properties.ClientInstanceName = "tariffHeadingDescription";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Height = Unit.Pixel(35);
+			   settings.ReadOnly = true;
+
+		   }).GetHtml()
+
+		</td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Número de B/L</td>
+		<td class="ps-control-90">
+			@Html.DevExpress().MemoFor(m => m.InvoiceExterior.BLNumber, settings =>
+		   {
+			   settings.Name = "BLNumber";
+			   settings.Properties.ClientInstanceName = "BLNumber";
+			   settings.Width = Unit.Percentage(100);
+
+			   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Height = Unit.Pixel(35);
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "BLNumber").isReadOnly;
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "BLNumber").isRequired)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				   settings.CustomJSProperties = (s, e) =>
+				   {
+					   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+					   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					   e.Properties["cpIsRequired"] = "true";
+					   e.Properties["cpTabControl"] = "tabControl";
+				   };
+			   }
+		   }).GetHtml()
+		</td>
+		<td>Fecha B/L</td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.InvoiceExterior.blDate,
+				dateEdit =>
+				{
+					dateEdit.Name = "blDate";
+					dateEdit.Width = Unit.Percentage(100);
+					dateEdit.Properties.ClientInstanceName = "blDate";
+					dateEdit.ShowModelErrors = true;
+
+					dateEdit.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "blDate").isReadOnly;
+					if (_ControlsState.FirstOrDefault(r => r.controlName == "blDate").isRequired)
+					{
+						dateEdit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+						dateEdit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+					}
+
+				}).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-invcldemb">
+
+
+		<td>Cantidad de Contenedores: </td>
+		<td class="ps-tdspace">
+			<span class="xfloat">
+				@Html.DevExpress().SpinEditFor(m => m.InvoiceExterior.numeroContenedores, settings =>
+		   {
+			   settings.Name = "numeroContenedores";
+			   settings.Properties.ClientInstanceName = "numeroContenedores";
+			   settings.Width = Unit.Percentage(100);
+
+			   settings.Properties.DisplayFormatString = "N0";
+			   settings.Properties.NumberType = SpinEditNumberType.Integer;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MinValue = 0;
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "numeroContenedores").isReadOnly;
+
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField2";
+			   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+			   settings.Properties.ValidationSettings.ErrorText = "Debe ingresar número de contenedores";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   if (_ControlsState.FirstOrDefault(r => r.controlName == "numeroContenedores").isRequired)
+				   {
+					   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					   e.Properties["cpIsRequired"] = "true";
+
+				   }
+				   e.Properties["cpTabControl"] = "tabControl";
+				   e.Properties["cpCallBack"] = "validateItemContainer";
+				   e.Properties["cpMessageErrorFormart"] = "Debe ingresar número de contenedores";
+
+			   };
+
+
+		   }).GetHtml()
+			</span>
+			<span class="xfloat">
+				@{
+					int? id_capacityContainer = (Model != null && Model.InvoiceExterior.id_capacityContainer != 0) ? (int?)Model.InvoiceExterior.id_capacityContainer : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_capacityContainer, settings =>
+		   {
+			   settings.Name = "id_capacityContainer";
+			   settings.Properties.ClientInstanceName = "id_capacityContainer";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextFormatString = "{1} {2}";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(80);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.Columns.Add("code", "Cod.", 35);
+			   settings.Properties.Columns.Add("name", "Capacidad", 100);
+			   settings.Properties.Columns.Add("MetricUnit.code", "U.M.", 60);
+			   settings.ShowModelErrors = true;
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_capacityContainer").isReadOnly;
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField2";
+			   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   if (_ControlsState.FirstOrDefault(r => r.controlName == "id_capacityContainer").isRequired)
+				   {
+					   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					   e.Properties["cpIsRequired"] = "true";
+				   }
+				   e.Properties["cpTabControl"] = "tabControl";
+				   e.Properties["cpCallBack"] = "validateCapacityContainer";
+				   e.Properties["cpMessageErrorFormart"] = "Debe seleccionar capacidad de contenedor";
+
+			   };
+
+
+		   }).BindList(DataProviderCapacityContainer.CapacityContainerAll()).Bind(id_capacityContainer).GetHtml()
+			</span>
+		</td>
+
+
+
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DAE: </td>
+		<td colspan="3">
+			<span class="ps-control-31px">
+				@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.daeNumber, settings =>
+		   {
+			   settings.Name = "daeNumber";
+			   settings.Properties.ClientInstanceName = "daeNumber";
+			   settings.Width = Unit.Percentage(100);
+
+			   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 3;
+			   settings.Properties.ClientSideEvents.KeyPress = "OnDaeTextChanged";
+
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+				   e.Properties["cpMaxLength"] = "3";
+				   e.Properties["cpNextControl"] = "daeNumber2";
+
+			   };
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "daeNumber").isReadOnly;
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "daeNumber").isRequired)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+			   }
+
+
+		   }).GetHtml()
+			</span>
+			<span class="ps-control-41px">
+				@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.daeNumber2, settings =>
+		   {
+			   settings.Name = "daeNumber2";
+			   settings.Properties.ClientInstanceName = "daeNumber2";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.MaxLength = 4;
+
+			   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.KeyPress = "OnDaeTextChanged";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+				   e.Properties["cpMaxLength"] = "4";
+				   e.Properties["cpNextControl"] = "daeNumber3";
+
+			   };
+
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "daeNumber2").isReadOnly;
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "daeNumber2").isRequired)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+			   }
+
+
+		   }).GetHtml()
+			</span>
+			<span class="ps-control-31px">
+				@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.daeNumber3, settings =>
+		   {
+			   settings.Name = "daeNumber3";
+			   settings.Properties.ClientInstanceName = "daeNumber3";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.MaxLength = 2;
+
+			   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.KeyPress = "OnDaeTextChanged";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+
+				   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+				   e.Properties["cpMaxLength"] = "2";
+				   e.Properties["cpNextControl"] = "daeNumber4";
+
+			   };
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "daeNumber3").isReadOnly;
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "daeNumber3").isRequired)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+			   }
+
+
+		   }).GetHtml()
+			</span>
+			<span class="ps-control-71px">
+				@Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.daeNumber4, settings =>
+		   {
+			   settings.Name = "daeNumber4";
+			   settings.Properties.ClientInstanceName = "daeNumber4";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.MaxLength = 8;
+
+			   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+			   settings.ShowModelErrors = true;
+
+			   settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "daeNumber4").isReadOnly;
+			   if (_ControlsState.FirstOrDefault(r => r.controlName == "daeNumber4").isRequired)
+			   {
+				   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				   settings.CustomJSProperties = (s, e) =>
+				   {
+					   e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+					   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					   e.Properties["cpIsRequired"] = "true";
+					   e.Properties["cpTabControl"] = "tabControl";
+				   };
+			   }
+
+
+		   }).GetHtml()
+			</span>
+		</td>
+
+	</tr>
+	<tr class="psn-invcldemb">
+		<td>Contenedores:</td>
+		<td>
+			@Html.DevExpress().MemoFor(m => m.InvoiceExterior.containers, settings =>
+			{
+				settings.Name = "containers";
+				settings.Properties.ClientInstanceName = "containers";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "containers").isReadOnly;
+			}).GetHtml()
+		</td>
+
+	</tr>
+</table>
+
+<script src="~/Scripts/invoiceeexterior/editform.js"></script>

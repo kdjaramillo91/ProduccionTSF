@@ -1,0 +1,30 @@
+﻿@model IList<DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingTransferSummaryDTO>
+<div>
+	<table width="100%">
+		<tr>
+			<td><b>Tipo</b></td>
+			<td><b>Origen</b></td>
+			<td><b>Destino</b></td>
+			<td><b>Entero</b></td>
+			<td><b>Cola</b></td>
+			<td><b>Total</b></td>
+		</tr>
+		@foreach (var detalle in this.Model)
+		{
+			<tr>
+				<td>@detalle.transferType</td>
+				<td>@detalle.machineForProdOrigin</td>
+				<td>@detalle.machineForProdDestiny</td>
+				<td>@detalle.whole.ToString("N2")</td>
+				<td>@detalle.tail.ToString("N2")</td>
+				<td>@detalle.total.ToString("N2")</td>
+			</tr>
+		}
+		<tr>
+			<td colspan="3"><b>Total</b></td>
+			<td>@this.Model.Sum(x => x.whole).ToString("N2")</td>
+			<td>@this.Model.Sum(x => x.tail).ToString("N2")</td>
+			<td>@this.Model.Sum(x => x.total).ToString("N2")</td>
+		</tr>
+	</table>
+</div>

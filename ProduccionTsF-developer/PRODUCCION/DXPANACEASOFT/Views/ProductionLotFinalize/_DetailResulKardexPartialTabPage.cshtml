@@ -1,0 +1,757 @@
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+@{
+	var entityObjectPermissions = (EntityObjectPermissions)ViewData["entityObjectPermissions"];
+	var showCost = true;
+	var loteMarcado = DataProviderSetting.ValueSetting("LMMASTER");
+	if (entityObjectPermissions != null)
+	{
+		var objectPermissions = entityObjectPermissions.listObjectPermissions.FirstOrDefault(fod => fod.codeObject == "COS");
+		showCost = objectPermissions == null;
+	}
+
+	bool ver_costos = IsEnabled("VerCosto");
+}
+@{
+	var grid = Html.DevExpress().GridView<ResultKardex>(settings =>
+	{
+		settings.Name = "gvKardexDetails";
+		settings.CallbackRouteValues = new { Controller = "productionLotFinalize", Action = "KardexPartial" };
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.SettingsBehavior.AllowFixedGroups = true;
+
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.ClientSideEvents.BeginCallback = "OnGridViewKardex_BeginCallback";
+
+		#region SearchPanel
+
+		//Panel de Busqueda
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		#endregion
+
+		settings.Settings.ShowFooter = true;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView detailsGrid = s as MVCxGridView;
+			if (detailsGrid == null) return;
+
+			e.Properties["cpSettingKardex"] = null;
+
+		};
+
+		settings.Columns.Add(m => m.document, column =>
+		{
+			column.Name = "document";
+			column.Caption = "No. Movimiento";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.documentType, column =>
+		{
+			column.Name = "documentType";
+			column.Caption = "Tipo de Movimiento";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+
+		settings.Columns.Add(m => m.inventoryReason, column =>
+		{
+			column.Name = "inventoryReason";
+			column.Caption = "Motivo de Inventario";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.emissionDate, column =>
+		{
+			column.Name = "emissionDate";
+			column.Caption = "Fecha de Emisión";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.code_item, column =>
+		{
+			column.Name = "code_item";
+			column.Caption = "Código-Producto";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(10);
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				ViewContext.Writer.Write(
+							@"<a href=""javascript: void(0);"" onclick=""GridViewShowPagefromLinkButton_Click({0},'Item')"">{1}</a>",
+							DataBinder.Eval(c.DataItem, "id_item"),
+							DataBinder.Eval(c.DataItem, "code_item")
+							);
+
+			});
+		}).GroupIndex = 0;
+
+		settings.Columns.Add(m => m.numberRemissionGuide, column =>
+		{
+			column.Name = "numberRemissionGuide";
+			column.Caption = "Guía";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.UnboundType = UnboundColumnType.String;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.metricUnit, column =>
+		{
+			column.Name = "metricUnit";
+			column.Caption = "UM";
+			column.ReadOnly = true;
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(3);
+		});
+
+		settings.Columns.Add(m => m.number, column =>
+		{
+			column.Name = "number";
+			column.Caption = "Lote";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(5);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_lot = (int?)DataBinder.Eval(c.DataItem, "id_lot");
+				ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_lot);
+				if (productionLot != null)
+				{
+					var typeLot = "Recepcion";
+					if (productionLot.ProductionProcess.code != ("REC"))
+					{
+						typeLot = "Proceso";
+					}
+					ViewContext.Writer.Write(
+							@"<a href=""javascript: void(0);"" onclick=""GridViewShowPagefromLinkButton_Click({0},'{1}')"">{2}</a>",
+							DataBinder.Eval(c.DataItem, "id_lot"),
+							typeLot,
+							DataBinder.Eval(c.DataItem, "number")
+							);
+				}
+				else
+				{
+					ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "number"));
+				}
+
+
+			});
+		}).GroupIndex = 3;
+
+		if (loteMarcado == "SI")
+		{
+			settings.Columns.Add(m => m.lotMarked, column =>
+			{
+				column.Name = "lotMarked";
+				column.Caption = "Lote Marcado";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			}).GroupIndex = 3;
+		}
+
+		settings.Columns.Add(m => m.warehouse, column =>
+		{
+			column.Name = "warehouse";
+			column.Caption = "Bodega";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		}).GroupIndex = 1;
+
+		settings.Columns.Add(m => m.warehouseLocation, column =>
+		{
+			column.Name = "warehouseLocation";
+			column.Caption = "Ubicación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		}).GroupIndex = 2;
+
+
+		#region commented
+
+		if (ver_costos)
+		{
+			settings.Columns.AddBand(band =>
+			{
+				band.Caption = "Anterior";
+				band.Width = Unit.Percentage(15);
+				band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "previousBalance";
+					column.Caption = "Saldo";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var previousBalance = (decimal?)DataBinder.Eval(content.DataItem, "previousBalance");
+
+						if (previousBalance.HasValue && previousBalance != 0)
+						{
+							ViewContext.Writer.Write(previousBalance.Value.ToDecimalFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.Name = "unitPreviousBalance";
+					column.Caption = "P. Unit";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var balance = (decimal?)DataBinder.Eval(content.DataItem, "previousBalance");
+						var balanceCost = (decimal?)DataBinder.Eval(content.DataItem, "previousBalanceCost");
+
+						if ((balance.HasValue && balance != 0) && (balanceCost.HasValue))
+						{
+							var unitBalancePrice = Math.Abs(balanceCost.Value / balance.Value);
+							ViewContext.Writer.Write(unitBalancePrice.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "previousBalanceCost";
+					column.Caption = "Costo";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+					column.SetDataItemTemplateContent(content =>
+					{
+						var previousBalance = (decimal?)DataBinder.Eval(content.DataItem, "previousBalance");
+						var previousBalanceCost = (decimal?)DataBinder.Eval(content.DataItem, "previousBalanceCost");
+
+						if ((previousBalance.HasValue && previousBalance != 0) && (previousBalanceCost.HasValue))
+						{
+							ViewContext.Writer.Write(previousBalanceCost.Value.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+			});
+
+			settings.Columns.AddBand(band =>
+			{
+				band.Caption = "Ingreso";
+				band.Width = Unit.Percentage(15);
+				band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "entry";
+					column.Caption = "Cantidad";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var entry = (decimal?)DataBinder.Eval(content.DataItem, "entry");
+
+						if(entry.HasValue && entry != 0)
+						{
+							ViewContext.Writer.Write(entry.Value.ToDecimalFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "priceCost";
+					column.Caption = "P. Unit";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var entry = (decimal?)DataBinder.Eval(content.DataItem, "entry");
+						var priceCost = (decimal?)DataBinder.Eval(content.DataItem, "priceCost");
+
+						if ((entry.HasValue && entry != 0) && (priceCost.HasValue))
+						{
+							ViewContext.Writer.Write(priceCost.Value.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "entryCost";
+					column.Caption = "Costo";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var entry = (decimal?)DataBinder.Eval(content.DataItem, "entry");
+						var entryCost = (decimal?)DataBinder.Eval(content.DataItem, "entryCost");
+
+						if ((entry.HasValue && entry != 0) && (entryCost.HasValue))
+						{
+							ViewContext.Writer.Write(entryCost.Value.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+			});
+
+			settings.Columns.AddBand(band =>
+			{
+				band.Caption = "Egreso";
+				band.Width = Unit.Percentage(15);
+				band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "exit";
+					column.Caption = "Cantidad";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var exit = (decimal?)DataBinder.Eval(content.DataItem, "exit");
+
+						if (exit.HasValue && exit != 0)
+						{
+							ViewContext.Writer.Write(exit.Value.ToDecimalFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "priceCost";
+					column.Caption = "P. Unit";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var exit = (decimal?)DataBinder.Eval(content.DataItem, "exit");
+						var priceCost = (decimal?)DataBinder.Eval(content.DataItem, "priceCost");
+
+						if ((exit.HasValue && exit != 0) && (priceCost.HasValue))
+						{
+							ViewContext.Writer.Write(priceCost.Value.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "exitCost";
+					column.Caption = "Costo";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var exit = (decimal?)DataBinder.Eval(content.DataItem, "exit");
+						var exitCost = (decimal?)DataBinder.Eval(content.DataItem, "exitCost");
+
+						if ((exit.HasValue && exit != 0) && (exitCost.HasValue))
+						{
+							ViewContext.Writer.Write(exitCost.Value.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+			});
+
+			settings.Columns.AddBand(band =>
+			{
+				band.Caption = "Saldo";
+				band.Width = Unit.Percentage(15);
+				band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "balance";
+					column.Caption = "Cantidad";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var balance = (decimal?)DataBinder.Eval(content.DataItem, "balance");
+
+						if (balance.HasValue && balance != 0)
+						{
+							ViewContext.Writer.Write(balance.Value.ToDecimalFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.Name = "unitBalancePrice";
+					column.Caption = "P. Unit";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var balance = (decimal?)DataBinder.Eval(content.DataItem, "balance");
+						var balanceCost = (decimal?)DataBinder.Eval(content.DataItem, "balanceCost");
+
+						if ((balance.HasValue && balance != 0) && (balanceCost.HasValue))
+						{
+							var unitBalancePrice = balanceCost / balance;
+							ViewContext.Writer.Write(unitBalancePrice.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "balanceCost";
+					column.Caption = "Costo";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var balance = (decimal?)DataBinder.Eval(content.DataItem, "balance");
+						var balanceCost = (decimal?)DataBinder.Eval(content.DataItem, "balanceCost");
+
+						if ((balance.HasValue && balance != 0) && (balanceCost.HasValue))
+						{
+							ViewContext.Writer.Write(balanceCost.Value.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+			});
+
+			settings.Columns.AddBand(band =>
+			{
+				band.Caption = "Corte";
+				band.Width = Unit.Percentage(15);
+				band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				band.Visible = false;
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "balanceCutting";
+					column.Caption = "Cantidad";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var balance = (decimal?)DataBinder.Eval(content.DataItem, "balanceCutting");
+
+						if (balance.HasValue && balance != 0)
+						{
+							ViewContext.Writer.Write(balance.Value.ToDecimalFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.Name = "unitBalanceCuttingPrice";
+					column.Caption = "P. Unit";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var balance = (decimal?)DataBinder.Eval(content.DataItem, "balanceCutting");
+						var balanceCost = (decimal?)DataBinder.Eval(content.DataItem, "balanceCuttingCost");
+
+						if ((balance.HasValue && balance != 0) && (balanceCost.HasValue))
+						{
+							var unitBalancePrice = balanceCost / balance;
+							ViewContext.Writer.Write(unitBalancePrice.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+				band.Columns.Add(column =>
+				{
+					column.FieldName = "balanceCuttingCost";
+					column.Caption = "Costo";
+					column.Width = Unit.Percentage(3);
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+					column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+
+					column.SetDataItemTemplateContent(content =>
+					{
+						var balance = (decimal?)DataBinder.Eval(content.DataItem, "balanceCutting");
+						var balanceCost = (decimal?)DataBinder.Eval(content.DataItem, "balanceCuttingCost");
+
+						if ((balance.HasValue && balance != 0) && (balanceCost.HasValue))
+						{
+							ViewContext.Writer.Write(balanceCost.Value.ToCurrencyFormat());
+						}
+						else
+						{
+							ViewContext.Writer.Write("-");
+						}
+					});
+				});
+
+			});
+		}
+		else
+		{
+			settings.Columns.Add(m => m.previousBalance, column =>
+			{
+				column.Name = "previousBalance";
+				column.Caption = "Saldo Anterior";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.Width = Unit.Percentage(3);
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					decimal previousBalance = (decimal)DataBinder.Eval(c.DataItem, "previousBalance");
+
+					string text = previousBalance.ToString("#,##0.00");
+
+					ViewContext.Writer.Write(text);
+				});
+			});
+
+			settings.Columns.Add(m => m.entry, column =>
+			{
+				column.Name = "entryAmount";
+				column.Caption = "Ingreso";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+				column.Width = Unit.Percentage(3);
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					decimal entryAmount = (decimal)DataBinder.Eval(c.DataItem, "entry");
+
+					//string formato = entryAmount >= 1000 ? "0,000.00" : "0.00";
+					string text = entryAmount.ToString("#,##0.00");
+
+					ViewContext.Writer.Write(text);
+				});
+			});
+
+			settings.Columns.Add(m => m.exit, column =>
+			{
+				column.Name = "exitAmount";
+				column.Caption = "Egreso";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+				column.Width = Unit.Percentage(3);
+
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					decimal exitAmount = (decimal)DataBinder.Eval(c.DataItem, "exit");
+
+					//string formato = exitAmount >= 1000 ? "0,000.00" : "0.00";
+					string text = exitAmount.ToString("#,##0.00");
+
+					ViewContext.Writer.Write(text);
+				});
+			});
+
+			settings.Columns.Add(m => m.balance, column =>
+			{
+				column.Name = "balance";
+				column.Caption = "Saldo";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.Width = Unit.Percentage(3);
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					decimal balance = (decimal)DataBinder.Eval(c.DataItem, "balance");
+					string text = balance.ToString("#,##0.00");
+
+					ViewContext.Writer.Write(text);
+				});
+			});
+
+			settings.Columns.Add(m => m.balanceCutting, column =>
+			{
+				column.Name = "balanceCutting";
+				column.Caption = "Saldo Al Corte";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.Width = Unit.Percentage(3);
+				column.Visible = false;
+
+				column.SetDataItemTemplateContent(c =>
+				{
+					decimal balance = (decimal)DataBinder.Eval(c.DataItem, "balanceCutting");
+					string text = balance.ToString("#,##0.00");
+
+					ViewContext.Writer.Write(text);
+				});
+
+			});
+
+
+		}
+		#endregion
+
+		settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "balanceCutting").DisplayFormat = "<b>Saldo: {0:#,##0.00}</b>";
+		if (ver_costos)
+		{
+			settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "balanceCuttingCost").DisplayFormat = "<b>Saldo: {0:#,##0.00}</b>";
+		}
+
+	});
+}
+@grid.Bind(Model).GetHtml()
+
+@functions{
+	bool IsEnabled(string namePermission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.name.Equals(namePermission));
+
+		return (permission != null);
+	}
+
+}

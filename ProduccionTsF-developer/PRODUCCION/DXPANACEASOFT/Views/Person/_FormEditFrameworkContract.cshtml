@@ -1,0 +1,258 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.FrameworkContract>
+
+@{
+    var grid = Html.DevExpress().GridView<FrameworkContract>(settings => {
+        settings.Name = "PersonFrameworkContracts";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "PersonFrameworkContract" };
+
+        settings.ClientSideEvents.BeginCallback = "FrameworkContract_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "FrameworkContractAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "FrameworkContractUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "FrameworkContractDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm; //GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            //int id_item = (int)DataBinder.Eval(c.DataItem, "id");
+            FrameworkContract detail = (FrameworkContract)Model[c.ItemIndex];
+
+            //Item detail = DataProviderItem.Item(id_item);
+            if (detail != null && detail.FrameworkContractItem != null)
+            {
+                //Html.RenderAction("_BusinessOportunityPhasesDetailPartial", new { item = detail });
+                ViewData["id_frameworkContract"] = detail.id;
+                ViewData["code_typeContractFramework"] = detail.TypeContractFramework.code;
+                Html.RenderPartial("_FrameworkContractItemViewPartial", detail.FrameworkContractItem.OrderBy(od => od.id).ToList());
+            }
+        });
+        settings.Styles.Header.Font.Bold = true;
+
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        //Compañía
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_company";
+            column.Caption = "Compañía";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_company = (int?)DataBinder.Eval(c.DataItem, "id_company");
+
+                Company company = DataProviderCompany.CompanyById(id_company);
+
+                if (company != null)
+                {
+                    ViewContext.Writer.Write(company.businessName);
+                }
+            });
+
+            //column.EditorProperties().ComboBox(p =>
+            //{
+            //    p.ClientInstanceName = "id_company";
+            //    p.DataSource = DataProviderCompany.AllCompanies();
+            //    //p.TextField = "businessName";
+            //    p.TextFormatString = "{0}";
+            //    p.ValueField = "id";
+            //    p.ValueType = typeof(int);
+
+            //    p.Columns.Add("code", "Cod.", 50);
+            //    p.Columns.Add("businessName", "Nombre", 100);
+
+            //    p.DropDownStyle = DropDownStyle.DropDownList;
+            //    p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+            //    //p.EnableSynchronization = DefaultBoolean.False;
+            //    p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+            //    p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+            //    p.ClientSideEvents.Init = "ProviderRelatedCompanyCompanyCombo_Init";
+            //    p.ClientSideEvents.SelectedIndexChanged = "ProviderRelatedCompanyCompanyCombo_SelectedIndexChanged";
+
+            //    p.Width = Unit.Percentage(100);
+            //});
+
+        });
+
+        //Código
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_typeContractFramework";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_typeContractFramework = (int?)DataBinder.Eval(c.DataItem, "id_typeContractFramework");
+                TypeContractFramework typeContractFramework = DataProviderFrameworkContract.TypeContractFrameworkById(id_typeContractFramework);
+
+                if (typeContractFramework != null)
+                {
+                    ViewContext.Writer.Write(typeContractFramework.code);
+                }
+            });
+
+        });
+
+        //Tipo de Contrato Marco
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_typeContractFramework";
+            column.Caption = "Tipo de Contrato Marco";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_typeContractFramework = (int?)DataBinder.Eval(c.DataItem, "id_typeContractFramework");
+                TypeContractFramework typeContractFramework = DataProviderFrameworkContract.TypeContractFrameworkById(id_typeContractFramework);
+
+                if (typeContractFramework != null)
+                {
+                    ViewContext.Writer.Write(typeContractFramework.name);
+                }
+            });
+
+            //column.EditorProperties().ComboBox(p =>
+            //{
+            //    p.ClientInstanceName = "id_division";
+            //    p.DataSource = DataProviderDivision.AllDivisions();
+            //    //p.TextField = "name";
+            //    p.TextFormatString = "{0}";
+            //    p.ValueField = "id";
+            //    p.ValueType = typeof(int);
+
+            //    p.Columns.Add("code", "Cod.", 50);
+            //    p.Columns.Add("name", "Nombre", 100);
+
+            //    p.DropDownStyle = DropDownStyle.DropDownList;
+            //    p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+            //    //p.EnableSynchronization = DefaultBoolean.False;
+            //    p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+            //    p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+            //    //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+            //    p.ClientSideEvents.SelectedIndexChanged = "ProviderPaymentTermDivisionCombo_SelectedIndexChanged";
+
+            //    p.Width = Unit.Percentage(100);
+            //});
+
+        });
+
+        //Rol
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_rol";
+            column.Caption = "Rol en Contrato";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_rol = (int?)DataBinder.Eval(c.DataItem, "id_rol");
+                Rol rol = DataProviderRol.RoById(id_rol);
+
+                if (rol != null)
+                {
+                    ViewContext.Writer.Write(rol.name);
+                }
+                else
+                {
+                    ViewContext.Writer.Write("");
+                }
+            });
+
+        });
+
+        //Estado
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id";
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+                FrameworkContract detail = (FrameworkContract)Model[c.ItemIndex];
+                //Document document = DataProviderDocument.Document(id);
+
+                if (detail != null && detail.Document != null)
+                {
+                    ViewContext.Writer.Write(detail.Document.DocumentState.name);
+                }
+                else
+                {
+                    ViewContext.Writer.Write("PENDIENTE");
+                }
+            });
+
+        });
+
+        #region EditorLayout
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            FrameworkContract detail = new FrameworkContract();
+            if (c.ItemIndex >= 0)
+            {
+                detail = Model[c.ItemIndex];
+            }
+            //detail = (detail == null) ? new BusinessOportunityPhase() : detail;
+            ////Item detail = DataProviderItem.Item(id_item);
+            ////if (detail != null)
+            ////{
+            ////Html.RenderAction("_BusinessOportunityPhasesEditPartial", new { item = detail });
+            ////}
+            Html.RenderPartial("_FrameworkContractsEditPartial", detail);
+
+            //int? id_businessOportunityPhase = (int?)DataBinder.Eval(c.DataItem, "id");
+            //BusinessOportunityPhase businessOportunityPhase = (id_businessOportunityPhase != null) ? DataProviderBusinessOportunity.BusinessOportunityPhase(id_businessOportunityPhase) : new BusinessOportunityPhase();
+            //Html.RenderPartial("_BusinessOportunityPhasesEditPartial", businessOportunityPhase);
+
+            //int? id_item = (int?)DataBinder.Eval(content.DataItem, "id");
+            //Item item = (id_item != null) ? DataProviderItem.Item((int)id_item) : new Item { isActive = true };
+            //Html.RenderPartial("_ItemFormEdit", item);
+        });
+
+        #endregion
+
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

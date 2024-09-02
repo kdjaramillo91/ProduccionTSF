@@ -1,0 +1,265 @@
+﻿@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.LiquidationCartOnCart
+
+@{
+	string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) ? Model.Document.DocumentState.code : "";
+	int id_MachineForProd = (Model != null) ? Model.id_MachineForProd : 0;
+	int? id_MachineProdOpening = (Model != null) ? Model.id_MachineProdOpening : (int?)null;
+	var timeInitTurn = Model.MachineProdOpening != null && Model.MachineProdOpening.Turn != null ? Model.MachineProdOpening.Turn.timeInit.ToString() : null;
+	var timeEndTurn = Model.MachineProdOpening != null && Model.MachineProdOpening.Turn != null ? Model.MachineProdOpening.Turn.timeEnd.ToString() : null;
+	@Html.Hidden("id_MachineProdOpeningDetailInit", (int?)ViewBag.id_MachineProdOpeningDetailInit)
+	@Html.Hidden("timeInitMachineProdOpeningDetail", (TimeSpan?)ViewBag.timeInitMachineProdOpeningDetail)
+	@Html.Hidden("timeInitTurn", timeInitTurn)
+	@Html.Hidden("timeEndTurn", timeEndTurn)
+	@Html.HiddenFor(m => m.id_MachineForProd, new { @id = "id_MachineForProd" })
+	@Html.HiddenFor(m => m.id_MachineProdOpening, new { @id = "id_MachineProdOpening" })
+
+	@Html.Hidden("id_MachineForProdT2", id_MachineForProd)
+	@Html.Hidden("id_MachineProdOpeningT2", id_MachineProdOpening)
+
+	var dateTimeTimeInitLiquidationAux = (Model != null && Model.timeInit != null) ? new DateTime(2014, 1, 1, Model.timeInit.Hours, Model.timeInit.Minutes, Model.timeInit.Seconds) :
+																					 new DateTime(2014, 1, 1, 0, 0, 0);
+	var dateTimeTimeEndLiquidationAux = (Model != null && Model.timeEnd != null) ? new DateTime(2014, 1, 1, Model.timeEnd.Value.Hours, Model.timeEnd.Value.Minutes, Model.timeEnd.Value.Seconds) :
+																					 new DateTime(2014, 1, 1, 0, 0, 0);
+
+	Item it = Model.ProductionLot.ProductionLotDetail.Select(s => s.Item).FirstOrDefault();
+
+	int idProccesType = Model.ProductionLot.id_processtype ?? 0;
+	string nameItem = "";
+	string processType = "";
+	string nameProcessType = "";
+	if (it != null)
+	{
+		nameItem = it.name;
+
+		var processTypeModel = it.ItemProcessType.FirstOrDefault().ProcessType;
+		var itpt = processTypeModel.code;
+		nameProcessType = processTypeModel.name;
+		processType = itpt.ToString();
+		idProccesType = processTypeModel.id;
+	}
+	@Html.Hidden("codeProcessType", processType)
+	var liquidationCartOnCartDetail = (Model != null && Model.LiquidationCartOnCartDetail != null) ? Model.LiquidationCartOnCartDetail.Where(w => (w.InventoryMovePlantTransferDetail.FirstOrDefault(fod => fod.InventoryMovePlantTransfer.InventoryMove.Document.DocumentState.code == "01" ||
+																																						   fod.InventoryMovePlantTransfer.InventoryMove.Document.DocumentState.code == "03") != null)).ToList()
+																										   : new List<LiquidationCartOnCartDetail>();
+}
+
+<table id="mainTabLiquidationCartOnCart" class="table table-condensed" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="9">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Filtros Opcionales</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "idItemLabel";
+				settings.Text = "Producto:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBox(settings =>
+			{
+				settings.Name = "nameItem";
+				settings.Text = nameItem;
+				settings.ReadOnly = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "nameProcessLabel";
+				settings.Text = "Proceso:";
+			}).GetHtml()
+		</td>
+		<td>
+			@*@Html.DevExpress().TextBox(settings =>
+				{
+					settings.Name = "nameProcessType";
+					settings.Text = nameProcessType;
+					//settings.ReadOnly = true;
+				}).GetHtml()*@
+
+			@Html.DevExpress().ComboBoxFor(m => m.idProccesType, settings =>
+			{
+				settings.Name = "idProccesType";
+				settings.Properties.ClientInstanceName = "idProccesType";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(110);
+				settings.ReadOnly = codeState != "01" || (liquidationCartOnCartDetail.Count > 0);
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnIdProcessType_SelectedIndexChanged";
+				settings.Properties.ClientSideEvents.Validation = "OnIdProcessTypeValidation";
+			}).BindList(DataProviderProcessType.ProcessTypeSizeByProcess(idProccesType)).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "dataInitLabel";
+				settings.Text = "Fecha Inicio:";
+				settings.ControlStyle.Font.Bold = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.dateInit, settings =>
+			{
+				settings.Name = "dateInitLiquidation";
+				settings.Properties.ClientInstanceName = "dateInitLiquidation";
+				settings.Properties.UseMaskBehavior = true;
+				settings.Properties.EditFormat = EditFormat.Custom;
+				settings.Properties.EditFormatString = "dd/MM/yyyy";
+				settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = codeState != "01" || (liquidationCartOnCartDetail.Count > 0);
+				settings.ShowModelErrors = false;
+				settings.Properties.ClientSideEvents.Validation = "OnRangeLiquidationDateValidation";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "dataEndLabel";
+				settings.Text = "Fecha Fin:";
+				settings.ControlStyle.Font.Bold = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.dateEnd, settings =>
+			{
+				settings.Name = "dateEndLiquidation";
+				settings.Properties.ClientInstanceName = "dateEndLiquidation";
+				settings.Properties.UseMaskBehavior = true;
+				settings.Properties.EditFormat = EditFormat.Custom;
+				settings.Properties.EditFormatString = "dd/MM/yyyy";
+				settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = codeState != "01" || (liquidationCartOnCartDetail.Count > 0);
+				settings.ShowModelErrors = false;
+				settings.Properties.ClientSideEvents.Validation = "OnRangeLiquidationDateValidation";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "idMachineLabel";
+				settings.Text = "Máquina:";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				var machinesForProdModel = new LiquidationCartOnCartController.ComboBoxMachinesProdOpeningModel()
+				{
+					id_MachineForProd = id_MachineForProd,
+					id_MachineProdOpening = id_MachineProdOpening,
+					documentStateCode = codeState,
+					emissionDate = this.Model.Document.emissionDate,
+					id_PersonProcessPlant = this.Model.ProductionLot.id_personProcessPlant,
+					itemsReceivedTunnels = (liquidationCartOnCartDetail.Count > 0)
+				};
+
+				Html.RenderPartial("ComponentsDetail/_ComboBoxMachinesProdOpening", machinesForProdModel);
+			}
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "turnLabel";
+				settings.Text = "Turno:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.MachineProdOpening.Turn.name, settings =>
+			{
+				settings.Name = "nameTurno";
+				settings.ReadOnly = true;
+			}).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "timeInitLabel";
+				settings.Text = "Hora Inicio:";
+				settings.ControlStyle.Font.Bold = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TimeEdit(settings =>
+			{
+				settings.Name = "timeInitLiquidation";
+				settings.Properties.ClientInstanceName = "timeInitLiquidation";
+
+				settings.Properties.EditFormat = EditFormat.Time;
+				settings.Properties.EditFormatString = "HH:mm";
+				settings.Properties.DisplayFormatString = "HH:mm";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = codeState != "01";
+				settings.DateTime = dateTimeTimeInitLiquidationAux;
+				settings.ShowModelErrors = false;
+				//settings.Properties.ClientSideEvents.Validation = "TimeInitLiquidation_Validation";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "timeEndLabel";
+				settings.Text = "Hora Fin:";
+				settings.ControlStyle.Font.Bold = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TimeEdit(settings =>
+			{
+				settings.Name = "timeEndLiquidation";
+				settings.Properties.ClientInstanceName = "timeEndLiquidation";
+
+				settings.Properties.EditFormat = EditFormat.Time;
+				settings.Properties.EditFormatString = "HH:mm";
+				settings.Properties.DisplayFormatString = "HH:mm";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = codeState != "01";
+				settings.DateTime = dateTimeTimeEndLiquidationAux;
+				settings.ShowModelErrors = false;
+				//settings.Properties.ClientSideEvents.Validation = "TimeEndLiquidation_Validation";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_liquidator, settings =>
+		   {
+			   settings.Name = "id_liquidatorLabel";
+			   settings.Text = "Liquidador:";
+			   settings.AssociatedControlName = "id_liquidator";
+		   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_liquidator = (Model != null && Model.id_liquidator != 0) ? (int?)Model.id_liquidator : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_liquidator, settings =>
+			{
+				settings.Name = "id_liquidator";
+				settings.Properties.ClientInstanceName = "id_liquidator";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "fullname_businessName";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(85);
+				settings.ReadOnly = codeState != "01";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnLiquidatorValidation";
+			}).BindList(DataProviderPerson.liquidatorsByCompanyAndCurrent((int?)ViewData["id_company"], id_liquidator, (int?)ViewData["id_user"])).Bind(id_liquidator).GetHtml()
+		</td>
+	</tr>
+</table>
+<br />
+<br />

@@ -1,0 +1,30 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.RequestInventoryMoveDTO
+@model List<RequestInventoryMoveDocsFromApprovedIM>
+
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "gvDocsGeneratedIM";
+    settings.CallbackRouteValues = new { Controller = "RequestInventoryMove", Action = "DocsGeneratedFromApprovedIM" };
+
+    settings.KeyFieldName = "idDocumentDGModelP";
+    settings.Width = Unit.Percentage(100);
+
+    settings.Columns.Add("sequentialDGModelP").Caption = "Número";
+    settings.Columns.Add("nameNatureMove").Caption = "Naturaleza";
+    settings.Columns.Add("nameInventoryReasonDGModelP").Caption = "Motivo";
+    settings.Columns.Add(column =>
+    {
+        column.Name = "actions";
+        column.Caption = "Impresión";
+        column.Width = Unit.Percentage(8);
+        column.SetDataItemTemplateContent(c =>
+        {
+            int id = (int)DataBinder.Eval(c.DataItem, "idDocumentDGModelP");
+            Html.RenderPartial("_ActionsButtonsOnDetailDG", id);
+        });
+    });
+
+}).Bind(Model).GetHtml()

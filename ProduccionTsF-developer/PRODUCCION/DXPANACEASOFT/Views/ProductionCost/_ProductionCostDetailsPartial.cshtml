@@ -1,0 +1,226 @@
+﻿@using System.Web.Mvc.Html
+@using DXPANACEASOFT.Models
+
+@{
+	var gridView = Html.DevExpress().GridView<ProductionCostDetail>(
+		grid =>
+		{
+			grid.Name = "gvProductionCostDetail";
+
+			grid.CallbackRouteValues = new { Controller = "ProductionCost", Action = "ProductionCostDetailPartial" };
+
+			grid.SettingsEditing.AddNewRowRouteValues = new { Controller = "ProductionCost", Action = "ProductionCostDetailAddNew" };
+			grid.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionCost", Action = "ProductionCostDetailUpdate" };
+			grid.SettingsEditing.DeleteRowRouteValues = new { Controller = "ProductionCost", Action = "ProductionCostDetailDelete" };
+
+			grid.KeyFieldName = "code";
+
+			grid.Width = Unit.Percentage(100);
+
+
+			#region GridView Behavior
+
+			grid.SettingsBehavior.AllowSelectByRowClick = true;
+
+			grid.CustomJSProperties = (s, e) =>
+			{
+				if (ViewData["EditMessage"] != null)
+				{
+					e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+				}
+			};
+
+			#endregion
+
+			#region Edit Form
+
+			grid.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+			grid.SettingsPopup.EditForm.Modal = true;
+			grid.SettingsPopup.EditForm.Width = 800;
+			grid.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+			grid.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+			grid.SettingsBehavior.ConfirmDelete = true;
+
+			#endregion
+
+			#region Pager
+
+			grid.SettingsPager.Visible = true;
+			grid.SettingsPager.PageSize = 9;
+
+			#endregion
+
+			#region Client Side Events
+
+			grid.ClientSideEvents.BeginCallback = "ProductionCostDetails_OnBeginCallback";
+
+			#endregion
+
+			#region Search Panel
+
+			grid.SettingsSearchPanel.Visible = true;
+			grid.Styles.SearchPanel.CssClass = "searchPanel";
+
+			#endregion
+
+			#region Title Panel
+
+			grid.Settings.ShowTitlePanel = true;
+			grid.Styles.TitlePanel.CssClass = "titleContainer";
+
+			#endregion
+
+			#region Group Panel
+
+			grid.Settings.ShowGroupPanel = true;
+
+			#endregion
+
+			#region Filter Row
+
+			grid.Settings.ShowFilterRow = true;
+			grid.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+			#endregion
+
+			#region Command Column
+
+			grid.CommandColumn.Width = Unit.Percentage(8);
+			grid.CommandColumn.Visible = true;
+			grid.CommandColumn.ShowNewButton = false;
+			grid.CommandColumn.ShowDeleteButton = true;
+			grid.CommandColumn.ShowEditButton = true;
+			grid.CommandColumn.ShowNewButtonInHeader = true;
+
+			#endregion
+
+			#region Master-Details View
+
+			grid.SettingsDetail.ShowDetailRow = false;
+
+			#endregion
+
+			#region Adaptivity Settings
+
+			grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+			grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+			grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+			grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+			grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+			#endregion
+
+			#region Columns
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "code";
+				column.Name = "code";
+				column.Caption = "Código";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(8);
+
+				column.EditorProperties().TextBox(textBox =>
+				{
+					textBox.ClientInstanceName = "code";
+					textBox.Width = Unit.Percentage(100);
+					textBox.MaxLength = 20;
+
+					textBox.ClientSideEvents.Validation = "OnCodeProductionCostDetailValidation";
+				});
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "name";
+				column.Name = "name";
+				column.Caption = "Nombre";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+				column.EditorProperties().TextBox(textBox =>
+				{
+					textBox.ClientInstanceName = "name";
+					textBox.Width = Unit.Percentage(100);
+					textBox.MaxLength = 50;
+
+					textBox.ClientSideEvents.Validation = "OnNameProductionCostDetailValidation";
+				});
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "order";
+				column.Name = "order";
+				column.Caption = "Orden";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.PropertiesEdit.DisplayFormatString = "G";
+				column.Width = Unit.Percentage(8);
+
+				column.EditorProperties().SpinEdit(spinEdit =>
+				{
+					spinEdit.ClientInstanceName = "order";
+					spinEdit.Width = Unit.Percentage(100);
+
+					spinEdit.MinValue = 0.00m;
+					spinEdit.MaxValue = 100000000.00m;
+					spinEdit.NumberType = SpinEditNumberType.Integer;
+					spinEdit.NumberFormat = SpinEditNumberFormat.Number;
+					spinEdit.DisplayFormatString = "G";
+					spinEdit.DecimalPlaces = 0;
+					spinEdit.DisplayFormatInEditMode = true;
+
+					spinEdit.ClientSideEvents.Validation = "OnOrderProductionCostDetailValidation";
+				});
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "description";
+				column.Name = "description";
+				column.Caption = "Descripción";
+				column.ColumnType = MVCxGridViewColumnType.Memo;
+				column.Visible = false;
+
+				column.EditorProperties().Memo(memo =>
+				{
+					memo.ClientInstanceName = "description";
+					memo.Width = Unit.Percentage(100);
+				});
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "isActive";
+				column.Name = "isActive";
+				column.Caption = "¿Activo?";
+				column.Width = Unit.Percentage(3);
+				column.ColumnType = MVCxGridViewColumnType.CheckBox;
+
+				column.AutoFilterBy("Sí");
+				column.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+				column.EditorProperties().CheckBox(checkBox =>
+				{
+					checkBox.ClientInstanceName = "isActive";
+				});
+			});
+
+			#endregion
+
+			grid.InitNewRow = (s, e) =>
+			{
+				e.NewValues["isActive"] = true;
+				e.NewValues["order"] = 0;
+			};
+		});
+
+	if (ViewData["EditError"] != null)
+	{
+		gridView.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@gridView.Bind(this.Model).GetHtml()

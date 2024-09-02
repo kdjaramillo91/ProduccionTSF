@@ -1,0 +1,107 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.BusinessOportunityPartner>
+
+@{
+    var grid = Html.DevExpress().GridView<BusinessOportunityPartner>(settings => {
+        settings.Name = "gvBusinessPartners" + ViewData["id_businessOportunity"];
+
+
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessViewPartnersPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "BusinessOportunity_OnBeginCallback";
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdBusinessOportunity"] = 0;
+            }
+            e.Properties["cpIdBusinessOportunity"] = ViewData["id_businessOportunity"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_partner";
+            column.Caption = "Socio de Negocio";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int?)DataBinder.Eval(c.DataItem, "id_partner");
+                //BusinessOportunityPartner detail = (BusinessOportunityPartner)Model[c.ItemIndex];
+                var detail = DataProviderPerson.Person(id);
+                string person = (detail != null) ? detail.fullname_businessName : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                ViewContext.Writer.Write(person);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "referencePartner";
+            column.Caption = "Referencia";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string referencePartner = (string)DataBinder.Eval(c.DataItem, "referencePartner");
+
+                ViewContext.Writer.Write(referencePartner);
+            });
+
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "descriptionPartner";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string descriptionPartner = (string)DataBinder.Eval(c.DataItem, "descriptionPartner");
+
+                ViewContext.Writer.Write(descriptionPartner);
+            });
+
+
+        });
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

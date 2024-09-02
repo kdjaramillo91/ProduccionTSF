@@ -1,0 +1,63 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProductionLotDailyClose
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Employee.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "personClosingLabel";
+                settings.Text = "Persona que Cierra:";
+                settings.AssociatedControlName = "id_personClosing";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_personClosing = (Model != null && Model.id_personClosing != 0) ? (int?) Model.id_personClosing : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_personClosing, settings =>
+            {
+                settings.Name = "id_personClosing";
+                settings.Properties.ClientInstanceName = "id_personClosing";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "fullname_businessName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Width = Unit.Percentage(100);
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                //settings.ReadOnly = @Model.totalQuantityOrdered > 0;
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnPersonClosingValidation";
+
+            }).BindList(DataProviderPerson.EmployesByCompanyAndCurrent((int?) ViewData["id_company"], id_personClosing)).Bind(id_personClosing).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Employee.Department.name, settings =>
+            {
+                settings.Name = "employeeDepartamentLabel";
+                settings.Text = "Departamento:";
+                settings.AssociatedControlName = "employeeDepartament";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Department.name, settings =>
+            {
+                settings.Name = "employeeDepartament";
+                settings.Properties.ClientInstanceName = "employeeDepartament";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+
+                settings.ShowModelErrors = true;
+
+            }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+<script src="~/Scripts/productionlotdailyclose/_productionLotDailyCloseEditForm.js"></script>

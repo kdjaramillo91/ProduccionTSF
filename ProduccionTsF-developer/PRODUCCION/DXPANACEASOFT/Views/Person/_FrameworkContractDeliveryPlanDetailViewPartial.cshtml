@@ -1,0 +1,21 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.FrameworkContractItem
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td>
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Plan de Entrega</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @{
+                ViewData["id_frameworkContractItem"] = Model.id;
+                ViewData["id_frameworkContract"] = Model.id_frameworkContract;
+                Html.RenderPartial("_FrameworkContractDeliveryPlanViewPartial", Model.FrameworkContractDeliveryPlan.OrderBy(od => od.deliveryPlanDate).ThenBy(tb => tb.id).ToList());
+            }
+        </td>
+    </tr>
+</table>
+

@@ -1,0 +1,29 @@
+﻿
+@model List<DXPANACEASOFT.Models.SalesRequestDetail>
+
+<div id="GridMessageErrorSalesRequestDetail" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorSalesRequestDetail";
+           settings.Properties.ClientInstanceName = "gridMessageErrorSalesRequestDetail";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGenerateProductionSchedule";
+    settings.Text = "Generar Programación";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "GenerateProductionSchedule";
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+    Html.RenderPartial("_SalesRequestDetailsPartial", Model);
+}
+

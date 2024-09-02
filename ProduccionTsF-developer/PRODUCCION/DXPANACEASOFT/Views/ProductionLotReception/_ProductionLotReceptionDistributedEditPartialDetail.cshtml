@@ -1,0 +1,189 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProductionLotPayment>
+
+@{
+	var grid = Html.DevExpress().GridView<ProductionLotPayment>(settings =>
+	{
+		settings.Name = "gvProductionLotReceptionEditFormClosesDetailDistributed";
+		settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionPaymentsDetailDistributedPartial" };
+
+		settings.ClientSideEvents.BeginCallback = "ProductionLotReceptionDistributedDetailGridProduct_OnBeginCallback";
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_item";
+			column.Caption = "Producto";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(20);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) ? item.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_item";
+			column.Caption = "Clase";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) && (item.ItemTypeCategory != null) ? item.ItemTypeCategory.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_item";
+			column.Caption = "Talla";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = (item != null) && (item.ItemGeneral != null) && (item.ItemGeneral.ItemSize != null) ? item.ItemGeneral.ItemSize.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_item";
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+				Item item = DataProviderItem.Item(id_item);
+				var itemProcessTypeAux = (item != null) && (item.ItemType != null) ? item.ItemType : null;
+				var codeAux = itemProcessTypeAux != null && itemProcessTypeAux.ProcessType != null ? itemProcessTypeAux.ProcessType.code : "";
+
+				string text = (codeAux == "ENT") ? "ENTERO" : ((codeAux != "") ? "COLA" : "");
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalProcessMetricUnit";
+			column.Caption = "Rendimiento";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+			column.PropertiesEdit.DisplayFormatString = "N2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_metricUnitProcess";
+			column.Name = "metricUnitProcess";
+			column.Caption = "UM";
+			column.Width = Unit.Percentage(5);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_metricUnitProcess");
+				MetricUnit item = DataProviderMetricUnit.MetricUnit(id_item);
+
+				string text = (item != null) ? item.code : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "price";
+			column.Caption = "Precio LP";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(8);
+			column.PropertiesEdit.DisplayFormatString = "C2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalToPay";
+			column.Caption = "Total a Pagar LP";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+			column.PropertiesEdit.DisplayFormatString = "C2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalLbs";
+			column.Caption = "Lb";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(5);
+			column.PropertiesEdit.DisplayFormatString = "N2";
+			column.CellStyle.BackColor = Color.LightBlue;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalKgs";
+			column.Caption = "Kg";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(5);
+			column.PropertiesEdit.DisplayFormatString = "N2";
+			column.CellStyle.BackColor = Color.LightBlue;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "priceDis";
+			column.Caption = "Precio Dis";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(5);
+			column.PropertiesEdit.DisplayFormatString = "C2";
+			column.CellStyle.BackColor = Color.LightBlue;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "totalPriceDis";
+			column.Caption = "Precio Total Dis";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(5);
+			column.PropertiesEdit.DisplayFormatString = "C2";
+			column.CellStyle.BackColor = Color.LightBlue;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "differencia";
+			column.Caption = "Diferencia";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(5);
+			column.PropertiesEdit.DisplayFormatString = "C2";
+			column.CellStyle.BackColor = Color.LightGreen;
+		});
+
+	}).Bind(Model).GetHtml();
+}
+

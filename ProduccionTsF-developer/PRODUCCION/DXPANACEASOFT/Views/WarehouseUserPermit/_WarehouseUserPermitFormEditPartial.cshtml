@@ -1,0 +1,137 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.UserEntity
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditWarehouseUserPermit", name = "formEditWarehouseUserPermit" }))
+{
+    @Html.Hidden("id_warehouseUserPermit", Model.id)
+     
+    <table id="warehouseUserPermitTable" class="table table-condensed">
+		<tr>
+			<td style="width: 10%;">
+				@Html.DevExpress().LabelFor(m => m.id_user, settings =>
+				{
+					settings.Text = "Usuario: *";
+					settings.AssociatedControlName = "id_user";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_warehouseUserPermit = (Model != null && Model.id_user != 0) ? (int?)Model.id_user : null;
+					var dataUsuario = DataProviderWarehouseUserPermit.userByCompanyAndCurrent((int)ViewData["id_company"], id_warehouseUserPermit);
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_user, settings =>
+			    {
+				   settings.Name = "id_user";
+				   settings.Properties.ClientInstanceName = "id_user";
+				   settings.Width = Unit.Percentage(35);
+
+				   settings.Properties.ValueField = "id";
+				   settings.Properties.TextField = "username";
+				   settings.Properties.ValueType = typeof(int);
+				   settings.Properties.TextFormatString = "{1}";
+
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				   settings.Properties.ClientSideEvents.Validation = "OnUserValidation";
+				   settings.Properties.ClientSideEvents.SelectedIndexChanged = "UserCombo_SelectedIndexChanged";
+			    }).BindList(dataUsuario).Bind(id_warehouseUserPermit).GetHtml()
+			</td>
+			<td style="width: 10%;">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Text = "Empleado:";
+					settings.AssociatedControlName = "id_employee";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_person = (Model != null && Model.id_user != 0) ? (int?)Model.id_user : null;
+					var dataProvider = DataProviderWarehouseUserPermit.Employees(id_person);
+				}
+				@Html.DevExpress().ComboBox(settings =>
+				{
+					settings.Name = "id_employee";
+					settings.Properties.ClientInstanceName = "id_employee";
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "fullname_businessName";
+					settings.Properties.ValueType = typeof(int);
+					settings.Width = Unit.Percentage(100);
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+					settings.ShowModelErrors = true;
+
+				}).BindList(dataProvider).Bind(id_person).GetHtml()
+			</td>
+		</tr>        
+        <tr>
+            <td  colspan="5">
+				<div id="objWarehouseUserPermitDetail">
+					@{
+						ViewContext.Writer.Write(@"<input id=""warehouseUserPermitId"" type=""hidden"" value=""" + Model.id + @"""/>");
+						Html.DevExpress().PageControl(tabs =>
+						{
+							tabs.Name = "tabControl";
+							tabs.Width = Unit.Percentage(100);
+							tabs.EnableClientSideAPI = true;
+
+							tabs.TabPages.Add(tab =>
+							{
+								tab.Name = "tabBodegas";
+								tab.Text = "Bodegas";
+								tab.TabStyle.Width = Unit.Percentage(100);
+								tab.TabImage.Width = Unit.Pixel(16);
+								tab.TabImage.Height = Unit.Pixel(16);
+								tab.TabImage.Align = ImageAlign.Right;
+								tab.ActiveTabImage.Align = ImageAlign.Right;
+								tab.SetContent(() =>
+								{
+									var permisionDetail = Model.UserEntityDetail.ToList();
+									Html.RenderPartial("_WarehouseUserPermitDetailPartial", permisionDetail);
+								});
+							});
+						}).Render();
+					}
+				</div>
+			</td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+		<tr id="warehouseUserPermitAlertRow" style="display: none;">
+			<td colspan="6">
+				<div class="alert alert-danger fade in" style="margin-top:18px;">
+					<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+					<span id="warehouseUserPermitErrorMessage"></span>
+				</div>
+			</td>
+		</tr>
+    </table>
+ }

@@ -1,0 +1,35 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingDTO
+
+<div>
+    <div id="search_option" class="widget-box">
+        <div class="widget-header">
+            <h6 class="widget-title">Filtros de B&uacute;squeda</h6>
+            <span class="widget-toolbar">
+                @*<a href="#" data-action="reload">*@
+                @*<a href="#" id="btnAdvancedFilter">*@
+                    @*<i class="ace-icon fa fa-refresh"></i>*@
+                    @*<i class="ace-icon fa fa-filter"></i>
+                </a>*@
+                <a href="#" id="btnCollapseFilterDetails" data-action="collapse">
+                    <i id="filterFormIcon" class="ace-icon fa fa-chevron-up"></i>
+                </a>
+            </span>
+        </div>
+        <div id="filterForm" class="widget-body">
+            <div class="widget-main">
+                @Html.Partial("_FilterDetails", Model)
+                @*@{
+                    Html.RenderPartial(Model, ViewData["Model"]);
+                }*@
+            </div>
+        </div>
+    </div>
+    @*@{
+        Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_FilterDetails");
+    }*@
+    @Html.Partial("PanelButtonsDetailEdit")
+    <div class="MyContainer" id="divGridViewDetails">
+        @Html.Partial("_GridViewDetails", Model.OpeningClosingPlateLyingDetails)
+    </div>
+</div>

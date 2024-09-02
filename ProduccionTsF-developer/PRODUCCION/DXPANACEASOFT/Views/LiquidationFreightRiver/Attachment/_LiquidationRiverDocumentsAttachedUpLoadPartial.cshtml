@@ -1,0 +1,40 @@
+﻿@using DXPANACEASOFT.Models
+
+@model LiquidationFreightRiverDocument
+
+<table id="attachment-form-upLoad" class="table table-condensed">
+    <tr>
+        <td style="width:8%;">
+            @using (Html.BeginForm("upload-attachment", "LiquidationDocuments", FormMethod.Post))
+            {
+                @Html.DevExpress().UploadControl(
+                settings =>
+                {
+                    settings.Name = "attachmentUploadControl";
+                    settings.CallbackRouteValues = new { Controller = "LiquidationFreightRiver", Action = "TSupload-attachment", };
+                    settings.AutoStartUpload = true;
+                    settings.ShowTextBox = false;
+                    settings.ShowProgressPanel = true;
+                    settings.Height = Unit.Pixel(20);
+                    settings.Width = Unit.Percentage(100);
+                    settings.ValidationSettings.Assign(DXPANACEASOFT.Controllers.LiquidationFreightRiverController.UploadControlSettings.UploadValidationSettings);
+                    settings.ClientSideEvents.FileUploadComplete = "AttachedUploadComplete";
+                }).GetHtml()
+            }
+        </td>
+        <td style="vertical-align:bottom;">
+            @Html.HiddenFor(a => a.guid)
+            @Html.HiddenFor(a => a.url)
+            @Html.DevExpress().TextBoxFor(
+            a => a.attachment,
+            settings =>
+            {
+                settings.Properties.ClientInstanceName = "TSattachmentName";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.Properties.ClientSideEvents.Validation = "AttachedNameValidate";
+                settings.Properties.ClientSideEvents.Init = "AttachedName_OnInit";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

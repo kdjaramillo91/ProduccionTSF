@@ -1,0 +1,202 @@
+﻿@{
+    Layout = null;
+}
+
+<head>
+    <style>
+        .panelConsulta {
+            background: #fdf5ea;
+            border: solid 1px #8e8e8e;
+            padding: 10px;
+            max-width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            padding-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Gestionar Listas de Precios</h3>
+    <div class="form">
+        <div class="panelConsulta">
+            <div class="row">
+                <div class="col-sm-10">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelFechaInicio";
+                                settings.Text = "Fecha Desde: ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.DevExpress().DateEdit(settings =>
+                            {
+                                settings.Width = Unit.Percentage(100);
+                                settings.Name = "DateEditFechaInicio";
+                                settings.Date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                                settings.Properties.ClientSideEvents.DateChanged = "DateEditFechaInicio_Changed";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelFechaFin";
+                                settings.Text = "Fecha Hasta: ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.DevExpress().DateEdit(settings =>
+                            {
+                                settings.Width = Unit.Percentage(100);
+                                settings.Name = "DateEditFechaFin";
+                                settings.Date = DateTime.Now.Date;
+                                settings.Properties.MinDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                            }).GetHtml()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelEstado";
+                                settings.Text = "Estado ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.Partial("_ComboBoxEstadosIndex")
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelTipoLista";
+                                settings.Text = "Tipo de Lista: ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.Partial("_ComboBoxTipoListaIndex")
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelProveedores";
+                                settings.Text = "Proveedor ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.Partial("_ComboBoxProveedoresIndex")
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelGrupos";
+                                settings.Text = "Grupo: ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.Partial("_ComboBoxGruposIndex")
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelTipoListaCamaron";
+                                settings.Text = "Tipo Lista Camarón: ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.Partial("_ComboBoxTipoListaCamaronIndex")
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelResponsable";
+                                settings.Text = "Responsable: ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.Partial("_ComboBoxCompradoresIndex")
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                        </div>
+                        <div class="col-sm-4">
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "LabelCertificado";
+                                settings.Text = "Certificado: ";
+                            }).GetHtml()
+                        </div>
+                        <div class="col-sm-4">
+                            @Html.Partial("_ComboBoxCertificacionesIndex")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="row">
+                        <div class="col-sm-10">
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnEstados";
+                                settings.Text = "Buscar";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Height = 25;
+                                settings.ClientSideEvents.Click = "BuscarClick";
+                            }).GetHtml()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-10">
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnLimpiar";
+                                settings.Text = "Limpiar";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Height = 25;
+                                settings.ClientSideEvents.Click = "LimpiarClick";
+                            }).GetHtml()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-10">
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnNuevo";
+                                settings.Text = "Nuevo";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Height = 25;
+                                settings.ClientSideEvents.Click = "NuevoClick";
+                                settings.Enabled = !((bool)ViewBag.readOnly);
+                            }).GetHtml()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-10">
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnPendint";
+                                settings.Text = "Por Aprobar";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Height = 25;
+                                settings.ClientSideEvents.Click = "PendintClick";
+                                settings.Enabled = !((bool)ViewBag.readOnly);
+                            }).GetHtml()
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="grid"></div>
+    </div>
+
+</body>
+
+<script src="~/Scripts/price_list_responsive/index.js"></script>

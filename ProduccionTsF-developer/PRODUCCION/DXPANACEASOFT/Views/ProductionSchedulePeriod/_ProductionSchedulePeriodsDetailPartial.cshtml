@@ -1,0 +1,69 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    ProductionSchedulePeriod productionSchedulePeriod = Model ?? new ProductionSchedulePeriod();
+}
+
+@Html.Hidden("id_productionSchedulePeriod", productionSchedulePeriod.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(productionSchedulePeriod.name)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(productionSchedulePeriod.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(productionSchedulePeriod.dateCreate)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(productionSchedulePeriod.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(productionSchedulePeriod.dateUpdate)
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

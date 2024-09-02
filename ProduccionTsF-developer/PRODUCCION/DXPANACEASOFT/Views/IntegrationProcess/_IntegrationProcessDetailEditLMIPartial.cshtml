@@ -1,0 +1,103 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.IntegrationProcessDetailDTO
+
+@{
+    var grid = Html.DevExpress().GridView<IntegrationProcessDetailFmiDTO>(settings =>
+    {
+        settings.Name = "gvIntegrationProcessDetailFmi";
+        settings.CallbackRouteValues = new { Controller = "IntegrationProcess", Action = "CallBackDocumentProcessDocumentFmi" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.EnableRowsCache = false;
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.AllPages;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "uid";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle""> Listado de Documentos </span>");
+        });
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = false;
+
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(m => m.FechaEmision, column =>
+        {
+            column.Name = "FechaEmison";
+            column.Caption = "Fecha de Emison";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+        });
+
+        //Document
+        settings.Columns.Add(m => m.Descripcion, column =>
+        {
+            column.Name = "Descripcion";
+            column.Caption = "Descripción";
+        });
+
+        settings.Columns.Add(m => m.ValorDocumento, column =>
+        {
+            column.Name = "ValorDocumento";
+            column.Caption = "Valor Documento";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+            SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+            SpinEdit.DisplayFormatString = "C2";
+            SpinEdit.DecimalPlaces = 2;
+        });
+
+        settings.Columns.Add(m => m.NumeroLote, column =>
+        {
+            column.Name = "NumeroLote";
+            column.Caption = "Número de Lote";
+        });
+
+        settings.Columns.Add(m => m.EstadoLote, column =>
+        {
+            column.Name = "EstadoLote";
+            column.Caption = "Estado del Lote";
+        });
+
+        settings.Columns.Add(m => m.TipoDocumento, column =>
+        {
+            column.Name = "TipoDocumento";
+            column.Caption = "Tipo de Documento";
+        });
+
+        settings.Columns.Add(m => m.FechaContabilizacion, column =>
+        {
+            column.Name = "FechaContabilizacion";
+            column.Caption = "Fecha de Contabilización";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+        });
+    }
+);
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+
+}@grid.Bind(Model).GetHtml()

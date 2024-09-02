@@ -1,0 +1,98 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.Provider
+
+@{
+//var code_identification = (Model != null && Model.Provider != null && Model.Provider.Person != null && Model.Provider.Person.id_identificationType != 0) ? Model.Provider.Person.IdentificationType.codeSRI : "";
+//string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+
+<table class="table table-condensed" style="margin: 0px;">
+    @*@Html.Hidden("code_purchaseReason", code_purchaseReason)*@
+    <tr>
+        <td width="100%" class="ps-bar-collapse" dtx="psep-plazodesc">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Plazo de Pago</span>           
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="psep-plazodesc">
+        <td>
+           @{
+               var providerPaymentTerm = Model.ProviderPaymentTerm.ToList() ?? new List<ProviderPaymentTerm>();
+               Html.RenderPartial("_FormEditProviderPaymentTerm", providerPaymentTerm);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%" class="ps-bar-collapse" dtx="psep-formapago">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Forma de Pago</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="psep-formapago">
+        <td>
+            @{
+                var providerPaymentMethod = Model.ProviderPaymentMethod.ToList() ?? new List<ProviderPaymentMethod>();
+                Html.RenderPartial("_FormEditProviderPaymentMethod", providerPaymentMethod);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%" class="ps-bar-collapse" dtx="psep-seriedocs">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Serie para los Documentos</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="psep-seriedocs">
+        <td>
+            @{
+                var providerSeriesForDocuments = Model.ProviderSeriesForDocuments.ToList() ?? new List<ProviderSeriesForDocuments>();
+                Html.RenderPartial("_FormEditProviderSeriesForDocuments", providerSeriesForDocuments);
+            }
+        </td>
+    </tr>
+    <tr class="psep-seriedocs">
+
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.electronicDocumentIssuance, settings =>
+       {
+           settings.Name = "electronicDocumentIssuance";
+           settings.Properties.ClientInstanceName = "electronicDocumentIssuance";
+           settings.Text = ":Emisión de Documento Electrónico";
+           settings.RightToLeft = DefaultBoolean.True;
+
+           settings.ShowModelErrors = true;
+       }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%" class="ps-bar-collapse" dtx="psep-retenciones">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Retenciones</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="psep-retenciones">
+        <td>
+            @{
+                var providerRetention = Model.ProviderRetention.ToList() ?? new List<ProviderRetention>();
+                Html.RenderPartial("_FormEditProviderRetention", providerRetention);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%" class="ps-bar-collapse" dtx="psep-persautzef">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Personas Autorizadas Para hacer Efectivo el Cobro</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="psep-persautzef">
+        <td>
+            @{
+                var providerPersonAuthorizedToPayTheBill = Model.ProviderPersonAuthorizedToPayTheBill.ToList() ?? new List<ProviderPersonAuthorizedToPayTheBill>();
+                Html.RenderPartial("_FormEditProviderPersonAuthorizedToPayTheBill", providerPersonAuthorizedToPayTheBill);
+            }
+        </td>
+    </tr>
+</table>
+

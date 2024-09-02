@@ -1,0 +1,122 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.ProductionLotPackingMaterial>
+
+@{
+    var grid = Html.DevExpress().GridView<ProductionLotPackingMaterial>(settings =>
+    {
+        settings.Name = "gvProductionLotDetailProductionLotPackingMaterials" + ViewData["id_productionLot"]; //"gvPackingMaterialEditFormDetails";
+        settings.CallbackRouteValues = new { Controller = "ProductionLot", Action = "ProductionLotDetailProductionLotPackingMaterialsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "ProductionLotDetail_OnBeginCallback";//"ProductionLotReceptionDetailProductionLotPackingMaterials_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = false;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdProductionLot"] = 0;
+            }
+            e.Properties["cpIdProductionLot"] = ViewData["id_productionLot"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "masterCodePackingMaterial";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+                if (item != null)
+                {
+                    var masterCode = item.masterCode;
+                    ViewContext.Writer.Write(masterCode);
+                }
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+                if (item != null)
+                {
+                    var name = item.name;
+                    ViewContext.Writer.Write(name);
+                }
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "metricUnitPackingMaterial";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+                ViewContext.Writer.Write(metricUnit);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantity";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantity = (decimal)DataBinder.Eval(c.DataItem, "quantity");
+                ViewContext.Writer.Write(quantity.ToString("N2"));
+            });
+        });
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+

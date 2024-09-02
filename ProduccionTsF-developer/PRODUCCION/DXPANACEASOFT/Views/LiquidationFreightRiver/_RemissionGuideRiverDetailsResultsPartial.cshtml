@@ -1,0 +1,46 @@
+﻿@model List<DXPANACEASOFT.Models.RemissionGuideRiver>
+
+<div id="GridMessageErrorRemissionGuide" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+{
+
+    settings.Name = "GridMessageErrorRemissionGuide";
+    settings.Properties.ClientInstanceName = "GridMessageErrorRemissionGuide";
+    settings.Text = "";
+}).GetHtml()
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGenerateRemissionGuideRiver";
+    settings.Text = "Generar Liquidación";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "GenerateRemissionGuideRiver";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGeCerrar";
+    settings.Text = "Cerrar";
+    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+}).GetHtml()
+
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+
+
+
+    using (Html.BeginForm())
+    {
+        Html.RenderPartial("_RemissionGuideRiverDetailsPartial", Model);
+    }
+}

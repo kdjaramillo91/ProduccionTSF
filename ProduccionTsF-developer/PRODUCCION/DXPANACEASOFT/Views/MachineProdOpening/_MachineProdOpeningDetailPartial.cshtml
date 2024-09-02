@@ -1,0 +1,41 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.MachineProdOpening
+
+<table class="table table-condensed">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{  
+                ViewData["id_machineProdOpening"] = (Model != null) ? Model.id : 0;
+
+                Html.DevExpress().PageControl(tabs =>
+                {
+                    tabs.Name = "tabControl" + ViewData["id_machineProdOpening"];
+                    tabs.Width = Unit.Percentage(100);
+                    tabs.Height = Unit.Pixel(200);
+
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabMachineProdOpeningDetails";
+                        tab.Text = "Detalle";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var machineProdOpeningDetail = (Model != null && Model.MachineProdOpeningDetail != null) ? Model.MachineProdOpeningDetail.ToList() : new List<MachineProdOpeningDetail>();
+                            Html.RenderPartial("_MachineProdOpeningViewsDetailPartial", machineProdOpeningDetail.OrderBy(od => od.id).ToList());
+                        });
+                    });
+                }).Render();
+            }
+        </td>
+    </tr>
+</table>
+

@@ -1,0 +1,31 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.LiquidationMaterialDTO
+
+<div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Proveedor: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.provider,
+                    settings =>
+                    {
+                        settings.Name = "TextBoxProviderSumary";
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+            </div>
+        </div>
+    </div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        @Html.Partial("_GridViewSummary", Model.SummaryLiquidationMaterialDetailDTO)
+    </div>
+</div>

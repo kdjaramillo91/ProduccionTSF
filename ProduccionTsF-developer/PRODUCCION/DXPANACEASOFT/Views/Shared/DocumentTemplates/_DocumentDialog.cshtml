@@ -1,0 +1,35 @@
+﻿
+@Html.DevExpress().PopupControl(
+    settings =>
+    {
+        settings.Name = "popupDocument";
+        settings.PopupElementID = "body";
+        settings.HeaderText = "Editar Documento";
+
+        //settings.ContentUrl = (string) ViewData["UrlContent"];
+
+        settings.CallbackRouteValues = Model;
+        settings.ClientSideEvents.BeginCallback = "PopupBeginCallback";
+
+        settings.LoadContentViaCallback = LoadContentViaCallback.None;
+
+        settings.Modal = true;
+
+        settings.AllowDragging = false;
+        settings.AllowResize = false;
+        settings.ShowFooter = false;
+        settings.ShowOnPageLoad = false;
+        settings.CloseAction = CloseAction.CloseButton;
+
+        settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.PopupVerticalAlign = PopupVerticalAlign.TopSides;
+
+        settings.CloseOnEscape = true;
+        settings.ClientSideEvents.CloseButtonClick = "PopupCloseButton_Click";
+        
+
+        settings.Width = 1024;
+        settings.Height = 600;
+
+    }
+).GetHtml()

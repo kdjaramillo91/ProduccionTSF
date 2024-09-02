@@ -1,0 +1,20 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComboBoxItemType";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "SalesOrder",
+        Action = "ComboBoxItemType",
+    };
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxItemType_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxItemType_BeginCallback";
+    settings.Properties.ClientSideEvents.EndCallback = "ComboBoxItemType_EndCallback";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}).BindList(ViewData["ItemType"]).GetHtml()
+

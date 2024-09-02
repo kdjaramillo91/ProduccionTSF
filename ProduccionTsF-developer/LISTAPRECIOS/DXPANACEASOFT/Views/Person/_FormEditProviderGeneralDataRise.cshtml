@@ -1,0 +1,108 @@
+﻿
+@*@using System.Globalization*@
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProviderGeneralDataRise
+@*@{
+    string codeState = (Model != null && Model.PurchaseOrder != null && Model.PurchaseOrder.Document.DocumentState.code != "") ? Model.PurchaseOrder.Document.DocumentState.code : "";
+}*@
+<table class="table table-condensed">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_categoryRise, settings =>
+            {
+                settings.Name = "id_categoryRiseLabel";
+                settings.Text = "Categoría:";
+                settings.AssociatedControlName = "id_categoryRise";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_categoryRise = (Model != null && Model.id_categoryRise != 0) ? (int?)Model.id_categoryRise : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_categoryRise, settings =>
+       {
+           settings.Name = "id_categoryRise";
+           settings.Properties.ClientInstanceName = "id_categoryRise";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           //settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.Properties.Columns.Add("name", "Nombre", 100);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnCategoryRiseValidation";
+           //settings.Properties.ClientSideEvents.Init = "ComboCategoryRise_Init";
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboCategoryRise_SelectedIndexChanged";
+       }).BindList(DataProviderRise.CategoryRiseWithCurrent(id_categoryRise)).Bind(id_categoryRise).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_activityRise, settings =>
+            {
+                settings.Name = "id_activityRiseLabel";
+                settings.Text = "Actividad:";
+                settings.AssociatedControlName = "id_activityRise";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_activityRise = (Model != null && Model.id_activityRise != 0) ? (int?)Model.id_activityRise : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_activityRise, settings =>
+       {
+           settings.Name = "id_activityRise";
+           settings.Properties.ClientInstanceName = "id_activityRise";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           //settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.Properties.Columns.Add("name", "Nombre", 100);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnActivityRiseValidation";
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboActivityRise_SelectedIndexChanged";
+       }).BindList(DataProviderRise.ActivityRiseWithCurrent(id_activityRise)).Bind(id_activityRise).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.invoiceAmountRise, settings =>
+                {
+                    settings.Name = "invoiceAmountRiseLabel";
+                    settings.Text = "Monto por Factura:";
+                    settings.AssociatedControlName = "invoiceAmountRise";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.invoiceAmountRise, settings =>
+       {
+           settings.Name = "invoiceAmountRise";
+           settings.Properties.ClientInstanceName = "invoiceAmountRise";
+           settings.Properties.DisplayFormatString = "N2";
+           settings.Properties.DisplayFormatInEditMode = true;
+           settings.Properties.DecimalPlaces = 2;
+           //p.SpinButtons.ShowIncrementButtons = true;
+           //p.SpinButtons.ShowLargeIncrementButtons = true;
+           //p.Increment = 0.01M;
+           //p.LargeIncrement = 1.0M;
+           settings.Properties.MinValue = 0;
+           //p.MaxValue = 100;
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+           settings.ReadOnly = true;
+           //settings.ClientEnabled = false;
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.NumberChanged = "Quantity_NumberChange";
+           //settings.Properties.ClientSideEvents.Validation = "OnProviderValidation";
+       }).GetHtml()
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,308 @@
+﻿
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.Dto
+@model DXPANACEASOFT.Models.Dto.JobSchedulerDto
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formJobSchedule", name = "formJobSchedule" }))
+{
+
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    if (ViewData["ErrorMessage"] != null)
+    {
+        @Html.Raw(ViewData["ErrorMessage"]);
+    }
+
+    bool existeTarea = (Model != null && Model.id > 0);
+    int id_jobSchedule = (Model != null && Model.id > 0) ? Model.id : 0;
+    int id_statusProcess = (Model == null) ? 0 : Model.id_statusProcess;
+    string nombreStatusJob = "";
+    bool isRefresh = false;
+    string ejecutarObserver = "N";
+    switch (id_statusProcess)
+    {
+
+        case 1:
+        case 2:
+            nombreStatusJob = "EN PROCESO";
+            isRefresh = true;
+            ejecutarObserver = "S";
+            break;
+        case 3:
+            nombreStatusJob = "FINALIZADO";
+            isRefresh = false;
+            break;
+        case 4:
+            nombreStatusJob = "CON ERROR";
+            isRefresh = false;
+            break;
+    }
+
+
+    @Html.Hidden("id_jobScheduleOne", id_jobSchedule);
+    @Html.Hidden("modo_form", isRefresh);
+    @Html.Hidden("ejecutarObserver", ejecutarObserver);
+    
+
+    <table id="tableJobSchedule" class="table table-condensed" style="margin: 0px;">
+
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="8">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Estatus</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="8">
+                <div id="statusJob" border-color:#4d0f00">@nombreStatusJob</div>
+
+            </td>
+        </tr>
+
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="8">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Parámetros Proceso</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.dateInit, settings =>
+                {
+                        settings.Name = "dateInitLabel";
+                        settings.Text = "Fecha inicio:";
+                        settings.AssociatedControlName = "dateInit";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.dateInit, settings =>
+                {
+                    settings.Name = "dateInit";
+                    settings.Properties.ClientInstanceName = "dateInit";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullDisplayText = "Desde";
+                    settings.Properties.NullText = "Desde";
+
+                    settings.Properties.DisplayFormatInEditMode = true;
+                    settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                    settings.Properties.EditFormat = EditFormat.Custom;
+                    settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                    settings.Properties.ClientSideEvents.Validation = "OnRangeInitDateValidation";
+                    settings.ReadOnly = isRefresh;
+
+               }).GetHtml()
+            </td>
+            <td>
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.dateEnd, settings =>
+               {
+                       settings.Name = "dateEndLabel";
+                       settings.Text = "Fecha final:";
+                       settings.AssociatedControlName = "dateEnd";
+
+               }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.dateEnd, settings =>
+                {
+                    settings.Name = "dateEnd";
+                    settings.Properties.ClientInstanceName = "dateEnd";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullDisplayText = "Hasta";
+                    settings.Properties.NullText = "Hasta";
+
+                    settings.Properties.DisplayFormatInEditMode = true;
+                    settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                    settings.Properties.EditFormat = EditFormat.Custom;
+                    settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                    settings.Properties.ClientSideEvents.Validation = "OnRangeEndDateValidation";
+                    settings.ReadOnly = isRefresh;
+
+                }).GetHtml()
+            </td>
+        <tr>
+
+        <tr><td colspan="5"></td></tr>
+
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="8">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Configuraci&oacute;n Store Procedure</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.serverHost, settings =>
+               {
+                       settings.Name = "serverHostLabel";
+                       settings.Text = "Nombre servidor host:";
+                       settings.AssociatedControlName = "serverHost";
+
+               }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.serverHost, settings =>
+           {
+               settings.Name = "serverHost";
+               settings.Properties.ClientInstanceName = "serverHost";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.MaxLength = 30;
+               settings.ReadOnly = isRefresh;
+
+           }).GetHtml()
+            </td>
+            <td></td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.databaseHost, settings =>
+                {
+                        settings.Name = "databaseHostLabel";
+                        settings.Text = "Nombre base de datos:";
+                        settings.AssociatedControlName = "databaseHost";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.databaseHost, settings =>
+           {
+               settings.Name = "databaseHost";
+               settings.Properties.ClientInstanceName = "databaseHost";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.MaxLength = 30;
+               settings.ReadOnly = isRefresh;
+
+           }).GetHtml()
+            </td>
+        <tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.userdb, settings =>
+                  {
+                          settings.Name = "userdbLabel";
+                          settings.Text = "Usuario base de datos:";
+                          settings.AssociatedControlName = "userdb";
+
+                  }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.userdb, settings =>
+           {
+               settings.Name = "userdb";
+               settings.Properties.ClientInstanceName = "userdb";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.MaxLength = 15;
+               settings.ReadOnly = isRefresh;
+
+           }).GetHtml()
+            </td>
+            <td></td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.passwordb, settings =>
+                {
+                        settings.Name = "passwordbLabel";
+                        settings.Text = "Password base de datos:";
+                        settings.AssociatedControlName = "passwordb";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.passwordb, settings =>
+           {
+               settings.Name = "passwordb";
+               settings.Properties.ClientInstanceName = "passwordb";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.MaxLength = 15;
+               // settings.Properties.Password = true;
+               settings.AutoCompleteType = AutoCompleteType.Disabled;
+               settings.ReadOnly = isRefresh;
+
+           }).GetHtml()
+            </td>
+        <tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.storeProcedure, settings =>
+                {
+                        settings.Name = "storeProcedureLabel";
+                        settings.Text = "Store Procedure:";
+                        settings.AssociatedControlName = "storeProcedure";
+
+                }).GetHtml()
+            </td>
+            <td colspan="4">
+                @Html.DevExpress().TextBoxFor(m => m.storeProcedure, settings =>
+           {
+               settings.Name = "storeProcedure";
+               settings.Properties.ClientInstanceName = "storeProcedure";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.MaxLength = 80;
+               settings.ReadOnly = isRefresh;
+           }).GetHtml()
+            </td>
+        <tr>
+        <tr><td colspan="5"></td></tr>
+
+    </table>
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td></td>
+            <td></td>
+            <td></td>
+
+
+            <td style="text-align: right; margin-top: 5px; width: 10%;">
+                @{
+                    bool enableButtom = (id_statusProcess == 0 ||  id_statusProcess == 3 || id_statusProcess == 4) ? true : false;
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnExecuteJobSchedule";
+                        button.Text = "Ejecutar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonExecute_Click";
+                        button.ClientEnabled = enableButtom;
+                    }).Render();
+
+                }
+            </td>
+
+            <td style="text-align: right; margin-top: 5px; width: 10%;">
+                @{
+
+                    
+
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnDescargarJobSchedule";
+                        button.Text = "Descargar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsDownload16x16;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonDescargar_Click";
+                        button.ClientEnabled = enableButtom;
+
+
+
+                    }).Render();
+
+
+                }
+            </td>
+        </tr>
+    </table>
+}

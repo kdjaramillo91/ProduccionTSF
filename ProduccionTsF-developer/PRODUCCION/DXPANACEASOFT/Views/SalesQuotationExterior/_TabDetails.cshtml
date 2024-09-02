@@ -1,0 +1,51 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Invoice
+@{ 
+	DocumentState documentState = (Model != null && Model.Document != null && Model.Document.id_documentState != 0)
+		? Model.Document.DocumentState ?? DataProviderDocumentState.DocumentStateById(Model.Document.id_documentState)
+		: DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+
+	tbsysDocumentDocumentStateControlsState _ControlState = DataProviderControlState.ControlStateByDocumentByStateByControl("07", documentState.code, "gvInvoiceDetail");
+	this.ViewBag.ControlState = _ControlState;
+}
+<table class="table table-condensed ps-100">
+    <tr>
+        <td colspan="2">
+            @{
+				
+				List<InvoiceDetail> invoiceDetail = (Model != null && Model.InvoiceDetail != null)
+					? Model.InvoiceDetail.Where(r=> r.isActive ).ToList() : new List<InvoiceDetail>();
+				SalesQuotationExterior salesQuotationExterior = (Model != null && Model.SalesQuotationExterior != null)
+					? Model.SalesQuotationExterior : new SalesQuotationExterior();
+				Html.RenderPartial("_TabDetailsProduct", salesQuotationExterior);
+				<br />
+				Html.RenderPartial("_TabDetailsSelectorWeight");
+				Html.RenderPartial("_SalesQuotationExteriorFilterDetail");
+
+				Html.RenderPartial("DetailsButtonTemplates/_DocumentDetailsActionsButtonsSsch", _ControlState);
+				Html.RenderPartial("_TabDetailsGridViewProduct", invoiceDetail);
+                @Html.Hidden("amount" );
+                @Html.Hidden("id_amountInvoice");
+                @Html.Hidden("id_metricUnitInvoiceDetail");
+            }
+        </td>
+    </tr>
+    <tr>
+        <td id="objInfoAdicional"  class="ps-60 ps_valTop">
+            @{
+                Html.RenderPartial("_TabDetailsInfoAdicional");
+            }
+        </td>
+        <td class="ps-40 ps_valTop" >
+            <div id="objTotalesPartial">
+            @{
+                Html.RenderPartial("_TabDetailsExternalTotales");
+            }
+              </div>
+        </td>
+    </tr>
+</table>
+
+

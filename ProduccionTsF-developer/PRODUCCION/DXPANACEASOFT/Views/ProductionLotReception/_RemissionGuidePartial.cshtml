@@ -1,0 +1,345 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    var labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+    var labelEmp = DataProviderSetting.ValueSetting("EEPRIM");
+}
+@{
+	var grid = Html.DevExpress().GridView<RemissionGuide>(settings =>
+	{
+		settings.Name = "gvRemisssionGuide";
+		settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "RemissionGuidePartial" };
+
+		settings.Width = Unit.Percentage(100);
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.Width = Unit.Percentage(3);
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = false;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+		settings.ClientSideEvents.Init = "RemissionGuideOnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "RemissionGuideOnGridViewSelectionChanged";
+		settings.ClientSideEvents.EndCallback = "RemissionGuideOnGridViewEndCallback";
+
+
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			var gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+		};
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+					@"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""RemissionGuidegvResultsSelectAllRows()"">Seleccionar Todos</a>");
+				ViewContext.Writer.Write(
+					@"<a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""RemissionGuidegvResultsClearSelection()"">Anular Selección</a>");
+			}
+		});
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_certification";
+			column.Name = "id_certification";
+			column.Caption = "id_certification";
+			column.Visible = false;
+		});
+
+		//Document
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Número";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+				ViewContext.Writer.Write(remissionGuide.Document.number);
+			});
+		});
+
+		//Proceso
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+				ViewContext.Writer.Write(remissionGuide.Person2.processPlant);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Orden de Compra";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+				var purchaseOrder = (PurchaseOrder)this.GetPurchaseOrderFromRemissionGuide(remissionGuide);
+				if (purchaseOrder != null)
+				{
+					ViewContext.Writer.Write(purchaseOrder.Document.number);
+				}
+			});
+		});
+
+		settings.Columns.Add(m => m.Document.emissionDate, column =>
+		{
+			column.Caption = "Fecha de Emisión";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(10);
+			column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+		});
+
+		//Guía Externa
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Guía Externa";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+				ViewContext.Writer.Write(remissionGuide.Guia_Externa);
+			});
+		});
+
+		//settings.Columns.Add(column =>
+		//{
+		//    column.Caption = "Tipo de Documento";
+		//    column.ColumnType = MVCxGridViewColumnType.TextBox;
+		//    column.Width = Unit.Percentage(10);
+
+		//    column.SetDataItemTemplateContent(c =>
+		//    {
+		//        var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+		//        ViewContext.Writer.Write(remissionGuide.Document.DocumentType.name);
+		//    });
+		//});
+
+		settings.Columns.Add(m => m.Provider1.Person.fullname_businessName, column =>
+		{
+			column.Name = "proveedor";
+			column.Caption = "Proveedor";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(m => m.ProductionUnitProvider.name, column =>
+		{
+			column.Name = "productionUnit";
+			column.Caption = labelPup != "" ? labelPup : "Unidad de Producción";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(m => m.Certification.name, column =>
+		{
+			column.Name = "certification";
+			column.Caption = "Certificado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(m => m.despachureDate, column =>
+		{
+			column.Caption = "Fecha Despacho";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(10);
+			column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+		});
+		settings.Columns.Add(m => m.RemissionGuideTransportation.isOwn, column =>
+		{
+			column.Caption = "Logística de Tercero";
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			column.Width = Unit.Percentage(12);
+
+		});
+		settings.Columns.Add(m => m.isCopackingRG, column =>
+		{
+			column.Caption = "¿Copacking?";
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			column.Width = Unit.Percentage(12);
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Fecha Salida";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(12);
+			column.SetDataItemTemplateContent(c =>
+			{
+				var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+				var exitDate = "";
+				var exitHour = "";
+				if ((remissionGuide != null)
+					&& (remissionGuide.RemissionGuideControlVehicle != null)
+					&& (remissionGuide.RemissionGuideControlVehicle.exitDateProductionBuilding != null)
+					&& (remissionGuide.RemissionGuideControlVehicle.exitTimeProductionBuilding != null))
+				{
+					exitDate = remissionGuide.RemissionGuideControlVehicle.exitDateProductionBuilding.Value.ToString("dd/MM/yyyy");
+					exitHour = remissionGuide.RemissionGuideControlVehicle.exitTimeProductionBuilding.Value.ToString("hh\\:mm");
+				}
+				ViewContext.Writer.Write(exitDate + " " + exitHour);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Fecha Entrada";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(12);
+			column.SetDataItemTemplateContent(c =>
+			{
+				var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+				var entranceDate = "";
+				var entranceHour = "";
+				if ((remissionGuide != null)
+					&& (remissionGuide.RemissionGuideControlVehicle != null)
+					&& (remissionGuide.RemissionGuideControlVehicle.entranceDateProductionBuilding != null)
+					&& (remissionGuide.RemissionGuideControlVehicle.entranceTimeProductionBuilding != null))
+				{
+					entranceDate = remissionGuide.RemissionGuideControlVehicle.entranceDateProductionBuilding.Value.ToString("dd/MM/yyyy");
+					entranceHour = remissionGuide.RemissionGuideControlVehicle.entranceTimeProductionBuilding.Value.ToString("hh\\:mm");
+				}
+				ViewContext.Writer.Write(entranceDate + " " + entranceHour);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.Width = Unit.Percentage(5);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var remissionGuide = this.GetRemissionGuide(c.KeyValue);
+				var text = "";
+				if (remissionGuide.Document.DocumentState.code.Equals("03"))
+				{
+					foreach (var remissionGuideDispatchMaterial in remissionGuide.RemissionGuideDispatchMaterial)
+					{
+						var sumQuanty = (remissionGuideDispatchMaterial.InventoryMoveDetailExitDispatchMaterials != null)
+							? remissionGuideDispatchMaterial.InventoryMoveDetailExitDispatchMaterials.Sum(s => s.quantity)
+							: 0m;
+
+						if (sumQuanty != remissionGuideDispatchMaterial.sourceExitQuantity)
+						{
+							text = "<font color='red'>" + remissionGuide.Document.DocumentState.name + "</font>";
+							break;
+						}
+					}
+
+					if (text == "")
+					{
+						text = "<font color='green'>" + remissionGuide.Document.DocumentState.name + "</font>";
+					}
+				}
+				else
+				{
+					text = remissionGuide.Document.DocumentState.name;
+				}
+				ViewContext.Writer.Write(text);
+			});
+
+			column.EditorProperties().ComboBox(c =>
+			{
+				c.DataSource = DataProviderDocumentState.DocumentStates((int)ViewData["id_company"]);
+				c.ValueField = "id";
+				c.TextField = "name";
+				c.ValueType = typeof(int);
+				c.Width = Unit.Percentage(100);
+				c.DropDownStyle = DropDownStyle.DropDownList;
+				c.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				c.EnableSynchronization = DefaultBoolean.False;
+				c.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			});
+		});
+
+	});
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+    private RemissionGuide GetRemissionGuide(object id)
+    {
+        return ((IEnumerable<RemissionGuide>)this.Model)
+            .FirstOrDefault(r => r.id == (int)id);
+    }
+
+    private PurchaseOrder GetPurchaseOrderFromRemissionGuide(RemissionGuide remissionGuide)
+    {
+        if ((remissionGuide != null) && (remissionGuide.RemissionGuideDetail != null))
+        {
+            foreach (var remissionGuideDetail in remissionGuide.RemissionGuideDetail)
+            {
+                if ((remissionGuideDetail != null)
+                    && (remissionGuideDetail.RemissionGuideDetailPurchaseOrderDetail != null))
+                {
+                    foreach (var remissionGuideDetailPurchaseDetail in remissionGuideDetail.RemissionGuideDetailPurchaseOrderDetail)
+                    {
+                        if ((remissionGuideDetailPurchaseDetail != null)
+                            && (remissionGuideDetailPurchaseDetail.PurchaseOrderDetail != null)
+                            && (remissionGuideDetailPurchaseDetail.PurchaseOrderDetail.PurchaseOrder != null))
+                        {
+                            return remissionGuideDetailPurchaseDetail.PurchaseOrderDetail.PurchaseOrder;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+}

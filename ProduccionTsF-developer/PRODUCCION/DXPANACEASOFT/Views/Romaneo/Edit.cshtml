@@ -1,0 +1,91 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.RomaneoDTO
+
+@{
+    Layout = null;
+}
+
+<head>
+    <style>
+        .row {
+            padding-bottom: 2px;
+        }
+
+        td {
+            color: #000 !important;
+        }
+        .dxeCalendarDETS {
+            width: 1000px;
+        }
+
+        .Etiqueta {
+            font-size: 15px;
+            margin: 0;
+            color: #a98c8c;
+        }
+
+        .MyContainer {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h4>Registro de Romaneo</h4>
+    <hr style="margin: 10px 0px;">
+    @{
+        Html.RenderPartial("PanelButtonsEdit");
+    }
+    <div class="pagination">
+        <a href="#" class="first" data-action="first">&laquo;</a>
+        <a href="#" class="previous" data-action="previous">&lsaquo;</a>
+        <input type="text" readonly="readonly" />
+        <a href="#" class="next" data-action="next">&rsaquo;</a>
+        <a href="#" class="last" data-action="last">&raquo;</a>
+    </div>
+    <hr style="margin: 10px 0px;">
+
+    <form>
+        <div class="row">
+            <div class="col-sm-12">
+                @Html.Partial("_TabControlEdit", Model)
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-condensed">
+                    <tr style="border-top: 1px Solid #C0C0C0;">
+                        <td colspan="6" style="text-align: right; margin-top: 5px;">
+                            @{
+                                Html.DevExpress().Button(button =>
+                                {
+                                    button.Name = "btnUpdate";
+                                    button.Text = "Guardar";
+                                    button.RenderMode = ButtonRenderMode.Button;
+                                    button.ImagePosition = ImagePosition.Left;
+                                    button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                                    button.UseSubmitBehavior = false;
+                                    button.ValidateInvisibleEditors = true;
+                                    button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                                }).Render();
+
+                                ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                                Html.DevExpress().Button(button =>
+                                {
+                                    button.Name = "btnCancel";
+                                    button.Text = "Cancelar";
+                                    button.RenderMode = ButtonRenderMode.Button;
+                                    button.ImagePosition = ImagePosition.Left;
+                                    button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                                    button.UseSubmitBehavior = false;
+                                    button.ClientSideEvents.Click = "ButtonCancel_Click";
+                                }).Render();
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </form>
+</body>
+<script src="~/Scripts/romaneo/edit.js"></script>

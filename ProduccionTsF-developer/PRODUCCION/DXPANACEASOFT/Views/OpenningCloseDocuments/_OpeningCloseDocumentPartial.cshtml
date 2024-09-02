@@ -1,0 +1,128 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.OpeningCloseDocumentsDTO
+
+@{
+    var grid = Html.DevExpress().GridView<OpeningCloseDocumentResults>(settings =>
+    {
+        settings.Name = "gvOpeningCloseDocument";
+        settings.CallbackRouteValues = new { Controller = "OpenningCloseDocuments", Action = "OpenningCloseDocumentsPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = false;
+
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Settings.ShowFooter = true;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+        settings.ClientSideEvents.RowDblClick = "OnRowDoubleClick";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Documentos</span>");
+        });
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = false;
+
+        //DETALLES EN GRID LLAMADA A OTRA TABLA
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(m=> m.numberDoc, column =>
+        {
+            column.Name = "numberDoc";
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m=> m.emissionDate,column =>
+        {
+            column.Name = "emissionDate";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+        });
+        settings.Columns.Add(m => m.nameProvider, column =>
+        {
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m=> m.nameDocumentType,column =>
+        {
+            column.Caption = "Tipo de Documento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.nameDocumentState, column =>
+        {
+            column.Caption = "Estado Documento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.isOpen, column =>
+        {
+            column.Caption = "Abierto";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@*@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}*@

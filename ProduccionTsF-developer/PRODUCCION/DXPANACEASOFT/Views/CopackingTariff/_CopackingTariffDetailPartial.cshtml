@@ -1,0 +1,247 @@
+﻿@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.CopackingTariffDetail>
+
+
+@{
+    var grid = Html.DevExpress().GridView<CopackingTariffDetail>(settings =>
+
+    {
+
+        settings.Name = "gvTransportTariffDetail";
+        settings.CallbackRouteValues = new { Controller = "CopackingTariff", Action = "CopackingTariffDetail" };
+
+        settings.CustomActionRouteValues= new { Controller = "CopackingTariff", Action = "CopackingTariffDetailChangePartial" };
+
+        settings.ClientSideEvents.BeginCallback = "TransportTariffDetail_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "CopackingTariff", Action = "CopackingTariffDetailAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "CopackingTariff", Action = "CopackingTariffDetailUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "CopackingTariff", Action = "CopackingTariffDetailDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.AllowFixedGroups = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 800;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 9;
+
+        #region SEARCH PANEL
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        #endregion
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+            e.NewValues["orderTariff"] = 0;
+        };
+
+        /*   tamaño de transporte */
+        /*   Validar si es un tipo de tranporte interno o no si el tipo de tarifario tiene un tipo de tranpsorte tipo vehiculo */
+        // -- si no es interno Y  dbo.[TransportTariffType] / id_shippingType  -> [PurchaseOrderShippingType].isTerrestriel =1
+
+        settings.Columns.Add(m => m.id_inventoryLine, column =>
+        {
+            column.Caption = "Linea de Inventario";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_inventoryLine");
+                InventoryLine item = DataProviderCopackingTariff.InventoryLine(id_ingredientItem);
+
+                string inventoryLineIngredientItem = (item != null) ? item.name : "";
+                ViewContext.Writer.Write(inventoryLineIngredientItem);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.DataSource = DataProviderInventoryLine.InventoryLinesByCompanyAndCurrent((int?)ViewData["id_company"], null);//id_inventoryLineIngredientItem);
+                p.ClientInstanceName = "id_inventoryLineIngredientItem";
+                p.Width = Unit.Percentage(100);
+
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.SelectedIndexChanged = "ComboInventoryLineIngredientItem_SelectedIndexChanged";
+                //p.ClientSideEvents.Validation = "OnInventoryLineIngredientItemValidation";
+                //p.ClientSideEvents.Init = "OnInventoryLineIngredientItemInit";
+
+            });
+
+        });
+
+        settings.Columns.Add(m => m.id_productType, column =>
+        {
+            column.Caption = "Tipo de Producto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_ingredientItem = (int?)DataBinder.Eval(c.DataItem, "id_productType");
+                ItemType itemType = DataProviderCopackingTariff.ItemType(id_ingredientItem);
+
+                string itemTypeIngredientItem = (itemType != null) ? itemType.name : "";
+                ViewContext.Writer.Write(itemTypeIngredientItem);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                //p.DataSource = DataProviderItemType.ItemTypes((int?)ViewData["id_company"]);
+
+                p.ClientInstanceName = "id_productType";
+                p.Width = Unit.Percentage(100);
+
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.SelectedIndexChanged = "ComboItemTypeIngredientItem_SelectedIndexChanged";
+                //p.ClientSideEvents.Validation = "OnItemTypeIngredientItemValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "tariff";
+            column.Caption = "Tarifa ";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? tariff = (decimal?)DataBinder.Eval(c.DataItem, "tariff");
+                ViewContext.Writer.Write(tariff != null ? tariff.Value.ToString("N4") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "tariff";
+                p.NumberType = SpinEditNumberType.Float;
+                p.DecimalPlaces = 4;
+                p.AllowMouseWheel = true;
+                p.LargeIncrement = 1;
+                p.MinValue = 0;
+                p.MaxValue = 99999;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+                p.ClientSideEvents.Validation = "OnTariffControlValidation";
+            });
+        });
+
+
+        /* Orden  Tarifa */
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "orderTariff";
+            column.Caption = "Orden ";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "orderTariff";
+                p.NumberType = SpinEditNumberType.Integer;
+                p.AllowMouseWheel = true;
+                p.LargeIncrement = 2;
+                p.MinValue = 0;
+                p.MaxValue = 99;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+            });
+        });
+
+        /* Estado */
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Name = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            //column.AutoFilterBy("Sí");
+            //column.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+            column.EditorProperties().CheckBox(p =>
+            {
+                p.ClientInstanceName = "isActive";
+            });
+
+        });
+
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            //    e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+            e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+            if (ViewData["EditMessage"] != null)
+            {
+                e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+            }
+
+        };
+
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model ).GetHtml()

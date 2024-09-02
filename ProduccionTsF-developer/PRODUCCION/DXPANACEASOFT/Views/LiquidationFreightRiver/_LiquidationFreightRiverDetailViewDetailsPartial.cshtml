@@ -1,0 +1,218 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@{     
+    var grid = Html.DevExpress().GridView<LiquidationFreightRiverDetail>(settings =>
+    {
+        settings.Name = "gvLiquidationFreightRiverDetail"; /*+ ViewData["id_purchaseOrder"];*/
+                                                      //settings.SettingsDetail.MasterGridName = "gvLiquidationFreightDetail";
+        settings.CallbackRouteValues = new { Controller = "LiquidationFreightRiver", Action = "LiquidationFreightRiverResultsDetailViewPartial" };
+        settings.ClientSideEvents.BeginCallback = "LiquidationFreightRiverResultsDetailViewPartial_BeginCallback";
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Detalles Lista de Flete</span>");
+        });
+
+        settings.KeyFieldName = "id_remisionGuideRiver";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSort = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(c => c.RemissionGuideRiver.Document.number, column =>
+        {
+
+            column.Caption = "Nro. Guia Remisión ";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+
+        //settings.Columns.Add(c => c.RemissionGuide.Document.DocumentState.name, column =>
+        //{
+
+        //    column.Caption = "Estado";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //    column.EditFormSettings.Visible = DefaultBoolean.False;
+
+        //});
+
+
+        settings.Columns.Add(c => c.RemissionGuideRiver.Document.emissionDate, column =>
+        {
+
+            column.Caption = "Fecha Emisión";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+
+        });
+
+
+
+        settings.Columns.Add(c => c.RemissionGuideRiver.Provider.Person.fullname_businessName, column =>
+        {
+
+            column.Caption = "Proveedor ";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = Unit.Percentage(15);
+        });
+
+        //CAMBIAR ZONA Y SITIO
+        settings.Columns.Add(c => c.RemissionGuideRiver.ProductionUnitProvider.FishingSite.name, column =>
+        {
+
+            column.Caption = "Sitio Pesca";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+        settings.Columns.Add(c => c.RemissionGuideRiver.ProductionUnitProvider.FishingSite.FishingZone.name, column =>
+        {
+
+            column.Caption = "Zona Pesca";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+
+        });
+        settings.Columns.Add(c => c.RemissionGuideRiver.RemissionGuideRiverTransportation.DriverVeicleProviderTransport.Person.fullname_businessName, column =>
+        {
+
+            column.Caption = "Chofer";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = Unit.Percentage(15);
+        });
+        settings.Columns.Add(c => c.RemissionGuideRiver.RemissionGuideRiverTransportation.DriverVeicleProviderTransport.VeicleProviderTransport.Vehicle.carRegistration, column =>
+        {
+
+            column.Caption = "Placa";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = Unit.Percentage(9);
+        });
+        settings.Columns.Add(c => c.quantityPoundsTransported, column =>
+        {
+            column.FieldName = "quantityPoundsTransported";
+            column.Caption = "Libras Transportadas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.Width = Unit.Percentage(9);
+            
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.DisplayFormatInEditMode = true;
+                p.MinValue = 0;
+                p.MaxValue = 800000;
+                p.NumberFormat = SpinEditNumberFormat.Number;
+                p.DisplayFormatString = "N2";
+                p.ValidationSettings.RequiredField.IsRequired = true;
+                p.Width = Unit.Percentage(100);
+                p.ValidationSettings.Display = Display.Dynamic;
+            });
+        });
+        settings.Columns.Add(c => c.price, column =>
+        {
+
+            column.Caption = "Flete";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(c => c.pricesavance, column =>
+        {
+
+            column.Caption = "Anticipo";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+
+
+        settings.Columns.Add(c => c.priceadjustment, column =>
+        {
+            column.FieldName = "priceadjustment";
+            column.Caption = "Ajuste";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.Width = Unit.Percentage(9);
+
+        });
+
+        settings.Columns.Add(c => c.pricedays, column =>
+        {
+            column.FieldName = "pricedays";
+            column.Caption = "Valor Dias ";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.Width = Unit.Percentage(9);
+
+        });
+
+        settings.Columns.Add(c => c.priceextension, column =>
+        {
+            column.FieldName = "priceextension";
+            column.Caption = "Extensión";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.Width = Unit.Percentage(9);
+
+        });
+
+
+        //});
+
+        settings.Columns.Add(c => c.pricetotal, column =>
+        {
+
+            column.Caption = "Total";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = Unit.Percentage(7);
+        });
+
+
+
+    });
+
+
+}
+@grid.Bind(Model).GetHtml()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,236 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.BackgroundProcessManagement
+
+@{
+    Layout = null;
+    var idCompany = (int)this.ViewBag.id_company;
+}
+
+<style>
+    .row {
+        padding-bottom: 4px;
+    }
+
+    .dxflGroupBoxCaption_Metropolis {
+    }
+
+    .boxSearch {
+        border-bottom: 1px Solid #C0C0C0;
+        border-top: 1px solid #E5E5E5;
+        margin-left: 0px;
+        margin: 5px;
+        padding: 5px;
+        background-color: White;
+        color: #B2B2B2;
+        font-weight: bold;
+    }
+</style>
+
+<div class="form">
+    <div class="panelConsulta">
+        <div class="row">
+            <div class="col-sm-10">
+                <div class="row boxSearch">
+                    Filtros
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Width = Unit.Percentage(100);
+                       settings.Text = "Estado: ";
+                   }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DevExpress().TextBox(settings =>
+                   {
+                       settings.Name = "TextBoxEstadoProceso";
+                       settings.ReadOnly = true;
+                       settings.Properties.ClientSideEvents.Init = "onEstadoProcesoInit";
+                       settings.Width = Unit.Percentage(100);
+                   }).GetHtml()
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Width = Unit.Percentage(100);
+                       settings.Text = "Periodo: ";
+                   }).GetHtml()
+                    </div>
+
+
+                    <div class="col-sm-4">
+
+                        @Html.DevExpress().ComboBox(
+                        comboBox =>
+                        {
+                            comboBox.Name = "idPeriod";
+                            comboBox.Properties.ClientInstanceName = "idPeriod";
+                            comboBox.Width = Unit.Percentage(100);
+
+                            comboBox.Properties.ValueField = "code";
+                            comboBox.Properties.TextField = "description";
+                            comboBox.Properties.ValueType = typeof(string);
+
+                            comboBox.Properties.NullDisplayText = "Todos";
+                            comboBox.Properties.NullText = "Todos";
+
+                            comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+
+                            comboBox.ShowModelErrors = true;
+                            //comboBox.CallbackRouteValues = new { Controller = "BackgroundProcessManagement", Action = "PeriodOfWarehouse" };
+
+                            //comboBox.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['idWarehouse'] = idWarehouse.GetValue();  }";
+                            comboBox.Properties.CallbackPageSize = 20;
+
+
+                            //}).BindList(TempData["BackgroundProcessManagementPeriods"]).GetHtml()
+                        }).BindList(DataProviderBackgroundProcessManagement.PeriodsFixed()).GetHtml()
+
+
+                    </div>
+
+
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Width = Unit.Percentage(100);
+                       settings.Text = "Bodega: ";
+                   }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DevExpress().ComboBox(
+                         comboBox =>
+                         {
+                             comboBox.Name = "idWarehouse";
+                             comboBox.Properties.ClientInstanceName = "idWarehouse";
+                             comboBox.Width = Unit.Percentage(100);
+
+                             comboBox.Properties.ValueField = "code";
+                             comboBox.Properties.TextField = "description";
+                             comboBox.Properties.ValueType = typeof(string);
+
+                             comboBox.Properties.NullDisplayText = "Todos";
+                             comboBox.Properties.NullText = "Todos";
+
+                             comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                             comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                             comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+
+                             comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { idLocation.PerformCallback();    }";
+
+                         }).BindList(DataProviderBackgroundProcessManagement.Warehouses(idCompany)).GetHtml()
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Width = Unit.Percentage(100);
+                       settings.Text = "Ubicación: ";
+                   }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @{
+                            Html.RenderPartial("comboboxcascading/_cmbLocation");
+                        }
+
+                    </div>
+
+
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Width = Unit.Percentage(100);
+                       settings.Text = "Producto: ";
+                   }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DevExpress().ComboBox(
+                 comboBox =>
+                 {
+                     comboBox.Name = "idItem";
+                     comboBox.Properties.ClientInstanceName = "idItem";
+                     comboBox.Width = Unit.Percentage(100);
+
+                     comboBox.Properties.ValueField = "code";
+                     comboBox.Properties.TextField = "description";
+                     comboBox.Properties.ValueType = typeof(string);
+
+                     comboBox.Properties.NullDisplayText = "Todos";
+                     comboBox.Properties.NullText = "Todos";
+
+                     comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                     comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                     comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                 }).BindList(DataProviderBackgroundProcessManagement.Items(idCompany)).GetHtml()
+                    </div>
+                </div>
+               
+            </div>
+            <div class="col-sm-2">
+                <div class="row boxSearch">
+                    Acciones
+                </div>
+                <div class="row">
+                    <div class="col-sm-10">
+                        @Html.DevExpress().Button(
+             button =>
+             {
+                 button.Name = "btnRefresh";
+                 button.Text = "Refrescar Estado";
+                 button.Width = Unit.Percentage(100);
+                 button.RenderMode = ButtonRenderMode.Button;
+                 button.ImagePosition = ImagePosition.Left;
+                 button.Images.Image.IconID = IconID.ActionsRefresh16x16;
+                 button.UseSubmitBehavior = false;
+                 button.ClientSideEvents.Click = "onRefreshProcessStateClick";
+             }).GetHtml()
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-10">
+                        @Html.DevExpress().Button(
+             button =>
+             {
+                 button.Name = "btnClear";
+                 button.Text = "Limpiar";
+                 button.Width = Unit.Percentage(100);
+                 button.RenderMode = ButtonRenderMode.Button;
+                 button.ImagePosition = ImagePosition.Left;
+                 button.Images.Image.IconID = IconID.ActionsClear16x16;
+                 button.UseSubmitBehavior = false;
+                 button.ClientSideEvents.Click = "onClearFilterPanelClick";
+             }).GetHtml()
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-10">
+                        @Html.DevExpress().Button(
+                                    button =>
+                                    {
+                                        button.Name = "btnProcess";
+                                        button.Text = "Procesar";
+                                        button.Width = Unit.Percentage(100);
+                                        button.RenderMode = ButtonRenderMode.Button;
+                                        button.ImagePosition = ImagePosition.Left;
+                                        button.Images.Image.IconID = IconID.ActionsAdd16x16;
+                                        button.UseSubmitBehavior = false;
+                                        button.ClientSideEvents.Click = "onProcessClick";
+                                    }).GetHtml()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

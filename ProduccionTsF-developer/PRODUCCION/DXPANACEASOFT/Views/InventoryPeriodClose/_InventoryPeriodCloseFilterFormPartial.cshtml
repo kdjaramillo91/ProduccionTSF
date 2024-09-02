@@ -1,0 +1,179 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryPeriod
+
+@using (Html.BeginForm("", "", FormMethod.Post, new {@id = "formFilterInventoryPeriodClose", name = "formFilterInventoryPeriodClose" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr>
+    
+        <td style="width: 40%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="4">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Año</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 35%;">
+                        @Html.DevExpress().LabelFor(m => m.year, settings =>
+                        {
+                            settings.Name = "yearLabel";
+                            settings.Text = "Año:";
+                            settings.AssociatedControlName = "year";
+                        }).GetHtml()
+                    </td>
+                    <td>
+
+                        @Html.DevExpress().SpinEditFor(m => m.year, settings =>
+                   {
+
+                       settings.Properties.NullDisplayText = "Año";
+                       settings.Properties.NullText = "Año";
+                       settings.Name = "year";
+                       settings.Properties.Width = Unit.Percentage(100);
+                       settings.Properties.ClientInstanceName = "year";
+                       settings.Properties.DisplayFormatString = "N0";
+                       settings.Properties.DisplayFormatInEditMode = true;
+                       settings.Properties.DecimalPlaces = 0;
+                       settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                       settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                       settings.Properties.Increment = 1M;
+                       settings.Properties.LargeIncrement = 1M;
+                       settings.Properties.MinValue = 0;
+                       settings.Properties.MaxValue = 3000;
+                       settings.Properties.NumberType = SpinEditNumberType.Integer;
+                       settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+                       settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                   }).GetHtml()
+
+                       
+                    </td>
+                    <td>
+                     
+                    </td>
+                </tr>
+      
+            </table>
+        </td>
+        <td style="width: 45%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="2">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Documento</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 35%">
+                       @Html.DevExpress().LabelFor(m => m.id_PeriodType, settings =>
+                        {
+                            settings.Name = "InventoryPeriodTypeLabel";
+                            settings.Text = "Tipo de Periodo:";
+                            settings.AssociatedControlName = "id_PeriodType";
+                        }).GetHtml()*
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBox(settings =>
+                        {
+                            settings.Name = "id_PeriodType";
+                            settings.Properties.ClientInstanceName = "id_PeriodType";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.ValueField = "id";
+                            settings.Properties.TextField = "name";
+                            settings.Properties.ValueType = typeof(int);
+                            settings.Properties.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Todos";
+                            settings.Properties.NullText = "Todos";
+
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        }).BindList(DataProviderAdvanceParameters.AdvanceParametersByCode("TPGV1")).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 35%">
+                        @Html.DevExpress().LabelFor(m => m.id_warehouse, settings =>
+                        {
+                            settings.Name = "id_warehouseLabel";
+                            settings.Text = "Bodega:";
+                            settings.AssociatedControlName = "id_warehouse";
+                        }).GetHtml()*
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBox(settings =>
+                        {
+                            settings.Name = "id_warehouse";
+                            settings.Properties.ClientInstanceName = "id_warehouse";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.ValueField = "id";
+                            settings.Properties.TextField = "name";
+                            settings.Properties.ValueType = typeof(int);
+                            settings.Properties.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Todos";
+                            settings.Properties.NullText = "Todos";
+
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        }).BindList(DataProviderWarehouse.WarehouseByCompany((int?)ViewData["id_company"])).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 15%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "btnSearch";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Buscar";
+                            settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnSearch_click";
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "Clear";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Limpiar";
+                            settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnClear_click";
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="btn-group" style="width: 100%;">
+                 
+                     
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+}

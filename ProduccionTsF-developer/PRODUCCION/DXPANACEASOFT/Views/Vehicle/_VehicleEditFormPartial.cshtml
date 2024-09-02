@@ -1,0 +1,400 @@
+﻿@model  DXPANACEASOFT.Models.Vehicle
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+    <table class="table table-condensed">
+        <!--FILA 1 Marca, Modelo, Placa-->
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.mark, settings =>
+                {
+                    settings.Text = "Marca:*";
+                    settings.AssociatedControlName = "mark";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.mark, settings =>
+           {
+               settings.Properties.ClientInstanceName = "mark";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.NullText = "Marca";
+               settings.ShowModelErrors = true;
+               settings.ClientVisible = true;
+               settings.Properties.ClientSideEvents.Validation = "OnVehicleMarkValidation";
+
+           }).GetHtml()
+            </td>
+
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.model, settings =>
+                {
+                    settings.Text = "Modelo:*";
+                    settings.AssociatedControlName = "model";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.model, settings =>
+           {
+               settings.Properties.ClientInstanceName = "model";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.NullText = "Modelo";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnVehicleModelValidation";
+
+           }).GetHtml()
+            </td>
+
+            <td style="width: 5%;">
+                @Html.DevExpress().LabelFor(m => m.carRegistration, settings =>
+                {
+                    settings.Text = "Placa:*";
+                    settings.AssociatedControlName = "carRegistration";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.carRegistration, settings =>
+           {
+               settings.Properties.ClientInstanceName = "carRegistration";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.NullText = "Placa";
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Validation = "OnVehicleCarRegistrationValidation";
+
+           }).GetHtml()
+            </td>
+
+        </tr>
+        <!--FILA 2-->
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.id_VehicleType, settings =>
+                {
+                    settings.Name = "id_VehicleTypeLabel";
+                    settings.Text = "Tipo de Vehículo:*";
+                    settings.AssociatedControlName = "id_VehicleTypeLabel";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_VehicleType = (Model != null && Model.id_VehicleType != 0) ? (int?)Model.id_VehicleType : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_VehicleType, settings =>
+               {
+                   settings.Name = "id_VehicleType";
+                   settings.Properties.ClientInstanceName = "id_VehicleType";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Properties.TextFormatString = "{0}";
+                   settings.Properties.ValueField = "id";
+                   settings.Properties.TextField = "name";
+                   settings.Properties.ValueType = typeof(int);
+                   ;
+                   settings.Properties.Columns.Add("name", "Nombre", 100);
+                   settings.Properties.Columns.Add("shippingType", "Medio", 100);
+                   settings.CustomJSProperties = (s, e) =>
+                   {
+                       e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                       e.Properties["cpIsRequired"] = "true";
+                       e.Properties["cpHasTab"] = "false";
+                   };
+                   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnVehicleType_SelectedIndexChanged";
+               }).BindList(DataProviderVehicleType.VehiculeTypes()).Bind(id_VehicleType).GetHtml()
+            </td>
+
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.id_personOwner, settings =>
+                {
+                    settings.Name = "id_personOwnerLabel";
+                    settings.Text = "Dueño:*";
+                    settings.AssociatedControlName = "id_personOwnerLabel";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_personOwner = (Model != null && Model.id_personOwner != 0) ? (int?)Model.id_personOwner : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_personOwner, settings =>
+                {
+                    settings.Name = "id_personOwner";
+                    settings.Properties.ClientInstanceName = "id_personOwner";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueType = typeof(int);
+                    settings.CustomJSProperties = (s, e) =>
+                    {
+                        e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                        e.Properties["cpIsRequired"] = "true";
+                        e.Properties["cpHasTab"] = "false";
+                    };
+                    settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                }).BindList(DataProviderPerson.PersonsTransportistDriver((int)ViewData["id_company"])).Bind(id_personOwner).GetHtml()
+            </td>
+
+            <td style="width: 5%;">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Medio de Transporte:";
+                    settings.AssociatedControlName = "id_shippingTypeLabel";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_vehicleType = (Model != null && Model.VehicleType != null) ? Model.id_VehicleType : 0;
+                    string transportWay = "";
+                    if (id_vehicleType != null && id_vehicleType != 0)
+                    {
+                        transportWay = DataProviderVehicleType.VehicleType(id_vehicleType).PurchaseOrderShippingType.name;
+                    }
+                }
+                @Html.DevExpress().TextBox(
+                settings =>
+                {
+                    settings.Name = "id_shippingTypeT";
+                    settings.Properties.ClientInstanceName = "id_shippingTypeT";
+                    settings.Width = Unit.Percentage(87);
+
+                    settings.Text = transportWay;
+                }).GetHtml()
+            </td>
+        </tr>
+        <!--FILA 3 Compañía Transportista-->
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.VeicleProviderTransport, settings =>
+                {
+                    settings.Name = "VeicleProviderTransportLabel";
+                    settings.Text = "Compañía Transportista:*";
+                    settings.AssociatedControlName = "VeicleProviderTransportLabel";
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+               @{
+                    int? id_providerTransportist = 0;
+
+                    id_providerTransportist = (Model != null && Model.id_providerT != 0) ? (int?)Model.id_providerT : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_providerT, settings =>
+                {
+                    settings.Name = "id_providerT";
+                    settings.Properties.ClientInstanceName = "id_providerT";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueType = typeof(int);
+                    settings.CustomJSProperties = (s, e) =>
+                    {
+                        e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                        e.Properties["cpIsRequired"] = "true";
+                        e.Properties["cpHasTab"] = "false";
+                    };
+                    settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                }).BindList(DataProviderPerson.PersonsTransportist((int)ViewData["id_company"])).Bind(id_providerTransportist).GetHtml()
+            </td>
+
+
+        </tr>
+        <!--FILA 4 Compañía que factura-->
+        <tr>
+            
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.VehicleProviderTransportBilling, settings =>
+                {
+                    settings.Name = "VeicleProviderTransportBillingLabel";
+                    settings.Text = "Compañía que factura:*";
+                    settings.AssociatedControlName = "VeicleProviderTransportBillingLabel";
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @{
+                    int? id_providerTransportistBilling = 0;
+
+                    id_providerTransportistBilling = (Model != null && Model.id_providerTBilling != 0) ? (int?)Model.id_providerTBilling : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_providerTBilling, settings =>
+                {
+                    settings.Name = "id_providerTBilling";
+                    settings.Properties.ClientInstanceName = "id_providerTBilling";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueType = typeof(int);
+                    settings.CustomJSProperties = (s, e) =>
+                    {
+                        e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                        e.Properties["cpIsRequired"] = "true";
+                        e.Properties["cpHasTab"] = "false";
+                    };
+                    settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                }).BindList(DataProviderPerson.PersonsTransportist((int)ViewData["id_company"])).Bind(id_providerTransportistBilling).GetHtml()
+            </td>
+        </tr>
+        <!--FILA 5 Descripción-->
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.description, settings =>
+                {
+                    settings.Text = "Descripción:";
+                    settings.AssociatedControlName = "description";
+
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().MemoFor(m => m.description, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "description";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "";
+                    settings.ShowModelErrors = true;
+
+                }).GetHtml()
+            </td>
+        </tr>
+        <!--FILA 6 Color, ¿Activo?, ¿Es Propio?-->
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.ItemColor, settings =>
+                    {
+                        settings.Text = "Color*:";
+                        settings.AssociatedControlName = "ItemColor";
+
+                    }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_itemColor = (Model != null && Model.id_itemColor != 0) ? (int?)Model.id_itemColor : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_itemColor, settings =>
+           {
+               settings.Name = "id_itemColor";
+               settings.Properties.ClientInstanceName = "id_itemColor";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.TextFormatString = "{1}";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+               ;
+               settings.Properties.Columns.Add("code", "Código", 100);
+               settings.Properties.Columns.Add("name", "Descripción", 100);
+               settings.CustomJSProperties = (s, e) =>
+               {
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpHasTab"] = "false";
+               };
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           }).BindList(DataProviderItemColor.ItemsColors()).Bind(id_itemColor).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+                {
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "isActive";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "isActive";
+                    settings.Width = Unit.Percentage(100);
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.isOwn, settings =>
+                    {
+                        settings.Text = "¿Propio?:";
+                        settings.AssociatedControlName = "isOwn";
+
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isOwn, settings =>
+                    {
+                        settings.Properties.ClientInstanceName = "isOwn";
+                        settings.Width = Unit.Percentage(100);
+
+                    }).GetHtml()
+            </td>
+        </tr>
+        <!--FILA 7 Sello Hunter -->
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "hasHunterDeviceLabel";
+                    settings.Text = "Tiene Hunter(Opcional)?:";
+                    settings.AssociatedControlName = "hunterLockLabel";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.hasHunterDevice, settings =>
+                    {
+                        settings.Properties.ClientInstanceName = "hasHunterDevice";
+                        settings.Width = Unit.Percentage(100);
+
+                    }).GetHtml()
+            </td>
+            <td style="width: 8%;">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "hunterLockLabel";
+                    settings.Text = "Candado Hunter(Opcional):";
+                    settings.AssociatedControlName = "hunterLockLabel";
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().TextBoxFor(m => m.hunterLockText, settings =>
+                {
+                    settings.Name = "hunterLockText";
+                    settings.Properties.ClientInstanceName = "hunterLockText";
+                    settings.Width = Unit.Percentage(100);
+                }).GetHtml()
+            </td>
+        </tr>
+        <!--FILA 8 Submit, Cancelar-->
+        <tr>
+            <td colspan="6" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr id="vehicleAlertRow" style="display: none;">
+            <td colspan="6">
+                <div class="alert alert-danger fade in" style="margin-top:18px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                    <span id="vehicleErrorMessage"></span>
+                </div>
+            </td>
+        </tr>
+    </table>
+                    
+
+<script src="~/Scripts/vehicle/editform.js"></script>

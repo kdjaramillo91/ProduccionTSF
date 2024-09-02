@@ -1,0 +1,103 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Customer
+
+<div style="width: 100%; overflow: auto;">
+    <table class="table table-condensed">
+        <tr>
+             
+            <td style="width: 100%;">
+                @{
+                    Customer _customer = Model ?? new Customer();
+
+                    Html.DevExpress().PageControl(tabs =>
+                    {
+                        tabs.Name = "tabControlCustomer";
+                        tabs.Width = Unit.Percentage(100);
+                        tabs.EnableClientSideAPI = true;
+
+                        // Tab: Datos Generales
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Datos Generales    ";
+                            tab.Name = "tabGeneralDataCustomer";
+
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                var icustomer = (Model != null ) ? Model: new Customer();
+                                Html.RenderPartial("_CustomerGeneralDataPartial", icustomer);
+                            });
+                            
+                        });
+
+                        // CustomerContact
+                        // CustomerAddress
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Datos de Contacto    ";
+                            tab.Name = "tabContactDataCustomer";
+
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                //_person.Provider = _person.Provider ?? new Provider();
+                                //ViewContext.Writer.Write("Datos Específicos");
+                                var icustomer = (Model != null) ? Model : new Customer();
+                                Html.RenderPartial("_CustomerContactDataPartial", icustomer);
+                            });
+
+                            //tab.ClientVisible = (_person.Provider != null);
+                        });
+
+                        //  CustomerCreditInfo
+                        //  CustomerPriceList
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Datos de Cobranzas    ";
+                            tab.Name = "tabDebtsDataCustomer";
+
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                //_person.Provider = _person.Provider ?? new Provider();
+                                //ViewContext.Writer.Write("Datos Relacionados");
+                                var icustomer = (Model != null) ? Model : new Customer();
+                                Html.RenderPartial("_CustomerDebtsDataPartial", icustomer);
+                            });
+
+                            //tab.ClientVisible = (_person.Provider != null);
+                        });
+
+
+                    }).Render();
+                }
+            </td>
+
+
+        </tr>
+    </table>
+</div>
+
+@*<script src="~/Scripts/person/_providerGeneralData.js"></script>*@

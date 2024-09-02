@@ -1,0 +1,450 @@
+﻿@using DXPANACEASOFT.Models
+
+@model ProductionCostCoefficient
+
+@{
+	var usarIntegracionContable = (bool)this.ViewBag.UsarIntegracionContable;
+	var idCompany = (int)this.ViewBag.id_company;
+
+	var tokenValueSeparator = '|';
+}
+<div id="datosGeneralesEditForm">
+	<div><b>Definición de Fórmula</b></div>
+	<hr style="width: 100%;">
+	<div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "sequenceLabel";
+						label.Text = "Número de Operación:";
+						label.AssociatedControlName = "sequence";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.sequence,
+					textBox =>
+					{
+						textBox.Name = "sequence";
+						textBox.Properties.ClientInstanceName = "sequence";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_executionTypeLabel";
+						label.Text = "Tipo de Ejecución:*";
+						label.AssociatedControlName = "id_executionType";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@{
+					var id_executionType = (this.Model.id_executionType > 0)
+						? (int?)this.Model.id_executionType
+						: null;
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_executionType";
+						comboBox.Properties.ClientInstanceName = "id_executionType";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnExecutionTypeProductionCostSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnExecutionTypeProductionCostValidation";
+
+					}).BindList(DataProviderProductionCostExecutionType.ProductionCostExecutionTypes()).Bind(id_executionType).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_planDeCuentasLabel";
+						label.Text = "Plan de Cuentas:*";
+						label.AssociatedControlName = "id_planDeCuentas";
+						label.Enabled = usarIntegracionContable;
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@{
+					var id_planDeCuentas = usarIntegracionContable && !String.IsNullOrWhiteSpace(this.Model.id_planDeCuentas)
+						? this.Model.id_planDeCuentas
+						: null;
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_planDeCuentas";
+						comboBox.Properties.ClientInstanceName = "id_planDeCuentas";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "CCiPlanCta";
+						comboBox.Properties.TextField = "CDsPlanCuenta";
+						comboBox.Properties.ValueType = typeof(string);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ClientEnabled = usarIntegracionContable;
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnPlanDeCuentasSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnPlanDeCuentasValidation";
+
+					}).BindList(DataProviderPlanDeCuentas.PlanesDeCuentas(idCompany)).Bind(id_planDeCuentas).GetHtml()
+			</div>
+		</div>
+	</div>
+	<div style="padding-top: 10px"><b>Datos de Procedencia</b></div>
+	<hr style="width: 100%;">
+	<div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_warehouseTypeLabel";
+						label.Text = "Tipo de Bodega:";
+						label.AssociatedControlName = "id_warehouseType";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@{
+					var id_warehouseType =
+						(this.Model.id_warehouseType.HasValue && this.Model.id_warehouseType.Value > 0)
+						? (int?)this.Model.id_warehouseType
+						: null;
+
+					var warehouseTypesModel = ((List<WarehouseType>)this.ViewBag.TiposBodegasDistribucion)
+						.Select(t => new
+						{
+							t.id,
+							t.code,
+							t.name,
+						})
+						.OrderBy(t => t.code)
+						.ToArray();
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_warehouseType";
+						comboBox.Properties.ClientInstanceName = "id_warehouseType";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpWarehouseTypes"] = warehouseTypesModel;
+						};
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnWarehouseTypeSelectedIndexChanged";
+
+					}).BindList(warehouseTypesModel).Bind(id_warehouseType).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_warehouseslabel";
+						label.Text = "Bodegas:";
+						label.AssociatedControlName = "id_warehouses";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@{
+					var id_warehousesArray = this.Model.ProductionCostCoefficientWarehouses
+						.Select(w => w.id_warehouse)
+						.ToArray();
+					var id_warehouses = id_warehousesArray.Any()
+						? String.Join(Convert.ToString(tokenValueSeparator), id_warehousesArray)
+						: null;
+
+					var warehousesAllModel = ((List<Warehouse>)this.ViewBag.BodegasDistribucionCosto)
+						.Select(w => new
+						{
+							w.id,
+							w.code,
+							w.name,
+							w.id_warehouseType,
+						})
+						.OrderBy(w => w.code)
+						.ToArray();
+
+					var warehousesModel = warehousesAllModel
+						.Where(w => !id_warehouseType.HasValue
+							|| (id_warehouseType.Value == w.id_warehouseType)
+							|| id_warehousesArray.Contains(w.id))
+						.ToArray();
+				}
+				@Html.DevExpress().TokenBox(
+					tokenBox =>
+					{
+						tokenBox.Name = "id_warehouses";
+						tokenBox.Properties.ClientInstanceName = "id_warehouses";
+						tokenBox.Width = Unit.Percentage(100);
+
+						tokenBox.Properties.ValueField = "id";
+						tokenBox.Properties.TextField = "name";
+						tokenBox.Properties.ValueSeparator = tokenValueSeparator;
+
+						tokenBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						tokenBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						tokenBox.ShowModelErrors = true;
+
+						tokenBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpWarehouses"] = warehousesAllModel;
+						};
+
+						tokenBox.Properties.ClientSideEvents.ValueChanged = "OnWarehousesValueChanged";
+						tokenBox.Properties.ClientSideEvents.Validation = "OnWarehousesValidation";
+
+					}).BindList(warehousesModel).Bind(id_warehouses).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_warehouseLocationslabel";
+						label.Text = "Ubicaciones:";
+						label.AssociatedControlName = "id_warehouseLocations";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@{
+					var id_warehouseLocationsArray = this.Model.ProductionCostCoefficientWarehouseLocations
+						.Select(l => l.id_warehouseLocation)
+						.ToArray();
+					var id_warehouseLocations = id_warehouseLocationsArray.Any()
+						? String.Join(Convert.ToString(tokenValueSeparator), id_warehouseLocationsArray)
+						: null;
+
+					var warehouseLocationsAllModel = ((List<WarehouseLocation>)this.ViewBag.UbicacionesBodegasDistribucion)
+						.Select(l => new
+						{
+							l.id,
+							l.code,
+							l.name,
+							l.id_warehouse,
+						})
+						.OrderBy(l => l.code)
+						.ToArray();
+
+					var warehouseLocationsModel = warehouseLocationsAllModel
+						.Where(l => (id_warehousesArray.Length == 1)
+							&& ((id_warehousesArray[0] == l.id_warehouse) || id_warehouseLocationsArray.Contains(l.id)))
+						.ToArray();
+				}
+				@Html.DevExpress().TokenBox(
+					tokenBox =>
+					{
+						tokenBox.Name = "id_warehouseLocations";
+						tokenBox.Properties.ClientInstanceName = "id_warehouseLocations";
+						tokenBox.Width = Unit.Percentage(100);
+						tokenBox.ClientEnabled = (id_warehousesArray.Length == 1);
+
+						tokenBox.Properties.ValueField = "id";
+						tokenBox.Properties.TextField = "name";
+						tokenBox.Properties.ValueSeparator = tokenValueSeparator;
+
+						tokenBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						tokenBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						tokenBox.ShowModelErrors = true;
+
+						tokenBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpWarehouseLocations"] = warehouseLocationsAllModel;
+						};
+
+					}).BindList(warehouseLocationsModel).Bind(id_warehouseLocations).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_simpleFormulaLabel";
+						label.Text = "Motivo de Costo:*";
+						label.AssociatedControlName = "id_simpleFormula";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@{
+					var id_simpleFormula = (this.Model.id_simpleFormula > 0)
+						? (int?)this.Model.id_simpleFormula
+						: null;
+
+					var simpleFormulasModel = (List<SimpleFormula>)DataProviderSimpleFormula.GetSimpleFormulaByType("TIPOBODEGA");
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_simpleFormula";
+						comboBox.Properties.ClientInstanceName = "id_simpleFormula";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpSimpleFormulas"] = simpleFormulasModel
+								.Select(f => new
+								{
+									f.id,
+									f.formula,
+								})
+								.ToArray();
+						};
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnSimpleFormulaSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnSimpleFormulaValidation";
+
+					}).BindList(simpleFormulasModel).Bind(id_simpleFormula).GetHtml()
+			</div>
+			<div class="col-sm-4"></div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_poundTypeLabel";
+						label.Text = "Tipo de Libras:*";
+						label.AssociatedControlName = "id_poundType";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@{
+					var id_poundType = (this.Model.id_poundType > 0)
+						? (int?)this.Model.id_poundType
+						: null;
+				}
+				@Html.DevExpress().ComboBox(
+					comboBox =>
+					{
+						comboBox.Name = "id_poundType";
+						comboBox.Properties.ClientInstanceName = "id_poundType";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.Validation = "OnPoundTypeValidation";
+
+					}).BindList(DataProviderProductionCostPoundType.ProductionCostPoundTypeByCurrent(id_poundType)).Bind(id_poundType).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "formulacionLabel";
+						label.Text = "Formulación:";
+						label.AssociatedControlName = "formulacionTextField";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-11">
+				@{
+					var formulaText = (this.Model.SimpleFormula != null)
+						? this.Model.SimpleFormula.formula
+						: String.Empty;
+				}
+				@Html.TextArea(
+					"formulacionTextField", @formulaText, new
+					{
+						id = "formulacionTextField",
+						style = "width:97%;resize:none",
+						rows = "5",
+						@readonly = "readonly",
+					})
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "descriptionLabel";
+						label.Text = "Descripción:";
+						label.AssociatedControlName = "description";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-11">
+				@Html.DevExpress().MemoFor(
+					m => m.description,
+					memo =>
+					{
+						memo.Name = "description";
+						memo.Properties.ClientInstanceName = "description";
+						memo.Width = Unit.Percentage(100);
+						memo.ShowModelErrors = true;
+					}).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "isActiveLabel";
+						label.Text = "¿Activo?:";
+						label.AssociatedControlName = "isActive";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().CheckBoxFor(
+					m => m.isActive,
+					checkBox =>
+					{
+						checkBox.Name = "isActive";
+						checkBox.Properties.ClientInstanceName = "isActive";
+						checkBox.Width = Unit.Percentage(100);
+					}).GetHtml()
+			</div>
+		</div>
+	</div>
+</div>

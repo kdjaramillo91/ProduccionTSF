@@ -1,0 +1,101 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<RomaneoDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewDetails";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "Romaneo",
+            Action = "GridViewDetails",
+            drawersNumber = ViewBag.drawersNumber,
+            //((List<RomaneoDetailDTO>) Model).Count
+            idTypeRomaneo = ViewBag.idTypeRomaneo,
+            percentTara = ViewBag.percentTara,
+            enabled = ViewBag.enabled
+        };
+
+        settings.KeyFieldName = "id";
+        settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+        settings.Enabled = ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+        settings.SettingsBehavior.AllowFixedGroups = false;
+        settings.SettingsBehavior.AllowSort = false;
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            var list = (Model as List<RomaneoDetailDTO>) ?? new List<RomaneoDetailDTO>();
+            e.Properties["cpDetailCount"] = list.Count;
+        };
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id";
+            column.Name = "id";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "drawerNumber";
+            column.Name = "drawerNumber";
+            column.Caption = "No. Gavetas";
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "grossWeight";
+            column.Name = "grossWeight";
+            column.Caption = "Peso Bruto";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.MinValue = 0;
+            prop.MaxValue = 9999;
+            prop.DisplayFormatString = "n";
+            prop.DecimalPlaces = 1;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "um";
+            column.Name = "um";
+            column.Caption = "U.M.";
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "poundsTrash";
+            column.Name = "poundsTrash";
+            column.Caption = "Lbs. Basura";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.MinValue = 0;
+            prop.MaxValue = 9999;
+            prop.DisplayFormatString = "n";
+            prop.DecimalPlaces = 1;
+        });
+    });
+}
+@grid.Bind(Model).GetHtml()

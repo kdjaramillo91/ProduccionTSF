@@ -1,0 +1,161 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.PriceList
+@{
+    string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+
+<table class="table table-condensed" style="border: 0px solid #ffffff;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Filtros del Detalle</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 9%">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "inventoryLineLabel";
+               settings.Text = "Linea de Inventario:";
+               //settings.AssociatedControlName = "id_priceList";
+           }).GetHtml()
+        </td>
+        <td style="width: 25%">
+            @*@{
+                int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+            }*@
+            @*@Html.Hidden("id_priceListAux", id_priceList)*@
+            @Html.DevExpress().TokenBox(settings =>
+           {
+               settings.Name = "inventoryLines";
+               settings.Properties.ClientInstanceName = "inventoryLines";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullDisplayText = "Todos";
+               settings.Properties.NullText = "Todos";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.ReadOnly = codeState != "01";
+               ////settings.ReadOnly = @Model.ProductionLotState.code != "07" && @Model.ProductionLotState.code != "06";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Init = "TokenInventoryLine_Init";
+               //settings.Properties.ClientSideEvents.Validation = "OnPriceListInventoryLineValidation";
+               settings.Properties.ClientSideEvents.ValueChanged = "TokenInventoryLine_ValueChanged";
+           }).BindList(DataProviderInventoryLine.InventoryLineFilter((int)ViewData["id_company"])).GetHtml()
+        </td>
+        <td style="width: 8%">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "itemTypeLabel";
+               settings.Text = "Tipo de Ítem:";
+               //settings.AssociatedControlName = "id_priceList";
+           }).GetHtml()
+        </td>
+        <td style="width: 25%">
+            @*@{
+                int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+            }*@
+            @*@Html.Hidden("id_priceListAux", id_priceList)*@
+            @Html.DevExpress().TokenBox(settings =>
+           {
+               settings.Name = "itemTypes";
+               settings.Properties.ClientInstanceName = "itemTypes";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullDisplayText = "Todos";
+               settings.Properties.NullText = "Todos";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.ReadOnly = codeState != "01";
+               ////settings.ReadOnly = @Model.ProductionLotState.code != "07" && @Model.ProductionLotState.code != "06";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Init = "TokenItemType_Init";
+               //settings.Properties.ClientSideEvents.Validation = "OnPriceListItemTypeValidation";
+               settings.Properties.ClientSideEvents.ValueChanged = "TokenItemType_ValueChanged";
+               //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboPriceList_SelectedIndexChanged";
+             }).BindList(DataProviderItemType.ItemTypes((int) ViewData["id_company"])).GetHtml()
+        </td>
+        <td style="width: 8%">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "itemGroupLabel";
+               settings.Text = "Grupo/Sub-Grupo de Ítem:";
+               //settings.AssociatedControlName = "id_priceList";
+           }).GetHtml()
+        </td>
+        <td style="width: 25%">
+            @*@{
+                int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+            }*@
+            @*@Html.Hidden("id_priceListAux", id_priceList)*@
+            @Html.DevExpress().TokenBox(settings =>
+           {
+               settings.Name = "itemGroups";
+               settings.Properties.ClientInstanceName = "itemGroups";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullDisplayText = "Todos";
+               settings.Properties.NullText = "Todos";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.ReadOnly = codeState != "01";
+               ////settings.ReadOnly = @Model.ProductionLotState.code != "07" && @Model.ProductionLotState.code != "06";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Init = "TokenItemGroup_Init";
+               //settings.Properties.ClientSideEvents.Validation = "OnPriceListItemGroupValidation";
+               settings.Properties.ClientSideEvents.ValueChanged = "TokenItemGroup_ValueChanged";
+               //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboPriceList_SelectedIndexChanged";
+           }).BindList(DataProviderItemGroup.ItemGroups((int)ViewData["id_company"])).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Filtro de Muestra</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 9%">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "filterShowLabel";
+               settings.Text = "Campos de Muestra:";
+               //settings.AssociatedControlName = "id_priceList";
+           }).GetHtml()
+        </td>
+        <td style="width: 25%">
+            @*@{
+                    int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+                }*@
+            @*@Html.Hidden("id_priceListAux", id_priceList)*@
+            @Html.DevExpress().TokenBox(settings =>
+       {
+           settings.Name = "filterShows";
+           settings.Properties.ClientInstanceName = "filterShows";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NullDisplayText = "Todos";
+           settings.Properties.NullText = "Todos";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.ReadOnly = codeState != "01";
+           ////settings.ReadOnly = @Model.ProductionLotState.code != "07" && @Model.ProductionLotState.code != "06";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Init = "TokenFilterShow_Init";
+           //settings.Properties.ClientSideEvents.Validation = "OnPriceListFilterShowValidation";
+           settings.Properties.ClientSideEvents.ValueChanged = "TokenFilterShow_ValueChanged";
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboPriceList_SelectedIndexChanged";
+       }).BindList(DataProviderPriceList.FiltersShow()).GetHtml()
+        </td>
+        <td style="width: 8%">
+        </td>
+        <td style="width: 25%">
+        </td>
+        <td style="width: 8%">
+        </td>
+        <td style="width: 25%">
+        </td>
+    </tr>
+
+</table>
+
+<script src="~/Scripts/pricelist/_priceListHeadFormPriceListDetail.js"></script>

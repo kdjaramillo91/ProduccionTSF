@@ -1,0 +1,213 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDetailDTO
+
+@{
+	Html.Hidden("id_detail", Model.id);
+}
+<div class="row">
+	<div class="col-sm-6">
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "Producto:";
+				}).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.Partial("CmbBoxesEdit/_ComboBoxItemEdit", Model)
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "UM Mov.:";
+				}).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.Partial("CmbBoxesEdit/_ComboBoxMetricUnitMovEdit", Model)
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Name = "LabelTotal";
+			   settings.Width = Unit.Percentage(100);
+			   settings.ClientVisible = IsEnabled("VerCosto");
+			   settings.Text = "Total";
+		   }).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.DevExpress().SpinEditFor(model => model.total, settings =>
+		   {
+			   settings.Name = "total";
+			   settings.ClientVisible = IsEnabled("VerCosto");
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+			   settings.Properties.DisplayFormatString = "N6";
+			   settings.Properties.DisplayFormatInEditMode = true;
+			   settings.Properties.DecimalPlaces = 6;
+			   settings.Properties.NumberType = SpinEditNumberType.Float;
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+			   settings.Width = Unit.Percentage(100);
+			   settings.ReadOnly = true;
+		   }).GetHtml()
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "Saldo";
+				}).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.DevExpress().SpinEditFor(model => model.saldo, settings =>
+		   {
+			   settings.Name = "saldo";
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+			   settings.Properties.DisplayFormatString = "N6";
+			   settings.Properties.DisplayFormatInEditMode = true;
+			   settings.Properties.DecimalPlaces = 6;
+			   settings.Properties.NumberType = SpinEditNumberType.Float;
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+			   settings.ReadOnly = true;
+			   settings.Width = Unit.Percentage(100);
+		   }).GetHtml()
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "UM Inv.:";
+				}).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.Partial("CmbBoxesEdit/_ComboBoxMetricUnitInvEdit", Model)
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "Cant. A Transferir";
+				}).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.DevExpress().SpinEditFor(model => model.quantity, settings =>
+		   {
+			   settings.Name = "quantity";
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+			   settings.Properties.DisplayFormatString = "N6";
+			   settings.Properties.DisplayFormatInEditMode = true;
+			   settings.Properties.DecimalPlaces = 6;
+			   settings.Properties.NumberType = SpinEditNumberType.Float;
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.Init = "quantity_init";
+			   settings.Properties.ClientSideEvents.ValueChanged = "quantity_valuechanged";
+		   }).GetHtml()
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Name = "LabelCosto";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Text = "Costo";
+			   settings.ClientVisible = IsEnabled("VerCosto"); ;
+		   }).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.DevExpress().SpinEditFor(model => model.cost, settings =>
+		   {
+			   settings.Name = "cost";
+			   settings.ClientVisible = IsEnabled("VerCosto");
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+			   settings.Properties.DisplayFormatString = "N6";
+			   settings.Properties.DisplayFormatInEditMode = true;
+			   settings.Properties.DecimalPlaces = 6;
+			   settings.Properties.NumberType = SpinEditNumberType.Float;
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+			   settings.Properties.ClientSideEvents.Init = "cost_init";
+			   settings.Properties.ClientSideEvents.ValueChanged = "cost_valuechanged";
+			   settings.Width = Unit.Percentage(100);
+		   }).GetHtml()
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4 col-sm-4">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "Lote:";
+				}).GetHtml()
+			</div>
+			<div class="col-8 col-sm-8">
+				@Html.Partial("CmbBoxesEdit/_ComboBoxLotEdit", Model)
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-9 col-sm-offset-9" style="margin-top: 8em;">
+		@Html.DevExpress().Button(settings =>
+		   {
+			   settings.Name = "btnUpdateDetail";
+			   settings.Text = "Actualizar";
+			   settings.RenderMode = ButtonRenderMode.Button;
+			   settings.UseSubmitBehavior = false;
+			   settings.ImagePosition = ImagePosition.Left;
+			   settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+
+			   settings.ValidateInvisibleEditors = true;
+			   settings.ClientEnabled = true;
+			   settings.ClientSideEvents.Click = "btnUpdateDetail_Click";
+		   }).GetHtml()
+		@Html.DevExpress().Button(settings =>
+		{
+			settings.Name = "btnCancelClick";
+			settings.Text = "Cancelar";
+			settings.RenderMode = ButtonRenderMode.Button;
+			settings.UseSubmitBehavior = false;
+			settings.ImagePosition = ImagePosition.Left;
+			settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+			settings.ClientSideEvents.Click = "btnCancelClick_Click";
+		}).GetHtml()
+	</div>
+</div>
+
+
+@functions{
+
+	bool IsEnabled(string namePermission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.name.Equals(namePermission));
+
+		return (permission != null);
+	}
+
+}

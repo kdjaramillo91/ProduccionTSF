@@ -1,0 +1,185 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ResultQueryPhase
+
+@*@{
+        Company company = Model ?? new Company();
+    }
+
+    @Html.Hidden("id_company", company.id)*@
+<div style="width: 100%;">
+    @Html.DevExpress().Button(settings =>
+    {
+
+        settings.Name = "btnPrintResultQueryPhase";
+        settings.ToolTip = "Imprimir";
+        //settings.Width = 90;
+        settings.Text = "";
+        //settings.RenderMode = ButtonRenderMode.Link;
+        settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+        settings.ClientEnabled = true;
+        settings.UseSubmitBehavior = false;
+        settings.EnableClientSideAPI = true;
+        settings.ClientSideEvents.Click = "PrintResultQueryPhase";
+
+    }).GetHtml()
+
+</div>
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0; width: 100%;">
+        <td colspan="5">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Resultados</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 45%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Tipo de Oportunidad:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterDocumentType)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Localidad(Socio de Negocio):
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterAddress)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Socio de Negocio:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterPersons)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Empleado(Ejecutivo):
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterExecutivePersons)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Etapa:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterPhases)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Fecha Inicio:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterRangeStartDate)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Fecha Cierre:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterRangeEndDate)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Monto de Oportunidad:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterAmounts)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Porcentaje de Cierre:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterPercents)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Talla del Producto:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterItemSizes)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Estado:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterDocumentState)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%">
+                        <strong>
+                            Estado de la Oportunidad:
+                        </strong>
+                    </td>
+                    <td>
+                        @Html.Raw(Model.filterBusinessOportunityState)
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr>
+                    <td rowspan="10" style="width: 100%;">
+                        @*<img src="@Url=action('CharterColumn')" alt="Chart" />*@
+                        @*<img src="_ChartViewOpportunities.cshtml"/>*@
+                        @*<img src="@Html.Partial("_ChartViewOpportunities", Model.listQueryPhase)"/>*@
+                        @Html.Partial("_ChartViewOpportunities", Model.listQueryPhase)
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+@*<tr>
+    <td rowspan="4" style="width: 10%;">
+        @Html.Partial("_Logo", company.logo)
+    </td>
+</tr>*@
+
+
+<br />
+
+@Html.Partial("_ViewOpportunitiesDetailResultQueryPhasePartial", Model.listQueryPhase)
+

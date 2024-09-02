@@ -1,0 +1,113 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+@using System.Drawing
+
+<table class="table table-condenced" style="margin: 0px;">
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "noTransaccionLabel";
+				settings.Text = "Sec. Transaccional:";
+				settings.AssociatedControlName = "noTransaccionLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.number, settings =>
+			{
+				settings.Name = "number";
+				settings.Properties.ClientInstanceName = "number";
+				settings.Width = Unit.Percentage(70);
+				settings.ReadOnly = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "noLoteLabel";
+				settings.Text = "No. Lote:";
+				settings.AssociatedControlName = "noLoteLabel";
+				settings.ControlStyle.Font.Bold = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.internalNumber, settings =>
+			{
+				settings.Name = "internalNumber";
+				settings.Properties.ClientInstanceName = "internalNumber";
+                settings.Width = Unit.Percentage(90);
+                settings.ReadOnly = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_personProcessPlantLabel";
+				settings.Text = "Proceso:";
+				settings.AssociatedControlName = "id_personProcessPlantLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.Person1.processPlant, settings =>
+		   {
+			   settings.Name = "person1ProcessPlant";
+			   settings.Properties.ClientInstanceName = "person1ProcessPlant";
+			   settings.Width = Unit.Percentage(90);
+			   settings.ReadOnly = true;
+		   }).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "personProviderLabel";
+				settings.Text = "Proveedor:";
+				settings.AssociatedControlName = "personProviderLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_provider, settings =>
+			{
+				settings.Name = "id_provider";
+				settings.Properties.ClientInstanceName = "id_provider";
+				settings.Width = Unit.Percentage(70);
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.ReadOnly = true;
+			}).BindList(DataProviderPerson.ProviderByCompanyAndCurrent((int?)ViewData["id_company"], id_provider)).Bind(id_provider).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "camaroneraLabel";
+				settings.Text = "Camaronera:";
+				settings.AssociatedControlName = "camaroneraLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				Html.RenderPartial("comboboxcascading/_cmbProviderProductionUnitPartial");
+			}
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "piscinaLabel";
+				settings.Text = "Piscina:";
+				settings.AssociatedControlName = "piscinaLabel";
+				settings.ControlStyle.Font.Bold = true;
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				Html.RenderPartial("comboboxcascading/_cmbProviderProductionUnitProviderPoolPartial");
+			}
+		</td>
+	</tr>
+</table>

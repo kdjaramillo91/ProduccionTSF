@@ -1,0 +1,384 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvFishingCustodian";
+        settings.CallbackRouteValues = new { Controller = "FishingCustodian", Action = "FishingCustodianPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "FishingCustodian", Action = "FishingCustodianPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "FishingCustodian", Action = "FishingCustodianPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "FishingCustodian", Action = "FishingCustodianPartialDelete" };
+
+        settings.CustomActionRouteValues = new { Controller = "FishingCustodian", Action = "DeleteSelectedFishingCustodian" };
+
+        settings.KeyFieldName = "id";
+
+        settings.Width = Unit.Percentage(100);
+
+        #region GRIDVIEW BEHAIVOR
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+            if (ViewData["EditMessage"] != null)
+            {
+                e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+            }
+        };
+
+
+        #endregion
+
+        #region EDITFORM
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Editar Tarifario de Custodios";
+
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 800;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.Settings.ShowFooter = true;
+        settings.SettingsExport.EnableClientSideExportAPI = true;
+        settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+        settings.SettingsExport.FileName = "Rango_Libras_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+        settings.Toolbars.Add(t =>
+        {
+            t.EnableAdaptivity = true;
+            t.Items.Add(GridViewToolbarCommand.ExportToXls);
+            t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+            t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+        });
+
+        #endregion
+
+        #region PAGER
+
+        settings.SettingsPager.Visible = true;
+
+        #endregion
+
+        #region CLIENT SIDE EVENTS (JAVASCRIPT)
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        #endregion
+
+        #region SEARCH PANEL
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        #endregion
+
+        #region TITLE PANEL
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Tarifario de Custodios</span>");
+        });
+
+        #endregion
+
+        #region GROUP PANEL
+
+        settings.Settings.ShowGroupPanel = true;
+
+        #endregion
+
+        #region FILTER ROW
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+        #endregion
+
+        #region FOOTER ROW
+
+        settings.Settings.ShowFooter = true;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""UnselectAllRows();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        #endregion
+
+        #region COMMAND COLUMN
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        #endregion
+
+        #region MASTER DETAILS VIEW
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+        settings.SetDetailRowTemplateContent(column =>
+        {
+            int? id_FishingCustodian = (int?)DataBinder.Eval(column.DataItem, "id");
+            FishingCustodian warehouse = DataProviderFishingCustodian.FishingCustodianById(id_FishingCustodian);
+            Html.RenderPartial("_FishingCustodianDetailPartial", warehouse);
+        });
+
+        #endregion
+
+        #region AUTOGENERATED
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #endregion
+
+        #region ColumnsAdd
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "code";
+            column.Name = "code";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_FishingSite";
+            column.Name = "id_FishingSite";
+            column.Caption = "Zona | Sitio de Pesca";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(15);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_FishingSite = (int?)DataBinder.Eval(c.DataItem, "id_FishingSite");
+                FishingSite fishingSite = DataProviderFishingSite.FishingSiteFishingZoneById(id_FishingSite);
+                //DataProviderFishingSite.FishingSitesByCompanyAndCurrent((int)ViewData["id_company"], id_FishingSite)
+                string name = (fishingSite != null) ? fishingSite.name : "";
+                ViewContext.Writer.Write(name);
+            });
+
+            column.EditorProperties().ComboBox(comboBox =>
+            {
+                comboBox.DataSource = DataProviderFishingSite.FishingSitesByCompanyAndCurrent((int)ViewData["id_company"], null);
+                comboBox.ValueField = "id";
+                comboBox.TextField = "name";
+                comboBox.ValueType = typeof(int);
+
+                comboBox.DropDownStyle = DropDownStyle.DropDown;
+                comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "patrol";
+            column.Name = "patrol";
+            column.Caption = "Patrulla";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "semiComplete";
+            column.Name = "semiComplete";
+            column.Caption = "Semi Completa";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "truckDriver";
+            column.Name = "truckDriver";
+            column.Caption = "Camioneta";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "changeHG";
+            column.Name = "changeHG";
+            column.Caption = "H/Cabina Gye";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "cabinHR";
+            column.Name = "cabinHR";
+            column.Caption = "H/Cabina Ruta";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Name = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+
+            column.AutoFilterBy("Sí");
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+        });
+
+        if (ShowEditButton() || ShowDeleteButton())
+        {
+            MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+            {
+                ShowEditButton = ShowEditButton(),
+                ShowDeleteButton = false,
+                Visible = true,
+                VisibleIndex = 10,
+                Width = Unit.Percentage(5),
+                Caption = "Acciones"
+            };
+
+            if (ShowDeleteButton())
+            {
+                commandColumn.CustomButtons.Add(
+                      new GridViewCommandColumnCustomButton
+                      {
+                          ID = "btnDeleteRow",
+                          Text = "Eliminar"
+                      }
+                );
+            }
+
+            settings.ClientSideEvents.CustomButtonClick = "GridViewItemsCustomCommandButton_Click";
+
+            settings.Columns.Add(commandColumn);
+        }
+
+        #endregion
+
+        #region EDITOR FORM LAYOUT
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_FishingCustodian = (int?)DataBinder.Eval(c.DataItem, "id");
+            FishingCustodian FishingCustodian = DataProviderFishingCustodian.FishingCustodianById(id_FishingCustodian);
+
+            if (FishingCustodian == null && ViewData["rowToCopy"] != null)
+            {
+                FishingCustodian = (ViewData["rowToCopy"] as FishingCustodian) ?? new FishingCustodian
+                {
+                    isActive = true,
+                    cabinHR = 0,
+                    changeHG = 0,
+                    patrol = 0,
+                    semiComplete = 0,
+                    truckDriver = 0,
+                };
+                FishingCustodian.id = 0;
+                FishingCustodian.code = "";
+                //FishingCustodian.name += "-Copia";
+            }
+
+            FishingCustodian = FishingCustodian ?? new FishingCustodian
+            {
+                isActive = true,
+                cabinHR = 0,
+                changeHG = 0,
+                patrol = 0,
+                semiComplete = 0,
+                truckDriver = 0,
+            };
+
+            settings.PreRender = (s, e) =>
+            {
+                MVCxGridView g = (s as MVCxGridView);
+                if (g != null)
+                {
+                    g.FilterExpression = "isActive = true";
+                }
+            };
+
+            Html.RenderPartial("_FishingCustodianEditFormPartial", FishingCustodian);
+        });
+
+        #endregion
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+    });
+
+
+}
+
+@grid.Bind(Model).GetHtml()
+
+@functions {
+
+    bool ShowEditButton()
+    {
+        var permissions = (ViewData["permissions"] as List<int>);
+        return true; //(permissions != null && permissions.Contains(10));
+    }
+
+    bool ShowDeleteButton()
+    {
+        var permissions = (ViewData["permissions"] as List<int>);
+        return true; //(permissions != null && permissions.Contains(8));
+    }
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

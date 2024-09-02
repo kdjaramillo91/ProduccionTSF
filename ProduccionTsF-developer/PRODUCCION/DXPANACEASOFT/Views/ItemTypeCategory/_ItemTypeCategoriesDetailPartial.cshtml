@@ -1,0 +1,114 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    ItemTypeCategory itemTypeCategory = Model ?? new ItemTypeCategory();
+}
+
+@Html.Hidden("id_itemTypeCategory", itemTypeCategory.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(itemTypeCategory.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(itemTypeCategory.name)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 20%;">
+            @*<strong>
+                L&iacute;nea de inventario:
+            </strong>*@
+        </td>
+        <td colspan="4">
+            @*@{
+                string tInventario = (itemTypeCategory.InventoryLine != null) ? itemTypeCategory.InventoryLine.name : "";
+            }
+            @Html.Raw(tInventario)*@
+        </td>
+    </tr>   
+    <tr>
+        <td style="width: 20%;">
+            @*<strong>
+                Tipo de Producto:
+            </strong>*@
+        </td>
+        <td colspan="4">
+            @*@{
+                string tProducto = (itemTypeCategory.ItemType != null) ? itemTypeCategory.ItemType.name : "";
+            }
+            @Html.Raw(tProducto)*@
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(itemTypeCategory.description)
+        </td>
+    </tr>
+      
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(itemTypeCategory.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(itemTypeCategory.dateCreate)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(itemTypeCategory.id_userUpdate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(itemTypeCategory.dateUpdate)
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

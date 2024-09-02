@@ -1,0 +1,42 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InvoiceCommercial
+
+<table class="table table-condensed">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{  
+				ViewData["id_invoiceCommercial"] = (Model != null) ? Model.id : 0;
+
+				Html.DevExpress().PageControl(tabs =>
+				{
+					tabs.Name = "tabControl" + ViewData["id_invoiceCommercial"];
+					tabs.Width = Unit.Percentage(100);
+					tabs.Height = Unit.Pixel(200);
+
+					tabs.TabPages.Add(tab =>
+					{
+						tab.Name = "tabInvoiceCommercialsDetails";
+						tab.Text = "Detalle";
+						tab.TabStyle.Width = Unit.Percentage(100);
+						tab.SetContent(() =>
+						{
+							var invoiceCommercialsDetail = (Model != null && Model.InvoiceCommercialDetail != null) ? Model.InvoiceCommercialDetail.Where(r=> r.isActive).ToList() : new List<InvoiceCommercialDetail>();
+							this.ViewBag.TotalBoxes = (decimal)invoiceCommercialsDetail.Sum(e => e.numBoxes);
+							Html.RenderPartial("_InvoiceCommercialDetailViewsPartial", invoiceCommercialsDetail.Where(r=> r.isActive).OrderBy(od => od.id).ToList());
+						});
+					});
+				}).Render();
+            }
+        </td>
+    </tr>
+</table>
+

@@ -1,0 +1,98 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using  DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.TermsNegotiation
+@using System.Drawing
+@{
+    
+    bool modifi =true ;
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Name = "dcodeLabel";
+                settings.Text = "Código:";
+                settings.AssociatedControlName = "dcode";
+            }).GetHtml()
+
+
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+           {
+               settings.Name = "dcode";
+               settings.Properties.ClientInstanceName = "dcode";
+
+               settings.ShowModelErrors = true;
+               settings.Properties.MaxLength = 20;
+               settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+               settings.ReadOnly = modifi;
+               //settings.Width = Unit.Percentage(50);
+               //settings.Height = Unit.Percentage(50);
+           }).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+        <td></td>
+        <td colspan="3"></td>
+
+    </tr>
+
+    <tr>
+
+        <td>
+
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+            {
+                settings.Name = "dnameLabel";
+                settings.Text = " Nombre:";
+                settings.AssociatedControlName = "dname";
+
+            }).GetHtml()
+
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "dname";
+           settings.Properties.ClientInstanceName = "dname";
+           settings.Width = Unit.Percentage(100);
+ 
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ReadOnly = modifi;
+       }).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+
+
+    </tr>
+
+
+
+    <tr></tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+    
+
+

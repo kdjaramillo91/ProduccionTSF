@@ -1,0 +1,393 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model ProductionCostCoefficientDetail
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditProductionCoefficient", name = "formEditProductionCoefficient" }))
+{
+	@Html.Hidden("idCoefficientDetail", this.Model.id)
+
+	<table id="productionCoefficientTable" class="table table-condensed">
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_cuentaContabLabel";
+						label.Text = "Cuenta Contable:*";
+						label.AssociatedControlName = "id_cuentaContab";
+					}).GetHtml()
+			</td>
+			<td width="90%" colspan="4">
+				@{
+					var id_cuentaContab = !String.IsNullOrEmpty(this.Model.id_cuentaContab)
+						? this.Model.id_cuentaContab
+						: null;
+					var idPlanDeCuentas = (string)this.ViewBag.IdPlanDeCuentas;
+
+					var cuentaContabModel = DataProviderPlanDeCuentas
+						.GetCuentasContablesByCurrent(idPlanDeCuentas, id_cuentaContab)
+						.Select(c => new
+						{
+							idCuentaContable = c.CCiCuenta,
+							cuentaContable = c.CDsCuenta,
+							descripcion = String.Concat(c.CCiCuenta.TrimEnd(), " - ", c.CDsCuenta.TrimEnd()),
+							aceptaAuxiliar = c.BSnAceptaAux.HasValue ? c.BSnAceptaAux.Value : false,
+							aceptaCentroCosto = c.BsnAceptaProyecto.HasValue ? c.BsnAceptaProyecto.Value : false,
+						})
+						.OrderBy(c => c.idCuentaContable)
+						.ToArray();
+
+					var cuentaContabCurrent = cuentaContabModel
+						.FirstOrDefault(c => c.idCuentaContable == id_cuentaContab);
+
+					var requiereAuxiliarContable = (cuentaContabCurrent != null)
+						? cuentaContabCurrent.aceptaAuxiliar
+						: false;
+					var requiereCentroCosto = (cuentaContabCurrent != null)
+						? cuentaContabCurrent.aceptaCentroCosto
+						: false;
+				}
+				@Html.DevExpress().ComboBoxFor(
+					m => m.id_cuentaContab,
+					comboBox =>
+					{
+						comboBox.Name = "id_cuentaContab";
+						comboBox.Properties.ClientInstanceName = "id_cuentaContab";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "idCuentaContable";
+						comboBox.Properties.TextField = "cuentaContable";
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{0}-{1}";
+
+						comboBox.Properties.Columns.Add("idCuentaContable", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("cuentaContable", "Nombre", Unit.Percentage(70));
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpCuentasContables"] = cuentaContabModel;
+						};
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnCuentaContableDetailSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnCuentaContableDetailValidation";
+
+					}).BindList(cuentaContabModel).Bind(id_cuentaContab).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_tipoAuxContabLabel";
+						label.Text = "Tipo de Auxiliar:*";
+						label.AssociatedControlName = "id_tipoAuxContab";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@{
+					var id_tipoAuxContab = (requiereAuxiliarContable && !String.IsNullOrEmpty(this.Model.id_tipoAuxContab))
+						? this.Model.id_tipoAuxContab
+						: null;
+
+					var tipoAuxiliarContableModel = (id_tipoAuxContab == null)
+						? new object[] { }
+						: DataProviderPlanDeCuentas
+							.GetTiposAuxiliaresContablesByCurrent(idPlanDeCuentas, id_cuentaContab, id_tipoAuxContab)
+							.Select(ta => new
+							{
+								idTipoAuxContable = ta.CCiTipoAuxiliar,
+								tipoAuxContable = ta.CDsTipoAuxiliar,
+							})
+							.OrderBy(ta => ta.idTipoAuxContable)
+							.ToArray();
+				}
+				@Html.DevExpress().ComboBoxFor(
+					m => m.id_tipoAuxContab,
+					comboBox =>
+					{
+						comboBox.Name = "id_tipoAuxContab";
+						comboBox.Properties.ClientInstanceName = "id_tipoAuxContab";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ClientEnabled = requiereAuxiliarContable;
+
+						comboBox.Properties.ValueField = "idTipoAuxContable";
+						comboBox.Properties.TextField = "tipoAuxContable";
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("idTipoAuxContable", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("tipoAuxContable", "Nombre", Unit.Percentage(70));
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnTipoAuxiliarContableDetailSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnTipoAuxiliarContableDetailValidation";
+
+					}).BindList(tipoAuxiliarContableModel).Bind(id_tipoAuxContab).GetHtml()
+			</td>
+			<td width="2%"></td>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_auxiliarContabLabel";
+						label.Text = "Auxiliar Contable:*";
+						label.AssociatedControlName = "id_auxiliarContab";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@{
+					var id_auxiliarContab = (requiereAuxiliarContable && !String.IsNullOrEmpty(this.Model.id_auxiliarContab))
+						? this.Model.id_auxiliarContab
+						: null;
+
+					var auxiliarContableModel = (id_auxiliarContab == null)
+						? new object[] { }
+						: DataProviderPlanDeCuentas
+							.GetAuxiliaresContablesByCurrent(id_tipoAuxContab, id_auxiliarContab)
+							.Select(ax => new
+							{
+								idAuxContable = ax.CCiAuxiliar,
+								auxContable = ax.CDsAuxiliar,
+							})
+							.OrderBy(ta => ta.idAuxContable)
+							.ToArray();
+				}
+				@Html.DevExpress().ComboBoxFor(
+					m => m.id_auxiliarContab,
+					comboBox =>
+					{
+						comboBox.Name = "id_auxiliarContab";
+						comboBox.Properties.ClientInstanceName = "id_auxiliarContab";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ClientEnabled = requiereAuxiliarContable;
+
+						comboBox.Properties.ValueField = "idAuxContable";
+						comboBox.Properties.TextField = "auxContable";
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("idAuxContable", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("auxContable", "Nombre", Unit.Percentage(70));
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.Validation = "OnAuxiliarContableDetailValidation";
+
+					}).BindList(auxiliarContableModel).Bind(id_auxiliarContab).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_tipoPresContabLabel";
+						label.Text = "Tipo de Presupuesto:*";
+						label.AssociatedControlName = "id_tipoPresContab";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@{
+					var id_tipoPresContab = !String.IsNullOrEmpty(this.Model.id_tipoPresContab)
+						? this.Model.id_tipoPresContab
+						: null;
+
+					var tiposPresupuestoModel = DataProviderPlanDeCuentas
+						.GetTiposPresupuestoContablesByCurrent(id_tipoPresContab)
+						.Select(p => new
+						{
+							idTipoPresupuesto = p.CCiTipoPres,
+							tipoPresupuesto = p.CDsTipoPres,
+						})
+						.OrderBy(p => p.idTipoPresupuesto)
+						.ToArray();
+				}
+				@Html.DevExpress().ComboBoxFor(
+					m => m.id_tipoPresContab,
+					comboBox =>
+					{
+						comboBox.Name = "id_tipoPresContab";
+						comboBox.Properties.ClientInstanceName = "id_tipoPresContab";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ClientEnabled = requiereCentroCosto;
+
+						comboBox.Properties.ValueField = "idTipoPresupuesto";
+						comboBox.Properties.TextField = "tipoPresupuesto";
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("idTipoPresupuesto", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("tipoPresupuesto", "Nombre", Unit.Percentage(70));
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnTipoPresupuestoDetailSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnTipoPresupuestoDetailValidation";
+
+					}).BindList(tiposPresupuestoModel).Bind(id_tipoPresContab).GetHtml()
+			</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_centroCtoContabLabel";
+						label.Text = "Centro de Costo:*";
+						label.AssociatedControlName = "id_centroCtoContab";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@{
+					var id_centroCtoContab = (requiereCentroCosto && !String.IsNullOrEmpty(this.Model.id_centroCtoContab))
+						? this.Model.id_centroCtoContab
+						: null;
+
+					var centroCostoContableModel = (id_centroCtoContab == null)
+						? new object[] { }
+						: DataProviderPlanDeCuentas
+							.GetCentrosCostoContablesByCurrent(id_tipoPresContab, id_centroCtoContab)
+							.Select(c => new
+							{
+								idCentroCosto = c.CCiProyecto,
+								centroCosto = c.CDsProyecto,
+							})
+							.OrderBy(c => c.idCentroCosto)
+							.ToArray();
+				}
+				@Html.DevExpress().ComboBoxFor(
+					m => m.id_centroCtoContab,
+					comboBox =>
+					{
+						comboBox.Name = "id_centroCtoContab";
+						comboBox.Properties.ClientInstanceName = "id_centroCtoContab";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ClientEnabled = requiereCentroCosto;
+
+						comboBox.Properties.ValueField = "idCentroCosto";
+						comboBox.Properties.TextField = "centroCosto";
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("idCentroCosto", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("centroCosto", "Nombre", Unit.Percentage(70));
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnCentroCostoContableDetailSelectedIndexChanged";
+						comboBox.Properties.ClientSideEvents.Validation = "OnCentroCostoContableDetailValidation";
+
+					}).BindList(centroCostoContableModel).Bind(id_centroCtoContab).GetHtml()
+			</td>
+			<td width="2%"></td>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_subcentroCtoContabLabel";
+						label.Text = "Subcentro de Costo:*";
+						label.AssociatedControlName = "id_subcentroCtoContab";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@{
+					var id_subcentroCtoContab = (requiereCentroCosto && !String.IsNullOrEmpty(this.Model.id_subcentroCtoContab))
+						? this.Model.id_subcentroCtoContab
+						: null;
+
+					var subCentroCostoContableModel = (id_subcentroCtoContab == null)
+						? new object[] { }
+						: DataProviderPlanDeCuentas
+							.GetSubcentrosCostoContablesByCurrent(id_tipoPresContab, id_centroCtoContab, id_subcentroCtoContab)
+							.Select(c => new
+							{
+								idSubcentroCosto = c.CCiSubProyecto,
+								subcentroCosto = c.CDsSubProyecto,
+							})
+							.OrderBy(c => c.idSubcentroCosto)
+							.ToArray();
+				}
+				@Html.DevExpress().ComboBoxFor(
+					m => m.id_subcentroCtoContab,
+					comboBox =>
+					{
+						comboBox.Name = "id_subcentroCtoContab";
+						comboBox.Properties.ClientInstanceName = "id_subcentroCtoContab";
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.ClientEnabled = requiereCentroCosto;
+
+						comboBox.Properties.ValueField = "idSubcentroCosto";
+						comboBox.Properties.TextField = "subcentroCosto";
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("idSubcentroCosto", "Código", Unit.Percentage(30));
+						comboBox.Properties.Columns.Add("subcentroCosto", "Nombre", Unit.Percentage(70));
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.Validation = "OnSubcentroCostoContableDetailValidation";
+
+					}).BindList(subCentroCostoContableModel).Bind(id_subcentroCtoContab).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5" style="text-align: right;">
+				@Html.DevExpress().Button(
+					button =>
+					{
+						button.Name = "btnUpdateDetail";
+						button.Text = "Actualizar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "OnUpdateDetailButtonClick";
+					}).GetHtml()
+
+				@Html.DevExpress().Button(
+					button =>
+					{
+						button.Name = "btnCancelDetail";
+						button.Text = "Cancelar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "OnCancelDetailButtonClick";
+					}).GetHtml()
+			</td>
+		</tr>
+	</table>
+}

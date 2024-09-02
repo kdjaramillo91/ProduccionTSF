@@ -1,0 +1,193 @@
+﻿
+@model IEnumerable<ProductionCostCoefficientDetail>
+
+@{
+	var gridView = Html.DevExpress().GridView<ProductionCostCoefficientDetail>(
+		grid =>
+		{
+			grid.Name = "gvProductionCoefficientDetail";
+			grid.KeyFieldName = "id";
+			grid.Width = Unit.Percentage(100);
+
+			grid.CallbackRouteValues = new
+			{
+				Controller = "ProductionCoefficient",
+				Action = "ProductionCoefficientDetail",
+			};
+
+			grid.SettingsEditing.AddNewRowRouteValues = new { Controller = "ProductionCoefficient", Action = "ProductionCoefficientDetailAddNew" };
+			grid.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionCoefficient", Action = "ProductionCoefficientDetailUpdate" };
+			grid.SettingsEditing.DeleteRowRouteValues = new { Controller = "ProductionCoefficient", Action = "ProductionCoefficientDetailDelete" };
+
+			#region GridView Behavior
+
+			grid.SettingsBehavior.AllowSelectByRowClick = false;
+
+			grid.CustomJSProperties = (s, e) =>
+			{
+				if (ViewData["EditMessage"] != null)
+				{
+					e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+				}
+			};
+
+			#endregion
+
+			#region Edit Form
+
+			grid.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+			grid.SettingsText.PopupEditFormCaption = "Editar Detalle de Coeficiente";
+
+			grid.SettingsPopup.EditForm.Modal = true;
+			grid.SettingsPopup.EditForm.Width = 800;
+			grid.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+			grid.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+			grid.SettingsBehavior.ConfirmDelete = true;
+
+			#endregion
+
+			#region Pager
+
+			grid.SettingsPager.Visible = true;
+
+			#endregion
+
+			#region Client Side Events
+
+			grid.ClientSideEvents.BeginCallback = "ProductionCoefficientDetails_OnBeginCallback";
+
+			#endregion
+
+			#region Search Panel
+
+			grid.SettingsSearchPanel.Visible = true;
+			grid.Styles.SearchPanel.CssClass = "searchPanel";
+
+			#endregion
+
+			#region Title Panel
+
+			grid.Settings.ShowTitlePanel = true;
+			grid.Styles.TitlePanel.CssClass = "titleContainer";
+
+			#endregion
+
+			#region Group Panel
+
+			grid.Settings.ShowGroupPanel = true;
+
+			#endregion
+
+			#region Filter Row
+
+			grid.Settings.ShowFilterRow = true;
+			grid.Settings.ShowFilterRowMenu = true;
+			grid.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+			#endregion
+
+			#region Command Column
+
+			grid.CommandColumn.Width = Unit.Percentage(8);
+			grid.CommandColumn.Visible = true;
+			grid.CommandColumn.ShowNewButton = false;
+			grid.CommandColumn.ShowDeleteButton = true;
+			grid.CommandColumn.ShowEditButton = true;
+			grid.CommandColumn.ShowNewButtonInHeader = true;
+
+			#endregion
+
+			#region Master-Details View
+
+			grid.SettingsDetail.ShowDetailRow = false;
+
+			#endregion
+
+			#region Adaptivity Settings
+
+			grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+			grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+			grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+			grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+			grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+			#endregion
+
+			#region Columns
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "id_cuentaContab";
+				column.Name = "id_cuentaContab";
+				column.Caption = "Código de Cuenta";
+				column.Width = Unit.Percentage(8);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "name_cuentaContab";
+				column.Caption = "Descripción";
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "description_tipoAuxContab";
+				column.Caption = "Tipo Auxiliar";
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "description_auxiliarContab";
+				column.Caption = "Auxiliar";
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "description_centroCtoContab";
+				column.Caption = "Centro de Costo";
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "description_subcentroCtoContab";
+				column.Caption = "Subcentro de Costo";
+				column.Width = Unit.Percentage(12);
+			});
+
+			#endregion
+
+			#region Editor Form Layout
+
+			grid.SetEditFormTemplateContent(content =>
+			{
+				var idProductionCoefficientDetail = (int?)DataBinder.Eval(content.DataItem, "id");
+
+				var productionCoefficientDetail = (idProductionCoefficientDetail.HasValue && idProductionCoefficientDetail.Value > 0)
+					? this.Model.First(d => d.id == idProductionCoefficientDetail.Value)
+					: new ProductionCostCoefficientDetail();
+
+				Html.RenderPartial("_ProductionCoefficientDetailEditForm", productionCoefficientDetail);
+			});
+
+			#endregion
+
+			grid.InitNewRow = (s, e) =>
+			{
+				e.NewValues["isActive"] = true;
+				e.NewValues["id_planDeCuentas"] = (string)this.ViewBag.IdPlanDeCuentas;
+			};
+		});
+
+	if (ViewData["EditError"] != null)
+	{
+		gridView.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@gridView.Bind(this.Model).GetHtml()

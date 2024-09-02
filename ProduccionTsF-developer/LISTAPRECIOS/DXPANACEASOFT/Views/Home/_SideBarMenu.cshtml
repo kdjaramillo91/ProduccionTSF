@@ -1,0 +1,730 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+
+
+<ul class="nav nav-list">
+    @{
+        if (Model != null)
+        {
+            List<DXPANACEASOFT.Models.Menu> menues = (List<DXPANACEASOFT.Models.Menu>)Model;
+            foreach (var menu in menues)
+            {
+                RenderMenu(menu);
+            }
+        }
+    }
+</ul>
+
+@functions {
+    void RenderMenu(DXPANACEASOFT.Models.Menu menuItem)
+    {
+        string controller = (menuItem.TController != null)? menuItem.TController.name : "";
+        string action = (menuItem.TAction != null)? menuItem.TAction.name : "";
+
+        List<DXPANACEASOFT.Models.Menu> submenues = menuItem.Menu1.ToList();
+
+        if (menuItem.id_parent == null)
+        {
+            ViewContext.Writer.Write("<li class=\"\">");
+
+            if (submenues.Count == 0)
+            {
+                ViewContext.Writer.Write("<a href=\"javascript:;\" data-url=\"" + controller + "/" + action + "\" class=\"custom-menu-item\">");
+            }
+            else
+            {
+                ViewContext.Writer.Write("<a href=\"javascript:;\" data-url=\"" + controller + "/" + action + "\" class=\"dropdown-toggle\">");
+            }
+
+
+            ViewContext.Writer.Write("<i class=\"menu-icon fa fa-list\"></i>");
+            ViewContext.Writer.Write("<span class=\"menu-text\"> " + menuItem.title + " </span>");
+
+            if (submenues.Count == 0)
+            {
+                ViewContext.Writer.Write("<b class=\"arrow\"></b>");
+            }
+            else
+            {
+                ViewContext.Writer.Write("<b class=\"arrow fa fa-angle-down\"></b>");
+            }
+
+            ViewContext.Writer.Write("</a>");
+
+            if (submenues.Count > 0){
+                ViewContext.Writer.Write("<b class=\"arrow\"></b>");
+                ViewContext.Writer.Write("<ul class=\"submenu\">");
+
+                foreach (var subMenu in submenues)
+                {
+                    RenderSubMenu(subMenu);
+                }
+
+                ViewContext.Writer.Write(@"</ul>");
+            }
+
+            ViewContext.Writer.Write(@"</li>");
+        }
+    }
+
+    void RenderSubMenu(DXPANACEASOFT.Models.Menu subMenu)
+    {
+        string controller = (subMenu.TController != null) ? subMenu.TController.name : "";
+        string action = (subMenu.TAction != null) ? subMenu.TAction.name : "";
+
+        List<DXPANACEASOFT.Models.Menu> submenues = subMenu.Menu1.ToList();
+
+        ViewContext.Writer.Write("<li class=\"\">");
+
+        if (submenues.Count == 0)
+        {
+            ViewContext.Writer.Write("<a href=\"javascript:;\" data-url=\"" + controller + "/" + action + "\" class=\"custom-menu-item\">");
+        }
+        else
+        {
+            ViewContext.Writer.Write("<a href=\"javascript:;\" data-url=\"" + controller + "/" + action + "\" class=\"dropdown-toggle\">");
+        }
+
+        ViewContext.Writer.Write("<i class=\"menu-icon fa fa-caret-right\"></i>");
+        ViewContext.Writer.Write(" " + subMenu.title + " ");
+
+        if(submenues.Count == 0)
+        {
+            ViewContext.Writer.Write("<b class=\"arrow\"></b>");
+        }
+        else
+        {
+            ViewContext.Writer.Write("<b class=\"arrow fa fa-angle-down\"></b>");
+        }
+
+        ViewContext.Writer.Write("</a>");
+
+        if (submenues.Count > 0)
+        {
+            ViewContext.Writer.Write("<b class=\"arrow\"></b>");
+            ViewContext.Writer.Write("<ul class=\"submenu\">");
+
+            foreach (var subSubMenu in submenues)
+            {
+                RenderSubMenu(subSubMenu);
+            }
+
+            ViewContext.Writer.Write(@"</ul>");
+        }
+
+        ViewContext.Writer.Write(@"</li>");
+    }
+
+}
+
+@*<ul class="nav nav-list">
+        <li class="">
+            <a href="#" class="dropdown-toggle">
+                <i class="menu-icon fa fa-list"></i>
+                <span class="menu-text">
+                    Mantenimientos
+                </span>
+
+                <b class="arrow fa fa-angle-down"></b>
+            </a>
+
+            <b class="arrow"></b>
+
+            <ul class="submenu">
+                <li class="">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Productos
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript:;" class="dropdown-toggle">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Inventarios
+                                <b class="arrow fa fa-angle-down"></b>
+                            </a>
+                            <b class="arrow"></b>
+
+                            <ul class="submenu">
+                                <li class="">
+                                    <a href="javascript: void(0);" data-url="InventoryLine/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Líneas
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                                <li class="">
+                                    <a href="javascript: void(0);" data-url="ItemType/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Tipos
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                                <li class="">
+                                    <a href="javascript: void(0);" data-url="ItemTypeCategory/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Categorías
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript:;" class="dropdown-toggle">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Grupos
+                                <b class="arrow fa fa-angle-down"></b>
+                            </a>
+                            <b class="arrow"></b>
+
+                            <ul class="submenu">
+                                <li class="">
+                                    <a href="javascript: void(0);" data-url="ItemGroup/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Grupos/Subgrupos
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                                <li class="">
+                                    <a href="javascript: void(0);" data-url="ItemGroupCategory/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Categorías
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript:;" class="dropdown-toggle">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Características
+                                <b class="arrow fa fa-angle-down"></b>
+                            </a>
+                            <b class="arrow"></b>
+
+                            <ul class="submenu">
+                                <li class="">
+                                    <a href="javascript: void(0);" data-url="ItemTrademark/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Marcas
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                                <li class="">
+                                    <a href="javascript: void(0);" data-url="ItemTrademarkModel/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Modelos
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                                <li class="">
+                                    <a href="javascript:;" data-url="ItemSize/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Tallas
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+
+                                <li class="">
+                                    <a href="javascript:;" data-url="ItemColor/Index" class="custom-menu-item">
+                                        <i class="menu-icon fa fa-caret-right"></i>
+                                        Colores
+                                    </a>
+                                    <b class="arrow"></b>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript:;" data-url="Item/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Registar Productos
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+
+                    </ul>
+
+                </li>
+
+                <li class="">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Bodegas
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="WarehouseType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Tipos
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="Warehouse/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Bodegas
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="WarehouseLocation/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Ubicaciones
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Estructuras
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="BusinessGroup/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Grupos de Negocios
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="Company/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Compa&ntilde;&iacute;as
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="Division/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Divisiones
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="BranchOffice/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Sucursales
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="EmissionPoint/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Puntos de Emisión
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="Deparment/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Departamentos
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+
+                        Metricas
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+
+                    <b class="arrow"></b>
+
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="MetricType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Tipo de Medida
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="MetricUnit/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Unidad de Medida
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="MetricUnitConversion/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Conversiones
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="DataType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Tipo de Datos
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+
+                        Impuestos
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+
+                    <b class="arrow"></b>
+
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="TaxType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Tipos
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="Rate/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Tarifas
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+
+                        Personas
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+
+                    <b class="arrow"></b>
+
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="PersonType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Tipo Personas
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="IdentificationType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Identificación
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="Rol/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Roles
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="Person/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Registro Personas
+                            </a>
+
+                            <b class="arrow"></b>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Contabilidad
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="AccountPlan/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Plan de Cuentas
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Compras
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="PaymentMethod/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Forma de Pago
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="PaymentMean/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Medio de Pago
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="PurchaseReason/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Motivos
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="PurchaseOrderShippingType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Medio de Envio
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+
+                    </ul>
+                </li>
+
+                <li class="">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Documentos
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="DocumentType/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Tipos
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+
+                        <li class="">
+                            <a href="javascript: void(0);" data-url="DocumentStates/Index" class="custom-menu-item">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                Estados
+                            </a>
+                            <b class="arrow"></b>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+
+        <li class="">
+            <a href="#" class="dropdown-toggle">
+                <i class="menu-icon fa fa-list"></i>
+                <span class="menu-text"> Compras </span>
+
+                <b class="arrow fa fa-angle-down"></b>
+            </a>
+
+            <b class="arrow"></b>
+
+            <ul class="submenu">
+                <li class="">
+                    <a href="javascript: void(0);" data-url="PriceList/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Listas de Precios
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+
+                <li class="">
+                    <a href="javascript: void(0);" data-url="PurchaseRequest/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Requerimientos
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+
+                <li class="">
+                    <a href="javascript: void(0);" data-url="PurchaseOrder/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Ordenes
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+            </ul>
+        </li>
+
+        <li class="">
+            <a href="#" class="dropdown-toggle">
+                <i class="menu-icon fa fa-list"></i>
+                <span class="menu-text"> Ventas </span>
+
+                <b class="arrow fa fa-angle-down"></b>
+            </a>
+
+            <b class="arrow"></b>
+
+            <ul class="submenu">
+                <li class="">
+                    <a href="javascript: void(0);" data-url="SalesQuotation/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Ofertas
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+
+                <li class="">
+                    <a href="javascript: void(0);" data-url="SalesRequest/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Pedidos
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+
+                <li class="">
+                    <a href="javascript: void(0);" data-url="SalesOrder/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Ordenes
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+
+                <li class="">
+                    <a href="javascript: void(0);" data-url="SalesReturn/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Devoluciones
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+            </ul>
+        </li>
+
+        <li class="">
+            <a href="#" class="dropdown-toggle">
+                <i class="menu-icon fa fa-list"></i>
+                <span class="menu-text"> Inventarios </span>
+
+                <b class="arrow fa fa-angle-down"></b>
+            </a>
+
+            <b class="arrow"></b>
+
+            <ul class="submenu">
+                <li class="">
+                    <a href="javascript: void(0);" data-url="InventoryMove/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>Movimientos
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+            </ul>
+        </li>
+
+        <li class="">
+            <a href="#" class="dropdown-toggle">
+                <i class="menu-icon fa fa-list"></i>
+                <span class="menu-text"> Log&iacute;stica </span>
+
+                <b class="arrow fa fa-angle-down"></b>
+            </a>
+
+            <b class="arrow"></b>
+            <ul class="submenu">
+                <li class="">
+                    <a href="javascript: void(0);" data-url="Logistics/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Gu&iacute;a de Remisi&oacute;n
+                    </a>
+                    <b class="arrow"></b>
+                </li>
+            </ul>
+        </li>
+
+        <li class="">
+            <a href="#" class="dropdown-toggle">
+                <i class="menu-icon fa fa-list"></i>
+                <span class="menu-text"> Producci&oacute;n </span>
+
+                <b class="arrow fa fa-angle-down"></b>
+            </a>
+
+            <b class="arrow"></b>
+
+            <ul class="submenu">
+                <li class="">
+                    <a href="javascript: void(0);" data-url="ProductionLotReception/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>Recepci&oacute;n
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+                <li class="">
+                    <a href="javascript: void(0);" data-url="ProductionLotProcess/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>Procesos
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+                <li class="">
+                    <a href="javascript: void(0);" data-url="ProductionLotLiquidation/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>Liquidaci&oacute;n
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+                <li class="">
+                    <a href="javascript: void(0);" data-url="ProductionLotClose/Index" class="custom-menu-item">
+                        <i class="menu-icon fa fa-caret-right"></i>Cierre
+                    </a>
+
+                    <b class="arrow"></b>
+                </li>
+            </ul>
+        </li>
+
+
+    </ul>*@
+

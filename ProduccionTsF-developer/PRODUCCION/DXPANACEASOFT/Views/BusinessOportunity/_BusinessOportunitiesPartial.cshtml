@@ -1,0 +1,243 @@
+@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<BusinessOportunity>(settings => {
+        settings.Name = "gvBusinessOportunities";
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessOportunitiesPartial" };
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Settings.ShowFooter = true;
+
+        settings.ClientSideEvents.Init = "BusinessOportunityOnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "BusinessOportunityOnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "BusinessOportunityOnGridViewEndCallback";
+        settings.ClientSideEvents.RowDblClick = "OnRowDoubleClick";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Oportunidades</span>");
+        });
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""BusinessOportunitySelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""BusinessOportunityClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.Columns.Add(m => m.Document.number, column =>
+        {
+            column.Caption = "No. Oportunidad";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(m => m.Document.DocumentType.name, column =>
+        {
+            column.Caption = "Tipo de Oportunidad";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    //int? id_documentType = (int?)DataBinder.Eval(c.DataItem, "Document.id_documentType");
+
+            //    BusinessOportunity oportunity = (BusinessOportunity)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(oportunity.Document.DocumentType.name);
+            //});
+        });
+
+        settings.Columns.Add(m => m.contactPerson, column =>
+        {
+            column.Caption = "Persona de Contacto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.executivePerson, column =>
+        {
+            column.Caption = "Ejecutivo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => (m.advance), column =>
+        {
+            column.Caption = "Avance";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+                BusinessOportunity oportunity = DataProviderBusinessOportunity.BusinessOportunityById(id);
+
+                decimal closingPercentage = (oportunity != null && oportunity.BusinessOportunityPhase != null && oportunity.BusinessOportunityPhase.Count() != 0) ? oportunity.BusinessOportunityPhase.Max(m => m.advance) : 0;
+                closingPercentage = closingPercentage / 100;
+
+                //BusinessOportunity oportunity = (BusinessOportunity)Model[c.ItemIndex];
+                ViewContext.Writer.Write(closingPercentage.ToString("P2"));
+            });
+
+            //column.EditorProperties().SpinEdit(spinEdit =>
+            //{
+            //    spinEdit.DecimalPlaces = 2;
+            //    spinEdit.DisplayFormatInEditMode = true;
+            //    spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+            //    spinEdit.DisplayFormatString = "P2";
+            //});
+
+        });
+
+        settings.Columns.Add(m => m.BusinessOportunityResults.totalAmount, column =>
+        {
+            column.Caption = "Monto Total";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.EditorProperties().SpinEdit(spinEdit =>
+            {
+                spinEdit.DecimalPlaces = 2;
+                spinEdit.DisplayFormatInEditMode = true;
+                spinEdit.NumberFormat = SpinEditNumberFormat.Custom;
+                spinEdit.DisplayFormatString = "C2";
+            });
+
+        });
+
+        settings.Columns.Add(m => m.startDate, column =>
+        {
+            column.Caption = "Fecha de Inicio";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.EditorProperties().DateEdit(dateEdit =>
+            {
+                dateEdit.DisplayFormatInEditMode = true;
+                dateEdit.DisplayFormatString = "dd/MM/yyyy";
+
+            });
+
+        });
+
+        settings.Columns.Add(m => m.endDate, column =>
+        {
+            column.Caption = "Fecha de Cierre";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.EditorProperties().DateEdit(dateEdit =>
+            {
+                dateEdit.DisplayFormatInEditMode = true;
+                dateEdit.DisplayFormatString = "dd/MM/yyyy";
+
+            });
+        });
+
+        settings.Columns.Add(m => m.BusinessOportunityResults.BusinessOportunityState.name, column =>
+        {
+            column.Caption = "Estado de Oportunidad";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+        });
+
+        // COMMAND COLUMN
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = false,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 14,
+            Caption = "Acciones",
+            Width = Unit.Percentage(5)
+        };
+
+        commandColumn.CustomButtons.Add(
+            new GridViewCommandColumnCustomButton
+            {
+                ID = "btnEditRow",
+                Text = "Editar"
+            }
+        );
+        settings.ClientSideEvents.CustomButtonClick = "BusinessOportunityGridViewCustomCommandButton_Click";
+        settings.Columns.Add(commandColumn);
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

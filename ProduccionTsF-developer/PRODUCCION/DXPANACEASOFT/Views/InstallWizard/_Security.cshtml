@@ -1,0 +1,41 @@
+﻿@model DXPANACEASOFT.Models.InstallWizard
+
+<div style="padding: 0% 35%;">
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+        <tr>
+            <td colspan="4">
+                <h3 style="text-align: center">Usuario Administrador del Sistema</h3>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Nombre de Usuario *:
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.User.username, settings =>{
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "Usuario administrador";
+                    settings.Properties.ClientInstanceName = "userAdmin";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ValidationGroup = "security";
+                    settings.Properties.ClientSideEvents.Validation = "OnUserAdminValidation";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Contraseña*:
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.User.password, settings => {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "Contraseña";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.Password = true;
+                    settings.Properties.ValidationSettings.ValidationGroup = "security";
+                    settings.Properties.ClientSideEvents.Validation = "OnPasswordAdminValidation";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>

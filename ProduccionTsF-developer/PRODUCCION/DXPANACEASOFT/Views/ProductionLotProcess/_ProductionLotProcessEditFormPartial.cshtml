@@ -1,0 +1,364 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+
+@{
+	int id_productionLot = (Model != null) ? Model.id : 0;
+	string codeState = (Model != null) ? Model.ProductionLotState.code : "";
+	int tabSelected = ViewData["tabSelected"] == null ? 0 : (int)ViewData["tabSelected"];
+	bool solicitaMaquina = ViewBag.solicitaMaquina;
+	bool generaTransferencia = ViewBag.generaTransferencia;
+
+	bool isRequestCarMachine = ViewBag.isRequestCarMachine;
+
+
+	var isBtnToReturn = ViewData["isBtnToReturn"] != null ? (bool)ViewData["isBtnToReturn"] : false;
+	if (isBtnToReturn)
+	{
+        <script src="~/Scripts/productionlotprocess/index.js"></script>
+        <script src="~/Scripts/productionlotprocess/validations.js"></script>
+    }
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditProductionLotProcess", name = "formEditProductionLotProcess" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+    @Html.Hidden("id_productionLot", id_productionLot)
+    @Html.Hidden("codeState", codeState)
+	@Html.Hidden("isRequestCarMachine", isRequestCarMachine)
+    @Html.DevExpress().PageControl(tabs =>
+{
+	tabs.Name = "tabControl";
+	tabs.Width = Unit.Percentage(100);
+	tabs.ActiveTabIndex = tabSelected;
+
+	tabs.CustomJSProperties = (s, e) =>
+	{
+		e.Properties["cpExistenRegistros"] = (this.Model != null && this.Model.ProductionLotDetail != null)
+			? this.Model.ProductionLotDetail.Any() : false;
+	};
+
+	tabs.ClientSideEvents.Init = "tabControl_init";
+
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabDocument";
+		tab.Text = "Documento    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+		tab.SetContent(() =>
+		{
+			Html.RenderPartial("ProductionTemplates/_ProductionFormEdit");
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProcess";
+		tab.Text = "Proceso    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+		tab.SetContent(() =>
+		{
+			Html.RenderPartial("_ProductionLotProcessMainFormTabProcess");
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabItemsDetails";
+		tab.Text = "Materia Prima    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabStyle.Width = Unit.Percentage(100);
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+		tab.SetContent(() =>
+		{
+			var itemsDetail = (Model != null && Model.ProductionLotDetail != null) ? Model.ProductionLotDetail.ToList() : new List<ProductionLotDetail>();
+			if (codeState == "01")
+			{
+				Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorItemDetail");
+				Html.RenderPartial("ProductionTemplates/_ProductionDetailsActionsButtons");
+				Html.RenderPartial("_ProductionLotProcessEditFormDetailWarehousePartial", Model);
+				Html.RenderPartial("_ProductionLotProcessEditFormItemsDetailPartial", itemsDetail);
+			}
+			else
+			{
+				Html.RenderPartial("_ProductionLotProcessDetailItemsPartial", itemsDetail);
+			}
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotLiquidationsDetails";
+		tab.NewLine = true;
+
+		tab.Text = "Liquidación    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabStyle.Width = Unit.Percentage(100);
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState != "01";
+
+		tab.SetContent(() =>
+		{
+			var productionLotLiquidationsDetail = (Model != null && Model.ProductionLotLiquidation != null) ? Model.ProductionLotLiquidation.ToList() : new List<ProductionLotLiquidation>();
+
+			@Html.RenderPartial("ProductionLot/ComponentsDetail/_FilterDetails", productionLotLiquidationsDetail);
+			if (codeState == "02" || codeState == "03")
+			{
+
+				if(isRequestCarMachine)
+				{
+					ViewBag.codeStateLiqNoval = codeState;
+					ViewBag.receptionDateLiqNoVal = Model.receptionDate;
+					ViewBag.id_personProcessPlantLiqNoVal = Model.id_personProcessPlant;
+
+					ProductionLotMachineTurn productionLotMachineTurn = (ProductionLotMachineTurn)ViewBag.productionLotMachineTurn;
+
+					Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotMachineTurn", productionLotMachineTurn);
+				}
+				Html.RenderPartial("ProductionLotProcessButtons/_ProductionLiquidationActionsButtons");
+				Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotLiquidationsDetailPartial", productionLotLiquidationsDetail);
+				//Html.RenderPartial("_ProductionLotProcessEditFormProductionLotLiquidationsDetailPartial", productionLotLiquidationsDetail);
+			}
+			else
+			{
+				if(codeState == "04" || codeState == "05" || codeState == "06")
+				{
+					if (isRequestCarMachine)
+					{
+						ViewBag.codeStateLiqNoval = codeState;
+						ViewBag.receptionDateLiqNoVal = Model.receptionDate;
+						ViewBag.id_personProcessPlantLiqNoVal = Model.id_personProcessPlant;
+
+						ProductionLotMachineTurn productionLotMachineTurn = (ProductionLotMachineTurn)ViewBag.productionLotMachineTurn;
+
+						Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotMachineTurn", productionLotMachineTurn);
+					}
+				}
+				Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotLiquidationsPartial", productionLotLiquidationsDetail);
+				//Html.RenderPartial("_ProductionLotProcessDetailProductionLotLiquidationsPartial", productionLotLiquidationsDetail);
+			}
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotPackingMaterialDetails";
+		tab.Text = "Materiales de Empaque    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState != "01";
+
+		tab.SetContent(() =>
+		{
+			List<ProductionLotPackingMaterial> packingMaterial = (Model != null && Model.ProductionLotPackingMaterial != null)
+																		? Model.ProductionLotPackingMaterial.Where(d => d.isActive && (d.quantity > 0)).ToList()
+																		: new List<ProductionLotPackingMaterial>();
+
+			if (codeState == "02" || codeState == "03")
+			{
+				Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorPackingMaterialDetail");
+				Html.RenderPartial("ProductionLotProcessButtons/_ProductionPackingMaterialsActionButtons");
+				Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotPackingMaterialsDetailPartial", packingMaterial);
+				//Html.RenderPartial("_ProductionLotReceptionEditFormProductionLotPackingMaterialsDetailPartial", packingMaterial);
+			}
+			else
+			{
+				Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotPackingMaterialsPartial", packingMaterial);
+				//Html.RenderPartial("_ProductionLotReceptionDetailProductionLotPackingMaterialsPartial", packingMaterial);
+			}
+		});
+
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotTrashsDetails";
+		tab.Text = "Desperdicio    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabStyle.Width = Unit.Percentage(100);
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState != "01";
+
+		tab.SetContent(() =>
+		{
+
+			var productionLotTrashsDetail = (Model != null && Model.ProductionLotTrash != null) ? Model.ProductionLotTrash.ToList() : new List<ProductionLotTrash>();
+			if (codeState == "02" || codeState == "03")
+			{
+				Html.RenderPartial("ProductionLotProcessButtons/_ProductionTrashActionsButtons");
+				Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotTrashsDetailPartial", productionLotTrashsDetail);
+				//Html.RenderPartial("_ProductionLotProcessEditFormProductionLotTrashsDetailPartial", productionLotTrashsDetail);
+			}
+			else
+			{
+				Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotTrashsPartial", productionLotTrashsDetail);
+				//Html.RenderPartial("_ProductionLotProcessDetailProductionLotTrashsPartial", productionLotTrashsDetail);
+			}
+
+
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotLossDetails";
+		tab.Text = "Merma    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabStyle.Width = Unit.Percentage(100);
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState != "01";
+
+		tab.SetContent(() =>
+		{
+
+			var productionLotLossDetail = (Model != null && Model.ProductionLotLoss != null) ? Model.ProductionLotLoss.ToList() : new List<ProductionLotLoss>();
+			if (codeState == "02" || codeState == "03")
+			{
+				Html.RenderPartial("ProductionLotProcessButtons/_ProductionLossActionsButtons");
+				Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotLossDetailPartial", productionLotLossDetail);
+			}
+			else
+			{
+				Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotLossPartial", productionLotLossDetail);
+			}
+
+
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotCloseDetails";
+		tab.Text = "Cierre    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabStyle.Width = Unit.Percentage(100);
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState == "04" ||
+					  codeState == "05" ||
+					  codeState == "06" ||
+					  codeState == "10";
+		tab.SetContent(() =>
+		{
+			Html.RenderPartial("_ProductionLotProcessHeadFormProductionLotCloseDetailPartial", Model);
+		});
+	});
+	if(generaTransferencia)
+	{
+		tabs.TabPages.Add(tab =>
+		{
+			tab.Name = "tabProductionLotTransferDetails";
+			tab.NewLine = true;
+
+			tab.Text = "Transferencia a Bodega    ";
+			tab.TabStyle.Width = Unit.Percentage(100);
+
+			tab.TabStyle.Width = Unit.Percentage(100);
+			tab.TabImage.Width = Unit.Pixel(16);
+			tab.TabImage.Height = Unit.Pixel(16);
+			tab.TabImage.Align = ImageAlign.Right;
+			tab.TabImage.Url = "/Content/image/noimage.png";
+			tab.ActiveTabImage.Align = ImageAlign.Right;
+			tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+			tab.Visible = codeState == "06" || codeState == "10";
+
+			tab.SetContent(() =>
+			{
+				var productionLotLiquidationsDetail = (Model != null && Model.ProductionLotLiquidation != null) ? Model.ProductionLotLiquidation.ToList() : new List<ProductionLotLiquidation>();
+				if (codeState == "06")
+				{
+					Html.RenderPartial("_ProductionLotProcessHeadFormDetailPartial", Model);
+					Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotLiquidationsTransferDetailPartial", productionLotLiquidationsDetail);
+				}
+				else
+				{
+					Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotLiquidationsTransferPartial", productionLotLiquidationsDetail);
+				}
+			});
+		});
+	}
+}).GetHtml()
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdate_EditForm";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.ClientEnabled = (codeState != "06" && codeState != "09" && codeState != "10") || (generaTransferencia && codeState == "06");
+                        //button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnCancel_EditForm";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+<script src="~/Scripts/productionlotprocess/editform.js"></script>
+

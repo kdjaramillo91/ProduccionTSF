@@ -1,0 +1,84 @@
+﻿
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryMove
+
+@{
+    string code = (ViewData["code"] != null) ? (string)ViewData["code"] : "";
+    int id_inventoryMove = (Model != null) ? Model.id : 0;
+    string codeDocumentState = (Model.Document != null) ? (Model.Document.DocumentState != null ? Model.Document.DocumentState.code : "") : "";
+}
+
+<tr>
+    <td>
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "id_warehouseLabel";
+            settings.Text = "Bodega:";
+            settings.AssociatedControlName = "id_warehouse";
+        }).GetHtml()
+    </td>
+    <td>
+        @*@{
+            int? id_warehouse = (Model != null && Model.InventoryEntryMove != null && Model.InventoryEntryMove.id_warehouseEntry != 0) ? (int?)Model.InventoryEntryMove.id_warehouseEntry : null;
+        }*@
+        @Html.DevExpress().ComboBox(settings =>
+   {
+       settings.Name = "id_warehouse";
+       settings.Properties.ClientInstanceName = "id_warehouse";
+       settings.Width = Unit.Percentage(100);
+       settings.Properties.ValueField = "id";
+       settings.Properties.TextField = "name";
+       settings.Properties.ValueType = typeof(int);
+       settings.Properties.Width = Unit.Percentage(100);
+       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+       settings.Properties.EnableSynchronization = DefaultBoolean.False;
+       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+       //settings.ClientEnabled = (id_inventoryMove == 0);
+       settings.ClientEnabled = (codeDocumentState == "01");
+
+       settings.ShowModelErrors = true;
+       //settings.Properties.ClientSideEvents.Validation = "OnWarehouseEntryValidation";
+       settings.Properties.ClientSideEvents.SelectedIndexChanged = (code != null && code.Equals("06")) ? "" : "WarehouseCombo_SelectedIndexChanged";
+
+   }).BindList(DataProviderWarehouse.Warehouses((int?)ViewData["id_company"], code, (EntityObjectPermissions)ViewData["entityObjectPermissions"])).GetHtml()
+    </td>
+    <td>
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "locationLabel";
+            settings.Text = "Ubicación:";
+            settings.AssociatedControlName = "id_warehouseLocation";
+        }).GetHtml()
+    </td>
+    <td>
+        @*@{
+            int? id_locationEntry = (Model != null && Model.InventoryEntryMove != null && Model.InventoryEntryMove.id_warehouseLocationEntry != 0) ? (int?)Model.InventoryEntryMove.id_warehouseLocationEntry : null;
+        }*@
+        @Html.DevExpress().ComboBox(settings =>
+   {
+       settings.Name = "id_warehouseLocation";
+       settings.Properties.ClientInstanceName = "id_warehouseLocation";
+       settings.Width = Unit.Percentage(100);
+       settings.Properties.ValueField = "id";
+       settings.Properties.TextField = "name";
+       settings.Properties.ValueType = typeof(int);
+       settings.Properties.Width = Unit.Percentage(100);
+       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+       settings.Properties.EnableSynchronization = DefaultBoolean.False;
+       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+       //settings.ClientEnabled = (id_inventoryMove == 0);
+       settings.ClientEnabled = (codeDocumentState == "01");
+
+       settings.ShowModelErrors = true;
+       //settings.Properties.ClientSideEvents.Validation = "OnLocationEntryValidation";
+       settings.Properties.ClientSideEvents.SelectedIndexChanged = (code != null && code.Equals("06")) ? "" : "WarehouseLocationCombo_SelectedIndexChanged";
+
+   }).GetHtml()
+   @*BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).Bind(id_locationEntry).GetHtml()*@
+    </td>
+</tr>

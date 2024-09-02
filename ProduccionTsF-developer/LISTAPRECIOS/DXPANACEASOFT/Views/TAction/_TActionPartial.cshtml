@@ -1,0 +1,263 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "gvTAction";
+        settings.CallbackRouteValues = new { Controller = "TAction", Action = "TActionPartial" };
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "TAction", Action = "TActionPartialAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "TAction", Action = "TActionPartialUpdate" };
+
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "TAction", Action = "TActionPartialDelete" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.KeyFieldName = "id";
+
+        #region EDITFORM
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Añadir Acción";
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 800;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        #endregion
+
+        #region GRIDVIEW  BEHAIVOR
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+
+
+        #endregion
+
+        #region EVENT JAVASCRIPT
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        #endregion
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        #region
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+        #endregion
+
+        #region  Filter
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+
+        settings.CommandColumn.Visible = true;
+
+        #endregion
+
+        #region SEARCH PANEL
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        #endregion
+
+        #region COMAND COLUMN
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        #endregion
+
+
+
+        #region DONT TOUCH
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #endregion
+
+        #region BOTONES DE COMANDO PARA REGISTRO
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+        commandColumn.ShowEditButton = true;
+        commandColumn.ShowDeleteButton = false;
+        commandColumn.Visible = true;
+        commandColumn.VisibleIndex = 10;
+        commandColumn.Caption = "Acciones";
+        commandColumn.CustomButtons.Add(
+          new GridViewCommandColumnCustomButton
+          {
+              ID = "btnDeleteRow",
+              Text = "Eliminar"
+          }
+      );
+        settings.ClientSideEvents.CustomButtonClick = "GridViewItemsCustomCommandButton_Click";
+
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+        #region TITLE PANEL
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTilte"">Añadir acción</span>");
+        });
+
+        #endregion
+
+        #region ColumnsEdit
+
+        //settings.SettingsSearchPanel.Visible = true;
+        //settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_taction = (int?)DataBinder.Eval(c.DataItem, "id");
+            TAction taction = DataProviderTAction.TAction(id_taction);
+            taction = taction ?? new TAction
+            {
+                isActive = true
+            };
+            Html.RenderPartial("_TActionEditFormPartial", taction);
+        });
+
+        #endregion
+
+        #region MASTER DETAILS 
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            int? id_taction = (int?)DataBinder.Eval(c.DataItem, "id");
+            TAction taction = DataProviderTAction.TAction(id_taction);
+
+            Html.RenderPartial("_TActionDetailPartial", taction);
+        });
+        #endregion
+
+        #region FOOTER
+
+        settings.Settings.ShowFooter = true;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a href=""javascript:;"" id=""lnkSelectAllRows"" style=""cursor pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+                    <a href=""javascript:;"" id=""lnkClearSelection"" style=""cursor pointer;"" onclick=""UnselectAllRows();"">Anular Selección </a>"
+                );
+            }
+        });
+
+        #endregion
+
+        #region COLUMNS ADD
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_controller";
+            column.Caption = "Seleccione el controlador";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(15);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_controller = (int?)DataBinder.Eval(c.DataItem, "id_controller");
+                TController tcontroller = DataProviderTController.TControllerById(id_controller);
+
+                string name = (tcontroller != null) ? tcontroller.name : "";
+                ViewContext.Writer.Write(name);
+            });
+
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Name = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+            column.EditorProperties().TextBox(a =>
+            {
+                a.ClientSideEvents.Validation = ("OnTActionNameValidation");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "description";
+            column.Name = "description";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.Visible = true;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Name = "isActive";
+            column.PropertiesEdit.ClientInstanceName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Visible = true;
+        });
+
+        #endregion
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

@@ -1,0 +1,271 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Invoice
+
+@{
+    DocumentState documentState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) 
+        ? Model.Document.DocumentState : DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+    List<tbsysDocumentDocumentStateControlsState> _ControlsState = DataProviderControlState.ControlStateByDocumentByState("131", documentState.code);
+
+    var canEditPaymentTerm = (this.Model.Document.DocumentState.code == "01")
+        || (this.Model.Document.DocumentState.code == "02");
+
+    var aSettingIGFS = DataProviderSetting.SettingByCode("IGFS");
+    bool boolSettingIGFS = aSettingIGFS != null ? aSettingIGFS.value == "SI" : false;
+}
+
+<table class="table table-condensed">
+    <tr class="ps-line-sep">
+        <td colspan="2" class="ps-bar-collapse">
+            <span class="dxflGroupBoxCaption_Metropolis">Totales</span>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Subtotal 0%</td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.subTotalIVA0Truncate, settings =>
+            {
+                settings.Name = "subTotalIVA0";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ClientInstanceName = "subTotalIVA0";
+                settings.ReadOnly = true;
+                settings.Properties.DisplayFormatString = "##.00";
+                var txtProperties = settings.Properties as TextBoxProperties;
+                txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>Descuento:</td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.totalDiscountTruncate, settings =>
+            {
+                settings.Name = "totalDiscount";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ClientInstanceName = "totalDiscount";
+                settings.ReadOnly = true;
+                settings.Properties.DisplayFormatString = "##.00";
+                var txtProperties = settings.Properties as TextBoxProperties;
+                txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            }).GetHtml()
+
+        </td>
+    </tr>
+    <tr>
+        <td>Valor Total FOB: </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.valueTotalFOBTruncate, settings =>
+       {
+           settings.Name = "valueTotalFOB";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientInstanceName = "valueTotalFOB";
+           settings.ReadOnly = true;
+           settings.Properties.DisplayFormatString = "##.00";
+           var txtProperties = settings.Properties as TextBoxProperties;
+           txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+       }).GetHtml()
+
+        </td>
+    </tr>
+    <tr class="ps-line-sep">
+        <td colspan="2"></td>
+    </tr>
+    <tr>
+
+        <td>Flete Internacional ($): </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.SalesQuotationExterior.valueInternationalFreight , settings =>
+       {
+           settings.Name = "valueInternationalFreight";
+           settings.Properties.ClientInstanceName = "valueInternationalFreight";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.Display = Display.Dynamic;
+           settings.ShowModelErrors = true;
+           settings.Properties.DecimalPlaces =2;
+           settings.Properties.MaxValue = 9999999;
+           settings.Properties.MinValue = 0;
+           settings.Properties.ClientSideEvents.GotFocus = "GenericSelectAllText";
+           settings.Properties.ClientSideEvents.ValueChanged = "Invoice_ChangeInvoiceTotal";
+           var txtProperties = settings.Properties as SpinEditProperties;
+           txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+           settings.Properties.SpinButtons.ShowIncrementButtons = false;
+           settings.Properties.AllowNull = false;
+
+           var aValueInternationalFreight = _ControlsState.FirstOrDefault(r => r.controlName == "valueInternationalFreight");
+           
+           settings.ReadOnly = (aValueInternationalFreight != null ? aValueInternationalFreight.isReadOnly : false) || !boolSettingIGFS;
+           var isRequiredvalueInternationalFreight = aValueInternationalFreight != null ? aValueInternationalFreight.isRequired : false;
+           if (isRequiredvalueInternationalFreight)
+            {
+                settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                settings.CustomJSProperties = (s, e) =>
+                {
+
+                    e.Properties["cpTabContainer"] = "tabSalesQuotationExterior";
+                    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                    e.Properties["cpIsRequired"] = "true";
+                    e.Properties["cpTabControl"] = "tabControl";
+
+                };
+            }
+
+       }).GetHtml()
+
+        </td>
+    </tr>
+    <tr>
+
+        <td>Seguro Internacional ($):</td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.SalesQuotationExterior.valueInternationalInsurance, settings =>
+       {
+           settings.Name = "valueInternationalInsurance";
+           settings.Properties.ClientInstanceName = "valueInternationalInsurance";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.Display = Display.Dynamic;
+           settings.ShowModelErrors = true;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.MaxValue = 9999999;
+           settings.Properties.MinValue = 0;
+           settings.Properties.ClientSideEvents.GotFocus = "GenericSelectAllText";
+           settings.Properties.ClientSideEvents.ValueChanged = "Invoice_ChangeInvoiceTotal";
+           var txtProperties = settings.Properties as SpinEditProperties;
+           txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+           settings.Properties.SpinButtons.ShowIncrementButtons = false;
+           settings.Properties.AllowNull = false;
+
+           var aValueInternationalInsurance = _ControlsState.FirstOrDefault(r => r.controlName == "valueInternationalInsurance");
+           settings.ReadOnly = (aValueInternationalInsurance != null ? aValueInternationalInsurance.isReadOnly : false) || !boolSettingIGFS;
+           var isRequiredValueInternationalInsurance = aValueInternationalInsurance != null ? aValueInternationalInsurance.isRequired : false;
+           if (isRequiredValueInternationalInsurance)
+           {
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               settings.CustomJSProperties = (s, e) =>
+               {
+
+                   e.Properties["cpTabContainer"] = "tabSalesQuotationExterior";
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpTabControl"] = "tabControl";
+
+               };
+           }
+
+       }).GetHtml()
+
+        </td>
+    </tr>
+    <tr>
+
+        <td>Gastos Aduaneros ($):</td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.SalesQuotationExterior.valueCustomsExpenditures, settings =>
+       {
+           settings.Name = "valueCustomsExpenditures";
+           settings.Properties.ClientInstanceName = "valueCustomsExpenditures";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.Display = Display.Dynamic;
+           settings.ShowModelErrors = true;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.MaxValue = 9999999;
+           settings.Properties.MinValue = 0;
+           settings.Properties.ClientSideEvents.GotFocus = "GenericSelectAllText";
+           settings.Properties.ClientSideEvents.ValueChanged = "Invoice_ChangeInvoiceTotal";
+           settings.Properties.SpinButtons.ShowIncrementButtons = false;
+           settings.Properties.AllowNull = false;
+
+           var txtProperties = settings.Properties as SpinEditProperties;
+           txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+
+           var aValueCustomsExpenditures = _ControlsState.FirstOrDefault(r => r.controlName == "valueCustomsExpenditures");
+           settings.ReadOnly = (aValueCustomsExpenditures != null ? aValueCustomsExpenditures.isReadOnly : false) || !boolSettingIGFS;
+           var isRequiredValueCustomsExpenditures = aValueCustomsExpenditures != null ? aValueCustomsExpenditures.isRequired : false;
+           if (isRequiredValueCustomsExpenditures)
+           {
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               settings.CustomJSProperties = (s, e) =>
+               {
+
+                   e.Properties["cpTabContainer"] = "tabSalesQuotationExterior";
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpTabControl"] = "tabControl";
+
+               };
+           }
+
+       }).GetHtml()
+
+        </td>
+    </tr>
+    <tr>
+
+        <td>Gastos Transp./Otros ($):</td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.SalesQuotationExterior.valueTransportationExpenses, settings =>
+       {
+           settings.Name = "valueTransportationExpenses";
+           settings.Properties.ClientInstanceName = "valueTransportationExpenses";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.Display = Display.Dynamic;
+           settings.ShowModelErrors = true;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.MaxValue = 9999999;
+           settings.Properties.MinValue = 0;
+           settings.Properties.ClientSideEvents.GotFocus = "GenericSelectAllText";
+           settings.Properties.ClientSideEvents.ValueChanged = "Invoice_ChangeInvoiceTotal";
+           settings.Properties.SpinButtons.ShowIncrementButtons = false;
+           settings.Properties.AllowNull = false;
+
+           var txtProperties = settings.Properties as SpinEditProperties;
+           txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+
+           var aValueTransportationExpenses = _ControlsState.FirstOrDefault(r => r.controlName == "valueTransportationExpenses");
+           settings.ReadOnly = (aValueTransportationExpenses != null ? aValueTransportationExpenses.isReadOnly : false) || !boolSettingIGFS;
+           var isRequiredValueTransportationExpenses = aValueTransportationExpenses != null ? aValueTransportationExpenses.isRequired : false;
+           if (isRequiredValueTransportationExpenses)
+           {
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               settings.CustomJSProperties = (s, e) =>
+               {
+
+                   e.Properties["cpTabContainer"] = "tabSalesQuotationExterior";
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpTabControl"] = "tabControl";
+
+               };
+           }
+
+       }).GetHtml()
+
+        </td>
+    </tr>
+    <tr class="ps-line-sep">
+        <td colspan="2"></td>
+    </tr>
+    <tr>
+        <td>Valor Total: </td>
+        <td class="ps_alignNum">
+            @Html.DevExpress().TextBoxFor(m => m.valuetotalCIFTruncate, settings =>
+            {
+                settings.Name = "valuetotalCIF";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ClientInstanceName = "valuetotalCIF";
+
+                settings.ReadOnly = true;
+
+                if (canEditPaymentTerm)
+                {
+                    settings.Properties.ClientSideEvents.Init = "OnInvoiceTotalValueReady";
+                    settings.Properties.ClientSideEvents.ValueChanged = "OnInvoiceTotalValueReady";
+                }
+
+                settings.Properties.DisplayFormatString = "##.00";
+                var txtProperties = settings.Properties as TextBoxProperties;
+                txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

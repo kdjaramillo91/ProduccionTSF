@@ -1,0 +1,64 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLotState
+
+
+@{
+    ProductionLotState productionLotState = Model ?? new ProductionLotState();
+}
+
+@Html.Hidden("id_productionLotState", productionLotState.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>Código:</td>
+        <td colspan="4">
+            @Html.Raw(productionLotState.code)
+        </td>
+    </tr>
+    <tr>
+    <tr>
+        <td>Nombre:</td>
+        <td colspan="4">
+            @Html.Raw(productionLotState.name)
+        </td>
+    </tr>
+    <tr>
+        <td>Descripción:</td>
+        <td colspan="4">
+            @Html.Raw(productionLotState.description)
+        </td>
+    </tr>
+    <td style="width: 10%;">Creado por:</td>
+    <td style="width: 10%;">
+        @Html.Raw(GetUserName(productionLotState.id_userCreate))
+    </td>
+    <td style="width: 10%;">Fecha de Creación:</td>
+    <td>
+        @Html.Raw(productionLotState.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+    </td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>
+            @Html.Raw(GetUserName(productionLotState.id_userUpdate))
+        </td>
+        <td>Fecha de Modificaci&oacute;n:</td>
+        <td>
+            @Html.Raw(productionLotState.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

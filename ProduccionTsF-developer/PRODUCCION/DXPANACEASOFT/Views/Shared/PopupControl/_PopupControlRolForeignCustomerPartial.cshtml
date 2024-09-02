@@ -1,0 +1,31 @@
+﻿@using DXPANACEASOFT.Models
+
+@model Person
+
+@Html.DevExpress().PopupControl(
+    settings =>
+    {
+    settings.Name = "popupControlRolForeignCustomer";
+    //settings.Width = 500;
+    settings.Width = 1000;
+        settings.Height = 1000;
+    settings.CallbackRouteValues = new { Controller = "ForeignCustomer", Action = "PopupControlRolForeignCustomerPartial" };
+
+    //settings.AllowDragging = true;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.CloseOnEscape = false;
+    settings.PopupAnimationType = AnimationType.None;
+    settings.HeaderText = "Cliente del Exterior";
+    settings.Modal = true;
+    settings.LoadContentViaCallback = LoadContentViaCallback.OnFirstShow;
+    settings.AutoUpdatePosition = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.SetContent(() =>
+    {
+        Html.RenderAction("PopupControlRolForeignCustomer", "ForeignCustomer", Model);
+    });
+
+    //settings.ClientSideEvents.CloseUp = "function(s, e){ ASPxClientEdit.ClearEditorsInContainer(null, '', true); }";
+}).GetHtml()
+

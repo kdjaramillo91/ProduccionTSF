@@ -1,0 +1,166 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.BusinessOportunityPartner>
+
+@{
+    var grid = Html.DevExpress().GridView<BusinessOportunityPartner>(settings => {
+        settings.Name = "gvBusinessPartners";
+
+
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessPartnersPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "BusinessOportunityPhase_OnBeginCallback";
+
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessPartnersPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessPartnersPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessPartnersPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 4;
+        settings.CommandColumn.Caption = "Acciones";
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+        settings.Width = Unit.Percentage(100);
+
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_partner";
+            column.Caption = "Socio de Negocio";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int?)DataBinder.Eval(c.DataItem, "id_partner");
+                //BusinessOportunityPartner detail = (BusinessOportunityPartner)Model[c.ItemIndex];
+                var detail = DataProviderPerson.Person(id);
+                string person = (detail != null) ? detail.fullname_businessName : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                ViewContext.Writer.Write(person);
+
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_partner";
+                p.DataSource = DataProviderPerson.Persons((int)ViewData["id_company"]);
+
+                p.ValueField = "id";
+                p.TextField = "fullname_businessName";
+                p.ValueType = typeof(int);
+
+                p.CallbackPageSize = 15;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.Columns.Add("masterCode", "Código", Unit.Percentage(50));
+                //p.Columns.Add("name", "Nombre del Producto", Unit.Percentage(70));
+                //p.Columns.Add("barCode", "EAN", Unit.Percentage(50));
+
+                //p.Columns.Add("ItemPurchaseInformation.MetricUnit.code", "UM", Unit.Percentage(20));
+
+                p.ClientSideEvents.Init = "PartnerCombo_OnInit";
+                //p.ClientSideEvents.DropDown = "ItemCombo_DropDown";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnPersonValidation";
+                p.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "GetPartner"/*, TextField = "CityName"*/ };
+                p.ClientSideEvents.BeginCallback = "BusinessOportunityPartner_BeginCallback";
+                p.ClientSideEvents.EndCallback = "BusinessOportunityPartner_EndCallback";
+                //p.ClientSideEvents.ValueChanged = "ItemsCombo_ValueChanged";}
+            });
+        });
+
+        //settings.Columns.Add(m => m.id_partner, column =>
+        //{
+        //    column.Caption = "Ejecutivo";
+        //    column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+        //    column.EditorProperties().ComboBox(comboBox =>
+        //    {
+        //        comboBox.ClientInstanceName = "id_partner";
+        //        comboBox.Width = Unit.Percentage(100);
+
+        //        comboBox.DataSource = DataProviderPerson.Providers();
+
+        //        comboBox.ValueField = "id";
+        //        comboBox.TextField = "fullname_businessName";
+        //        comboBox.ValueType = typeof(int);
+        //    });
+        //});
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "referencePartner";
+            column.Caption = "Referencia";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string referencePartner = (string)DataBinder.Eval(c.DataItem, "referencePartner");
+
+                ViewContext.Writer.Write(referencePartner);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "referencePartner";
+
+                //p.ClientSideEvents.Validation = "OnReferenciaValidation";
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "descriptionPartner";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string descriptionPartner = (string)DataBinder.Eval(c.DataItem, "descriptionPartner");
+
+                ViewContext.Writer.Write(descriptionPartner);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "descriptionPartner";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

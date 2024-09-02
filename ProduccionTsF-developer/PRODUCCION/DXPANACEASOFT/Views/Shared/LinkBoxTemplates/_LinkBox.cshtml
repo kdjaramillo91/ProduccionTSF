@@ -1,0 +1,40 @@
+﻿@model String
+@{
+    ViewData["isBtnToReturn"] = true;
+}
+<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr>
+        <td style="width: 100%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.Hidden("isBtnToReturn", true)
+                        @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnToReturn";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Regresar";
+                                settings.Images.Image.IconID = IconID.ActionsLeft16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnToReturn_click";
+                            }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div>
+                            @{
+                                Html.RenderPartial(Model, ViewData["ModelLink"]);
+                            }
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

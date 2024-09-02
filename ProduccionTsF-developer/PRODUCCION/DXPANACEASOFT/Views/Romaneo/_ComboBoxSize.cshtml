@@ -1,0 +1,24 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.RomaneoDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.idSize, settings =>
+{
+    settings.Name = "ComboBoxSize";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Seleccionar...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Romaneo",
+        Action = "ComboBoxSize",
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxSize_BeginCallback";
+    settings.Properties.ClientSideEvents.EndCallback = "ComboBoxSize_EndCallback";
+    //settings.Properties.ClientSideEvents.Init = "ComboBoxSize_Init";
+    settings.ShowModelErrors = true;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.ReadOnly = !((bool)ViewBag.enabled /*&& (bool)ViewBag.enabledSize*/);
+}).BindList(ViewData["Tallas"]).GetHtml()
+

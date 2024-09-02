@@ -1,0 +1,189 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<SalesQuotationDetail>(settings =>
+    {
+        settings.Name = "gvSalesQuotationsDetails";
+        settings.CallbackRouteValues = new { Controller = "SalesRequest", Action = "SalesQuotationsDetailsPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";//"id_salesQuotation;id_item";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "SalesQuotationsDetailsOnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "SalesQuotationsDetailsOnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "SalesQuotationsDetailsOnGridViewEndCallback";
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SalesQuotationsDetailsSelectAllRow();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""SalesQuotationsDetailsClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        //"No. Cotización"
+        settings.Columns.Add(m => m.SalesQuotation.Document.number ,column =>
+        {
+            //column.FieldName = "id_salesQuotation";
+            column.Caption = "No. Cotización";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    SalesQuotationDetail detail = (SalesQuotationDetail)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.SalesQuotation.Document.number);
+            //});
+
+        });
+        
+        //"Cliente"
+        settings.Columns.Add(m => m.SalesQuotation.Customer.Person.fullname_businessName, column =>
+        {
+            column.Caption = "Cliente";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    SalesQuotationDetail detail = (SalesQuotationDetail)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.SalesQuotation.Customer.Person.fullname_businessName);
+            //});
+
+        });
+
+        //"Lista de Precio
+        settings.Columns.Add(m => m.SalesQuotation.PriceList.name, column =>
+        {
+            column.Caption = "Lista de Precio";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    SalesQuotationDetail detail = (SalesQuotationDetail)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(detail.SalesQuotation.Customer.Person.fullname_businessName);
+            //});
+
+        });
+        //"Item"
+        settings.Columns.Add(m => m.Item.name, column =>
+        {
+            column.Caption = "Item";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+        });
+
+        //settings.Columns.Add(m => m.id_item, column =>
+        //{
+        //    column.FieldName = "id_item";
+        //    column.Caption = "Item";
+        //    column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        //    column.SetDataItemTemplateContent(c =>
+        //    {
+        //        SalesQuotationDetail detail = (SalesQuotationDetail)Model[c.ItemIndex];
+        //        ViewContext.Writer.Write(detail.Item.name);
+        //    });
+
+        //});
+
+
+
+        //"Cant. Aprobada Pendiente"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityTypeUMPresentation";
+            column.Caption = "Cant. Aprobada Pendiente";
+            column.Width = Unit.Percentage(5);
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                SalesQuotationDetail detail = (SalesQuotationDetail)Model[c.ItemIndex];
+                var auxSalesRequestDetailSalesQuotation = (detail.SalesRequestDetailSalesQuotation.Where(w => w.SalesRequestDetail.SalesRequest.Document.DocumentState.code == "03" ||//Aprobada
+                                                                                                            w.SalesRequestDetail.SalesRequest.Document.DocumentState.code != "06"));//Autorizada
+                var quantityAux = auxSalesRequestDetailSalesQuotation != null && auxSalesRequestDetailSalesQuotation.Count() > 0 ? auxSalesRequestDetailSalesQuotation.Sum(s => s.quantity) : 0;
+                ViewContext.Writer.Write((detail.quantityTypeUMPresentation - quantityAux).ToString("#,##0.00"));
+                //if (detail.quantityTypeUMPresentation > quantityAux)
+                //{
+                //    tempSalesQuotationDetail.Add(item);
+                //}
+            });
+
+        });
+
+        //"UM"
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(3);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.Presentation != null && item.Presentation.MetricUnit != null) ? item.Presentation.MetricUnit.code : "";
+                ViewContext.Writer.Write(metricUnit);
+            });
+
+        });
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        string[] values = new string[] { "id" };//{ "id_salesQuotation", "id_item" };
+        foreach (var key in grid.GetCurrentPageRowValues(values))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+

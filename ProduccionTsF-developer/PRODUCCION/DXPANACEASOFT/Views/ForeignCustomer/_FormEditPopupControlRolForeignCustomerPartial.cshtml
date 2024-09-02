@@ -1,0 +1,216 @@
+﻿@using DXPANACEASOFT.Models
+
+@model ForeignCustomer
+@{
+    var formato = ViewBag.formatoTelFax == "" ? "SI" : ViewBag.formatoTelFax;
+}
+<script src="~/Scripts/ForeignCustomer/editform.js"></script>
+@{
+	Html.DevExpress<ForeignCustomer>().FormLayout(settings =>
+	{
+		settings.Name = "formLayoutEditForeignCustomer";
+		settings.Width = Unit.Percentage(100);
+		settings.ColCount = 4;
+
+		var groupItem = settings.Items.AddGroupItem(i =>
+		{
+			i.Caption = "Información Cliente del Exterior";
+			i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+			i.ColSpan = 2;
+			i.ColCount = 4;
+			i.Width = Unit.Percentage(100);
+			i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+		});
+
+		var groupItem2 = settings.Items.AddGroupItem(i =>
+		{
+			i.Caption = "   ";
+			i.ColCount = 2;
+			i.GroupBoxDecoration = GroupBoxDecoration.None;
+			i.Width = Unit.Percentage(100);
+		});
+
+		groupItem.Items.Add(m => m.IFFC, item =>
+		{
+			item.Name = "IFFC";
+			item.Caption = "I.F";
+			item.Width = Unit.Percentage(100);
+			item.ColSpan = 2;
+
+			item.NestedExtension().SpinEdit(spinEdit =>
+			{
+				spinEdit.Width = Unit.Percentage(100);
+				spinEdit.Properties.MaxLength = 100;
+				spinEdit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinEdit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinEdit.Properties.ValidationSettings.Display = Display.Dynamic;
+				spinEdit.Properties.ClientInstanceName = "IFFC";
+				spinEdit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+				spinEdit.Properties.ValidationSettings.CausesValidation = true;
+				spinEdit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinEdit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinEdit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinEdit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				spinEdit.Properties.ValidationSettings.EnableCustomValidation = true;
+				spinEdit.ShowModelErrors = true;
+			});
+		});
+		groupItem.Items.AddEmptyItem();
+
+		groupItem.Items.Add(m => m.RCFC, item =>
+		{
+			item.Name = "RCFC";
+			item.Caption = "RC";
+			item.Width = Unit.Percentage(100);
+			item.ColSpan = 2;
+
+			item.NestedExtension().SpinEdit(spinEdit =>
+			{
+				spinEdit.Width = Unit.Percentage(100);
+				spinEdit.Properties.MaxLength = 100;
+				spinEdit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinEdit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinEdit.Properties.ValidationSettings.Display = Display.Dynamic;
+				spinEdit.Properties.ClientInstanceName = "RCFC";
+				spinEdit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+				spinEdit.Properties.ValidationSettings.CausesValidation = true;
+				spinEdit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinEdit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinEdit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinEdit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				spinEdit.Properties.ValidationSettings.EnableCustomValidation = true;
+				spinEdit.ShowModelErrors = true;
+			});
+		});
+		groupItem.Items.AddEmptyItem();
+
+		groupItem.Items.Add(m => m.patenteFC, item =>
+		{
+			item.Name = "patenteFC";
+			item.Caption = "Patente";
+			item.Width = Unit.Percentage(100);
+			item.ColSpan = 2;
+
+			item.NestedExtension().SpinEdit(spinEdit =>
+			{
+				spinEdit.Width = Unit.Percentage(100);
+				spinEdit.Properties.MaxLength = 100;
+				spinEdit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinEdit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinEdit.Properties.ValidationSettings.Display = Display.Dynamic;
+				spinEdit.Properties.ClientInstanceName = "patenteFC";
+				spinEdit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+				spinEdit.Properties.ValidationSettings.CausesValidation = true;
+				spinEdit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinEdit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinEdit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinEdit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				spinEdit.Properties.ValidationSettings.EnableCustomValidation = true;
+				spinEdit.ShowModelErrors = true;
+			});
+		});
+		groupItem.Items.AddEmptyItem();
+
+		groupItem.Items.Add(m => m.CNSSFC, item =>
+		{
+			item.Name = "CNSSFC";
+			item.Caption = "CNSS";
+			item.Width = Unit.Percentage(100);
+			item.ColSpan = 2;
+
+			item.NestedExtension().SpinEdit(spinEdit =>
+			{
+				spinEdit.Width = Unit.Percentage(100);
+				spinEdit.Properties.MaxLength = 100;
+				spinEdit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinEdit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinEdit.Properties.ValidationSettings.Display = Display.Dynamic;
+				spinEdit.Properties.ClientInstanceName = "CNSSFC";
+				spinEdit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+				spinEdit.Properties.ValidationSettings.CausesValidation = true;
+				spinEdit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinEdit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinEdit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinEdit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				spinEdit.Properties.ValidationSettings.EnableCustomValidation = true;
+				spinEdit.ShowModelErrors = true;
+			});
+		});
+		groupItem.Items.AddEmptyItem();
+
+		groupItem.Items.Add(m => m.ICEFC, item =>
+		{
+			item.Name = "ICEFC";
+			item.Caption = "ICE";
+			item.Width = Unit.Percentage(100);
+			item.ColSpan = 2;
+
+			item.NestedExtension().TextBox(textBox =>
+			{
+				textBox.Width = Unit.Percentage(100);
+				textBox.Properties.ValidationSettings.Display = Display.Dynamic;
+
+				textBox.Properties.ClientInstanceName = "ICEFC";
+				textBox.Properties.ValidationSettings.RequiredField.IsRequired = false;
+				textBox.Properties.ValidationSettings.CausesValidation = true;
+				textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+				textBox.Properties.ValidationSettings.SetFocusOnError = true;
+				textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+				textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+				textBox.ShowModelErrors = true;
+			});
+		});
+		groupItem.Items.AddEmptyItem();
+		groupItem.Items.AddEmptyItem();
+
+		groupItem2.Items.AddEmptyItem();
+
+
+		groupItem.Items.Add(item =>
+		{
+			item.ColSpan = 4;
+			item.Width = Unit.Percentage(100);
+			item.ShowCaption = DefaultBoolean.False;
+
+			item.SetNestedContent(Html.Action("FormEditForeignCustomerIdentificationPartial").ToHtmlString());
+
+		});
+		groupItem2.Items.AddEmptyItem();
+
+		groupItem.Items.Add(item =>
+		{
+			item.Name = "messageErrors";
+			item.Width = Unit.Percentage(100);
+			item.ColSpan = 2;
+			item.ShowCaption = DefaultBoolean.False;
+			item.SetNestedContent(Html.Partial("ProductionLotGridMessageErrors/_GridMessageErrorsDetail", null).ToHtmlString());
+		});
+		groupItem2.Items.AddEmptyItem();
+
+	}).Render();
+
+    <div class="row" style="text-align: center; padding: 13px 35px 5px 0px; margin-bottom: 20px; margin-right: 20px;">
+        @Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnUpdatePopupForeignCustomer";
+				settings.Text = "Actualizar";
+				settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "OnBtnUpdatePopupForeignCustomer_Click";
+			}).GetHtml()
+        @Html.DevExpress().Button(settings =>
+		   {
+			   settings.Name = "btnCancelPopupForeignCustomer";
+			   settings.Text = "Cancelar";
+			   settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+			   settings.UseSubmitBehavior = false;
+			   settings.ClientSideEvents.Click = "OnBtnCancelPopupForeignCustomer_Click";
+		   }).GetHtml()
+
+    </div>
+
+}
+
+
+

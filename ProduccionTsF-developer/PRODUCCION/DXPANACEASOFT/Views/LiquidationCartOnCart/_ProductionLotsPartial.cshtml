@@ -1,0 +1,190 @@
+﻿@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<ProductionLot>(settings =>
+    {
+        settings.Name = "gvProductionLots";
+        settings.CallbackRouteValues = new { Controller = "LiquidationCartOnCart", Action = "ProductionLotsPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";//"id_purchaseRequest;id_item";
+
+settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "ProductionLotsOnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "ProductionLotsOnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "ProductionLotsOnGridViewEndCallback";
+
+//Panel para cantidad de registros
+settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""ProductionLotsSelectAllRow();"">Seleccionar Todos</a>
+              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""ProductionLotsClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+//"No. de Lote" 10
+settings.Columns.Add(m => m.number, column =>
+        {
+            column.Caption = "Sec. Transaccional";
+            column.Width = Unit.Percentage(10);
+
+        });
+//"No. de Lote" 10
+settings.Columns.Add(m => m.internalNumber, column =>
+        {
+            column.Caption = "No. Lote";
+            column.Width = Unit.Percentage(10);
+
+        });
+        settings.Columns.Add(m => m.receptionDate, column =>
+        {
+            column.Caption = "Fecha de Recepción";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(3);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+
+        });
+
+//totalQuantityRecived 10
+settings.Columns.Add(m => m.totalQuantityRecived, column =>
+        {
+            column.FieldName = "totalQuantityRecived";
+            column.Name = "totalQuantityRecived";
+            column.Caption = "Libras Remitidas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal totalQuantityRecived = (decimal)DataBinder.Eval(c.DataItem, "totalQuantityRecived");
+                ViewContext.Writer.Write(totalQuantityRecived.ToString("N2"));
+            });
+        });
+
+//wholeSubtotal 10
+settings.Columns.Add(m => m.wholeSubtotal, column =>
+        {
+            column.FieldName = "wholeSubtotal";
+            column.Name = "wholeSubtotal";
+            column.Caption = "Libras Liq. Entero";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? _wholeSubTotal = (decimal?)DataBinder.Eval(c.DataItem, "wholeSubtotal");
+                _wholeSubTotal = _wholeSubTotal != null ? _wholeSubTotal : 0;
+                ViewContext.Writer.Write(_wholeSubTotal.Value.ToString("N2"));
+            });
+        });
+
+//wholeSubtotal 10
+settings.Columns.Add(m => m.subtotalTail, column =>
+        {
+            column.FieldName = "subtotalTail";
+            column.Name = "subtotalTail";
+            column.Caption = "Libras Liq. Cola";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? _subtotalTail = (decimal?)DataBinder.Eval(c.DataItem, "subtotalTail");
+                _subtotalTail = _subtotalTail != null ? _subtotalTail : 0;
+                ViewContext.Writer.Write(_subtotalTail.Value.ToString("N2"));
+            });
+        });
+
+//Proceso
+settings.Columns.Add(m => m.Person1.processPlant, column =>
+        {
+            column.Caption = "Proceso";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(30);
+        });
+
+//"Proveedor" 30
+settings.Columns.Add(m => m.Provider.Person.fullname_businessName, column =>
+        {
+            column.Caption = "Proveedor";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(30);
+        });
+
+//"Camaronera" 20
+settings.Columns.Add(m => m.ProductionUnitProvider.name, column =>
+        {
+            column.Caption = "Camaronera";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(20);
+        });
+
+//"Piscina" 10
+settings.Columns.Add(m => m.ProductionUnitProviderPool.name, column =>
+        {
+            column.Caption = "Piscina";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(10);
+        });
+
+//"Estado" 10
+settings.Columns.Add(m => m.ProductionLotState.name, column =>
+        {
+            column.Caption = "Estado";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(10);
+        });
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        string[] values = new string[] { "id" };//{ "id_purchaseRequest", "id_item" };
+        foreach (var key in grid.GetCurrentPageRowValues(values))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+

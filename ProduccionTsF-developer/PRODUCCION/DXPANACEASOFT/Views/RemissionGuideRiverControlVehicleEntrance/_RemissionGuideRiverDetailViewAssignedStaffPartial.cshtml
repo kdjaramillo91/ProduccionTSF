@@ -1,0 +1,141 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvAssignedStaffEditFormDetails";
+        settings.CallbackRouteValues = new { Controller = "Logistics", Action = "RemissionGuideRiverDetailViewAssignedStaff" };
+
+        settings.ClientSideEvents.BeginCallback = "RemissionGuideRiverDetailViewAssignedStaff_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = false;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_person";
+            column.Name = "id_person";
+            column.Caption = "Persona";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_person");
+                Person person = DataProviderPerson.Person(id);
+                if (person != null)
+                {
+                    var name = person.fullname_businessName;
+                    ViewContext.Writer.Write(name);
+                }
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_travelType";
+            column.Name = "id_travelType";
+            column.Caption = "Viaje";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_travelType");
+                RemissionGuideTravelType travelType = DataProviderTravelType.TravelType(id);
+                if (travelType != null)
+                {
+                    var name = travelType.name;
+                    ViewContext.Writer.Write(name);
+                }
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_assignedStaffRol";
+            column.Name = "id_assignedStaffRol";
+            column.Caption = "Rol";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_assignedStaffRol = (int?)DataBinder.Eval(c.DataItem, "id_assignedStaffRol");
+
+                RemissionGuideAssignedStaffRol rol = DataProviderAssignedStaffRol.AssignedStaffRol(id_assignedStaffRol);
+                if (rol != null)
+                {
+                    ViewContext.Writer.Write(rol.name);
+                }
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "viaticPrice";
+            column.Caption = "Viatico";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var viaticPrice = DataBinder.Eval(c.DataItem, "viaticPrice");
+                if (viaticPrice != null)
+                {
+                    decimal viaPriceTmp = Convert.ToDecimal(viaticPrice);
+                    ViewContext.Writer.Write(viaPriceTmp.ToString("N2"));
+                }
+                
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "viaticPrice";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.SpinButtons.ShowIncrementButtons = true;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                //   p.ClientSideEvents.ValueChanged = "QuantityOrdered_ValueChanged";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                //p.ClientSideEvents.Init = "QuantityOrdered_Init";
+                //      p.ClientSideEvents.Validation = "QuantityOrderedValidation";
+            });
+        });
+
+
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+

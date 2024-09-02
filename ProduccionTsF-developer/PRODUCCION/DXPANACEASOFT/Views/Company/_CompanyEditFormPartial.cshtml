@@ -1,0 +1,342 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Company
+
+@{
+    int id_company = (Model != null) ? Model.id : 0;
+}
+
+@Html.Hidden("id_company", id_company)
+
+<table class="table table-condensed">
+    <tr>
+        <td rowspan="8" style="width: 12%; text-align: center; vertical-align: top;">
+            @Html.DevExpress().BinaryImageFor(m => m.logo, settings =>
+            {
+                settings.Properties.ClientInstanceName = "logo";
+
+                settings.Properties.ImageWidth = 200;
+                settings.Properties.ImageHeight = 190;
+                settings.Properties.EnableServerResize = true;
+                settings.Properties.ImageSizeMode = ImageSizeMode.FitProportional;
+                settings.CallbackRouteValues = new { Controller = "Company", Action = "BinaryImageColumnPhotoUpdate" };
+                settings.Properties.EditingSettings.Enabled = true;
+                settings.Properties.EditingSettings.UploadSettings.UploadValidationSettings.MaxFileSize = 4194304;
+
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Razón Social:*";
+                settings.AssociatedControlName = "businessName";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.businessName, settings =>
+            {
+                settings.Properties.ClientInstanceName = "businessName";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Nombre de Negocio de la Compañía";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCompaniesBusinessNameValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Nombre Comercial:*";
+                settings.AssociatedControlName = "trademark";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.trademark, settings =>
+            {
+                settings.Properties.ClientInstanceName = "trademark";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Marca de la Compañía";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCompaniesTrademarkValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Ruc:*";
+                settings.AssociatedControlName = "ruc";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ruc, settings =>
+            {
+                settings.Properties.ClientInstanceName = "ruc";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Registro Unico de Contribuyente";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCompaniesRucValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_businessGroup, settings =>
+            {
+                settings.Text = "Grupo de Negocio:";
+                settings.AssociatedControlName = "id_businessGroup";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_businessGroup = (Model != null && Model.id_businessGroup != 0) ? (int?) Model.id_businessGroup : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_businessGroup, settings =>
+            {
+                settings.Properties.ClientInstanceName = "id_businessGroup";
+
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Seleccione Grupo de Negocio";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                settings.ShowModelErrors = true;
+                //settings.Properties.ClientSideEvents.Validation = "OnCompaniesBusinessGroupValidation";
+            }).BindList(DataProviderBusinessGroup.BusinessGroups()).Bind(id_businessGroup).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.email, settings =>
+            {
+                settings.Text = "Correo Electrónico:*";
+                settings.AssociatedControlName = "email";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.email, settings =>
+            {
+                settings.Properties.ClientInstanceName = "email";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "correo.electronico@miservidor.com";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCompaniesEmailValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.phoneNumber, settings =>
+            {
+                settings.Text = "Teléfono:*";
+                settings.AssociatedControlName = "phoneNumber";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.phoneNumber, settings =>
+            {
+                settings.Properties.ClientInstanceName = "phoneNumber";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "No. de Telfono";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCompaniesPhoneNumberValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.plantCode, settings =>
+            {
+                settings.Text = "Código de Planta:";
+                settings.AssociatedControlName = "plantCode";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.plantCode, settings =>
+            {
+                settings.Properties.ClientInstanceName = "plantCode";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.registryFDA, settings =>
+            {
+                settings.Text = "Registro FDA:";
+                settings.AssociatedControlName = "registryFDA";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.registryFDA, settings =>
+            {
+                settings.Properties.ClientInstanceName = "registryFDA";
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.ShowModelErrors = true;
+
+            }).GetHtml()
+        </td>
+    </tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.websiteCompany, settings =>
+			{
+				settings.Text = "Página Web de la cía:";
+				settings.AssociatedControlName = "websiteCompany";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.websiteCompany, settings =>
+			{
+				settings.Properties.ClientInstanceName = "websiteCompany";
+
+				settings.Width = Unit.Percentage(100);
+
+
+				settings.ShowModelErrors = true;
+
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.requiredLogistic, settings =>
+		   {
+			   settings.Name = "requiredLogisticLabel";
+			   settings.Text = "Logística Propia:";
+			   settings.AssociatedControlName = "requiredLogistic";
+		   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().CheckBoxFor(m => m.requiredLogistic, settings =>
+			{
+				settings.Name = "requiredLogistic";
+				settings.Properties.ClientInstanceName = "requiredLogistic";
+				settings.ShowModelErrors = true;
+				settings.Checked = true;
+			}).GetHtml()
+		</td>
+	</tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.address, settings =>
+            {
+                settings.Text = "Dirección:*";
+                settings.AssociatedControlName = "address";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().MemoFor(m => m.address, settings =>
+            {
+                settings.Properties.ClientInstanceName = "address";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "Dirección postal";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCompaniesAddressValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Text = "Descripción:";
+                settings.AssociatedControlName = "description";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().MemoFor(m => m.description, settings =>
+            {
+                settings.Properties.ClientInstanceName = "description";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "";
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+            {
+                settings.Text = "¿Activo?:";
+                settings.AssociatedControlName = "isActive";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+            {
+                settings.Properties.ClientInstanceName = "isActive";
+
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            @Html.DevExpress().PageControl(tabs =>
+            {
+                tabs.Name = "tabControl";
+                tabs.Width = Unit.Percentage(100);
+
+                tabs.TabPages.Add(tab =>
+                {
+                    tab.Name = "tabElectronicFacturation";
+                    tab.Text = "Facturación    ";
+                    tab.TabStyle.Width = Unit.Percentage(100);
+
+                    tab.TabImage.Width = Unit.Pixel(16);
+                    tab.TabImage.Height = Unit.Pixel(16);
+                    tab.TabImage.Align = ImageAlign.Right;
+                    tab.TabImage.Url = "/Content/image/noimage.png";
+                    tab.ActiveTabImage.Align = ImageAlign.Right;
+                    tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                    tab.SetContent(() =>
+                    {
+                        var electronicFacturation = (Model != null && Model.CompanyElectronicFacturation != null) ? Model.CompanyElectronicFacturation : new CompanyElectronicFacturation();
+                        Html.RenderPartial("_CompanyEditorFromTabElectronicFacturation", electronicFacturation);
+                    });
+                });
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5" style="text-align: right;">
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnUpdate";
+                settings.Text = "Actualizar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+            }).GetHtml()
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnCancel";
+                settings.Text = "Cancelar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonCancel_Click";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+
+<script src="~/Scripts/company/editform.js"></script>

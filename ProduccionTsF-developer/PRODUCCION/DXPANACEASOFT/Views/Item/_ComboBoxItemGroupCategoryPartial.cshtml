@@ -1,0 +1,23 @@
+﻿@using DXPANACEASOFT.DataProviders
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "id_groupCategory";
+    settings.Properties.ClientInstanceName = "id_groupCategory";
+
+    settings.CallbackRouteValues = new { Controller = "Item", Action = "ComboBoxItemGroupCategoryPartial" };
+
+    settings.Properties.ClientSideEvents.BeginCallback = "ItemGroupCategoryCombo_BeginCallback";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemGroupCategoryCombo_SelectedIndexChanged";
+
+    settings.ControlStyle.CssClass = "editor";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+}).BindList(Model).Bind(ViewData["id_groupCategory"]).GetHtml()

@@ -1,0 +1,99 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using  DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.CategoryCustomerType
+@using System.Drawing
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_Category, settings =>
+            {
+                settings.Name = "did_CategoryLabel";
+                settings.Text = "Categoría:";
+                settings.AssociatedControlName = "did_Category";
+            }).GetHtml()
+
+
+        </td>
+        <td>
+            @{
+                int? id_Category = (Model != null && Model.id_Category != 0) ? (int?)Model.id_Category : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_Category, settings =>
+       {
+           settings.Name = "did_Category";
+           settings.Properties.ClientInstanceName = "did_Category";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Columns.Add("name", "Nombre", 200);
+           settings.Width = Unit.Percentage(50);
+           settings.Height = Unit.Percentage(50);
+           settings.Properties.EnableClientSideAPI = true;
+           settings.Properties.CallbackPageSize = 20;
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+  
+
+       }).BindList(DataProviderClientCategory.ClientCategoryAll((int?)id_Category)).Bind(id_Category).GetHtml()
+
+        </td>
+        <!-- FECHA FIn-->
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_CustomerType, settings =>
+            {
+                settings.Name = "did_CustomerTypeLabel";
+                settings.Text = "Tipo de Cliente:";
+                settings.AssociatedControlName = "did_CustomerType";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_CustomerType = (Model != null && Model.id_CustomerType != 0) ? (int?)Model.id_CustomerType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_CustomerType, settings =>
+       {
+           settings.Name = "did_CustomerType";
+           settings.Properties.ClientInstanceName = "did_CustomerType";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Columns.Add("name", "Nombre", 200);
+           settings.Width = Unit.Percentage(50);
+           settings.Height = Unit.Percentage(50);
+           settings.Properties.EnableClientSideAPI = true;
+           settings.Properties.CallbackPageSize = 20;
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+      
+
+       }).BindList(DataProviderCustomerType.CustomerTypeAll((int?)id_CustomerType)).Bind(id_CustomerType).GetHtml()
+        </td>
+
+    </tr>
+   
+    <tr></tr>
+
+</table>
+
+
+
+
+
+    
+
+

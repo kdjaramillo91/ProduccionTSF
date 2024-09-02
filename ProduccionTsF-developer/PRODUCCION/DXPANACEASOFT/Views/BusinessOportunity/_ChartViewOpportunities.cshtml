@@ -1,0 +1,62 @@
+﻿@{
+    ChartControlSettings settings = new ChartControlSettings();
+    settings.Name = "chart";
+    settings.BorderOptions.Visibility = DefaultBoolean.False;
+    settings.Height = 250;
+    settings.Width = 600;
+    Series series = new Series("WebSiteVisitors", DevExpress.XtraCharts.ViewType.Funnel);
+    series.ArgumentDataMember = "id_phase";
+    series.ValueDataMembers[0] = "percent";
+    //series.LabelsVisibility = options.ShowLabels ? DefaultBoolean.True : DefaultBoolean.False;
+    //((FunnelSeriesLabel)series.Label).Position = options.LabelPosition;
+    //if (options.ValueAsPercent)
+    //{
+    //    series.Label.TextPattern = "{VP:P0}";
+    //}
+    //else
+    //{
+    //    series.Label.TextPattern = "{V}";
+    //}
+    //series.LegendTextPattern = "{A}: {V}";
+    settings.Series.Add(series);
+    //settings.Titles.Add(new ChartTitle()
+    //{
+    //    Font = new Font("Tahoma", 18),
+    //    Text = "Web Site Visitors Trend"
+    //});
+    settings.Legend.AlignmentHorizontal = LegendAlignmentHorizontal.Right;
+    settings.Legend.AlignmentVertical = LegendAlignmentVertical.Bottom;
+    //((FunnelSeriesView)series.View).AlignToCenter = options.AlignToCenter;
+    //((FunnelSeriesView)series.View).HeightToWidthRatioAuto = options.HeightToWidthRatioAuto;
+    //((FunnelSeriesView)series.View).HeightToWidthRatio = options.HeightToWidthRatio;
+    //((FunnelSeriesView)series.View).PointDistance = options.Distance;
+    @Html.DevExpress().Chart(settings).Bind(Model).GetHtml()
+}
+
+@*@Html.DevExpress().Chart(biSettings =>
+    {
+        biSettings.Width = 600;
+        biSettings.Height = 250;
+        biSettings.Name = "Chart";
+    }).Bind(Model).GetHtml()*@
+
+
+@*@Html.DevExpress().Chart(biSettings =>
+{
+    biSettings.Width = 85;
+    biSettings.Height = 80;
+    biSettings.Properties.ImageSizeMode = ImageSizeMode.FitProportional;
+    biSettings.Name = "Logo";
+    biSettings.Properties.EnableServerResize = true;
+}).Bind(Model).GetHtml()*@
+@*@{ 
+    new Chart(width: 600, height: 400, theme: ChartTheme.Green)
+            .AddTitle("")
+            .AddSeries("Default",
+            chartType: "Funnel",
+            xValue: Model,
+            xField: "id_phase",
+            yValues: Model,
+            yFields: "percent")
+            .Write("bmp");
+}*@

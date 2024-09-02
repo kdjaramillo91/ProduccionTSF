@@ -1,0 +1,412 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using InventoryMoveDetailDTO = DXPANACEASOFT.Controllers.InventoryMoveController.InventoryMoveDetailDTO;
+
+@{
+	string code = (ViewData["code"] != null) ? (string)ViewData["code"] : "";
+
+	bool IngresoPorTransferencia = (code == "34" || code == "130" || code == "136" || code == "143");
+	bool IngresoPorTransferenciaAutomatica = (code == "130" || code == "136" || code == "143");
+	bool EgresoPorTransferencia = (code == "32" || code == "129" || code == "135" || code == "142");
+	bool EgresoPorTransferenciaAutomatica = (code == "129" || code == "135" || code == "142");
+	var loteMarcado = DataProviderSetting.ValueSetting("LMMASTER");
+	int id_inventoryMove = (int?)ViewData["id_inventoryMove"] ?? 0;
+	string _natureMove = ViewData["_natureMove"] != null ? (string)ViewData["_natureMove"] : "";
+	var entityObjectPermissions = (EntityObjectPermissions)ViewData["entityObjectPermissions"];
+	var showCost = true;
+	if (entityObjectPermissions != null)
+	{
+		var objectPermissions = entityObjectPermissions.listObjectPermissions.FirstOrDefault(fod => fod.codeObject == "COS");
+		showCost = objectPermissions == null;
+	}
+	string customParamOP = (string)ViewData["_customParamOP"];
+	bool aMostrarOP = ViewData["mostrarOP"] == null ? false : (bool)ViewData["mostrarOP"];
+
+	var detailsDTO = (InventoryMoveDetailDTO[])TempData["inventoryMoveDetailDTO"];
+}
+
+
+@{
+	var grid = Html.DevExpress().GridView<InventoryMoveDetailDTO>(settings =>
+	{
+		settings.Settings.ShowFooter = true;
+		settings.Name = "gridViewMoveDetails" + ViewData["id_inventoryMove"];
+		settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "InventoryMoveDetails" };
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.CommandColumn.Visible = false;
+		settings.KeyFieldName = "id";
+
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+		settings.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs['id_inventoryMove'] = s.cpIdInventoryMove; }";
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Detalles del Movimiento</span>");
+		});
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView detailsGrid = s as MVCxGridView;
+			if (detailsGrid == null) return;
+
+			e.Properties["cpIdInventoryMove"] = ViewData["id_inventoryMove"];
+		};
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "No. Egreso Por Transferencia";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = (ViewData["code"] != null && (IngresoPorTransferencia));
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var numEgresoTransferencia = (string)DataBinder.Eval(c.DataItem, "NumEgresoTransferencia");
+				ViewContext.Writer.Write(numEgresoTransferencia);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "No. Orden de Compra";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var value = (string)DataBinder.Eval(c.DataItem, "NumOrdenCompra");
+				ViewContext.Writer.Write(value);
+			});
+
+			column.Visible = (ViewData["code"] != null && ViewData["code"].Equals("04"));
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreBodegaEgreso";
+			column.Caption = "Bodega Egreso";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = (code != null && IngresoPorTransferencia);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreUbicacionEgreso";
+			column.Caption = "Ubicación Egreso";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = (code != null && IngresoPorTransferencia);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreBodegaDetalle";
+			column.Caption = (code != null && IngresoPorTransferencia) ? "Bodega Ingreso" : ((code != null && EgresoPorTransferencia) ? "Bodega Egreso" : ("Bodega"));
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreUbicacionDetalle";
+			column.Caption = (code != null && IngresoPorTransferencia) ? "Ubicación Ingreso" : ((code != null && EgresoPorTransferenciaAutomatica) ? "Ubicación Egreso" : "Ubicación");
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreBodegaIngreso";
+			column.Caption = "Bodega Ingreso";
+			column.ReadOnly = true;
+			column.Visible = (code != null && EgresoPorTransferencia);
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreUbicacionIngreso";
+			column.Caption = "Ubicación Ingreso";
+			column.ReadOnly = true;
+			column.Visible = (code != null && EgresoPorTransferenciaAutomatica);
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "MasterCodeProducto";
+			column.Caption = "Código";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreProducto";
+			column.Caption = "Nombre del Producto";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.EditFormCaptionStyle.Font.Size = 10;
+			column.Width = Unit.Percentage(50);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "metricUnitInventoryPurchase";
+			column.Caption = (code != null && code.Equals("04")) ? "UM Compra" : ((code != null && IngresoPorTransferencia) ? "UM Mov.Egr." : "UM Inv.");
+			column.PropertiesEdit.ClientInstanceName = "metricUnitInventoryPurchase";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.SetDataItemTemplateContent(c =>
+			{
+				var umItem = (string)DataBinder.Eval(c.DataItem, "NombreUnidadMedidaItem");
+				var umMov = (string)DataBinder.Eval(c.DataItem, "NombreUnidadMedidaMovimiento");
+				var umCompra = (string)DataBinder.Eval(c.DataItem, "NombreUnidadMedidaCompra");
+				var text = (code != null && code.Equals("04")) ? umCompra : ((code != null && IngresoPorTransferencia) ? umMov : umItem);
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreCentoCosto";
+			column.Caption = "C. Costo";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(50);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NombreSubCentoCosto";
+			column.Caption = "Sub. C.Costo";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(50);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "AmountMove";
+			column.Caption = ((code != null && (code.Equals("03") || code.Equals("04") || IngresoPorTransferencia)) || customParamOP == "IPXM") ? (id_inventoryMove == 0) ? "Cantidad a Ingresar" : "Cantidad Ingresada" :
+							 ((code != null && (code.Equals("05") || code.Equals("32"))) ? ((id_inventoryMove == 0) ? "Cantidad a Egresar" : "Cantidad Egresada") :
+							 ((code != null && EgresoPorTransferenciaAutomatica) ? ((id_inventoryMove == 0) ? "Cantidad a Transferir" : "Cantidad Transferida") : ""));
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(50);
+			column.PropertiesEdit.DisplayFormatString = "N2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_metricUnitMove";
+			column.Caption = "UM Mov.";
+			column.Width = Unit.Percentage(5);
+			column.PropertiesEdit.ClientInstanceName = "id_metricUnitMove";
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.SetDataItemTemplateContent(c =>
+			{
+				var umItem = (string)DataBinder.Eval(c.DataItem, "NombreUnidadMedidaItem");
+				var umMov = (string)DataBinder.Eval(c.DataItem, "NombreUnidadMedidaMovimiento");
+				var umCompra = (string)DataBinder.Eval(c.DataItem, "NombreUnidadMedidaCompra");
+				var text = (!String.IsNullOrEmpty(umMov) ? umMov : (code != null && code.Equals("04")) ? umCompra : umItem);
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "UnitPriceMove";
+			column.Caption = "Costo";
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(50);
+			column.ReadOnly = !(code != null && code.Equals("03"));
+			column.Visible = IsEnabled("VerCosto");
+			column.PropertiesEdit.DisplayFormatString = "C6";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "BalanceCost";
+			column.Caption = "Total";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			column.Visible = IsEnabled("VerCosto");
+			column.Visible = showCost;
+			column.PropertiesEdit.DisplayFormatString = "C2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "Lote";
+			column.Caption = "Lote";
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(50);
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? false :
+							 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? true : false);
+		});
+
+		if (loteMarcado == "SI")
+		{
+			settings.Columns.Add(column =>
+			{
+				column.FieldName = "NumeroLoteMarcado";
+				column.Name = "lotMarkedDetail";
+				column.Caption = "Lote Marcado";
+				column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			});
+		}
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "SecTransaccionalLote";
+			column.Caption = "Sec. Transacc";
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(50); column.EditFormCaptionStyle.Font.Size = 10;
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? true :
+							 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? false : true);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "NumeroInternoLote";
+			column.Caption = "Lote";
+			column.ReadOnly = true; column.EditFormCaptionStyle.Font.Size = 11;
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? true :
+											 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? false : true);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "GeneraSecuenciaTransaccional";
+			column.Caption = "Gen.Sec.Trans.";
+			column.EditFormCaptionStyle.Font.Size = 5;
+			column.Visible = ((code != null && (code.Equals("03") || code.Equals("04"))) || customParamOP == "IPXM") ? true :
+											 ((code != null && (code.Equals("05") || EgresoPorTransferencia || IngresoPorTransferencia)) ? false : true);
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "CompraAprobada";
+			column.Caption = "Compra Aprobada";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Visible = (ViewData["code"] != null && ViewData["code"].Equals("04"));
+			column.PropertiesEdit.DisplayFormatString = "N2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "CompraRecibida";
+			column.Caption = "Cantidad Recibida";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Visible = (ViewData["code"] != null && ViewData["code"].Equals("04"));
+			column.PropertiesEdit.DisplayFormatString = "N2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "Pendiente";
+			column.Caption = "Pendiente";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Visible = (ViewData["code"] != null && (ViewData["code"].Equals("04") || IngresoPorTransferencia));
+			column.PropertiesEdit.DisplayFormatString = "N2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "Saldo";
+			column.Caption = "Saldo Producto";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			//column.UnboundType = UnboundColumnType.Decimal;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.Visible = (code != null && (code.Equals("05") || EgresoPorTransferencia));
+			column.PropertiesEdit.DisplayFormatString = "N2";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "OrdenProduccion";
+			column.Caption = "OP";
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = aMostrarOP;
+		});
+
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "AmountMove").DisplayFormat = "<b>{0:N2}</b>";
+	});
+}
+@grid.Bind(detailsDTO).GetHtml()
+
+@functions{
+
+	bool IsEnabled(string namePermission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.name.Equals(namePermission));
+
+		return (permission != null);
+	}
+
+}
+

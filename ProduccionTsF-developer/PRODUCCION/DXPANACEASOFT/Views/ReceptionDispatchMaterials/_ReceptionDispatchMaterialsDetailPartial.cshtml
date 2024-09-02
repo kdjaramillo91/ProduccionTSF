@@ -1,0 +1,42 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ReceptionDispatchMaterials
+
+<table class="table table-condensed">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{  
+                ViewData["id_receptionDispatchMaterials"] = (Model != null) ? Model.id : 0;
+
+                Html.DevExpress().PageControl(tabs =>
+                {
+                    tabs.Name = "tabControl" + ViewData["id_receptionDispatchMaterials"];
+                    tabs.Width = Unit.Percentage(100);
+                    tabs.Height = Unit.Pixel(200);
+
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabReceptionDispatchMaterialsDetails";
+                        tab.Text = "Detalle";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var receptionDispatchMaterialsDetail = (Model != null && Model.ReceptionDispatchMaterialsDetail != null) ? Model.ReceptionDispatchMaterialsDetail.ToList() : new List<ReceptionDispatchMaterialsDetail>();
+                            Html.RenderPartial("_RemissionGuidesViewsRemissionGuideDispatchMaterialPartial", Model.RemissionGuide.RemissionGuideDispatchMaterial.OrderBy(od => od.id).ToList());
+                            Html.RenderPartial("_ReceptionDispatchMaterialsViewsDetailPartial", receptionDispatchMaterialsDetail.OrderBy(od => od.id).ToList());
+                        });
+                    });
+                }).Render();
+            }
+        </td>
+    </tr>
+</table>
+

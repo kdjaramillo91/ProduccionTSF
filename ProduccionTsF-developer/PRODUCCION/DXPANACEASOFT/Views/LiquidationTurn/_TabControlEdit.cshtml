@@ -1,0 +1,31 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.LiquidationTurnDTO
+
+@Html.Hidden("id_liquidationTurn", Model.id)
+@Html.Hidden("enabled", ((bool)ViewBag.enabled))
+@{
+	var id_liquidationTurn = Model.id;
+}
+@*@Html.Hidden("id_machineProdOpening", Model.id_machineProdOpening)*@
+
+@Html.DevExpress().PageControl(settings =>
+{
+	settings.Name = "pcFeatures";
+	settings.Width = Unit.Percentage(100);
+	settings.Height = Unit.Pixel(400);
+	settings.ActiveTabIndex = 1;
+	settings.TabPages.Add("Documento").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabDocumentEdit'>" +
+			@Html.Partial("_TabDocumentEdit", Model)
+			+ "</div>");
+	});
+	settings.TabPages.Add("Detalles").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabDetailsEdit'>" +
+			@Html.Partial("_TabDetailsEdit", Model)
+			+ "</div>");
+	});
+}).GetHtml()
+

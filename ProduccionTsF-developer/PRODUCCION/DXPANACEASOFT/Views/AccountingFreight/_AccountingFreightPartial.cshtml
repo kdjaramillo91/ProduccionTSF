@@ -1,0 +1,139 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+	var grid = Html.DevExpress().GridView<AccountingFreightResult>(settings =>
+	{
+		settings.Name = "gvAccountingFreight";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "AccountingFreight",
+			Action = "AccountingFreightPartial"
+		};
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		settings.CommandColumn.Visible = true;
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Width = Unit.Percentage(1);
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = false;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		//MASTER DETAILS
+		settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+		settings.SettingsDetail.ShowDetailRow = false;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView detailsGrid = s as MVCxGridView;
+			if (detailsGrid == null) return;
+
+			e.Properties["cpVisibleRowCount"] = detailsGrid.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(detailsGrid);
+		};
+
+		settings.Columns.Add(m => m.processPlantName, column =>
+		{
+			column.Caption = "Planta Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+		});
+
+		settings.Columns.Add(m => m.liquidationName, column =>
+		{
+			column.Caption = "Tipo Liquidación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+
+		});
+
+
+		settings.Columns.Add(m => m.isActive, column =>
+		{
+			column.Caption = "Activo";
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			column.Width = Unit.Percentage(5);
+		});
+
+
+
+		// COMMAND COLUMN
+
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+		commandColumn.ShowEditButton = false;
+		commandColumn.ShowDeleteButton = false;
+		commandColumn.Visible = true;
+		commandColumn.VisibleIndex = 14;
+		commandColumn.Caption = "Acciones";
+		commandColumn.Width = Unit.Percentage(3);
+
+		commandColumn.CustomButtons.Add(
+			new GridViewCommandColumnCustomButton
+			{
+				ID = "btnEditRow",
+				Text = "Editar"
+			}
+		);
+		settings.ClientSideEvents.CustomButtonClick = "GridViewlgvAccountingFreightCustomCommandButton_Click";
+		settings.Columns.Add(commandColumn);
+
+
+
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	String GetUserName(int id)
+	{
+		var user = DataProviderUser.UserById(id);
+		return user.username;
+	}
+}
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+}

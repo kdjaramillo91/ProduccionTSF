@@ -1,0 +1,33 @@
+﻿@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Document
+
+@{
+    Layout = null;
+
+    var document = (Model != null && Model.ElectronicDocument != null) ? Model.ElectronicDocument : new ElectronicDocument();
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>@{ ViewContext.Writer.Write(document.Document.number); }</title>
+        <script src="~/Content/plugins/syntaxhighlighter/scripts/shCore.js"></script>
+        <script src="~/Content/plugins/syntaxhighlighter/scripts/shBrushXml.js"></script>
+        <link href="~/Content/plugins/syntaxhighlighter/styles/shCore.css" rel="stylesheet" />
+        <link href="~/Content/plugins/syntaxhighlighter/styles/shThemeEclipse.css" rel="stylesheet" />
+        <script type="text/javascript">SyntaxHighlighter.all();</script>
+    </head>
+
+    <body style="background: white; font-family: Helvetica">
+        <h1>Xml del Documento: @{ ViewContext.Writer.Write(document.Document.DocumentType.name + " - " + document.Document.number); }</h1>
+        <hr/>
+        <pre class="brush: xml;">
+            @{
+                string text = (!string.IsNullOrEmpty(document.signedXml)) ? document.signedXml : document.xml;
+                ViewContext.Writer.Write(text);
+            }
+        </pre>
+    </body>
+</html>
+

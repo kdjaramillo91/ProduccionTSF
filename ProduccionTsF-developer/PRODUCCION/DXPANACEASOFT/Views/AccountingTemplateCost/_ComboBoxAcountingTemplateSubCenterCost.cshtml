@@ -1,0 +1,75 @@
+﻿
+@using DXPANACEASOFT.Models
+
+@model AccountLedger
+
+@{
+}
+@{
+	string idSubCostCenter;
+	string idCostCenter;
+	if (this.Model.id > 0)
+	{
+		idCostCenter = this.Model.nameCenterCost;
+		idSubCostCenter = this.Model.nameSubCenterCost;
+	}
+	else
+	{
+		idCostCenter = null;
+		idSubCostCenter = null;
+	}
+
+}
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = "nameSubCenterCost";
+		settings.Properties.ClientInstanceName = "nameSubCenterCost";
+		settings.Width = Unit.Percentage(92);
+
+		settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		settings.CallbackRouteValues = new { Controller = "AccountingTemplateCost", Action = "GetSubCenterCosts" };
+		settings.Properties.CallbackPageSize = 10;
+
+		settings.Properties.TextFormatString = "{0} - {1}";
+		settings.Properties.ValueField = "id";
+		settings.Properties.Columns.Clear();
+		settings.Properties.ValueType = typeof(string);
+		settings.Properties.Columns.Add("id", "Código", Unit.Percentage(20));
+		settings.Properties.Columns.Add("CDsSubProyecto", "Descripción", Unit.Percentage(70));
+		settings.Properties.ClientSideEvents.BeginCallback = "NameSubCenterCost_BeginCallback";
+		settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboSubCenterCostLedger_SelectedIndexChanged";
+		settings.Properties.ClientSideEvents.EndCallback = "NameSubCenterCost_EndCallback";
+		settings.Properties.ClientSideEvents.Init = "OnNameSubCenterCostInit";
+		settings.ItemTextCellPrepared = (sender, e) =>
+		{
+			e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+		};
+		//settings.Name = "nameSubCenterCost";
+
+		//var p = settings.Properties;
+
+		//p.ClientInstanceName = "nameSubCenterCost";
+		//p.ValueField = "id";
+		////p.TextField = "CDsSubProyecto";
+		//p.ValueType = typeof(string);
+		//p.DisplayFormatString = "{0} - {1}";
+		//p.Columns.Add("id", "Código", Unit.Percentage(15));
+		//p.Columns.Add("CDsSubProyecto", "Descripción", Unit.Percentage(70));
+		//p.DropDownStyle = DropDownStyle.DropDownList;
+		//p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		//p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		//p.ClientSideEvents.SelectedIndexChanged = "ComboSubCenterCostLedger_SelectedIndexChanged";
+		//p.ClientSideEvents.Init = "OnNameSubCenterCostInit";
+
+		//settings.Width = Unit.Percentage(92);
+
+		//settings.ItemTextCellPrepared = (sender, e) =>
+		//{
+		//	e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+		//};
+	}).BindList(DataProviderAccountingTemplate.AccountingTemplateSubCenterCost(idCostCenter)).Bind(idSubCostCenter).GetHtml()

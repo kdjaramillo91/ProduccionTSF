@@ -1,0 +1,70 @@
+﻿@using DXPANACEASOFT.Models
+
+@model AccountLedger
+
+@{
+}
+@{
+	string idAuxiliary;
+	if (this.Model.id > 0)
+	{
+		idAuxiliary = this.Model.id_auxiliary;
+	}
+	else
+	{
+		idAuxiliary = null;
+	}
+
+}
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+	settings.Name = "id_auxiliary";
+	settings.Properties.ClientInstanceName = "id_auxiliary";
+	settings.Width = Unit.Percentage(92);
+
+	settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+	settings.CallbackRouteValues = new { Controller = "AccountingTemplateCost", Action = "GetNameAuxiliar" };
+	settings.Properties.CallbackPageSize = 10;
+
+	settings.Properties.DisplayFormatString = "{0} - {1}";
+	settings.Properties.ValueField = "id";
+	//settings.Properties.TextField = "name";
+	settings.Properties.ValueType = typeof(string);
+	settings.Properties.Columns.Add("id", "Código", Unit.Percentage(15));
+	settings.Properties.Columns.Add("name", "Descripción", Unit.Percentage(70));
+	settings.Properties.ClientSideEvents.BeginCallback = "OnNameAuxiliar_BeginCallback";
+	settings.Properties.ClientSideEvents.EndCallback = "OnNameAuxiliar_EndCallback";
+	settings.Properties.ClientSideEvents.Init = "OnNameAuxiliarInit";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboAuxiliarLedger_SelectedIndexChanged";
+	settings.ItemTextCellPrepared = (sender, e) =>
+	{
+		e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+	};
+		@*settings.Name = "nameAuxiliar";
+
+		var p = settings.Properties;
+
+		p.ClientInstanceName = "nameAuxiliar";
+		p.ValueField = "id";
+		p.TextField = "name";
+		p.ValueType = typeof(string);
+
+		p.DropDownStyle = DropDownStyle.DropDownList;
+		p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		p.ClientSideEvents.SelectedIndexChanged = "ComboAuxiliarLedger_SelectedIndexChanged";
+		p.ClientSideEvents.Init = "OnNameAuxiliarInit";
+
+		settings.Width = Unit.Percentage(92);
+
+		settings.ItemTextCellPrepared = (sender, e) =>
+		{
+			e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+		};*@
+	}).BindList(DataProviderAccountingTemplate.AccountingTemplateAuxiliarByTypeAuxiliar(Model.typeAuxiliar)).Bind(idAuxiliary).GetHtml()

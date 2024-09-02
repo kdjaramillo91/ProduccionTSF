@@ -1,0 +1,720 @@
+﻿@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using Utilitarios.Logs
+
+@model List<DXPANACEASOFT.Models.InvoiceDetail>
+
+@{
+	var _esManual = (ViewBag.IsManual == null)?true: ViewBag.IsManual;
+
+	var documentState = (ViewBag.id_documentState != null && ViewBag.id_documentState != 0)
+		? DataProviderDocumentState.DocumentStateById(ViewBag.id_documentState)
+		: DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+	var _ControlState = DataProviderControlState.ControlStateByDocumentByStateByControl("07", documentState.code, "gvInvoiceDetail");
+	var cpDocumentOrigen = ViewBag.DocumentOrigen;
+	var puedeModificarInfoProforma = DataProviderSetting.SettingByCode("MODINFP").value == "SI";
+	bool movimiento = this.ViewBag.movimiento ?? false;
+	var m = this.Model;
+	var a = 0;
+
+	string tabCodePriceDiscount = string.Empty;
+	if (_esManual)
+	{
+		tabCodePriceDiscount = "function(s,e){ unitPrice.Focus(); }";
+	}
+	else
+	{
+		tabCodePriceDiscount = "function(s,e){ discount.Focus(); }";
+	}
+}
+
+@{
+	var grid = Html.DevExpress().GridView<InvoiceDetail>(settings =>
+	{
+	settings.Name = "gvInvoiceDetail";
+	settings.CallbackRouteValues = new { Controller = "InvoiceExterior", Action = "InvoiceExteriorDetail" };
+
+	settings.ClientSideEvents.Init = "InvoiceExteriorDetail_OnGridViewInit";
+	settings.ClientSideEvents.BeginCallback = "InvoiceExteriorDetail_OnBeginCallback";
+	settings.ClientSideEvents.EndCallback = "InvoiceExteriorDetail_OnEndCallback";
+	settings.ClientSideEvents.SelectionChanged = "InvoiceExteriorDetail_OnSelectionChanged";
+
+	settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "InvoiceExterior", Action = "InvoiceExteriorDetailAddNew" };
+	settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InvoiceExterior", Action = "InvoiceExteriorDetailUpdate" };
+	settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "InvoiceExterior", Action = "InvoiceExteriorDetailDelete" };
+	settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+	settings.SettingsEditing.EditFormColumnCount = 4;
+
+	settings.Width = Unit.Percentage(100);
+
+	settings.CommandColumn.Visible = !_ControlState.isReadOnly;
+	settings.CommandColumn.ShowSelectCheckbox = !_ControlState.isReadOnly;
+	settings.CommandColumn.SelectAllCheckboxMode = _ControlState.isReadOnly
+		? GridViewSelectAllCheckBoxMode.None : GridViewSelectAllCheckBoxMode.Page;
+
+	settings.KeyFieldName = "id";
+
+	settings.Settings.ShowGroupPanel = false;
+	settings.Settings.ShowFilterRow = false;
+	settings.SettingsPager.Visible = true;
+	settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+	settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+	settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+	settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+	settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+	settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+	settings.InitNewRow = (s, e) =>
+	{
+		int? id_tariffHeadingDefault = 0;
+
+		TariffHeading tariffHeading = DataProviderTariffHeading.TariffHeadingDefault();
+
+		if (tariffHeading != null)
+		{
+			id_tariffHeadingDefault = tariffHeading.id;
+		}
+
+		e.NewValues["id_tariffHeadingDetail"] = id_tariffHeadingDefault;
+		e.NewValues["numBoxes"] = 0;
+		e.NewValues["amount"] = 0.00M;
+		e.NewValues["id_amountInvoice"] = 0.00M;
+		e.NewValues["unitPrice"] = 0.00M;
+		e.NewValues["discount"] = 0.00M;
+		e.NewValues["totalPriceWithoutTax"] = 0.00M;
+
+	};
+
+	// Item Display
+	settings.Columns.Add(column =>
+	{
+		column.FieldName = "id_item";
+		column.Name = "id_item";
+		column.Caption = "Nombre del Producto";
+		column.ColumnType = MVCxGridViewColumnType.ComboBox;
+		column.VisibleIndex = 1;
+		column.EditFormSettings.ColumnSpan = 4;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			int id_item = (int)DataBinder.Eval(c.DataItem, "id_item");
+			Item item = DataProviderItem.Item(id_item);
+			if (item != null) ViewContext.Writer.Write(item.description);
+		});
+
+		column.EditorProperties().ComboBox(p =>
+		{
+
+			List<int> _id_items = (List<int>)TempData["id_Items"];
+			p.CallbackRouteValues = new { Controller = "InvoiceExterior", Action = "LoadItemCombobox" };
+			p.DataSource = ViewBag.DocumentOrigen != null ? null : DataProviderItem.SalesItemsByCompany((int?)ViewData["id_company"], _id_items);
+			p.ClientInstanceName = "id_item";
+			p.ValueField = "id";
+			p.TextFormatString = "{0} | {1}";
+			p.ValueType = typeof(int);
+			column.VisibleIndex = 1;
+			p.CallbackPageSize = 20;
+			p.Width = Unit.Percentage(100);
+			p.DropDownStyle = DropDownStyle.DropDownList;
+			p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			p.Columns.Add("masterCode", "Código", 80);//, Unit.Percentage(50));
+			p.Columns.Add("name", "Nombre del Producto", 300);//, Unit.Percentage(70));
+															  //p.Columns.Add("barCode", "EAN", Unit.Percentage(50));
+			p.Columns.Add("auxCode", "Cod.Aux.", 160);//, Unit.Percentage(50));
+			p.Columns.Add("Presentation.MetricUnit.code", "U.M.", 50);//, Unit.Percentage(20));
+			p.Columns.Add("description2", "Descripcion", 0);//, Unit.Percentage(20));
+
+
+			p.ClientSideEvents.Init = "ItemCombo_OnInit";
+			//p.ClientSideEvents.DropDown = "ItemCombo_DropDown";
+			p.ClientSideEvents.SelectedIndexChanged = "ItemCombo_SelectedIndexChanged";
+			p.ClientSideEvents.BeginCallback = "ItemCombo_OnBeginCallback";
+			p.ClientSideEvents.EndCallback = "ItemCombo_OnEndCallback";
+			p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+			p.ClientSideEvents.Validation = "function (s, e) {e.isValid = (e.value != null ); e.errorText = 'Debe elegir un Item';}";
+		});
+	});
+
+	// Master Code Display
+	settings.Columns.Add(r => r.masterCode, column =>
+	{
+
+		column.Name = "masterCode";
+		column.Caption = "Código";
+		column.ReadOnly = true;
+		column.ColumnType = MVCxGridViewColumnType.TextBox;
+		column.PropertiesEdit.ClientInstanceName = "masterCode";
+		column.EditFormSettings.ColumnSpan = 3;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			int id_item = (int)DataBinder.Eval(c.DataItem, "id_item");
+			Item item = DataProviderItem.Item(id_item);
+			if (item != null) ViewContext.Writer.Write(item.masterCode);
+		});
+
+
+		column.EditorProperties().TextBox(p =>
+		{
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "masterCode";
+			p.ClientSideEvents.Init = "DevInvoiceDetail_masterCode_Init";
+		});
+
+	});
+
+	// description2
+	settings.Columns.Add(r => r.Item.description2, column =>
+	{
+
+
+		column.Name = "description2";
+		column.Caption = "Descripción";
+		column.Visible = false;
+		column.ReadOnly = true;
+		column.ColumnType = MVCxGridViewColumnType.TextBox;
+		column.PropertiesEdit.ClientInstanceName = "description2";
+		column.VisibleIndex = 2;
+		column.EditFormSettings.ColumnSpan = 3;
+		column.EditFormSettings.Visible = DefaultBoolean.True;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			int id_item = (int)DataBinder.Eval(c.DataItem, "id_item");
+			Item item = DataProviderItem.Item(id_item);
+			if (item != null) ViewContext.Writer.Write(item.description2);
+		});
+
+		column.EditorProperties().TextBox(p =>
+		{
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "description2";
+			p.ClientSideEvents.Init = "DevInvoiceDetail_description2_Init";
+		});
+
+	});
+
+	// Aux Code Display
+	settings.Columns.Add(r => r.descriptionAuxCode, column =>
+	{
+		column.Name = "auxCode";
+		column.Caption = "Código Aux.";
+		column.ReadOnly = true;
+		column.ColumnType = MVCxGridViewColumnType.TextBox;
+		column.PropertiesEdit.ClientInstanceName = "auxCode";
+		column.VisibleIndex = 4;
+
+		column.EditorProperties().TextBox(p =>
+		{
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "auxCode";
+			p.ClientSideEvents.Init = "DevInvoiceDetail_auxCode_Init";
+		});
+	});
+
+	// total cajas Display
+
+	settings.Columns.Add(r => r.numBoxes, column =>
+	{
+		column.FieldName = "numBoxes";
+
+		column.Caption = "Cartones";
+		column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		column.ReadOnly = (puedeModificarInfoProforma) ? true : false;
+		column.VisibleIndex = 5;
+		column.EditFormSettings.ColumnSpan = 2;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			int numBoxes = (int)DataBinder.Eval(c.DataItem, "numBoxes");
+			ViewContext.Writer.Write(numBoxes.ToString("N0"));
+		});
+
+		column.EditorProperties().SpinEdit(p =>
+		{
+			p.Width = Unit.Percentage(90);
+			p.ClientInstanceName = "numBoxes";
+			p.DisplayFormatString = "N0";
+			p.DisplayFormatInEditMode = true;
+			p.DecimalPlaces = 0;
+			p.SpinButtons.ShowIncrementButtons = true;
+			p.SpinButtons.ShowLargeIncrementButtons = false;
+			p.MaxValue = ViewBag.DocumentOrigen != null ? 99990 : 99999; //Buscar el valor pendiente de la proforma
+			p.MinValue = 1;
+			p.AllowNull = false;
+			p.NumberType = SpinEditNumberType.Integer;
+			p.NumberFormat = SpinEditNumberFormat.Custom;
+			p.ClientSideEvents.ValueChanged = "numBoxesValueChanged";
+			p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+			p.ClientSideEvents.Validation = "function (s, e) {e.isValid = (e.value > 0 ); e.errorText = 'Valor debe ser mayor a 0';}";
+
+
+		});
+	});
+
+	// cantidad display
+	settings.Columns.Add(r => r.amountDisplay, column =>
+	{
+		column.FieldName = "amountDisplay";
+		column.Caption = "Cantidad Origen";
+		column.ColumnType = MVCxGridViewColumnType.TextBox;
+		column.ReadOnly = true;
+		column.VisibleIndex = 6;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			Decimal _amount = (Decimal)DataBinder.Eval(c.DataItem, "amount");
+			int _id_metricUnit = (int)DataBinder.Eval(c.DataItem, "id_metricUnit");
+			String codeMetricUnit = DataProviderMetricUnit.MetricUnitById(_id_metricUnit).code;
+			ViewContext.Writer.Write(_amount.ToString("N2") + " " + codeMetricUnit);
+		});
+
+		column.EditorProperties().TextBox(p =>
+		{
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "amountDisplay";
+			p.ClientSideEvents.Init = "DevInvoiceDetail_amountDisplay_Init";
+
+		});
+	});
+
+	// cantidad Unidad Medida Factura Display
+	settings.Columns.Add(r => r.amountInvoiceDisplay, column =>
+	{
+		column.FieldName = "amountInvoiceDisplay";
+		column.Caption = "Cantidad Factura";
+		column.ColumnType = MVCxGridViewColumnType.TextBox;
+		column.ReadOnly = true;
+		column.VisibleIndex = 7;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			Decimal _id_amountInvoice = (Decimal)DataBinder.Eval(c.DataItem, "id_amountInvoice");
+			int _id_metricUnitItem = (int)DataBinder.Eval(c.DataItem, "id_metricUnit");
+			String codeMetricUnitItem = DataProviderMetricUnit.MetricUnitById(_id_metricUnitItem).code;
+			int _id_metricUnitInvoiceDetail = (int)DataBinder.Eval(c.DataItem, "id_metricUnitInvoiceDetail");
+
+			String codeMetricUnittInvoiceDetail = codeMetricUnitItem;
+
+			if (_id_metricUnitInvoiceDetail != 999)
+			{
+				codeMetricUnittInvoiceDetail = DataProviderMetricUnit.MetricUnitById(_id_metricUnitInvoiceDetail).code;
+			}
+
+			ViewContext.Writer.Write(_id_amountInvoice.ToString("N2") + " " + codeMetricUnittInvoiceDetail);
+		});
+
+		column.EditorProperties().TextBox(p =>
+		{
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "amountInvoiceDisplay";
+			p.ClientSideEvents.Init = "DevInvoiceDetail_amountInvoiceDisplay_Init";
+		});
+
+	});
+
+	// Peso Proforma
+	settings.Columns.Add(r => r.proformaWeight, column =>
+	{
+		column.FieldName = "proformaWeight";
+		column.Caption = "Peso Proforma";
+		column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		column.VisibleIndex = 8;
+		//column.Visible = false;
+
+		column.ReadOnly = ViewBag.DocumentOrigen != null;
+		//column.ReadOnly = true;
+
+		var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+		SpinEdit.NumberType = SpinEditNumberType.Float;
+		SpinEdit.NumberFormat = SpinEditNumberFormat.Number;
+		SpinEdit.DisplayFormatString = "N4";
+		SpinEdit.DecimalPlaces = 4;
+
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			decimal proformaWeight = (decimal)DataBinder.Eval(c.DataItem, "proformaWeight");
+			ViewContext.Writer.Write(proformaWeight.ToString("N4"));
+		});
+
+		column.EditorProperties().SpinEdit(p =>
+		{
+			p.Width = Unit.Percentage(90);
+			p.ClientInstanceName = "proformaWeight";
+			p.DisplayFormatString = "N4";
+			//p.DisplayFormatInEditMode = true;
+			p.DecimalPlaces = 6;
+			p.MaxValue = 99999;
+			p.MinValue = 0;
+			p.NumberType = SpinEditNumberType.Float;
+			p.NumberFormat = SpinEditNumberFormat.Number;
+			p.AllowNull = false;
+			p.ClientSideEvents.Init = "DevInvoiceDetail_proformaWeight_Init";
+			if(ViewBag.DocumentOrigen == null)
+				p.ClientSideEvents.ValueChanged = "proformaWeightValueChanged";
+		});
+	});
+
+	// Cantidad Proforma
+	settings.Columns.Add(r => r.amountProformaDisplay, column =>
+	{
+		column.FieldName = "amountProformaDisplay";
+		column.Caption = "Cantidad Total Proforma";
+		column.ColumnType = MVCxGridViewColumnType.TextBox;
+		column.ReadOnly = true;
+		column.VisibleIndex = 8;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			Decimal _amount = (Decimal)DataBinder.Eval(c.DataItem, "amountproforma");
+			int _id_metricUnit = (int)DataBinder.Eval(c.DataItem, "id_metricUnit");
+			String codeMetricUnit = DataProviderMetricUnit.MetricUnitById(_id_metricUnit).code;
+			if (ViewBag.DocumentOrigen != null)
+			{
+				ViewContext.Writer.Write(_amount.ToString("N2") + " " + codeMetricUnit);
+			}
+			else
+			{
+				int numBoxes = (int)DataBinder.Eval(c.DataItem, "numBoxes");
+				decimal proformaWeight = (decimal)DataBinder.Eval(c.DataItem, "proformaWeight");
+				decimal _amountProforma = numBoxes * proformaWeight;
+				ViewContext.Writer.Write(_amountProforma.ToString("N2") + " " + codeMetricUnit);
+			}
+		});
+
+		column.EditorProperties().TextBox(p =>
+		{
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "amountProformaDisplay";
+			p.ClientSideEvents.Init = "DevInvoiceDetail_amountProformaDisplay_Init";
+		});
+	});
+
+	// Precion Unitario Display Proforma
+	settings.Columns.Add(r => r.unitPriceProforma, column =>
+	{
+		column.FieldName = "unitPriceProforma";
+		column.Caption = "Precio Proforma";
+		column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		column.VisibleIndex = 8;
+
+		column.ReadOnly = ViewBag.DocumentOrigen != null;
+		//column.ReadOnly = true;
+
+		var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+		SpinEdit.NumberType = SpinEditNumberType.Float;
+		SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+		SpinEdit.DisplayFormatString = "C6";
+		SpinEdit.DecimalPlaces = 4;
+
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			decimal unitPriceProforma = (decimal)DataBinder.Eval(c.DataItem, "unitPriceProforma");
+			ViewContext.Writer.Write(unitPriceProforma.ToString("C6"));
+		});
+
+		column.EditorProperties().SpinEdit(p =>
+		{
+			p.Width = Unit.Percentage(90);
+			p.ClientInstanceName = "unitPriceProforma";
+			p.DisplayFormatString = "C6";
+			//p.DisplayFormatInEditMode = true;
+			p.DecimalPlaces = 6;
+			p.MaxValue = 99999;
+			p.MinValue = 0;
+			p.NumberType = SpinEditNumberType.Float;
+			p.NumberFormat = SpinEditNumberFormat.Currency;
+			p.AllowNull = false;
+			p.ClientSideEvents.Init = "DevInvoiceDetail_unitPriceProforma_Init";
+			//p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode. ;
+
+			//p.ClientSideEvents.GotFocus = "GenericSelectAllText";
+			p.ClientSideEvents.ValueChanged = "unitPriceProformaValueChanged";
+			//p.ClientSideEvents.Validation = "function (s, e) {e.isValid = (e.value > 0 ); e.errorText = 'Valor debe ser mayor a 0';}";
+		});
+	});
+
+	//Total Proforma
+	settings.Columns.Add(r => r.totalProforma, column =>
+	{
+		column.FieldName = "totalProforma";
+		column.Caption = "Total Proforma";
+		column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		column.VisibleIndex = 8;
+
+		//column.ReadOnly = ViewBag.DocumentOrigen != null;
+		column.ReadOnly = true;
+
+		var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+		SpinEdit.NumberType = SpinEditNumberType.Float;
+		SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+		SpinEdit.DisplayFormatString = "C2";
+		SpinEdit.DecimalPlaces = 4;
+
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			decimal totalProforma = (decimal)DataBinder.Eval(c.DataItem, "totalProforma");
+			ViewContext.Writer.Write(totalProforma.ToString("C2"));
+		});
+
+		column.EditorProperties().SpinEdit(p =>
+		{
+			p.Width = Unit.Percentage(90);
+			p.ClientInstanceName = "totalProforma";
+			p.DisplayFormatString = "C2";
+			//p.DisplayFormatInEditMode = true;
+			p.DecimalPlaces = 2;
+			p.MaxValue = 99999;
+			p.MinValue = 0;
+			p.NumberType = SpinEditNumberType.Float;
+			p.NumberFormat = SpinEditNumberFormat.Currency;
+			p.AllowNull = false;
+			p.ClientSideEvents.Init = "DevInvoiceDetail_totalProforma_Init";
+
+			//p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode. ;
+
+			//p.ClientSideEvents.GotFocus = "GenericSelectAllText";
+			//p.ClientSideEvents.ValueChanged = "unitPriceValueChanged";
+			//p.ClientSideEvents.Validation = "function (s, e) {e.isValid = (e.value > 0 ); e.errorText = 'Valor debe ser mayor a 0';}";
+		});
+	});
+
+	// UNIUTPRICE
+	// Precion Unitario Display
+	settings.Columns.Add(r => r.unitPrice, column =>
+	{
+		column.FieldName = "unitPrice";
+		column.Caption = "Precio";
+		column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		column.VisibleIndex = 9;
+
+		column.ReadOnly = ViewBag.DocumentOrigen != null;
+
+		var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+		SpinEdit.NumberType = SpinEditNumberType.Float;
+		SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+		SpinEdit.DisplayFormatString = "C6";
+		SpinEdit.DecimalPlaces = 4;
+
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			decimal unitPrice = (decimal)DataBinder.Eval(c.DataItem, "unitPrice");
+			ViewContext.Writer.Write(unitPrice.ToString("C6"));
+		});
+
+		column.EditorProperties().SpinEdit(p =>
+		{
+			p.Width = Unit.Percentage(90);
+			p.ClientInstanceName = "unitPrice";
+			p.DisplayFormatString = "C6";
+			//p.DisplayFormatInEditMode = true;
+			p.DecimalPlaces = 6;
+			p.MaxValue = 99999;
+			p.MinValue = 0;
+			p.NumberType = SpinEditNumberType.Float;
+			p.NumberFormat = SpinEditNumberFormat.Currency;
+			p.AllowNull = false;
+			//p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode. ;
+			p.ClientSideEvents.Init = "DevInvoiceDetail_unitPrice_Init";
+
+			p.ClientSideEvents.GotFocus = "GenericSelectAllText";
+			p.ClientSideEvents.ValueChanged = "unitPriceValueChanged";
+			p.ClientSideEvents.Validation =  "function (s, e) {e.isValid = (e.value > 0 ); e.errorText = 'Valor debe ser mayor a 0';}";
+		});
+	});
+
+	// Descuento Display
+	settings.Columns.Add(r => r.discount, column =>
+	{
+		column.FieldName = "discount";
+		column.Caption = "Descuento";
+		column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		column.VisibleIndex = 10;
+		column.ReadOnly = (puedeModificarInfoProforma) ? true : false;
+
+		//column.ReadOnly = ViewBag.DocumentOrigen != null;
+
+		var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+		SpinEdit.NumberType = SpinEditNumberType.Float;
+		SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+		SpinEdit.DisplayFormatString = "C2";
+		SpinEdit.DecimalPlaces = 2;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			decimal discount = (decimal)DataBinder.Eval(c.DataItem, "discount");
+			ViewContext.Writer.Write(discount.ToString("C2"));
+
+		});
+
+		column.EditorProperties().SpinEdit(p =>
+		{
+
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "discount";
+			p.DisplayFormatString = "C2";
+			//p.DisplayFormatInEditMode = true;
+			p.DecimalPlaces = 2;
+			p.SpinButtons.ShowIncrementButtons = true;
+			p.SpinButtons.ShowLargeIncrementButtons = false;
+			/*p.Increment = 0.01M;
+			p.LargeIncrement = 1.0M;*/
+			p.MaxValue = 99999999;
+			p.MinValue = 0;
+			p.AllowNull = false;
+			//p.MaxValue = 100;
+			p.NumberType = SpinEditNumberType.Float;
+			p.NumberFormat = SpinEditNumberFormat.Currency;
+			p.ClientSideEvents.GotFocus = "GenericSelectAllText";
+			p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			p.ClientSideEvents.ValueChanged = "unitPriceValueChanged";
+			//p.ClientSideEvents.ValueChanged = "Price_ValueChanged";
+			p.ClientSideEvents.Validation = "discountValidation";
+			//p.ClientSideEvents.LostFocus = "function(s,e){ id_tariffHeadingDetail.Focus(); }";
+
+
+		});
+	});
+
+	// Valor Total Display
+	settings.Columns.Add(r => r.totalPriceWithoutTax, column =>
+	{
+		column.FieldName = "totalPriceWithoutTax";
+		column.Caption = "Total";
+		column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+		column.ReadOnly = true;
+		column.VisibleIndex = 11;
+
+		var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+		SpinEdit.NumberType = SpinEditNumberType.Float;
+		SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+		SpinEdit.DisplayFormatString = "C2";
+		SpinEdit.DecimalPlaces = 2;
+
+		column.SetDataItemTemplateContent(c =>
+		{
+			decimal totalPriceWithoutTax = (decimal)DataBinder.Eval(c.DataItem, "totalPriceWithoutTax");
+			ViewContext.Writer.Write(totalPriceWithoutTax.ToString("C2"));
+		});
+
+		column.EditorProperties().SpinEdit(p =>
+		{
+			p.Width = Unit.Percentage(100);
+			p.ClientInstanceName = "totalPriceWithoutTax";
+			p.DisplayFormatString = "C2";
+			p.DecimalPlaces = 2;
+			p.SpinButtons.ShowIncrementButtons = false;
+			p.NumberType = SpinEditNumberType.Float;
+			p.NumberFormat = SpinEditNumberFormat.Currency;
+			p.ClientSideEvents.Init = "DevInvoiceDetail_totalPriceWithoutTax_Init";
+			//p.ClientSideEvents.LostFocus = "function(s,e){ id_tariffHeadingDetail.Focus(); }";
+
+
+		});
+
+	});
+
+	// Partida Arancelaria Detalle
+	settings.Columns.Add(column =>
+	{
+		column.FieldName = "id_tariffHeadingDetail";
+		column.Name = "id_tariffHeadingDetail";
+		column.Caption = "Partida Arancelaria(Item)";
+		column.ColumnType = MVCxGridViewColumnType.ComboBox;
+		column.VisibleIndex = 12;
+		column.Visible = false;
+		column.EditFormSettings.Visible = DefaultBoolean.True;
+
+		column.EditorProperties().ComboBox(p =>
+		{
+			column.SetDataItemTemplateContent(c =>
+			{
+				string tariffHeadingDescription = "";
+				int? id_tariffHeadingDetail = (int?)DataBinder.Eval(c.DataItem, "id_tariffHeadingDetail");
+				if (id_tariffHeadingDetail != null)
+				{
+					TariffHeading _tariffHeading = DataProviderTariffHeading.TariffHeadingById(id_tariffHeadingDetail);
+					if (_tariffHeading != null)
+					{
+
+						tariffHeadingDescription = _tariffHeading.code + " - " + _tariffHeading.nombre;
+					}
+				}
+
+				ViewContext.Writer.Write(tariffHeadingDescription);
+			});
+
+			p.DataSource = DataProviderTariffHeading.TariffHeadingAll();
+			//p.DataSource = DataProviderItem.SalesItemsByCompany((int?)ViewData["id_company"]);
+			p.ClientInstanceName = "id_tariffHeadingDetail";
+			p.ValueField = "id";
+			p.TextFormatString = "{1}";
+			p.ValueType = typeof(int);
+
+			p.Width = Unit.Percentage(100);
+			p.DropDownStyle = DropDownStyle.DropDownList;
+			p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			p.Columns.Add("code", "Código", 110);
+			p.Columns.Add("nombre", "Nombre", 160);
+			//p.ClientSideEvents.SelectedIndexChanged = "tariffHeadingDetail_SelectedIndexChanged";
+
+			p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+			p.ClientSideEvents.Validation = "function (s, e) {e.isValid = (e.value != null && e.value != undefined); e.errorText = 'Debe elegir una Partida arancelaria';}";
+		});
+	});
+
+		if(!movimiento)
+		{
+			var commandColumn = new MVCxGridViewCommandColumn
+			{
+				ShowEditButton = true,
+				ShowDeleteButton = !_ControlState.isReadOnly,
+				ShowCancelButton = true,
+				ShowUpdateButton = true,
+
+				VisibleIndex = 14,
+				Caption = "Acciones",
+				Width = Unit.Percentage(2)
+			};
+			commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			if (!_ControlState.isReadOnly) settings.Columns.Add(commandColumn);
+		}
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpDocumentOrigen"] = cpDocumentOrigen;
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpSelectedRowCount"] = gv.Selection;
+
+			e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null)
+				? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+			if (ViewData["EditMessage"] != null)
+			{
+				e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+			}
+			List<InvoiceDetail> rows = (Model as List<InvoiceDetail>);
+			rows = (rows != null) ? rows.ToList() : new List<InvoiceDetail>();
+			e.Properties["cpRowsCount"] = rows.Count;
+		};
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()

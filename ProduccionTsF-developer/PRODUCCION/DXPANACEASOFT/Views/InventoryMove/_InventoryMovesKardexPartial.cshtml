@@ -1,0 +1,284 @@
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<InventoryMoveDetail>(settings => {
+        settings.Name = "gvInventoryMoveDetails";
+        settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesKardexPartial" };
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesPartialAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesPartialUpdate" };
+        //settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = false;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        #region SearchPanel
+
+        //Panel de Busqueda
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        #endregion
+
+        settings.Settings.ShowFooter = true;
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""UnSelectRows();"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView detailsGrid = s as MVCxGridView;
+            if (detailsGrid == null) return;
+
+            e.Properties["cpVisibleRowCount"] = detailsGrid.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(detailsGrid);
+        };
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        //settings.SettingsDetail.ShowDetailRow = true;
+
+        //settings.SetDetailRowTemplateContent(column =>
+        //{
+        //    int? id_inventoryMove = (int?)DataBinder.Eval(column.DataItem, "id");
+
+        //    InventoryMove inventoryMove = DataProviderInventoryMove.InventoryMove(id_inventoryMove);
+
+        //    Html.RenderPartial("_InventoryMoveDetailPartial", inventoryMove);
+        //});
+
+        settings.Columns.Add(m => m.InventoryMove.Document.number, column =>
+        {
+            column.Name = "number";
+            column.Caption = "No. Movimiento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+        });
+
+        settings.Columns.Add(m => m.InventoryMove.Document.DocumentType.name, column =>
+        {
+            column.Name = "documentType";
+            column.Caption = "Tipo de Movimiento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.InventoryMove.Document.emissionDate, column =>
+        {
+            column.Name = "emissionDate";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(8);
+        });
+
+        settings.Columns.Add(m => m.id_item, column =>
+        {
+            column.Name = "masterCode";
+            column.Caption = "Código";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int id_item = (int)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+
+                string text = (item != null) ? item.masterCode : "";
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.InventoryMove.InventoryEntryMove.Warehouse.name, column =>
+        {
+            column.Name = "warehouseEntry";
+            column.Caption = "Bodega Entrada";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.InventoryMove.InventoryEntryMove.WarehouseLocation.name, column =>
+        {
+            column.Name = "warehouseLocationEntry";
+            column.Caption = "Ubicación Entrada";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.InventoryMove.InventoryExitMove.Warehouse.name, column =>
+        {
+            column.Name = "warehouseExit";
+            column.Caption = "Bodega Salida";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.InventoryMove.InventoryExitMove.WarehouseLocation.name, column =>
+        {
+            column.Name = "warehouseLocationExit";
+            column.Caption = "Ubicación Salida";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.balance, column =>
+        {
+            column.Name = "previousBalance";
+            column.Caption = "Saldo Anterior";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.Width = Unit.Percentage(3);
+
+            //string code = (string)ViewData["code"];
+            //column.Visible = (ViewData["code"].Equals("05") || ViewData["code"].Equals("06"));
+        });
+
+        settings.Columns.Add(m => m.entryAmount, column =>
+        {
+            column.Name = "entryAmount";
+            column.Caption = "Ingreso";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.Width = Unit.Percentage(3);
+
+        });
+        settings.Columns.Add(m => m.exitAmount, column =>
+        {
+            column.Name = "exitAmount";
+            column.Caption = "Egreso";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.Width = Unit.Percentage(3);
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "balance";
+            column.Caption = "Saldo";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal previousBalance = (decimal)DataBinder.Eval(c.DataItem, "previousBalance");
+                decimal entryAmount = (decimal)DataBinder.Eval(c.DataItem, "entryAmount");
+                decimal exitAmount = (decimal)DataBinder.Eval(c.DataItem, "exitAmount");
+
+                decimal balance = previousBalance + entryAmount - exitAmount;
+
+                string text = balance.ToString();
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+        //settings.Columns.Add(m => m.InventoryMove.InventoryEntryMove.Employee.Person.fullname_businessName, column =>
+        //{
+        //    column.Name = "reciever";
+        //    column.Caption = "Recibido Por";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //});
+
+
+
+        //settings.Columns.Add(m => m.InventoryMove.InventoryExitMove.Employee.Person.fullname_businessName, column =>
+        //{
+        //    column.Name = "dispacher";
+        //    column.Caption = "Despachado Por";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //});
+
+        //settings.Columns.Add(m => m.InventoryMove.Document.DocumentState.name, column =>
+        //{
+        //    column.Name = "documentState";
+        //    column.Caption = "Estado";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //    column.Width = Unit.Percentage(10);
+        //    column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        //});
+
+        //settings.FormatConditions.AddHighlight("Document.DocumentState.name", "[Document.DocumentState.name] == 'PENDIENTE'", GridConditionHighlightFormat.YellowFillWithDarkYellowText);
+        //settings.FormatConditions.AddHighlight("Document.DocumentState.name", "[Document.DocumentState.name] == 'APROBADA'", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+        //settings.FormatConditions.AddHighlight("Document.DocumentState.name", "[Document.DocumentState.name] == 'AUTORIZADA'", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+        //settings.FormatConditions.AddHighlight("Document.DocumentState.name", "[Document.DocumentState.name] == 'ANULADA'", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+
+
+        //Botones de comandos para registros de la tabla
+        //MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+        //commandColumn.ShowEditButton = false;
+        //commandColumn.ShowDeleteButton = false;
+        //commandColumn.ShowCancelButton = false;
+        //commandColumn.ShowUpdateButton = false;
+        //commandColumn.Visible = true;
+        //commandColumn.VisibleIndex = 14;
+        //commandColumn.Caption = "Acciones";
+        //commandColumn.Width = Unit.Percentage(8);
+
+        //commandColumn.CustomButtons.Add(
+        //    new GridViewCommandColumnCustomButton
+        //    {
+        //        ID = "btnEditMove",
+        //        Text = "Editar"
+        //    }
+        //);
+        //settings.ClientSideEvents.CustomButtonClick = "OnClickEditInventoryMove";
+        //settings.Columns.Add(commandColumn);
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

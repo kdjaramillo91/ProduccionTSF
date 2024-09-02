@@ -1,0 +1,35 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+
+@{
+    int? idNatureMove = ViewBag.idNatureMove;
+ }
+
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "id_inventoryReason";
+    settings.Properties.ClientInstanceName = "id_inventoryReason";
+    settings.Width = Unit.Percentage(112);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.CallbackRouteValues = new { Controller = "Kardex", Action = "GetInventoryReason"};
+    settings.Properties.CallbackPageSize = 10;
+
+    settings.Properties.NullDisplayText = "Todas";
+    settings.Properties.NullText = "Todas";
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.ShowModelErrors = true;
+    settings.Properties.ClientSideEvents.Init = "OnInventoryReasonInit";
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_NatureMove'] = idNatureMove.GetValue(); }";
+
+}).BindList(DataProviderInventoryMove.GetInventoryReasons(idNatureMove)).GetHtml()

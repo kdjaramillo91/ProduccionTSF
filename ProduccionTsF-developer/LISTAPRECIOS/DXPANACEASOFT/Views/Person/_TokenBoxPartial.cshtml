@@ -1,0 +1,22 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model List<DXPANACEASOFT.Models.Rol>
+
+@Html.DevExpress().TokenBox(t =>
+{
+    t.Name = "id_roles";
+    t.Properties.ClientInstanceName = "id_roles";
+    t.Width = Unit.Percentage(100);
+    t.Properties.ValueField = "id";
+    t.Properties.TextField = "name";
+    t.Properties.ItemValueType = typeof(int);
+    t.Properties.AllowCustomTokens = false;
+    if(Model != null)
+    {
+        t.Properties.Tokens.AddRange(Model.Select(r => r.name).ToList());
+    }
+    t.ShowModelErrors = true;
+    t.Properties.ClientSideEvents.Validation = "OnRolValidation";
+    t.Properties.ClientSideEvents.TokensChanged = "RolTokenBox_TokensChanged";
+
+}).BindList(DataProviderRol.Rol()).GetHtml()

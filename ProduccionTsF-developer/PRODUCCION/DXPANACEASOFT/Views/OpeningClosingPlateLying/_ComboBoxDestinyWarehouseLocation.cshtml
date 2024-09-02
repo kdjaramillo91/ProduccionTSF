@@ -1,0 +1,37 @@
+﻿@model IList<WarehouseLocation>
+@{
+	var habModificacionUbiDestino = DataProviderSetting.SettingByCode("MODUNTP").value == "SI";
+	var modelo = Model ?? new WarehouseLocation[] { };
+	var id_DestinyWarehouseLocation = (int?)ViewBag.id_DestinyWarehouseLocation;
+	var enabled = !((bool)ViewBag.enabled);
+}
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = "ComboBoxDestinyWarehouseLocation";
+		settings.Width = Unit.Percentage(100);
+		settings.CallbackRouteValues = new
+		{
+			Controller = "OpeningClosingPlateLying",
+			Action = "ComboBoxDestinyWarehouseLocation",
+		};
+
+		settings.ClientVisible = habModificacionUbiDestino;
+		settings.Properties.ClientInstanceName = "ComboBoxDestinyWarehouseLocation";
+		settings.Properties.CallbackPageSize = 15;
+		settings.Properties.TextField = "name";
+		settings.Properties.ValueField = "id";
+		settings.Properties.ValueType = typeof(int);
+		settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxDestinyWarehouseLocation_BeginCallback";
+		settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxDestinyWarehouseLocation_SelectedIndexChanged";
+		settings.ReadOnly = enabled;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			e.Properties["cpHabModificacionUbiDestino"] = habModificacionUbiDestino;
+			e.Properties["cpEnabled"] = enabled;
+		};
+
+	}).BindList(modelo).Bind(id_DestinyWarehouseLocation).GetHtml()
+

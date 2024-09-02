@@ -1,0 +1,27 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.ClosingMachinesTurnDTO
+
+@Html.Hidden("id_closingMachinesTurn", Model.id)
+@Html.Hidden("enabled", ((bool)ViewBag.enabled))
+@*@Html.Hidden("id_machineProdOpening", Model.id_machineProdOpening)*@
+
+@Html.DevExpress().PageControl(settings =>
+{
+    settings.Name = "pcFeatures";
+    settings.Width = Unit.Percentage(100);
+    settings.Height = Unit.Pixel(400);
+    settings.TabPages.Add("Documento").SetContent(() =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='divTabDocumentEdit'>" +
+            @Html.Partial("_TabDocumentEdit", Model)
+            + "</div>");
+    });
+    settings.TabPages.Add("Detalles").SetContent(() =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='divTabDetailsEdit'>" +
+            @Html.Partial("_TabDetailsEdit", Model)
+            + "</div>");
+    });
+}).GetHtml()
+

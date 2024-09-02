@@ -1,0 +1,114 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.AccountingFreightResult
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterAccountingFreight", name = "formFilterAccountingFreight" }))
+{
+	<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+		<tr>
+			<td style="width: 40%">
+				<table id="mainAccountingFreight" class="table table-condenced" style="margin: 0px;">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td style="width: 8%;">
+							@Html.DevExpress().LabelFor(m => m.id_processPlant, settings =>
+									{
+										settings.Text = "Planta Proceso:";
+										settings.AssociatedControlName = "id_processPlant";
+									}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBox(settings =>
+					   {
+						   settings.Name = "id_processPlant";
+						   settings.Properties.ClientInstanceName = "id_processPlant";
+						   settings.Width = Unit.Percentage(100);
+						   settings.Properties.ValueField = "id";
+						   settings.Properties.TextField = "processPlant";
+						   settings.Properties.ValueType = typeof(int);
+						   settings.Properties.Width = Unit.Percentage(50);
+						   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+						   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+						   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnProcessPlantSelectedIndexChanged";
+						   settings.ShowModelErrors = true;
+
+					   }).BindList(DataProviderPerson.GetPersonProcesPlant()).Bind(Model.id_processPlant).GetHtml()
+						</td>
+						<td style="width: 8%;">
+							@Html.DevExpress().LabelFor(m => m.liquidation_type, settings =>
+							{
+								settings.Text = "Tipo Liquidación:";
+								settings.AssociatedControlName = "liquidation_type";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBox(settings =>
+					   {
+						   settings.Name = "liquidation_type";
+						   settings.Properties.ClientInstanceName = "liquidation_type";
+						   settings.Width = Unit.Percentage(100);
+						   settings.Properties.ValueField = "id";
+						   settings.Properties.TextField = "name";
+						   settings.Properties.ValueType = typeof(string);
+						   settings.Properties.Width = Unit.Percentage(50);
+						   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+						   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+						   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnLiquidationTypeSelectedIndexChanged";
+						   settings.ShowModelErrors = true;
+
+					   }).BindList(DataProviderAccountingFreight.GetLiquidationType()).Bind(Model.liquidation_type).GetHtml()
+						</td>
+					</tr>
+
+				</table>
+			</td>
+			<td style="width: 15%">
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td>
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "btnSearch";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Buscar";
+								settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "btnSearch_click";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "Clear";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Limpiar";
+								settings.Images.Image.IconID = IconID.ActionsClear16x16;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "btnClear_click";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="btn-group" style="width: 100%;">
+								<button type="button" class="btn-default custom-button" onclick="AddNewDocument()" aria-haspopup="true" aria-expanded="false">
+									<img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nueva</span>
+								</button>
+
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+}

@@ -1,0 +1,142 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "gvRol";
+        settings.CallbackRouteValues = new { Controller = "Rol", Action = "RolesPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Rol", Action = "RolesPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Rol", Action = "RolesPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Rol", Action = "RolesPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Editar Tipo de Rol";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 700;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            //column.Width = Unit.Percentage(10);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientSideEvents.Validation = "OnRoleValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "description";
+            column.Caption = "Descripción";
+            //column.Width = Unit.Percentage(10);
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+        commandColumn.ShowEditButton = true;
+        commandColumn.ShowDeleteButton = false;
+        commandColumn.Visible = true;
+        commandColumn.VisibleIndex = 10;
+        commandColumn.Caption = "Acciones";// "<a href=\"javascript:;\" class=\"dxbButton_Metropolis dxgvCommandColumnItem_Metropolis dxgv__cci dxbButtonSys\" onclick = \"gvItems.AddNewRow();\" ><span>Nuevo</span></a>";
+        commandColumn.CustomButtons.Add(
+          new GridViewCommandColumnCustomButton
+          {
+              ID = "btnDeleteRow",
+              Text = "Eliminar"
+          }
+      );
+        settings.ClientSideEvents.CustomButtonClick = "GridViewItemsCustomCommandButton_Click";
+
+        settings.Columns.Add(commandColumn);
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SetDetailRowTemplateContent(column =>
+        {
+            var idCompany = DataBinder.Eval(column.DataItem, "id");
+            ViewData["id_company"] = idCompany;
+
+            int idRol = (int)DataBinder.Eval(column.DataItem, "id");
+            Rol roles = DataProviderRol.Rol(idRol);
+            Html.RenderAction("RolDetailPartial", new { rol = roles });
+        });
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+<script src="~/Scripts/rol/validation.js"></script>

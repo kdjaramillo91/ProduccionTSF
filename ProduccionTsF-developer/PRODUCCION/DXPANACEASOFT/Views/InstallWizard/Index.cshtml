@@ -1,0 +1,168 @@
+﻿
+@model DXPANACEASOFT.Models.InstallWizard
+
+<div style="margin: 0 10%; min-height: 600px;">
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "formInstallWizard", name = "formInstallWizard" }))
+    {
+        <div class="center">
+            <h1>
+                @*<i class="ace-icon fa fa-leaf fa-2x orange"></i>*@
+                <img src="~/Content/image/panacea-logo.png" /><br />
+                <span class="orange">Panaceasoft</span>
+                @*<span class="white" id="id-text2">Producci&oacute;n</span>*@
+            </h1>
+            @*<h4 class="blue" id="id-company-text">&copy; Company Name</h4>*@
+        </div>
+
+        <div class="space-6"></div>
+
+        <div class="widget-box">
+            <div class="widget-header widget-header-blue widget-header-flat">
+                <h4 class="widget-title lighter">Solicitud de Nuevo Registro</h4>
+            </div>
+
+            <div class="widget-body">
+                <div id="installWizard" class="widget-main">
+                    <div id="fuelux-wizard-container" class="no-steps-container">
+                        <div>
+                            <ul class="steps" style="margin-left: 0">
+                                <li data-step="1" class="active">
+                                    <span class="step">1</span>
+                                    <span class="title">Bienvenida</span>
+                                </li>
+
+                                <li data-step="2">
+                                    <span class="step">2</span>
+                                    <span class="title">Compa&ntilde;&iacute;a</span>
+                                </li>
+
+                                <li data-step="3">
+                                    <span class="step">3</span>
+                                    <span class="title">Estructura</span>
+                                </li>
+
+                                <li data-step="4">
+                                    <span class="step">4</span>
+                                    <span class="title">Seguridad</span>
+                                </li>
+
+                                <li data-step="5">
+                                    <span class="step">5</span>
+                                    <span class="title">Validaci&oacute;n</span>
+                                </li>
+
+                                <li data-step="6">
+                                    <span class="step">6</span>
+                                    <span class="title">Confirmaci&oacute;n</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <hr style="margin-bottom: 0px;"/>
+
+                        <div class="step-content pos-rel">
+                            <div class="step-pane active" data-step="1">
+                                @{
+                                    Html.RenderPartial("_Welcome");
+                                }
+                            </div>
+
+                            <div class="step-pane" data-step="2">
+                                @{
+                                    Html.RenderPartial("_Company");
+                                }
+                            </div>
+
+                            <div class="step-pane" data-step="3">
+                                @{
+                                    Html.RenderPartial("_Structure");
+                                }
+                            </div>
+
+                            <div class="step-pane" data-step="4">
+                                @{
+                                    Html.RenderPartial("_Security");
+                                }
+                            </div>
+
+                            <div class="step-pane" data-step="5">
+                                @{
+                                    Html.RenderPartial("_Validation");
+                                }
+                            </div>
+                            <div id="confirmation" class="step-pane" data-step="6">
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="wizard-actions">
+                        @Html.DevExpress().Button(btn =>
+                        {
+                            btn.Name = "btnPrev";
+                            btn.Text = "Anterior";
+                            btn.ImagePosition = ImagePosition.Left;
+                            btn.Images.Image.IconID = IconID.ArrowsPrev16x16;
+                            btn.ClientEnabled = false;
+                            btn.UseSubmitBehavior = false;
+                            btn.ClientSideEvents.Click = "BtnPrev_Click";
+                        }).GetHtml()
+
+                        @Html.DevExpress().Button(btn =>
+                        {
+                            btn.Name = "btnNext";
+                            btn.Text = "Siguiente";
+                            btn.ImagePosition = ImagePosition.Right;
+                            btn.Images.Image.IconID = IconID.ArrowsNext16x16;
+                            btn.UseSubmitBehavior = false;
+                            btn.ClientSideEvents.Click = "BtnNext_Click";
+                        }).GetHtml()
+
+                        @Html.DevExpress().Button(btn =>
+                        {
+                            btn.Name = "btnFinish";
+                            btn.Text = "Finalizar";
+                            btn.ImagePosition = ImagePosition.Left;
+                            btn.Images.Image.IconID = IconID.ContentCheckbox16x16office2013;
+                            btn.ClientEnabled = false;
+                            btn.UseSubmitBehavior = false;
+                            btn.ClientSideEvents.Click = "BtnFinish_Click";
+                        }).GetHtml()
+
+                        @Html.DevExpress().Button(btn =>
+                        {
+                            btn.Name = "btnCancel";
+                            btn.Text = "Cancelar";
+                            btn.ImagePosition = ImagePosition.Left;
+                            btn.Images.Image.IconID = IconID.ActionsCancel16x16;
+                            btn.UseSubmitBehavior = false;
+                            btn.ClientSideEvents.Click = "BtnCancel_Click";
+                        }).GetHtml()
+                    </div>
+                </div><!-- /.widget-main -->
+            </div><!-- /.widget-body -->
+        </div>
+
+        <br />
+        <div class="center">
+            <span>
+                Powered by <span class="blue bolder">o5 Software Solutions</span>
+            </span>
+        </div>
+    }
+</div>
+
+@Html.DevExpress().LoadingPanel(
+        settings =>
+        {
+            settings.Name = "LoadingPanel";
+            settings.Modal = true;
+            settings.ContainerElementID = "installWizard";
+        }
+    ).GetHtml()
+
+<script src="~/Scripts/assets/js/fuelux.wizard.min.js"></script>
+<script src="~/Scripts/installwizard/index.js"></script>
+<script src="~/Scripts/installwizard/validation.js"></script>
+

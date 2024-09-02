@@ -1,0 +1,38 @@
+﻿@model List<DXPANACEASOFT.Models.ResultReceptionDispatchMaterial>
+
+@{
+    Layout = null;
+}
+<h4>Liquidaci&oacute;n de Materiales, Fletes e Insumos </h4>
+
+<div id="search_option" class="widget-box">
+    <div class="widget-header">
+        <h6 class="widget-title">Criterios de B&uacute;squeda</h6>
+        <span class="widget-toolbar">
+            @*<a href="#" data-action="reload">*@
+            <a href="#" id="btnAdvancedFilter">
+                @*<i class="ace-icon fa fa-refresh"></i>*@
+                <i class="ace-icon fa fa-filter"></i>
+            </a>
+            <a href="#" id="btnCollapsePendiente" data-action="collapse">
+                <i id="filterFormIcon" class="ace-icon fa fa-chevron-up"></i>
+            </a>
+        </span>
+    </div>
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnAsignarLiquidacion";
+    settings.Text = "Asignar Liquidación";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "AsignarLiquidacion";
+}).GetHtml()
+
+@Html.Partial("_GridViewReceptionMaterialApproved", Model)
+
+
+<script src="~/Scripts/liquidation_material/reception_material_approved.js"></script>

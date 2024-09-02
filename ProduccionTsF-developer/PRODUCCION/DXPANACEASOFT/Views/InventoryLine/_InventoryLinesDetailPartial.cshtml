@@ -1,0 +1,114 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    InventoryLine inventoryLine = Model ?? new InventoryLine();
+}
+
+@Html.Hidden("id_inventoryLine", inventoryLine.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(inventoryLine.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(inventoryLine.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Secuencial:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(inventoryLine.sequential)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Maneja Kardex:
+            </strong>
+        </td>
+        <td colspan="4">
+            @{
+                string kardex = (inventoryLine.kardexControl == true) ? "Si" : "No";
+            }
+            @Html.Raw(kardex)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(inventoryLine.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(inventoryLine.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(inventoryLine.dateCreate)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(inventoryLine.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(inventoryLine.dateUpdate)
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@Html.Partial("_InventoryLineDetailItemTypesPartial", inventoryLine.ItemType.ToList())
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

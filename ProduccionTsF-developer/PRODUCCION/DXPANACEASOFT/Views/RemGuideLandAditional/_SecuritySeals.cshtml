@@ -1,0 +1,270 @@
+﻿@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.RemissionGuideSecuritySeal>
+
+@{
+    var grid = Html.DevExpress().GridView<RemissionGuideSecuritySeal>(settings =>
+    {
+        settings.Name = "gvSecuritySeals";
+        settings.CallbackRouteValues = new { Controller = "RemGuideLandAditional", Action = "RemissionGuideSecuritySealsPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "RemGuideLandAditional", Action = "RemissionGuideSecuritySealsPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "RemGuideLandAditional", Action = "RemissionGuideSecuritySealsPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "RemGuideLandAditional", Action = "RemissionGuideSecuritySealsPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.KeyFieldName = "number";
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<RemissionGuideSecuritySeal> rows = (Model as List<RemissionGuideSecuritySeal>);
+            rows = (rows != null) ? rows.Where(d => d.isActive).ToList() : new List<RemissionGuideSecuritySeal>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+
+            MVCxGridView gridView = (MVCxGridView)s;
+
+            if (gv.EditingRowVisibleIndex != -1)
+                e.Properties["cpEditingRowVisibleIndex"] = gv.EditingRowVisibleIndex;
+
+            if (gridView.EditingRowVisibleIndex != -1)
+            {
+
+                TempData["gvSecuritySealsNumber"] = gridView.GetRowValues(gridView.EditingRowVisibleIndex, "number");
+                TempData["gvSecuritySealsID"] = 0;
+            }
+
+        };
+
+
+
+
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfoSecurotySeals""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRowsSecuritySeals"" style=""cursor: pointer;"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelectionSecuritySeals"" style=""cursor: pointer;"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #region Columns
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ID";
+            column.Name = "ID";
+
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Visible = false;
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "ID";
+            });
+
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                TempData["gvSecuritySealsID"] = (int?)DataBinder.Eval(c.DataItem, "ID");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "number";
+            column.Name = "number";
+            column.Caption = "No. Sello";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "number";
+                p.ClientSideEvents.Validation = "OnSecuritySealNumberValidation";
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_travelType";
+            column.Caption = "Viaje";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_travelType";
+                p.DataSource = DataProviderTravelType.TravelTypes();
+
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.CallbackPageSize = 30;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                p.ClientSideEvents.Init = "InitSecuritySealTravelType";
+                p.ClientSideEvents.Validation = "OnSecuritySealTravelTypeValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_exitState";
+            column.Name = "id_exitState";
+            column.Caption = "Estado de Salida";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                if (TempData["gvSecuritySealsID"] !=null && (int)TempData["gvSecuritySealsID"]  ==0 && TempData["gvSecuritySealsNumber"] !="")
+                {
+
+                    RemissionGuide remissionGuide = (TempData["remissionGuide"] as RemissionGuide);
+                    if(remissionGuide !=null && remissionGuide.RemissionGuideSecuritySeal !=null)
+                    {
+                        var id = (from e in remissionGuide.RemissionGuideSecuritySeal
+                                  where e.number == (string)TempData["gvSecuritySealsNumber"]
+                                  select e.id).FirstOrDefault();
+                        TempData["gvSecuritySealsID"] = id;/// (int?)DataBinder.Eval(c.DataItem, "ID");
+                        TempData.Keep("gvSecuritySealsID");
+
+                    }
+                }
+                int? id_exitState = (int?)DataBinder.Eval(c.DataItem, "id_exitState");
+
+                SecuritySealState state = DataProviderSecuritySealState.SecuritySealStateById(id_exitState);
+                if (state != null)
+                {
+                    ViewContext.Writer.Write(state.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_exitState";
+                p.DataSource = DataProviderSecuritySealState.SecuritySealStates((int)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 30;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnSecuritySealExitStateValidation";
+
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_arrivalState";
+            column.Name = "id_arrivalState";
+            column.Caption = "Estado de Llegada";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+
+
+                int? id_arrivalState = (int?)DataBinder.Eval(c.DataItem, "id_arrivalState");
+
+                SecuritySealState state = DataProviderSecuritySealState.SecuritySealStateById(id_arrivalState);
+                if (state != null)
+                {
+                    ViewContext.Writer.Write(state.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_arrivalState";
+                p.DataSource = DataProviderSecuritySealState.SecuritySealStates((int)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 30;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnSecuritySealArrivalStateValidation";
+
+            });
+        });
+
+        #endregion
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 13,
+            Caption = "Acciones",
+            Width = Unit.Percentage(5)
+        };
+
+        settings.Columns.Add(commandColumn);
+    });
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("number"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

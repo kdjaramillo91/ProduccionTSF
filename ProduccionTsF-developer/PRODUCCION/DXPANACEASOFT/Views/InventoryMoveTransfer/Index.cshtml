@@ -1,0 +1,38 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    InventoryMove inventoryMove = Model;
+
+    string natureMoveTmp = (string)ViewData["_natureMove"];
+    if (!string.IsNullOrEmpty(natureMoveTmp))
+    {
+        if (natureMoveTmp.Equals("I"))
+        {
+            <h4>Movimientos de Ingresos por Transferencia</h4>
+        }
+        else if (natureMoveTmp.Equals("E"))
+        {
+            <h4>Movimientos de Egresos por Transferencia</h4>
+        }
+    }
+    else
+    {
+        <h4>Movimientos de Inventarios</h4>
+    }
+
+}
+
+@{
+    ViewData["Model"] = inventoryMove;
+    ViewData["code"] = inventoryMove.Document.DocumentType.code;
+
+    Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_InventoryMoveFilterFormPartial");
+}
+
+<div id="results">
+
+</div>
+
+<script src="~/Scripts/inventorymovetransfer/index.js"></script>
+

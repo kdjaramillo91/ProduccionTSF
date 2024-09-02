@@ -1,0 +1,498 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="OrigenPersonaProduccion.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="code" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="id_company" Type="int" Nullable="false" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Employee">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id_department" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="IdentificationType">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="code" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="name" Type="varchar(max)" Nullable="false" />
+          <Property Name="codeSRI" Type="varchar" MaxLength="2" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="is_Active" Type="bit" Nullable="false" />
+          <Property Name="id_company" Type="int" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_personType" Type="int" Nullable="false" />
+          <Property Name="id_identificationType" Type="int" Nullable="false" />
+          <Property Name="identification_number" Type="varchar" MaxLength="20" />
+          <Property Name="fullname_businessName" Type="varchar(max)" />
+          <Property Name="photo" Type="image" />
+          <Property Name="address" Type="varchar(max)" />
+          <Property Name="email" Type="varchar(max)" />
+          <Property Name="id_company" Type="int" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+          <Property Name="codeCI" Type="varchar" MaxLength="8" />
+          <Property Name="bCC" Type="varchar(max)" />
+          <Property Name="tradeName" Type="varchar(max)" />
+          <Property Name="cellPhoneNumberPerson" Type="varchar" MaxLength="20" />
+          <Property Name="emailCC" Type="varchar" MaxLength="80" />
+        </EntityType>
+        <EntityType Name="PersonRol">
+          <Key>
+            <PropertyRef Name="id_person" />
+            <PropertyRef Name="id_rol" />
+          </Key>
+          <Property Name="id_person" Type="int" Nullable="false" />
+          <Property Name="id_rol" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PersonType">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="code" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="name" Type="varchar(max)" Nullable="false" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="id_company" Type="int" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Rol">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar(max)" Nullable="false" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="id_company" Type="int" Nullable="false" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__Person__id_ident__4F7CD00D">
+          <End Role="IdentificationType" Type="Self.IdentificationType" Multiplicity="1" />
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IdentificationType">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Person">
+              <PropertyRef Name="id_identificationType" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employee_Department">
+          <End Role="Department" Type="Self.Department" Multiplicity="1" />
+          <End Role="Employee" Type="Self.Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Department">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="id_department" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employee_Person">
+          <End Role="Person" Type="Self.Person" Multiplicity="1" />
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Person_PersonType">
+          <End Role="PersonType" Type="Self.PersonType" Multiplicity="1" />
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PersonType">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Person">
+              <PropertyRef Name="id_personType" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRol_Person">
+          <End Role="Person" Type="Self.Person" Multiplicity="1" />
+          <End Role="PersonRol" Type="Self.PersonRol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="PersonRol">
+              <PropertyRef Name="id_person" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRol_Rol">
+          <End Role="Rol" Type="Self.Rol" Multiplicity="1" />
+          <End Role="PersonRol" Type="Self.PersonRol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Rol">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="PersonRol">
+              <PropertyRef Name="id_rol" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="OrigenPersonaProduccionStoreContainer">
+          <EntitySet Name="Department" EntityType="Self.Department" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Employee" EntityType="Self.Employee" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="IdentificationType" EntityType="Self.IdentificationType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Person" EntityType="Self.Person" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PersonRol" EntityType="Self.PersonRol" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PersonType" EntityType="Self.PersonType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Rol" EntityType="Self.Rol" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Person__id_ident__4F7CD00D" Association="Self.FK__Person__id_ident__4F7CD00D">
+            <End Role="IdentificationType" EntitySet="IdentificationType" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employee_Department" Association="Self.FK_Employee_Department">
+            <End Role="Department" EntitySet="Department" />
+            <End Role="Employee" EntitySet="Employee" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employee_Person" Association="Self.FK_Employee_Person">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="Employee" EntitySet="Employee" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Person_PersonType" Association="Self.FK_Person_PersonType">
+            <End Role="PersonType" EntitySet="PersonType" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRol_Person" Association="Self.FK_PersonRol_Person">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="PersonRol" EntitySet="PersonRol" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRol_Rol" Association="Self.FK_PersonRol_Rol">
+            <End Role="Rol" EntitySet="Rol" />
+            <End Role="PersonRol" EntitySet="PersonRol" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="OrigenPersonaProduccion" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="id_company" Type="Int32" Nullable="false" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Person" Relationship="Self.Employee" FromRole="Department" ToRole="Person" />
+        </EntityType>
+        <EntityType Name="IdentificationType">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="code" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="codeSRI" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="is_Active" Type="Boolean" Nullable="false" />
+          <Property Name="id_company" Type="Int32" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Person" Relationship="Self.FK__Person__id_ident__4F7CD00D" FromRole="IdentificationType" ToRole="Person" />
+        </EntityType>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_personType" Type="Int32" Nullable="false" />
+          <Property Name="id_identificationType" Type="Int32" Nullable="false" />
+          <Property Name="identification_number" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="fullname_businessName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="photo" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="address" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="email" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="id_company" Type="Int32" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="codeCI" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="bCC" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="tradeName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="cellPhoneNumberPerson" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="emailCC" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="IdentificationType" Relationship="Self.FK__Person__id_ident__4F7CD00D" FromRole="Person" ToRole="IdentificationType" />
+          <NavigationProperty Name="PersonType" Relationship="Self.FK_Person_PersonType" FromRole="Person" ToRole="PersonType" />
+          <NavigationProperty Name="Department" Relationship="Self.Employee" FromRole="Person" ToRole="Department" />
+          <NavigationProperty Name="Rol" Relationship="Self.PersonRol" FromRole="Person" ToRole="Rol" />
+        </EntityType>
+        <EntityType Name="PersonType">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="code" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <Property Name="id_company" Type="Int32" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Person" Relationship="Self.FK_Person_PersonType" FromRole="PersonType" ToRole="Person" />
+        </EntityType>
+        <EntityType Name="Rol">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="id_company" Type="Int32" Nullable="false" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Person" Relationship="Self.PersonRol" FromRole="Rol" ToRole="Person" />
+        </EntityType>
+        <Association Name="FK__Person__id_ident__4F7CD00D">
+          <End Role="IdentificationType" Type="Self.IdentificationType" Multiplicity="1" />
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IdentificationType">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Person">
+              <PropertyRef Name="id_identificationType" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Person_PersonType">
+          <End Role="PersonType" Type="Self.PersonType" Multiplicity="1" />
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PersonType">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Person">
+              <PropertyRef Name="id_personType" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Employee">
+          <End Role="Department" Type="Self.Department" Multiplicity="0..1" />
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
+        </Association>
+        <Association Name="PersonRol">
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
+          <End Role="Rol" Type="Self.Rol" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="DBContextoPersonaProduccion" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Department" EntityType="Self.Department" />
+          <EntitySet Name="IdentificationType" EntityType="Self.IdentificationType" />
+          <EntitySet Name="Person" EntityType="Self.Person" />
+          <EntitySet Name="PersonType" EntityType="Self.PersonType" />
+          <EntitySet Name="Rol" EntityType="Self.Rol" />
+          <AssociationSet Name="FK__Person__id_ident__4F7CD00D" Association="Self.FK__Person__id_ident__4F7CD00D">
+            <End Role="IdentificationType" EntitySet="IdentificationType" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Person_PersonType" Association="Self.FK_Person_PersonType">
+            <End Role="PersonType" EntitySet="PersonType" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+          <AssociationSet Name="Employee" Association="Self.Employee">
+            <End Role="Department" EntitySet="Department" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+          <AssociationSet Name="PersonRol" Association="Self.PersonRol">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="Rol" EntitySet="Rol" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="OrigenPersonaProduccionStoreContainer" CdmEntityContainer="DBContextoPersonaProduccion">
+          <EntitySetMapping Name="Department">
+            <EntityTypeMapping TypeName="OrigenPersonaProduccion.Department">
+              <MappingFragment StoreEntitySet="Department">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="id_company" ColumnName="id_company" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IdentificationType">
+            <EntityTypeMapping TypeName="OrigenPersonaProduccion.IdentificationType">
+              <MappingFragment StoreEntitySet="IdentificationType">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="codeSRI" ColumnName="codeSRI" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="is_Active" ColumnName="is_Active" />
+                <ScalarProperty Name="id_company" ColumnName="id_company" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Person">
+            <EntityTypeMapping TypeName="OrigenPersonaProduccion.Person">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="id_personType" ColumnName="id_personType" />
+                <ScalarProperty Name="id_identificationType" ColumnName="id_identificationType" />
+                <ScalarProperty Name="identification_number" ColumnName="identification_number" />
+                <ScalarProperty Name="fullname_businessName" ColumnName="fullname_businessName" />
+                <ScalarProperty Name="photo" ColumnName="photo" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="id_company" ColumnName="id_company" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+                <ScalarProperty Name="codeCI" ColumnName="codeCI" />
+                <ScalarProperty Name="bCC" ColumnName="bCC" />
+                <ScalarProperty Name="tradeName" ColumnName="tradeName" />
+                <ScalarProperty Name="cellPhoneNumberPerson" ColumnName="cellPhoneNumberPerson" />
+                <ScalarProperty Name="emailCC" ColumnName="emailCC" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PersonType">
+            <EntityTypeMapping TypeName="OrigenPersonaProduccion.PersonType">
+              <MappingFragment StoreEntitySet="PersonType">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="id_company" ColumnName="id_company" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Rol">
+            <EntityTypeMapping TypeName="OrigenPersonaProduccion.Rol">
+              <MappingFragment StoreEntitySet="Rol">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="id_company" ColumnName="id_company" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="Employee" TypeName="OrigenPersonaProduccion.Employee" StoreEntitySet="Employee">
+            <EndProperty Name="Department">
+              <ScalarProperty Name="id" ColumnName="id_department" />
+            </EndProperty>
+            <EndProperty Name="Person">
+              <ScalarProperty Name="id" ColumnName="id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="PersonRol" TypeName="OrigenPersonaProduccion.PersonRol" StoreEntitySet="PersonRol">
+            <EndProperty Name="Person">
+              <ScalarProperty Name="id" ColumnName="id_person" />
+            </EndProperty>
+            <EndProperty Name="Rol">
+              <ScalarProperty Name="id" ColumnName="id_rol" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

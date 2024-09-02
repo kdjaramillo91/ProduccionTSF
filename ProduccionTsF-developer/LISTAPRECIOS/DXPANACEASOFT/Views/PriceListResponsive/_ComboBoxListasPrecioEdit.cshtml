@@ -1,0 +1,26 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.PriceListDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.id_priceListBase, settings =>
+{
+    settings.Name = "ComboBoxListasPrecio";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Seleccionar...";
+    settings.CallbackRouteValues = new {
+        Controller = "PriceListResponsive",
+        Action = "ComboBoxListasPrecio",
+        From = "Edit",
+        enabled = ViewBag.enabled,
+        IsOwner = ViewBag.IsOwner
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxListasPrecio_Begin";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxListasPrecio_Change";
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !ViewBag.enabled || !ViewBag.IsOwner;
+}
+).BindList(ViewData["ListasPrecio"]).GetHtml()
+

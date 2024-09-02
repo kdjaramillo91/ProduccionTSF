@@ -1,0 +1,248 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.Models.DTOModel
+@using DXPANACEASOFT.Models
+
+@{
+	var grid = Html.DevExpress().GridView<PriceListDetailDTO>(settings =>
+	{
+		settings.Name = "GridViewPriceListDetails";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "PriceListResponsive",
+			Action = "GridViewPriceListDetails",
+			id_processtype = ViewBag.id_processtype,
+			isQuotation = ViewBag.isQuotation,
+			id_priceListBase = ViewBag.id_priceListBase,
+			enabled = ViewBag.enabled,
+			IsOwner = ViewBag.IsOwner,
+			code_processtype = ViewBag.code_processtype
+		};
+
+		settings.Enabled = ViewBag.enabled;
+
+		settings.KeyFieldName = "idItemSize";
+
+		settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+
+		settings.Settings.ShowGroupPanel = false;
+
+		settings.PreRender = (s, e) =>
+		{
+			MVCxGridView gridView = s as MVCxGridView;
+			if (gridView != null)
+				gridView.ExpandAll();
+		};
+
+		//settings.PreRender += (s, e) =>
+		//{
+		//	var gv = s as MVCxGridView;
+		//	if (ViewBag.isQuotation != null)
+		//	{
+		//		gv.DataColumns["basePrice"].Visible = (bool)ViewBag.isQuotation;
+		//		gv.DataColumns["commission"].Visible = (bool)ViewBag.isQuotation;
+		//		gv.DataColumns["pricePurchase"].Visible = (bool)ViewBag.isQuotation;
+		//		gv.DataColumns["distint"].Visible = (bool)ViewBag.isQuotation;
+		//	}
+		//};
+
+		settings.SettingsBehavior.AllowFixedGroups = true;
+
+		settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+		settings.Settings.VerticalScrollableHeight = 300;
+		settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+		settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+		settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+		settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+		settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+		settings.SettingsEditing.BatchEditSettings.ShowConfirmOnLosingChanges = false;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			var listPriceLists = (Model as List<PriceListDetailDTO>) ?? new List<PriceListDetailDTO>();
+			e.Properties["cpPriceListCount"] = listPriceLists.Count;
+			e.Properties["cpOrderClassShrimp"] = ViewBag.OrderClassShrimp;
+		};
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "idItemSize";
+			column.Name = "idItemSize";
+			column.Caption = "idItemSize";
+			column.Width = Unit.Percentage(0);
+			column.Settings.ShowEditorInBatchEditMode = false;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "commission";
+			column.Name = "commission";
+			column.Caption = "Comisión";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+			prop.ClientInstanceName = "commissionSpinEdit";
+			prop.MinValue = 0;
+			prop.MaxValue = 9999;
+			prop.DisplayFormatString = "n";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "nameClass";
+			column.Name = "nameClass";
+			column.Caption = "Calidad";
+			column.GroupIndex = 0;
+			column.Settings.ShowEditorInBatchEditMode = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "name";
+			column.Name = "name";
+			column.Caption = "Nombre";
+			column.Settings.ShowEditorInBatchEditMode = false;
+		});
+		int count = 0;
+		decimal priceLast = 0;
+		string codeLast = "";
+		List<ClassShrimp> aOrderClassShrimp = (List<ClassShrimp>)ViewBag.OrderClassShrimp;
+		foreach (var item in aOrderClassShrimp)
+		{
+			settings.Columns.Add(column =>
+			{
+				//column.FieldName = "price";
+				column.Name = item.code;
+				column.Caption = item.code;
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+				prop.MinValue = 0;
+				prop.MaxValue = 9999;
+				prop.DisplayFormatString = "n";
+
+				column.SetEditItemTemplateContent(c =>
+				{
+					List<PriceListClassShrimpDTO> aListPriceListClassShrimpDTO = (List<PriceListClassShrimpDTO>)DataBinder.Eval(c.DataItem, "ListPriceListClassShrimpDTO");
+					PriceListClassShrimpDTO aPriceListClassShrimpDTO = aListPriceListClassShrimpDTO.FirstOrDefault(fod=> fod.id_classShrimp == item.id);
+					priceLast = aPriceListClassShrimpDTO.price;
+
+					Html.DevExpress().SpinEdit(p =>
+					{
+						p.Name = item.code;
+						p.Properties.ClientInstanceName = item.code;
+
+						p.Width = Unit.Percentage(100);
+
+						//p.ReadOnly = true;
+						//p.ShowModelErrors = false;
+					}).Bind(aPriceListClassShrimpDTO.price).Render();
+				});
+			});
+			if (count > 0) {
+				var aDistint = codeLast + "-" + item.code;
+				settings.Columns.Add(column =>
+				{
+					//column.FieldName = "price";
+					column.Name = aDistint;
+					column.Caption = aDistint;
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+					prop.MinValue = 0;
+					prop.MaxValue = 9999;
+					prop.DisplayFormatString = "n";
+
+					column.SetEditItemTemplateContent(c =>
+					{
+						List<PriceListClassShrimpDTO> aListPriceListClassShrimpDTO = (List<PriceListClassShrimpDTO>)DataBinder.Eval(c.DataItem, "ListPriceListClassShrimpDTO");
+						PriceListClassShrimpDTO aPriceListClassShrimpDTO = aListPriceListClassShrimpDTO.FirstOrDefault(fod => fod.id_classShrimp == item.id);
+
+						Html.DevExpress().SpinEdit(p =>
+						{
+							p.Name = aDistint;
+							p.Properties.ClientInstanceName = aDistint;
+
+							p.Width = Unit.Percentage(100);
+
+							p.ReadOnly = true;
+							//p.ShowModelErrors = false;
+						}).Bind(priceLast - aPriceListClassShrimpDTO.price).Render();
+					});
+				});
+				settings.FormatConditions.AddHighlight(aDistint, "[" + aDistint + "] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+				settings.FormatConditions.AddHighlight(aDistint, "[" + aDistint + "] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+
+			}
+			count++;
+			codeLast = item.code;
+		}
+
+
+		//settings.Columns.Add(column =>
+		//{
+		//	column.FieldName = "commission";
+		//	column.Name = "commission";
+		//	column.Caption = "Comisión";
+		//	column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//	SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+		//	prop.ClientInstanceName = "commissionSpinEdit";
+		//	prop.MinValue = 0;
+		//	prop.MaxValue = 9999;
+		//	prop.DisplayFormatString = "n";
+		//});
+
+		//settings.Columns.Add(column =>
+		//{
+		//    column.FieldName = "pricePurchase";
+		//    column.Name = "pricePurchase";
+		//    column.Caption = "Precio Compra";
+		//    column.Settings.ShowEditorInBatchEditMode = false;
+		//    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+		//    prop.DisplayFormatString = "n";
+		//});
+
+		//settings.Columns.Add(column =>
+		//{
+		//    column.FieldName = "basePrice";
+		//    column.Name = "basePrice";
+		//    column.Caption = "Precio Referencial";
+		//    column.Settings.ShowEditorInBatchEditMode = false;
+		//    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+		//    prop.DisplayFormatString = "n";
+		//});
+
+		//settings.Columns.Add(column =>
+		//{
+		//    column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+		//    column.FieldName = "distint";
+		//    column.Name = "distint";
+		//    column.Caption = "Diferencia";
+		//    column.Settings.ShowEditorInBatchEditMode = false;
+		//    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+		//    prop.DisplayFormatString = "n";
+		//});
+
+		//settings.FormatConditions.AddHighlight("distint", "[distint] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+		//settings.FormatConditions.AddHighlight("distint", "[distint] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+
+	});
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+    }
+    @grid.Bind(Model).GetHtml()

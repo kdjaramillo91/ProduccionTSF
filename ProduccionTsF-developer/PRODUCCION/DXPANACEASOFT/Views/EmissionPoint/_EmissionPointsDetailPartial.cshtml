@@ -1,0 +1,98 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    EmissionPoint emissionPoint = Model ?? new EmissionPoint();
+}
+
+@Html.Hidden("id_emissionPoint", emissionPoint.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                Email:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(emissionPoint.email)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Direcci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(emissionPoint.address)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Tel&eacute;fono:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(emissionPoint.phoneNumber)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(emissionPoint.description)    
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(emissionPoint.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(emissionPoint.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(emissionPoint.id_userUpdate))
+        </td>
+        <td style="width: 13%;">
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(emissionPoint.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

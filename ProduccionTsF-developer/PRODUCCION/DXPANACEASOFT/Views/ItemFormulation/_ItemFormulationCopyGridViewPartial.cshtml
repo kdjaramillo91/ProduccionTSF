@@ -1,0 +1,203 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+	var puedeCopiar = (bool)this.ViewBag.PuedeCopiar;
+	var diccionarioCriterios = (Dictionary<string, object>)this.ViewBag.QueryCriteria;
+}
+@{
+	var grid = Html.DevExpress().GridView<Item>(settings =>
+	{
+		settings.Name = "gvProductosCopiar";
+
+		settings.SetDefaultQuerySettings();
+		settings.CallbackRouteValues = new { Controller = "ItemFormulation", Action = "query" };
+
+		settings.Width = Unit.Percentage(100);
+		settings.KeyFieldName = "id";
+
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		settings.CommandColumn.Width = Unit.Percentage(2);
+
+		settings.SettingsPopup.EditForm.Modal = true;
+		settings.SettingsPopup.EditForm.Width = 640;
+		settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+		settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		// Eventos JavaScript
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallBack";
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView itemGrid = s as MVCxGridView;
+			if (itemGrid == null) return;
+
+			e.Properties["cpVisibleRowCount"] = itemGrid.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(itemGrid);
+			e.Properties["cpPuedeCopiar"] = puedeCopiar;
+
+			if (ViewData["EditMessage"] != null)
+			{
+				e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+			}
+
+			foreach (var item in diccionarioCriterios)
+			{
+				string cpElement = "cp" + item.Key;
+				e.Properties[cpElement] = item.Value;
+			}
+		};
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Productos</span>");
+		});
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+					@"<a href=""javascript:;"" id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+			  <a href=""javascript:;"" id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""UnselectAllRows();"">Anular Selección.</a>"
+				);
+			}
+		});
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "masterCode";
+			column.Name = "masterCode";
+			column.Caption = "Código Principal";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "auxCode";
+			column.Name = "auxCode";
+			column.Caption = "Código Auxiliar";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "barCode";
+			column.Name = "barCode";
+			column.Caption = "Código de Barra";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "name";
+			column.Name = "name";
+			column.Caption = "Nombre";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "foreignName";
+			column.Name = "foreignName";
+			column.Caption = "Nombre Extranjero";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = false;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "description";
+			column.Name = "description";
+			column.Caption = "Descripción";
+			column.ColumnType = MVCxGridViewColumnType.Memo;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+			column.Visible = false;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_inventoryLine";
+			column.Name = "id_inventoryLine";
+			column.PropertiesEdit.ClientInstanceName = "id_inventoryLine";
+			column.Caption = "Línea de Inventario";
+			column.Width = Unit.Percentage(10);
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_inventoryLine = (int?)DataBinder.Eval(c.DataItem, "id_inventoryLine");
+				InventoryLine inventoryLine = DataProviderInventoryLine.InventoryLineById(id_inventoryLine);
+
+				string name = (inventoryLine != null) ? inventoryLine.name : "";
+				ViewContext.Writer.Write(name);
+			});
+			column.EditorProperties().ComboBox(comboBox =>
+			{
+				comboBox.DataSource = DataProviderInventoryLine.InventoryLineFilter((int)ViewData["id_company"]);
+				comboBox.ValueField = "id";
+				comboBox.TextField = "name";
+				comboBox.ValueType = typeof(int);
+
+				comboBox.DropDownStyle = DropDownStyle.DropDown;
+				comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "isActive";
+			column.Name = "isActive";
+			column.PropertiesEdit.ClientInstanceName = "isActive";
+			column.Caption = "¿Activo?";
+			column.Width = Unit.Percentage(3);
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+		});
+	});
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+}

@@ -1,0 +1,387 @@
+﻿
+@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.FrameworkContractItem
+@{
+    var code_documentState = (Model != null && Model.FrameworkContract != null && Model.FrameworkContract.Document != null) ? Model.FrameworkContract.Document.DocumentState.code : "";
+    var isSave = (Model != null && Model.FrameworkContractExtension != null && Model.FrameworkContractExtension.FirstOrDefault() != null) ? Model.FrameworkContractExtension.FirstOrDefault().isSave : (bool?)null;
+    var code_typeContractFramework = (Model != null && Model.FrameworkContract != null && Model.FrameworkContract.TypeContractFramework != null) ? Model.FrameworkContract.TypeContractFramework.code : "";
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditFrameworkContractItem", name = "formEditFrameworkContractItem" }))
+{
+    @Html.Hidden("id_frameworkContractItem", Model.id)
+    @Html.Hidden("createdFrameworkContractExtension", (Model.FrameworkContractExtension != null && Model.FrameworkContractExtension.Count > 0))
+
+    <table id="frameworkContractItemTable" class="table table-condensed" style="margin: 0; padding: 0">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Datos de Producto</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_item, settings =>
+           {
+               settings.Name = "itemLabel";
+               settings.Text = "Producto*:";
+               settings.AssociatedControlName = "item";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_item = (Model != null && Model.id_item != 0) ? Model.id_item : (int?)null;
+                }
+                @Html.DevExpress().ComboBox(settings =>
+           {
+               settings.Name = "id_itemFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "id_itemFrameworkContractItem";
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.TextFormatString = "{1}";
+
+               settings.Properties.Columns.Add("masterCode", "Cod.", 50);
+               settings.Properties.Columns.Add("name", "Nombre", 100);
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.ValueType = typeof(int);
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ReadOnly = (id_item != null || (code_documentState != "" && code_documentState != "01"));
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "FrameworkContractItemCombo_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Init = "OnItem_Init";
+               settings.Properties.ClientSideEvents.Validation = "OnItemValidation";
+
+           }).BindList(DataProviderItem.ItemsIsCurrent(id_item)).Bind(id_item).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.startDate, settings =>
+           {
+               settings.Text = "Fecha de Inicio*:";
+               settings.AssociatedControlName = "startDate";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.startDate, settings =>
+           {
+               settings.Name = "startDateFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "startDateFrameworkContractItem";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+               settings.ReadOnly = (code_documentState != "" && code_documentState != "01");//Pendiente
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnStartDateValidation";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.endDate, settings =>
+           {
+               settings.Text = "Fecha de Fin*:";
+               settings.AssociatedControlName = "endDate";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.endDate, settings =>
+           {
+               settings.Name = "endDateFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "endDateFrameworkContractItem";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ReadOnly = (code_documentState != "" && code_documentState != "01");//Pendiente
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnEndDateValidation";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.value, settings =>
+           {
+               settings.Text = "Valor*:";
+               settings.AssociatedControlName = "value";
+               settings.Name = "valueLabelFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "valueLabelFrameworkContractItem";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.value, settings =>
+           {
+               settings.Name = "valueFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "valueFrameworkContractItem";
+               settings.Width = Unit.Percentage(100);
+
+               //settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "C2";
+               //settings.Properties.MinValue = 0.01M;
+               //settings.Properties.MaxValue = 9999999999999.99M;
+               //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ReadOnly = (Model.FrameworkContractExtension != null && Model.FrameworkContractExtension.Count > 0) ||
+                                   (code_documentState != "" && code_documentState != "01");//Pendiente
+               settings.Properties.SpinButtons.Visible = false;
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Init = "OnValue_Init";
+               settings.Properties.ClientSideEvents.Validation = "OnValueValidation";
+               //settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.amout, settings =>
+           {
+               settings.Text = "Cantidad*:";
+               settings.AssociatedControlName = "amout";
+               settings.Name = "amoutLabelFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "amoutLabelFrameworkContractItem";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.amout, settings =>
+           {
+               settings.Name = "amoutFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "amoutFrameworkContractItem";
+               settings.Width = Unit.Percentage(100);
+
+               //settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "N2";
+               //settings.Properties.MinValue = 0.01M;
+               //settings.Properties.MaxValue = 9999999999999.99M;
+               //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ReadOnly = (Model.FrameworkContractExtension != null && Model.FrameworkContractExtension.Count > 0) ||
+                                   (code_documentState != "" && code_documentState != "01");//Pendiente
+               settings.Properties.SpinButtons.Visible = false;
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnAmoutValidation";
+               //settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_metricUnit, settings =>
+           {
+               settings.Name = "metricUnitLabel";
+               settings.Text = "UM*:";
+               settings.Name = "metricUnitFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "metricUnitFrameworkContractItem";
+               settings.AssociatedControlName = "id_metricUnit";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_metricUnit = (Model != null && Model.id_metricUnit != 0) ? Model.id_metricUnit : (int?)null;
+                }
+                @*@Html.Hidden("id_rolFrameworkContract", id_rol)*@
+                @Html.DevExpress().ComboBox(settings =>
+           {
+               settings.Name = "id_metricUnitFrameworkContractItem";
+               settings.Properties.ClientInstanceName = "id_metricUnitFrameworkContractItem";
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.TextFormatString = "{1}";
+
+               settings.Properties.Columns.Add("code", "Cod.", 50);
+               settings.Properties.Columns.Add("name", "Nombre", 100);
+
+               //settings.Properties.TextField = "code";
+               settings.Properties.ValueField = "id";
+               settings.Properties.ValueType = typeof(int);
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ReadOnly = (code_documentState != "" && code_documentState != "01");//Pendiente
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Init = "FrameworkContractRolCombo_Init";
+               //settings.Properties.ClientSideEvents.SelectedIndexChanged = "FrameworkContractMetricUnitCombo_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Validation = "OnMetricUnitValidation";
+
+           }).BindList(DataProviderMetricUnit.ListWithCurrent(id_metricUnit)).Bind(id_metricUnit).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                @Html.DevExpress().Button(settings =>
+           {
+               settings.Name = "btnAddFrameworkContract";//"btnUpdatePhase";
+               settings.Text = "Extender Contrato";
+               settings.RenderMode = ButtonRenderMode.Button;
+               settings.UseSubmitBehavior = false;
+               settings.ImagePosition = ImagePosition.Left;
+               settings.Images.Image.IconID = IconID.ActionsAdditem16x16;
+               settings.ValidateInvisibleEditors = true;
+               settings.ClientVisible = (Model.FrameworkContractExtension == null || (Model.FrameworkContractExtension != null && Model.FrameworkContractExtension.Count == 0)) && 
+                                        (Model.FrameworkContractDeliveryPlan == null || (Model.FrameworkContractDeliveryPlan != null && Model.FrameworkContractDeliveryPlan.Count == 0)) &&
+                                        code_documentState == "03";//"03": APROBADA
+               settings.ClientSideEvents.Click = "ButtonAddFrameworkContract_Click";//"ButtonUpdatePhase_Click";
+           }).GetHtml()
+            </td>
+        </tr>               
+    </table>
+
+    <table id="valueFrameworkContractExtensionTable" class="table table-condensed" style="margin: 0; padding: 0">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Extensi&oacute;n del Contrato</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label( settings =>
+                {
+                    settings.Name = "valueFrameworkContractExtensionLabel";
+                    settings.Text = "Valor*:";
+                    settings.AssociatedControlName = "value";
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @{
+                    var valueFrameworkContractExtension = (Model != null && Model.FrameworkContractExtension != null && Model.FrameworkContractExtension.FirstOrDefault() != null) ? Model.FrameworkContractExtension.FirstOrDefault().value : null;
+                }
+                @Html.DevExpress().SpinEdit(settings =>
+           {
+               settings.Name = "valueFrameworkContractExtension";
+               settings.Properties.ClientInstanceName = "valueFrameworkContractExtension";
+               settings.Width = Unit.Percentage(100);
+
+               //settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "C2";
+               //settings.Properties.MinValue = 0.01M;
+               //settings.Properties.MaxValue = 9999999999999.99M;
+               //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ReadOnly = (isSave == true);
+               settings.Properties.SpinButtons.Visible = false;
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Init = "OnValue_Init";
+               settings.Properties.ClientSideEvents.Validation = "OnValueFrameworkContractExtensionValidation";
+               //settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           }).Bind(valueFrameworkContractExtension).GetHtml()
+            </td>
+        </tr>
+    </table>
+
+    <table id="amoutFrameworkContractExtensionTable" class="table table-condensed" style="margin: 0; padding: 0">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Extensi&oacute;n del Contrato</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "amoutFrameworkContractExtensionLabel";
+                    settings.Text = "Cantidad:";
+                    settings.AssociatedControlName = "amout";
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @{
+                    var amoutFrameworkContractExtension = (Model != null && Model.FrameworkContractExtension != null && Model.FrameworkContractExtension.FirstOrDefault() != null) ? Model.FrameworkContractExtension.FirstOrDefault().amout : null;
+                }
+                @Html.DevExpress().SpinEdit(settings =>
+           {
+               settings.Name = "amoutFrameworkContractExtension";
+               settings.Properties.ClientInstanceName = "amoutFrameworkContractExtension";
+               settings.Width = Unit.Percentage(100);
+
+               //settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "N2";
+               //settings.Properties.MinValue = 0.01M;
+               //settings.Properties.MaxValue = 9999999999999.99M;
+               //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+               //settings.ReadOnly = codeState != "01";//Pendiente
+               settings.ReadOnly = (isSave == true);
+               settings.Properties.SpinButtons.Visible = false;
+               //settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnAmoutFrameworkContractExtensionValidation";
+               //settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           }).Bind(amoutFrameworkContractExtension).GetHtml()
+            </td>
+        </tr>
+    </table>
+
+    <table id="frameworkContractDeliveryPlanTable" class="table table-condensed" style="margin: 0; padding: 0">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Plan de Entrega</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                @{
+                    if (Model != null && Model.FrameworkContractDeliveryPlan != null)
+                    {
+                        ViewData["code_documentState"] = code_documentState;
+                        Html.RenderPartial("_FormEditFrameworkContractDeliveryPlan", Model.FrameworkContractDeliveryPlan.OrderBy(od => od.deliveryPlanDate).ThenBy(tb => tb.id).ToList());
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+
+    <table class="table table-condensed" style="margin: 0; padding: 0">    
+        <tr>
+            <td style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+           {
+               settings.Name = "btnUpdateFrameworkContractItem";//"btnUpdatePhase";
+               settings.Text = "Actualizar";
+               settings.RenderMode = ButtonRenderMode.Button;
+               settings.UseSubmitBehavior = false;
+               settings.ImagePosition = ImagePosition.Left;
+               settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+
+               settings.ValidateInvisibleEditors = true;
+               settings.ClientEnabled = (isSave != true) && ((code_documentState == "" ||code_documentState == "01") ||
+                                        (code_documentState == "03" && code_typeContractFramework != "VA31"));//01: PENDIENTE;
+               settings.ClientSideEvents.Click = "ButtonUpdateFrameworkContractItem_Click";//"ButtonUpdatePhase_Click";
+           }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancelFrameworkContractItem";//btnCancelPhase";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.ClientSideEvents.Click = "BtnCancelFrameworkContractItem_Click";//BtnCancelPhase_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+}

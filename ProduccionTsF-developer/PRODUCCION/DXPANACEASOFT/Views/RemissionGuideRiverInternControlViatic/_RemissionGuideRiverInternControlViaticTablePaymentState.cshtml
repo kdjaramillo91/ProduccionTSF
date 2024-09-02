@@ -1,0 +1,63 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuideRiver
+
+@{ 
+    string codeDocumentState = (Model != null) ? ((Model.Document != null) ? (Model.Document.DocumentState != null ? Model.Document.DocumentState.code : "") : "") : "";
+    var id_tbsysDocumentCatalog = (Model != null && Model.RemissionGuideRiverCustomizedViaticPersonalAssigned != null) ? Model.RemissionGuideRiverCustomizedViaticPersonalAssigned.id_PaymentState :  null;
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Estado de pago</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+            @Html.DevExpress().ComboBoxFor(m => m.RemissionGuideRiverCustomizedViaticPersonalAssigned.id_PaymentState, settings =>
+       {
+           settings.Name = "id_PaymentState";
+           settings.Properties.ClientInstanceName = "id_PaymentState";
+
+           settings.Width = 200;  //Unit.Percentage(100);
+
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.Columns.Add("descriptionState", "descripción", 50);
+           settings.Properties.ValueType = typeof(int);
+
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.CustomJSProperties = (s, e) =>
+           {
+               e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               e.Properties["cpIsRequired"] = "true";
+               e.Properties["cpHasTab"] = "false";
+           };
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+       }).BindList(DataProviderCatalogStatePay.DocumentStatesPay()).Bind(id_tbsysDocumentCatalog).GetHtml()
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+

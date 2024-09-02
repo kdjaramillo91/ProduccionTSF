@@ -1,0 +1,294 @@
+﻿@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.ItemP.ItemDTO
+@model DXPANACEASOFT.Models.InventoryMove
+
+<table class="table table-condenced">
+    <!-- 1 FILA -->
+    <tr>
+
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "locationLabel";
+                settings.Text = "Ubicación: ";
+                settings.AssociatedControlName = "id_LocationFilter";
+            }).GetHtml()
+        </td>
+        <td>
+
+            @{
+
+                Html.RenderPartial("_InventoryExitMovePackaingLocation");
+            }
+
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <!-- 2 FILA -->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "idLoteLabel";
+               settings.Text = "Lote: ";
+               settings.AssociatedControlName = "idLoteFilter";
+           }).GetHtml()
+
+        </td>
+        <td>
+            @{
+
+                Html.RenderPartial("_InventoryExitMovePackaingLote");
+            }
+            
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+         {
+             settings.Name = "nameProviderLabel";
+             settings.Text = "Proveedor: ";
+             settings.AssociatedControlName = "nameProvider";
+         }).GetHtml()
+
+        </td>
+        <td>
+            @{ 
+
+                string nameProvider = (Model == null) ? null : Model.nameProviderPackagingMaterials;
+            }
+
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = "nameProvider";
+                settings.Properties.ClientInstanceName = "nameProvider";
+                settings.ClientEnabled = false;
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Text = nameProvider;
+                settings.Properties.Width = Unit.Percentage(100);
+
+            }).GetHtml()
+
+        </td>
+        <td>
+           
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "nameCamaroneraLabel";
+               settings.Text = "Camaronera: ";
+               settings.AssociatedControlName = "nameCamaronera";
+           }).GetHtml()
+
+        </td>
+        <td>
+            @{
+
+                string nameProductionUnit = (Model == null) ? null : Model.nameProductionUnitProviderPackagingMaterials;
+            }
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = "nameCamaronera";
+                settings.Properties.ClientInstanceName = "nameCamaronera";
+                settings.ClientEnabled = false;
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Text = nameProductionUnit;
+                settings.Properties.Width = Unit.Percentage(100);
+
+            }).GetHtml()
+        </td>
+    </tr>
+    <!-- 2 FILA -->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+              {
+                  settings.Name = "idCostCenterLabel";
+                  settings.Text = "C.C.: ";
+                  settings.AssociatedControlName = "idCostCenter";
+              }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                int? idCostCenter = (Model == null) ? null : Model.idCostCenterPackagingMaterials;
+            }
+            @Html.DevExpress().ComboBox(settings =>
+             {
+                 settings.Name = "idCostCenter";
+                 settings.Width = Unit.Percentage(100);
+                 settings.ShowModelErrors = true;
+                 settings.Properties.ClientInstanceName = "idCostCenter";
+                 settings.Properties.ValueField = "id";
+                 settings.Properties.TextField = "name";
+                 settings.Properties.ValueType = typeof(int);
+                 settings.Properties.Width = Unit.Percentage(100);
+
+                 settings.Properties.ClientSideEvents.SelectedIndexChanged = "CostCenter_OnSelectedIndexChanged";
+                 settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                 settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                 settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                 settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+             }).BindList(DataProviderCostCenter.CostCenters() ).Bind(idCostCenter).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "idCostSubCenterLabel";
+                settings.Text = "S.C.: ";
+                settings.AssociatedControlName = "idCostSubCenter";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                Html.RenderPartial("_InventoryExitMovePackaingCostSubCenter");
+            }
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+             {
+                 settings.Name = "idItemFilterLabel";
+                 settings.Text = "Producto: ";
+                 settings.AssociatedControlName = "idItemFilter";
+             }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                Html.RenderPartial("_InventoryExitMovePackaingItem");
+            }
+
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+              {
+                  settings.Name = "nameItemLabel";
+                  settings.Text = "Descripción: ";
+                  settings.AssociatedControlName = "nameItem";
+              }).GetHtml()
+
+        </td>
+        <td>
+            @{
+
+                string nameItem = (Model == null) ? null : Model.nameItemDescriptionPackagingMaterials;
+            }
+            @Html.DevExpress().TextBox(settings =>
+           {
+               settings.Name = "nameItem";
+               settings.Properties.ClientInstanceName = "nameItem";
+               settings.ClientEnabled = false;
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+               settings.Text = nameItem;
+               settings.Properties.Width = Unit.Percentage(100);
+
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+             {
+                 settings.Name = "amoutItemLabel";
+                 settings.Text = "Cantidad: ";
+                 settings.AssociatedControlName = "amoutItem";
+             }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                decimal amoutItemTotal = 0.00M;
+
+                if (Model != null && Model.InventoryMoveExitPackingMaterial != null)
+                {
+                    amoutItemTotal = Model.InventoryMoveExitPackingMaterial.quantityExit;
+
+                }
+
+
+             }
+            @Html.DevExpress().SpinEdit(settings =>
+       {
+           settings.Name = "amoutItem";
+           settings.Properties.ClientInstanceName = "amoutItem";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValidationSettings.Display = Display.Dynamic;
+           settings.ShowModelErrors = true;
+           settings.Properties.DecimalPlaces =2;
+           //settings.Properties.DisplayFormatString = "C2";
+           settings.Properties.MaxValue = 9999999;
+           settings.Properties.MinValue = 0;
+           //settings.Properties.ClientSideEvents.ValueChanged = "Invoice_ChangeInvoiceTotal";
+           var txtProperties = settings.Properties as SpinEditProperties;
+           txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+           settings.Properties.SpinButtons.ShowIncrementButtons = false;
+           //settings.Properties.ClientSideEvents.ValueChanged= "ItemPackagingAmount_OnValueChange";
+           settings.Properties.AllowNull = false;
+
+           settings.Number = amoutItemTotal;
+           settings.ReadOnly =false;
+
+           //if (_ControlsState.FirstOrDefault(r => r.controlName == "valueInternationalFreight").isRequired)
+           //{
+           //    settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           //    settings.CustomJSProperties = (s, e) =>
+           //    {
+
+           //        e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+           //        e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           //        e.Properties["cpIsRequired"] = "true";
+           //        e.Properties["cpTabControl"] = "tabControl";
+
+           //    };
+           //}
+
+       }).GetHtml()
+
+        </td>
+        
+    </tr>
+    
+</table>
+<div style="text-align: right; display:block; width:100%; margin-bottom:25px;">
+
+    @{
+
+        Html.DevExpress().Button(button =>
+        {
+            button.Name = "btnCalculateDosage";
+            button.Text = "Calcular";
+            button.RenderMode = ButtonRenderMode.Button;
+            button.ImagePosition = ImagePosition.Left;
+            button.Images.Image.IconID = IconID.MathCalculationoptions16x16;
+                            //button.ClientEnabled = codeState == "01";//(id_inventoryMove == 0);
+                            button.UseSubmitBehavior = false;
+            button.EnableClientSideAPI = true;
+            button.ClientSideEvents.Click = "ButtonCalculateDosage_Click";
+        }).Render();
+
+        ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+        Html.DevExpress().Button(button =>
+        {
+            button.Name = "btnCancelCalculateDosage";
+            button.Text = "Cancelar";
+            button.RenderMode = ButtonRenderMode.Button;
+            button.ImagePosition = ImagePosition.Left;
+            button.Images.Image.IconID = IconID.ActionsCancel16x16;
+                            //button.ClientEnabled = codeState == "01";//(id_inventoryMove == 0);
+                            button.UseSubmitBehavior = false;
+            button.EnableClientSideAPI = true;
+            button.ClientSideEvents.Click = "ButtonCancelCalculateDosage_Click";
+        }).Render();
+
+    }
+</div>

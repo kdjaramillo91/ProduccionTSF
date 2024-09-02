@@ -1,0 +1,123 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<NonProductiveHourPendingNewDTO>(settings =>
+    {
+        settings.Name = "GridViewPendingNew";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "NonProductiveHour",
+            Action = "GridViewPendingNew",
+        };
+
+        settings.KeyFieldName = "emissionDateStr;id_turn;id_machineForProd";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "emissionDateStr";
+            column.Name = "emissionDateStr";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_turn";
+            column.Name = "id_turn";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_machineForProd";
+            column.Name = "id_machineForProd";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberMachineProdOpening";
+            column.Caption = "No.Apertura";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "emissionDate";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "machineForProd";
+            column.Caption = "Máquina";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "processPlant";
+            column.Caption = "Proceso";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "turn";
+            column.Caption = "Turno";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "personRequire";
+            column.Caption = "Persona Responsable";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "state";
+            column.Caption = "Estado";
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = false,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 11,
+            Caption = "Acción",
+            Width = Unit.Percentage(8)
+        };
+
+        commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+        {
+            ID = "btnProcess",
+            Text = "Registrar"
+        });
+
+        settings.ClientSideEvents.CustomButtonClick = "GridViewGenerate_Click";
+        settings.ClientSideEvents.RowDblClick = "GridViewGenerate_Click";
+        settings.Columns.Add(commandColumn);
+
+    });
+}
+@grid.Bind(Model).GetHtml()

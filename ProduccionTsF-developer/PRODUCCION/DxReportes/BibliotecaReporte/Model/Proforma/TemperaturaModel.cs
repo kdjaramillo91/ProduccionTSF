@@ -1,0 +1,96 @@
+﻿using System;
+
+namespace BibliotecaReporte.Model.ProformaModel
+{
+    internal class TemperaturaModel
+    {
+        public int Id { get; set; }
+        public string NombreCia { get; set; }
+        public string TelefonoCia { get; set; }
+        public string Email { get; set; }
+        public string PlantCode { get; set; }
+        public string FDA { get; set; }
+        public string Web { get; set; }
+        public string DirSucural { get; set; }
+        public string RucCia { get; set; }
+        public string Factura { get; set; }
+        public DateTime FechaEmision { get; set; }
+        public string Descripcion { get; set; }
+        public string Referencia { get; set; }
+        public string TerminoNegociacion { get; set; }
+        public string OrdenPedido { get; set; }
+        public string RazonSocialSoldTo { get; set; }
+        public string USCISoldTo { get; set; }
+        public string AddressSoldTo1 { get; set; }
+        public string AddressSoldTo2 { get; set; }
+        public string Telefono1SoldTo { get; set; }
+        public string Telefono2SoldTo { get; set; }
+        public string EmailSoldTo { get; set; }
+        public string RazonSocialShipTo { get; set; }
+        public string USCIShipTo { get; set; }
+        public string AddressShipTo1 { get; set; }
+        public string AddressShipTo2 { get; set; }
+        public string Telefono1ShipTo { get; set; }
+        public string Telefono2ShipTo { get; set; }
+        public string EmailShipTo { get; set; }
+        public string PuertoDestino { get; set; }
+        public string Shipper { get; set; }
+        public string PuertoDeEmbaruqe { get; set; }
+        public string FechaEmbarque { get; set; }
+        public string PurchaseOrder { get; set; }
+        public int Cartones { get; set; }
+        public decimal Cantidad { get; set; }
+        public decimal Precio { get; set; }
+        public string Size { get; set; }
+
+        // public string size2 { get; set; }
+        public string Casepack { get; set; }
+        public string Marca { get; set; }
+        public string descripcion { get; set; }
+        public string Total { get; set; }
+        public string Estado { get; set; }
+        public decimal GastoDistribuido { get; set; }
+        public decimal PrecioFob { get; set; }
+        public decimal ValuetotalCIF { get; set; }
+        public string Vendedor { get; set; }
+        public string Contacto { get; set; }
+        public string PlazoPago { get; set; }
+        public string CodigoBanco { get; set; }
+        public string NombreBanco { get; set; }
+        public string PaisBanco { get; set; }
+        public string DireccionBanco { get; set; }
+        public string MonedaBanco { get; set; }
+        public int EnrutamientoBanco { get; set; }
+        public string CuentaBanco { get; set; }
+        public string NombreCompaniaBanco { get; set; }
+        public string CodigoBancoIntermediario { get; set; }
+        public string NombreBancoIntermediario { get; set; }
+        public string CuentaBancoIntermediario { get; set; }
+        public string MonedaBancoIntermediario { get; set; }
+        public string PaisBancoIntermediario { get; set; }
+        public string Product { get; set; }
+        public string ColourGrade { get; set; }
+        public string PackingDetails { get; set; }
+        public string ContainerDetails { get; set; }
+
+        // public string ShipmentDate { get; set; }
+        public decimal NetoKilos { get; set; }
+
+        public decimal NetoLibras { get; set; }
+        public decimal BrutoKilos { get; set; }
+        public decimal BrutoLibras { get; set; }
+
+        // public decimal GlaseoKilos { get; set; }
+        // public decimal GlaseoLibras { get; set; }
+        public DateTime FechaActualizacion { get; set; }
+        public DateTime FechaActual { get; set; }
+        public string Usuario { get; set; }
+        public string CodigoPlanta { get; set; }
+        public int NumeroContenedores { get; set; }
+        public decimal ValorAbonado { get; set; }
+        public string CLIENTE_EXTERIOR { get; set; }
+        public string PuertoDescarga3 { get; set; }
+        public string TipoTemperatura { get; set; }
+        public int TEMPERATURAINSTRUCCION { get; set; }
+    }
+}

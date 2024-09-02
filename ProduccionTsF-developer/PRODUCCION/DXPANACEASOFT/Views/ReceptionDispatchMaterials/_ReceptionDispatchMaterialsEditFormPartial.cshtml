@@ -1,0 +1,148 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ReceptionDispatchMaterials
+
+@{
+    int id_receptionDispatchMaterials = (Model != null) ? Model.id : 0;
+    string codeDocumentState = (Model.Document != null) ? (Model.Document.DocumentState != null ? Model.Document.DocumentState.code : "") : "";
+
+    if (codeDocumentState == "01")
+    {
+        <script src="~/Scripts/receptiondispatchmaterials/_receptionDispatchMaterialsDetailsEditForm.js"></script>
+    }
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditReceptionDispatchMaterials", name = "formEditReceptionDispatchMaterials" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_receptionDispatchMaterials", id_receptionDispatchMaterials)
+    @Html.Hidden("codeDocumentState", codeDocumentState)
+
+    
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+
+    //tabs.ClientSideEvents.ActiveTabChanged = "TabControl_ActiveTabChanged";
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_ReceptionDispatchMaterialsDocumentFormEdit", Model.Document);
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabRemissionGuide";
+        tab.Text = "Guía de Remisión    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_RemissionGuideMainFormTab", Model.RemissionGuide);
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabReceptionDispatchMaterialsDetails";
+        tab.Text = "Detalles    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var receptionDispatchMaterialsDetail = (Model != null && Model.ReceptionDispatchMaterialsDetail != null) ? Model.ReceptionDispatchMaterialsDetail.ToList() : new List<ReceptionDispatchMaterialsDetail>();
+            //Html.RenderPartial("_InvoiceCommercialHeadFormDetailPartial", Model);
+            if (codeDocumentState == "01")
+            {
+                Html.RenderPartial("ReceptionDispatchMaterialsButtons/_GridMessageWarningDetail");
+                Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorMaterialsDetail");
+                Html.RenderPartial("_RemissionGuidesEditFormRemissionGuideDispatchMaterialPartial", Model.RemissionGuide.RemissionGuideDispatchMaterial.OrderBy(od => od.id).ToList());
+                Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorsDetail");
+                Html.RenderPartial("ReceptionDispatchMaterialsButtons/_ReceptionDispatchMaterialsDetailsActionsButtons");
+                Html.RenderPartial("_ReceptionDispatchMaterialsEditFormDetailPartial", receptionDispatchMaterialsDetail.OrderBy(od => od.id).ToList());
+            }
+            else
+            {
+                ViewData["id_receptionDispatchMaterials"] = (Model != null) ? Model.id : 0;
+                Html.RenderPartial("_RemissionGuidesViewsRemissionGuideDispatchMaterialPartial", Model.RemissionGuide.RemissionGuideDispatchMaterial.OrderBy(od => od.id).ToList());
+                Html.RenderPartial("_ReceptionDispatchMaterialsViewsDetailPartial", receptionDispatchMaterialsDetail.OrderBy(od => od.id).ToList());
+            }
+        });
+    });
+}).GetHtml()
+
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdate_EditForm";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.ClientEnabled = codeDocumentState == "01";//Pendiente 01
+                        //button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnCancel_EditForm";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        //button.ClientEnabled = true;
+                        button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/receptiondispatchmaterials/editform.js"></script>
+
+

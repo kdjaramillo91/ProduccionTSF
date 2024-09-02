@@ -1,0 +1,89 @@
+﻿@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<BranchOffice>(settings =>
+    {
+        settings.Name = "gvDivisionsDetail" /*+ ViewData["id_branchOffice"]*/;
+        settings.SettingsDetail.MasterGridName = "gvDivisions";
+        settings.CallbackRouteValues = new { Controller = "Division", Action = "DivisionsDetailBranchOfficesPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "GridViewDivisionBranchOfficesDetails_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Sucursales</span>");
+        });
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        //settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "code";
+            column.Caption = "Código";
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var code = DataBinder.Eval(c.DataItem, "code").ToString().PadLeft(3, '0');
+                ViewContext.Writer.Write(code);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ruc";
+            column.Caption = "RUC";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "address";
+            column.Caption = "Dirección";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "phoneNumber";
+            column.Caption = "Teléfonos";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+
+    });
+}
+
+@grid.Bind(Model).GetHtml()

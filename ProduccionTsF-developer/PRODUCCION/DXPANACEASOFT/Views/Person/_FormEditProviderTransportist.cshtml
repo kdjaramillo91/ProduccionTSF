@@ -1,0 +1,27 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProviderTransportist
+
+<table id="ANTTransportistTable" class="table table-condensed">
+    <tr>
+        <!--Especifiacion ANT-->
+        <td class="col-sm-2">
+            @Html.DevExpress().LabelFor(m => m.ANTEspecification, settings =>
+            {
+                settings.Name = "ANTEspecificationLabel";
+                settings.Text = "ANT Especificación:";
+                settings.AssociatedControlName = "ANTEspecificationLabel";
+            }).GetHtml()
+        </td>
+        <td class="col-sm-10" >
+            @Html.DevExpress().TextBoxFor(m => m.ANTEspecification, settings =>
+            {
+                settings.Name = "ANTEspecification";
+                settings.Properties.ClientInstanceName = "ANTEspecification";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ClientSideEvents.Validation = "OnANTEspecification";
+            }).GetHtml()
+
+        </td>
+    </tr>
+</table>

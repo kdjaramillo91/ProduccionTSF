@@ -1,0 +1,138 @@
+﻿
+
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ItemSaleInformation
+
+<div style="width: 100%; overflow: auto;">
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr class="no-border">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Precio:";
+                    settings.AssociatedControlName = "salePrice";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.salePrice, settings =>
+                {
+                    settings.Name = "salePrice";
+                    settings.Properties.ClientInstanceName = "salePrice";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NumberType = SpinEditNumberType.Float;
+                    settings.Properties.DecimalPlaces = 6;
+                    settings.Properties.AllowMouseWheel = true;
+                    settings.Properties.Increment = 0.1M;
+                    settings.Properties.LargeIncrement = 1;
+                    settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnSalePriceValidation";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Precio Mayor:";
+                    settings.AssociatedControlName = "wholesalePrice";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.wholesalePrice, settings =>
+                {
+                    settings.Name = "wholesalePrice";
+                    settings.Properties.ClientInstanceName = "wholesalePrice";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NumberType = SpinEditNumberType.Float;
+                    settings.Properties.DecimalPlaces = 6;
+                    settings.Properties.AllowMouseWheel = true;
+                    settings.Properties.Increment = 0.1M;
+                    settings.Properties.LargeIncrement = 1;
+                    settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnWholeSalePriceValidation";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Unidad de Medida para Venta:";
+                    settings.AssociatedControlName = "id_metricUnitSale";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_metricUnitSale = (Model != null && Model.id_metricUnitSale != 0) ? (int?)Model.id_metricUnitSale : null;
+                    int? id_metricType = (Model != null && Model.Item != null && Model.Item.id_metricType != 0) ? (int?)Model.Item.id_metricType : null;
+                }
+                @{
+                    var comboBox_metricUnit = Html.DevExpress().ComboBoxFor(m => m.id_metricUnitSale, settings =>
+                    {
+                        settings.Name = "id_metricUnitSale";
+                        settings.Properties.ClientInstanceName = "id_metricUnitSale";
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        settings.ShowModelErrors = true;
+                     //   settings.Properties.ClientSideEvents.Validation = "OnMetricUnitSaleValidation";
+
+                    }).BindList(DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], id_metricType, id_metricUnitSale)).Bind(id_metricUnitSale).GetHtml();
+                }
+            </td>            
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Descripción Corta:";
+                    settings.AssociatedControlName = "shortDescription";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.shortDescriptionSale, settings =>
+               {
+                   settings.Name = "shortDescriptionSale";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ShowModelErrors = true;
+               }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Descripción:";
+                    settings.AssociatedControlName = "descriptionSale";
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().MemoFor(m => m.descriptionSale, settings =>
+                {
+                    settings.Name = "descriptionSale";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</div>

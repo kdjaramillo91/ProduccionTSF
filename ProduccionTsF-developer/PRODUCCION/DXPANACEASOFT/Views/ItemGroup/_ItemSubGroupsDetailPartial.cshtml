@@ -1,0 +1,57 @@
+﻿@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvItemSubGroupsDetail" + ViewData["id_itemGroup"];
+        settings.SettingsDetail.MasterGridName = "gvItemGroups";
+        settings.CallbackRouteValues = new { Controller = "ItemGroup", Action = "ItemSubGroupsDetailPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Categorías de Grupos de Productos</span>");
+        });
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        //settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(30);
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "description";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(3);
+        });
+
+    });
+
+}
+@grid.Bind(Model).GetHtml()

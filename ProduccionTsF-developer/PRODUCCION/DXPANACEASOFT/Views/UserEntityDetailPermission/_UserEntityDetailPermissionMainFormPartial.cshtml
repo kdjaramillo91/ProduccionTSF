@@ -1,0 +1,155 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.UserEntityDetail
+
+@{
+	DBContext db = null;
+	int id_UserEntityDetail = (Model != null) ? Model.id : 0;
+	db = new DBContext();
+}
+
+
+@{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_UserEntityDetail", id_UserEntityDetail)
+
+
+    <div id="GridMessageError" style="display: none;">
+      
+    </div>
+    <table class="table table-condenced" style="margin: 0px;">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+            </td>
+        </tr>
+
+        <tr>
+     
+            <td>
+                @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "id_permissionLabel";
+                settings.Text = "Usuario:";
+                settings.AssociatedControlName = "id_permission";
+            }).GetHtml()
+
+
+            </td>
+            <td>
+                @{
+                    //int? id_userEntityDetail = (Model != null)
+                    //	? (int?)Model.id_userEntityDetail
+                    //	: null;
+
+
+                    //int? id_UED = db.UserEntityDetail.Where(e => e.id == ).FirstOrDefault().id_userEntity;
+                    int? id_userEntity = db.UserEntity.FirstOrDefault().id_user;
+                    int? id_user = db.User.Where(e => e.id == id_userEntity).FirstOrDefault().id;
+
+                }
+                @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "id_user";
+                settings.Properties.ClientInstanceName = "id_user";
+                settings.Properties.DataSourceID = "id_user";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Columns.Add("name", "Nombre", 200);
+                settings.Width = Unit.Percentage(50);
+                settings.Height = Unit.Percentage(50);
+                settings.Properties.EnableClientSideAPI = true;
+                settings.Properties.CallbackPageSize = 20;
+              
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnUser";
+
+            }).BindList(DataProviderUser.UserAll((int?)id_user)).Bind(id_user).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+            <td>
+                @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "id_entityValue";
+                settings.Text = "Bodega:";
+                settings.AssociatedControlName = "id_entityValue";
+            }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_warehouseEntityDetail = (Model != null && Model.id != 0) ? (int?)Model.id : null;
+                }
+                @Html.DevExpress().ComboBox(settings =>
+           {
+               settings.Name = "id_warehouseEntityDetail";
+               settings.Properties.ClientInstanceName = "id_warehouseEntityDetail";
+               settings.Properties.DataSourceID = "id_warehouseEntityDetail";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Columns.Add("name", "Nombre", 200);
+               settings.Width = Unit.Percentage(50);
+               settings.Height = Unit.Percentage(50);
+               settings.Properties.EnableClientSideAPI = true;
+               settings.Properties.CallbackPageSize = 20;
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnWarehouse";
+
+           }).BindList(DataProviderWarehouse.WarehouseByCompany((int)ViewData["id_company"])).GetHtml()
+            </td>
+
+        </tr>
+        
+        <tr></tr>
+
+    </table>
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+               
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}

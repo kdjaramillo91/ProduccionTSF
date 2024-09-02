@@ -1,0 +1,121 @@
+﻿
+@model DXPANACEASOFT.Models.InstallWizard
+
+<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr>
+        <td style="text-align: center; vertical-align: bottom;">
+            Logo de la Compa&ntilde;&iacute;a
+        </td>
+        <td colspan="4">
+            <h3 style="text-align: center; margin-left: -20%;">Ingrese los datos de la Compañía</h3>
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="5" style="text-align: center;">
+            @Html.DevExpress().BinaryImageFor(m => m.Company.logo, settings =>
+            {
+                settings.Properties.ClientInstanceName = "logo";
+
+                settings.Properties.ImageWidth = 200;
+                settings.Properties.ImageHeight = 190;
+                settings.Properties.EnableServerResize = true;
+                settings.Properties.ImageSizeMode = ImageSizeMode.FitProportional;
+                settings.CallbackRouteValues = new { Controller = "InstallWizard", Action = "BinaryImageColumnPhotoUpdate" };
+                settings.Properties.EditingSettings.Enabled = true;
+                settings.Properties.EditingSettings.UploadSettings.UploadValidationSettings.MaxFileSize = 4194304;
+
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;  ">
+            Razón Social*:
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Company.businessName, settings =>
+            {
+                settings.Properties.ClientInstanceName = "businessName";
+
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "Razón Social de la Compañía";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ValidationGroup = "company";
+                settings.Properties.ClientSideEvents.Validation = "OnBusinessNameValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            Nombre Comercial*:
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Company.trademark, settings =>{
+                settings.Properties.ClientInstanceName = "trademark";
+
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "Nombre Comercial de la Compañía";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ValidationGroup = "company";
+                settings.Properties.ClientSideEvents.Validation = "OnTradeMarkValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            RUC*:
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Company.ruc, settings => {
+           settings.Properties.ClientInstanceName = "ruc";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.NullText = "Registro Unico de Contribuyente";
+           settings.ShowModelErrors = true;
+           settings.Properties.ValidationSettings.ValidationGroup = "company";
+           settings.Properties.ClientSideEvents.Validation = "OnRucValidation";
+       }).GetHtml()
+        </td>
+        <td>
+            Correo*:
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Company.email, settings => {
+           settings.Properties.ClientInstanceName = "email";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.NullText = "Correo Electrónico";
+           settings.ShowModelErrors = true;
+           settings.Properties.ValidationSettings.ValidationGroup = "company";
+           settings.Properties.ClientSideEvents.Validation = "OnEmailValidation";
+       }).GetHtml()                   
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Dirección*:
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().MemoFor(m => m.Company.address, settings =>{
+                settings.Properties.ClientInstanceName = "address";
+                settings.Width = Unit.Percentage(100);
+                settings.Height = 50;
+                settings.Properties.NullText = "Dirección de la Compañía";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ValidationGroup = "company";
+                settings.Properties.ClientSideEvents.Validation = "OnAddressValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Teléfono*:
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Company.phoneNumber, settings =>{
+                settings.Properties.ClientInstanceName = "phoneNumber";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "Teléfono";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ValidationGroup = "company";
+                settings.Properties.ClientSideEvents.Validation = "OnPhoneNumberValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+

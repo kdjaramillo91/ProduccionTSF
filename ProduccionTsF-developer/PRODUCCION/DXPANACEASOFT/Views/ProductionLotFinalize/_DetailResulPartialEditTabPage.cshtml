@@ -1,0 +1,117 @@
+﻿@model IList<ProductionLotFinalize.DetalleLote>
+<table width="100%">
+	<tr>
+		<td>
+			@Html.DevExpress().GridView(
+				grid =>
+				{
+					grid.Name = "gvProductLotFinalezeDetail";
+					grid.Width = Unit.Percentage(100);
+					grid.SetDefaultEditSettings();
+
+					#region GridView Behavior
+
+					grid.SettingsBehavior.AllowSort = false;
+					grid.SettingsBehavior.AllowSelectByRowClick = true;
+					grid.SettingsBehavior.AllowDragDrop = false;
+
+					grid.SettingsPager.Visible = false;
+					grid.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+					grid.SettingsSearchPanel.Visible = false;
+					grid.Settings.ShowTitlePanel = false;
+					grid.Settings.ShowGroupPanel = false;
+					grid.Settings.ShowFooter = false;
+
+					grid.Settings.ShowFilterRow = false;
+					grid.Settings.ShowFilterRowMenu = false;
+
+					grid.CommandColumn.Visible = false;
+					grid.SettingsDetail.ShowDetailRow = false;
+
+					//grid.CustomJSProperties = (s, e) =>
+					//{
+					//	e.Properties["cpDetallesBodegas"] = detallesBodega;
+					//};
+
+					#endregion
+
+					#region Adaptivity Settings
+
+					grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+					grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+					grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+					grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+					grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+					#endregion
+
+					#region Columns
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "Orden";
+						column.Name = "Orden";
+						column.Caption = "Orden";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(12);
+
+						column.FooterCellStyle.Font.Bold = true;
+						column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Left;
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "SecuenciaTransaccional";
+						column.Name = "SecuenciaTransaccional";
+						column.Caption = "Secuencia Transaccional";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "Cantidad";
+						column.Name = "Cantidad";
+						column.Caption = "Cantidad";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "CantidadLibras";
+						column.Name = "CantidadLibras";
+						column.Caption = "Cantidad Libras";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "CantidadKilos";
+						column.Name = "CantidadKilos";
+						column.Caption = "Cantidad Kilos";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+					});
+
+					#endregion
+
+				}).Bind(this.Model).GetHtml()
+		</td>
+	</tr>
+
+	
+</table>

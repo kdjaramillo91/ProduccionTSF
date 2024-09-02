@@ -1,0 +1,578 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProviderPersonAuthorizedToPayTheBill>
+
+@{
+    var grid = Html.DevExpress().GridView<ProviderPersonAuthorizedToPayTheBill>(settings => {
+        settings.Name = "ProviderPersonAuthorizedToPayTheBills";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "ProviderPersonAuthorizedToPayTheBill" };
+
+        settings.ClientSideEvents.BeginCallback = "ProviderPaymentTerm_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "ProviderPersonAuthorizedToPayTheBillAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "ProviderPersonAuthorizedToPayTheBillUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "ProviderPersonAuthorizedToPayTheBillDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        //settings.CommandColumn.Width = Unit.Percentage(8);
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_identificationType";
+            column.Caption = "ID.";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_identificationType = (int)DataBinder.Eval(c.DataItem, "id_identificationType");
+                IdentificationType identificationType = DataProviderIdentificationType.IdentificationTypeById(id_identificationType);
+
+                if (identificationType != null)
+                {
+                    ViewContext.Writer.Write(identificationType.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_identificationTypeProviderPersonAuthorizedToPayTheBill";
+                p.DataSource = DataProviderIdentificationType.AllIdentificationType();
+                p.ValueField = "id";
+                p.TextFormatString = "{1}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Init = "ProviderPersonAuthorizedToPayTheBillIdentificationTypeCombo_Init";
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "identification_number";
+            column.Caption = "No. ID.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string identification_number = (string)DataBinder.Eval(c.DataItem, "identification_number");
+
+                ViewContext.Writer.Write(identification_number);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "identification_number";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillIdentificationNumberComboValidation";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string name = (string)DataBinder.Eval(c.DataItem, "name");
+
+                ViewContext.Writer.Write(name);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "name";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "address";
+            column.Caption = "Dirección";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string address = (string)DataBinder.Eval(c.DataItem, "address");
+
+                ViewContext.Writer.Write(address);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "address";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "phoneNumber1";
+            column.Caption = "Telf.1";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string phoneNumber1 = (string)DataBinder.Eval(c.DataItem, "phoneNumber1");
+
+                ViewContext.Writer.Write(phoneNumber1);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "phoneNumber1";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillPhoneNumber1Validation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "phoneNumber2";
+            column.Caption = "Telf.2";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string phoneNumber2 = (string)DataBinder.Eval(c.DataItem, "phoneNumber2");
+
+                ViewContext.Writer.Write(phoneNumber2);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "phoneNumber2";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillPhoneNumber2Validation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "typeReg";
+            column.Caption = "Tipo Reg.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string typeReg = (string)DataBinder.Eval(c.DataItem, "typeReg");
+
+                ViewContext.Writer.Write(typeReg);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "typeReg";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillCodeValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "codeProd";
+            column.Caption = "Cod Prod.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string codeProd = (string)DataBinder.Eval(c.DataItem, "codeProd");
+
+                ViewContext.Writer.Write(codeProd);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "codeProd";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillCodeValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "codeEmpr";
+            column.Caption = "Cod Empr.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string codeEmpr = (string)DataBinder.Eval(c.DataItem, "codeEmpr");
+
+                ViewContext.Writer.Write(codeEmpr);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "codeEmpr";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillCodeValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "type";
+            column.Caption = "Tipo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string type = (string)DataBinder.Eval(c.DataItem, "type");
+
+                ViewContext.Writer.Write(type);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "type";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillCodeValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_country";
+            column.Caption = "Cod. País";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_country = (int?)DataBinder.Eval(c.DataItem, "id_country");
+                Country country = DataProviderCountry.CountryById(id_country);
+
+                if (country != null)
+                {
+                    ViewContext.Writer.Write(country.code);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_country";
+                p.DataSource = DataProviderCountry.AllContries((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextFormatString = "{0}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_bank";
+            column.Caption = "Banco";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_bank = (int?)DataBinder.Eval(c.DataItem, "id_bank");
+                BoxCardAndBank bank = DataProviderBoxCardAndBank.BoxCardAndBankById(id_bank);
+
+                if (bank != null)
+                {
+                    ViewContext.Writer.Write(bank.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_bank";
+                p.DataSource = DataProviderBoxCardAndBank.AllBanks();
+                p.ValueField = "id";
+                p.TextFormatString = "{1}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_accountType";
+            column.Caption = "Tipo Cta.";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_accountType = (int?)DataBinder.Eval(c.DataItem, "id_accountType");
+                AccountType accountType = DataProviderAccount.AccountTypeById(id_accountType);
+
+                if (accountType != null)
+                {
+                    ViewContext.Writer.Write(accountType.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_accountType";
+                p.DataSource = DataProviderAccount.AllAccountTypes();
+                p.ValueField = "id";
+                p.TextFormatString = "{1}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "noAccount";
+            column.Caption = "No. Cuenta";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string noAccount = (string)DataBinder.Eval(c.DataItem, "noAccount");
+
+                ViewContext.Writer.Write(noAccount);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "noAccount";
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "amount";
+            column.Caption = "Monto";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? amount = (decimal?)DataBinder.Eval(c.DataItem, "amount");
+                ViewContext.Writer.Write(amount != null ? amount.Value.ToString("N2") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "amount";
+                p.NumberType = SpinEditNumberType.Float;
+                p.DecimalPlaces = 2;
+                p.AllowMouseWheel = true;
+                p.Increment = 0.1M;
+                p.LargeIncrement = 1;
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillAmountValidation";
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+            });
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "noPayments";
+            column.Caption = "No. Pagos";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? noPayments = (int?)DataBinder.Eval(c.DataItem, "noPayments");
+                ViewContext.Writer.Write(noPayments != null ? noPayments.Value.ToString("#") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "noPayments";
+                p.NumberType = SpinEditNumberType.Integer;
+                //p.DecimalPlaces = 2;
+                p.AllowMouseWheel = true;
+                p.Increment = 1;
+                p.LargeIncrement = 10;
+                p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillNoPaymentsValidation";
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "date";
+            column.Caption = "Fecha";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                DateTime? date = (DateTime?)DataBinder.Eval(c.DataItem, "date");
+                ViewContext.Writer.Write(date != null ? date.Value.ToString("dd/MM/yyyy") : "");
+            });
+
+            column.EditorProperties().DateEdit(p =>
+            {
+                p.ClientInstanceName = "date";
+                p.UseMaskBehavior = true;
+                p.EditFormat = EditFormat.Custom;
+                p.EditFormatString = "dd/MM/yyyy";
+                //p.ClientSideEvents.Validation = "OnProviderPersonAuthorizedToPayTheBillDateValidation";
+            });
+        });
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

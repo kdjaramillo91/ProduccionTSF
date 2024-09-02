@@ -1,0 +1,164 @@
+﻿@model IList<CostPerContenedorManualPoundDetail>
+@{ 
+	var detalles = this.Model
+		.Select(e => new
+		{
+			IdCostPoundManualFactor = e.id_costPoundManualFactor,
+			Valor = e.valor
+		})
+		.ToArray();
+}
+@Html.DevExpress().GridView(
+	gridView =>
+	{
+		gridView.Name = "gvCostContenedorManualPoundDetail";
+		gridView.KeyFieldName = "orden";
+		gridView.Width = Unit.Percentage(100);
+		gridView.SettingsSearchPanel.Visible = false;
+
+		gridView.SettingsSearchPanel.Visible = false;
+		gridView.Styles.SearchPanel.CssClass = "searchPanel";
+
+		var header = gridView.Styles.Header;
+		header.BackColor = System.Drawing.Color.FromArgb(255, 255, 191, 102);
+		header.Font.Bold = true;
+		header.ForeColor = System.Drawing.Color.Black;
+
+		var settings = gridView.Settings;
+		settings.ShowGroupPanel = false;
+		settings.ShowTitlePanel = false;
+		settings.ShowFilterRow = false;
+		settings.ShowFilterRowMenu = false;
+		settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+		var behavior = gridView.SettingsBehavior;
+		behavior.AllowSelectByRowClick = false;
+		behavior.AllowEllipsisInText = false;
+		behavior.AllowDragDrop = false;
+		behavior.AllowSort = true;
+		behavior.EnableRowHotTrack = false;
+
+		var pager = gridView.SettingsPager;
+		pager.Visible = true;
+		pager.PageSize = 40;
+		pager.Mode = GridViewPagerMode.EndlessPaging;
+
+		var loading = gridView.SettingsLoadingPanel;
+		loading.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+		loading.Text = "Cargando...";
+
+		var styles = gridView.Styles;
+		styles.AlternatingRow.Enabled = DevExpress.Utils.DefaultBoolean.True;
+		styles.AlternatingRow.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffffff");
+		styles.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#f5f3f4");
+
+		var adaptivity = gridView.SettingsAdaptivity;
+		adaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+
+		// Parámetros de Exportación
+		var exportSettings = gridView.SettingsExport;
+		exportSettings.EnableClientSideExportAPI = true;
+		exportSettings.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+
+		exportSettings.FileName = String.Format("{0}. {1:yyyyMMdd HHmm}", "FactoresCostoContenedor", DateTime.Now);
+
+		exportSettings.Styles.Header.Font.Name = "Verdana";
+		exportSettings.Styles.Header.Font.Size = FontUnit.Point(10);
+
+		exportSettings.Styles.Default.Font.Name = "Verdana";
+		exportSettings.Styles.Default.Font.Size = FontUnit.Point(8);
+
+		gridView.Toolbars.Add(toolbar =>
+		{
+			toolbar.Items.Add(new MVCxGridViewToolbarItem()
+			{
+				Name = "ExportToXlsx",
+				Text = "Exportar datos a Excel (2003)",
+				Command = GridViewToolbarCommand.ExportToXlsx,
+			});
+		});
+		gridView.SetClientJSProperties(null, null,
+			new Dictionary<string, object>
+			{
+				{ "Detalles", detalles },
+			});
+
+		// Eventos y callbacks
+		gridView.CallbackRouteValues = new { Controller = "CostPerContainer", Action = "CostContenedorManualPoundDetail" };
+
+		var events = gridView.ClientSideEvents;
+		events.BeginCallback = "onCostContenedorManualPoundDetailsBeginCallback";
+		events.Init = "onCostContenedorManualPoundDetailsInitCallback";
+		events.EndCallback = "onCostContenedorManualPoundDetailsEndCallback";
+
+		// Pie de página
+		gridView.Settings.ShowFooter = true;
+		gridView.SetFooterRowTemplateContent(content =>
+		{
+			this.ViewContext.Writer.Write(@"<span id=""lblCostContenedorManualPoundDetailGridViewInfo""></span>");
+		});
+
+		#region Columns
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "orden";
+			column.Caption = "Nº";
+			column.Width = Unit.Pixel(30);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "CostPoundManualFactor.name";
+			column.Caption = "Indicador";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Pixel(110);
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "valor";
+			column.Caption = "$ Valor";
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Pixel(120);
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var index = c.VisibleIndex;
+				var valor = this.Model[index].valor;
+				var id_costPoundManualFactor = this.Model[index].id_costPoundManualFactor;
+				Html.DevExpress().SpinEdit(spinEdit =>
+				{
+					spinEdit.Name = string.Concat("ValorEditText_", index.ToString());
+					spinEdit.SetDefaultSettingsForMoney();
+					spinEdit.SetClientJSProperties(null, null,
+						new Dictionary<string, object>
+						{
+							{ "Indice", index },
+							{ "Id_costPoundManualFactor", id_costPoundManualFactor },
+						});
+
+					var p = spinEdit.Properties;
+					p.DecimalPlaces = 6;
+					p.DisplayFormatString = GlobalUtils.Currency6Format;
+					p.ClientSideEvents.Validation = "onValorPoundManualFactorValidation";
+					p.ClientSideEvents.ValueChanged = "onValorPoundManualFactorValueChanged";
+
+				}).Bind(valor).Render();
+			});
+		});
+		#endregion
+
+	}).Bind(this.Model).GetHtml()

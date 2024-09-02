@@ -1,0 +1,207 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<LiquidationTurnDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewDetails";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "LiquidationTurn",
+            Action = "GridViewDetails",
+            //drawersNumber = ViewBag.drawersNumber,
+            //((List<LiquidationTurnDetailDTO>) Model).Count
+            //idTypeLiquidationTurn = ViewBag.idTypeLiquidationTurn,
+            //percentTara = ViewBag.percentTara,
+            enabled = ViewBag.enabled
+        };
+
+        settings.KeyFieldName = "id";
+        //settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+        //settings.Enabled = ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+        settings.SettingsBehavior.AllowFixedGroups = true;
+        //settings.SettingsBehavior.AllowSort = false;
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        //settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        //settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        //settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            var list = (Model as List<LiquidationTurnDetailDTO>) ?? new List<LiquidationTurnDetailDTO>();
+            e.Properties["cpDetailCount"] = list.Count;
+        };
+
+        #region SearchPanel
+
+        //Panel de Busqueda
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        #endregion
+
+        settings.Settings.ShowFooter = true;
+
+        settings.Columns.Add(m => m.turn, column =>
+        {
+            column.Name = "turn";
+            column.Caption = "Turno";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+        }).GroupIndex = 0;
+
+        settings.Columns.Add(m => m.numberLot, column =>
+        {
+            column.Name = "numberLot";
+            column.Caption = "No. de Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        }).GroupIndex = 1;
+
+        settings.Columns.Add(m => m.process, column =>
+        {
+            column.Name = "process";
+            column.Caption = "Proceso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+        }).GroupIndex = 2;
+
+        settings.Columns.Add(m => m.provider, column =>
+        {
+            column.Name = "provider";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+        }).GroupIndex = 3;
+
+        settings.Columns.Add(m => m.numberLiquidationCarOnCar, column =>
+        {
+            column.Name = "numberLiquidationCarOnCar";
+            column.Caption = "No. Liquidación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.machineForProd, column =>
+        {
+            column.Name = "machineForProd";
+            column.Caption = "Máquina";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.state, column =>
+        {
+            column.Name = "state";
+            column.Caption = "Estado Liq. Carro";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string cod_state = (string)DataBinder.Eval(c.DataItem, "cod_state");
+                string state = (string)DataBinder.Eval(c.DataItem, "state");
+
+                string text = state;
+                if (cod_state == "01")//01: Pendiente
+                {
+                    text = "<b style='color:#FF0000';>" + text + "</b>"; //<p style='color:#FF0000';>" + text + "</p>";
+                }
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+settings.Columns.Add(m => m.stateLote, column =>
+        {
+            column.Name = "stateLote";
+            column.Caption = "Estado Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.tail, column =>
+        {
+            column.Name = "tail";
+            column.Caption = "Cola";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal tail = (decimal)DataBinder.Eval(c.DataItem, "tail");
+
+                string text = tail.ToString("#,##0.00");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.whole, column =>
+        {
+            column.Name = "whole";
+            column.Caption = "Entero";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal whole = (decimal)DataBinder.Eval(c.DataItem, "whole");
+
+                string text = whole.ToString("#,##0.00");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.total, column =>
+        {
+            column.Name = "total";
+            column.Caption = "Total Lbs";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal total = (decimal)DataBinder.Eval(c.DataItem, "total");
+
+                string text = total.ToString("#,##0.00");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "tail").DisplayFormat = "<b>Cola: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "whole").DisplayFormat = "<b>Entero: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>Total Lbs: {0:#,##0.00}</b>";
+    });
+}
+@grid.Bind(Model).GetHtml()

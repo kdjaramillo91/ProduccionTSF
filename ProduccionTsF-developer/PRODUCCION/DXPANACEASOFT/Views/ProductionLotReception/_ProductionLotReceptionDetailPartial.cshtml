@@ -1,0 +1,113 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+
+@{
+	string settCxC = DataProviderSetting.ValueSetting("HLCXC");
+}
+<table class="table table-condensed">
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan="6">
+			@{
+				ViewData["id_productionLot"] = (Model != null) ? Model.id : 0;
+
+				Html.DevExpress().PageControl(tabs =>
+				{
+					tabs.Name = "tabControl" + ViewData["id_productionLot"];
+					tabs.Width = Unit.Percentage(100);
+					tabs.Height = Unit.Pixel(200);
+
+					tabs.TabPages.Add(tab =>
+					{
+						tab.Name = "tabItemsDetails";
+						tab.Text = "Materia Prima";
+						tab.TabStyle.Width = Unit.Percentage(100);
+						tab.SetContent(() =>
+						{
+							var itemsDetail = (Model != null && Model.ProductionLotDetail != null) ? Model.ProductionLotDetail.ToList() : new List<ProductionLotDetail>();
+							Html.RenderPartial("_ProductionLotReceptionDetailItemsPartial", itemsDetail);
+						});
+					});
+					tabs.TabPages.Add(tab =>
+					{
+						tab.Name = "tabProductionLotLiquidationsDetails";
+						tab.Text = "Liquidación";
+						tab.TabStyle.Width = Unit.Percentage(100);
+						tab.SetContent(() =>
+						{
+							var productionLotLiquidationsDetail = ((this.Model != null) && (this.Model.ProductionLotLiquidation != null))
+								? this.Model.ProductionLotLiquidation.ToList()
+								: new List<ProductionLotLiquidation>();
+
+							var productionLotLiquidationTotal = ((this.Model != null) && (this.Model.ProductionLotLiquidationTotal != null))
+								? this.Model.ProductionLotLiquidationTotal.ToList()
+								: new List<ProductionLotLiquidationTotal>();
+
+							bool modoCarroPorCarro;
+
+							if (productionLotLiquidationTotal.Any())
+							{
+								// Si hay detalles acumulados de carro por carro, mostrarlos...
+								modoCarroPorCarro = true;
+							}
+							else if (productionLotLiquidationsDetail.Any())
+							{
+								// Sino...si hay detalles normales, mostrarlos...
+								modoCarroPorCarro = false;
+							}
+							else if (settCxC == "0")
+							{
+								// Sino...si el parámetro está inactivo, usamos vista normal...
+								modoCarroPorCarro = false;
+							}
+							else
+							{
+								// Sino...usar la vista de carro por carro
+								modoCarroPorCarro = true;
+							}
+
+							if (!modoCarroPorCarro)
+							{
+								Html.RenderPartial("_ProductionLotReceptionDetailProductionLotLiquidationsPartial", productionLotLiquidationsDetail);
+							}
+							else
+							{
+								Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotLiquidationTotalsPartial", productionLotLiquidationTotal);
+							}
+						});
+					});
+					tabs.TabPages.Add(tab =>
+					{
+						tab.Name = "tabProductionLotTrashsDetails";
+						tab.Text = "Desperdicio";
+						tab.TabStyle.Width = Unit.Percentage(100);
+						tab.SetContent(() =>
+						{
+							var productionLotTrashsDetail = (Model != null && Model.ProductionLotTrash != null) ? Model.ProductionLotTrash.ToList() : new List<ProductionLotTrash>();
+							Html.RenderPartial("_ProductionLotReceptionDetailProductionLotTrashsPartial", productionLotTrashsDetail);
+						});
+					});
+					tabs.TabPages.Add(tab =>
+					{
+						tab.Name = "tabProductionLotQualityAnalysissDetails";
+						tab.Text = "Análisis de Calidad";
+						tab.TabStyle.Width = Unit.Percentage(100);
+						tab.SetContent(() =>
+						{
+							var productionLotQualityAnalysissDetail = (Model != null && Model.ProductionLotQualityAnalysis != null) ? Model.ProductionLotQualityAnalysis.ToList() : new List<ProductionLotQualityAnalysis>();
+							Html.RenderPartial("_ProductionLotReceptionDetailProductionLotQualityAnalysisPartial", productionLotQualityAnalysissDetail);
+						});
+					});
+				}).Render();
+			}
+		</td>
+	</tr>
+</table>

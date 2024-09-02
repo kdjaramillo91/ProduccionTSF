@@ -1,0 +1,309 @@
+﻿@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using System.Drawing
+@model List<DXPANACEASOFT.Models.InventoryPeriodDetail>
+@{ 
+	var codes = new [] { "PV", "VA" };
+	var idsAdvancesDetails = DataProviderAdvanceParametersDetail
+		.GetAdvanceParameterDetailByCode("EPIV1", codes)
+		.Select(e => e.id);
+}
+@{
+	var grid = Html.DevExpress().GridView<InventoryPeriodDetail>(settings =>
+	{
+		settings.Name = "gvDetail";
+		settings.CallbackRouteValues = new { Controller = "InventoryPeriod", Action = "InventoryPeriodDetailPartial" };
+
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InventoryPeriod", Action = "InventoryPeriodDetailPartialUpdate" };
+
+		settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+		settings.Width = Unit.Percentage(100);
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowSelectCheckbox = false;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+		settings.CommandColumn.Width = Unit.Percentage(2);
+		settings.SettingsBehavior.ConfirmDelete = false;
+
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.KeyFieldName = "id";
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+		settings.Settings.ShowFooter = true;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+			List<InventoryPeriodDetail> rows = (Model as List<InventoryPeriodDetail>);
+			rows = (rows != null) ? rows.ToList() : new List<InventoryPeriodDetail>();
+
+			e.Properties["cpRowsCount"] = rows.Count;
+		};
+
+		settings.CommandButtonInitialize = (s, e) =>
+		{
+			if (e.ButtonType == ColumnCommandButtonType.Edit)
+			{
+				MVCxGridView g = s as MVCxGridView;
+				var value = (int)g.GetRowValues(e.VisibleIndex, "id_PeriodState");
+				e.Visible = !idsAdvancesDetails.Contains(value); 
+			}
+		};
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		#region Columns
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "periodNumber";
+			column.PropertiesEdit.ClientInstanceName = "periodNumber";
+			column.Caption = "Periodo";
+			column.Width = Unit.Percentage(20);
+			column.UnboundType = UnboundColumnType.String;
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+
+				int? periodNumber = (int?)DataBinder.Eval(c.DataItem, "periodNumber");
+				string text = periodNumber.ToString();
+				ViewContext.Writer.Write(text);
+			});
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				int? periodNumber = (int?)DataBinder.Eval(c.DataItem, "periodNumber");
+				Html.DevExpress().TextBox(textBox =>
+				{
+					textBox.Name = "periodNumber";
+					textBox.Properties.ClientInstanceName = "periodNumber";
+					textBox.Width = Unit.Percentage(100);
+					textBox.ReadOnly = true;
+					textBox.ShowModelErrors = false;
+				}).Bind(periodNumber).GetHtml();
+			});
+		});
+
+
+		settings.Columns.Add(column =>
+		{
+
+			column.FieldName = "dateInit";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.PropertiesEdit.ClientInstanceName = "dateInit";
+			var colSettings = column.PropertiesEdit as DateEditProperties;
+			colSettings.DisplayFormatString = "dd/MM/yyyy";
+			colSettings.DisplayFormatInEditMode = true;
+			colSettings.EditFormat = EditFormat.Custom;
+			colSettings.EditFormatString = "dd/MM/yyyy";
+
+			colSettings.Width = Unit.Percentage(100);
+			colSettings.ValidationSettings.ValidationGroup = "tabDeta";
+
+			colSettings.ClientSideEvents.Validation = "OnstartDateValidation";
+			colSettings.DisplayFormatInEditMode = true;
+			colSettings.CalendarProperties.Columns = 2;
+			colSettings.DateRangeSettings.MinDayCount = 1;
+			colSettings.DateRangeSettings.MaxDayCount = 90;
+
+			column.Caption = "Fecha Inicio";
+			column.Name = "dateInit";
+			column.Width = Unit.Percentage(30);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+
+				DateTime dateInit = (DateTime)DataBinder.Eval(c.DataItem, "dateInit");
+				string text = dateInit.ToString("yyyy/MM/dd");
+				ViewContext.Writer.Write(text);
+			});
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				DateTime? dateInit = (DateTime?)DataBinder.Eval(c.DataItem, "dateInit");
+
+				Html.DevExpress().DateEdit(dateEdit =>
+				{
+					dateEdit.Name = "dateInit";
+					dateEdit.Properties.ClientInstanceName = "dateInit";
+					dateEdit.Properties.UseMaskBehavior = true;
+					dateEdit.Properties.EditFormat = EditFormat.Custom;
+					dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+					dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+					dateEdit.Width = Unit.Percentage(100);
+					dateEdit.Properties.ValidationSettings.ValidationGroup = "tabDeta";
+					dateEdit.ShowModelErrors = true;
+					dateEdit.Properties.ClientSideEvents.Validation = "OnstartDateValidation";
+					dateEdit.Properties.DisplayFormatInEditMode = true;
+					dateEdit.Properties.CalendarProperties.Columns = 2;
+					dateEdit.Properties.DateRangeSettings.MinDayCount = 1;
+					dateEdit.Properties.DateRangeSettings.MaxDayCount = 90;
+				}).Bind(dateInit).GetHtml();
+
+			});
+		});
+
+
+
+
+		settings.Columns.Add(column =>
+		{
+
+			column.FieldName = "dateEnd";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.PropertiesEdit.ClientInstanceName = "dateEnd";
+			var colSettings = column.PropertiesEdit as DateEditProperties;
+			colSettings.DisplayFormatString = "dd/MM/yyyy";
+			colSettings.DisplayFormatInEditMode = true;
+			colSettings.EditFormat = EditFormat.Custom;
+			colSettings.EditFormatString = "dd/MM/yyyy";
+
+			colSettings.Width = Unit.Percentage(100);
+			colSettings.ValidationSettings.ValidationGroup = "tabDeta";
+
+			colSettings.ClientSideEvents.Validation = "OnendDateValidation";
+			colSettings.DisplayFormatInEditMode = true;
+			colSettings.CalendarProperties.Columns = 2;
+			colSettings.DateRangeSettings.MinDayCount = 1;
+			colSettings.DateRangeSettings.MaxDayCount = 90;
+
+			column.Caption = "Fecha Fin";
+			column.Name = "dateEnd";
+			column.Width = Unit.Percentage(30);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+
+				DateTime dateEnd = (DateTime)DataBinder.Eval(c.DataItem, "dateEnd");
+				string text = dateEnd.ToString("yyyy/MM/dd");
+				ViewContext.Writer.Write(text);
+			});
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				DateTime? dateInit = (DateTime?)DataBinder.Eval(c.DataItem, "dateEnd");
+
+				Html.DevExpress().DateEdit(dateEdit =>
+				{
+					dateEdit.Name = "dateEnd";
+					dateEdit.Properties.ClientInstanceName = "dateEnd";
+					dateEdit.Properties.UseMaskBehavior = true;
+					dateEdit.Properties.EditFormat = EditFormat.Custom;
+					dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+					dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+					dateEdit.Width = Unit.Percentage(100);
+					dateEdit.Properties.ValidationSettings.ValidationGroup = "tabDeta";
+					dateEdit.ShowModelErrors = true;
+					dateEdit.Properties.DateRangeSettings.StartDateEditID = "dateInit";
+					dateEdit.Properties.ClientSideEvents.Validation = "OnendDateValidation";
+					dateEdit.Properties.DisplayFormatInEditMode = true;
+					dateEdit.Properties.CalendarProperties.Columns = 2;
+					dateEdit.Properties.DateRangeSettings.MinDayCount = 1;
+					dateEdit.Properties.DateRangeSettings.MaxDayCount = 90;
+				}).Bind(dateInit).GetHtml();
+
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_PeriodState";
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var id = (int)DataBinder.Eval(c.DataItem, "id_PeriodState");
+
+				AdvanceParametersDetail item = DataProviderAdvanceParameters.AdvanceParametersDetailByid(id);
+				string description = (item != null && item.description != null) ? item.description : "";
+				ViewContext.Writer.Write(description);
+
+
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "id_PeriodState";
+				p.DataSource = DataProviderAdvanceParameters.AdvanceParametersNormalPeriodByCode("EPIV1");
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+				p.CallbackPageSize = 30;
+				p.Width = Unit.Percentage(100);
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				p.Columns.Add("name", "Estado", 200);
+
+
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				p.ClientSideEvents.Validation = "OnPeriodStateValidation";
+
+			});
+
+		});
+		#endregion
+
+		MVCxGridViewCommandColumn commandEditColumn = new MVCxGridViewCommandColumn
+		{
+			Name = "Edit",
+			ShowEditButton = true,
+			ShowDeleteButton = false,
+			ShowCancelButton = true,
+			ShowUpdateButton = true,
+			Visible = true,
+			VisibleIndex = 5,
+			Caption = "Acciones",
+			Width = Unit.Percentage(5),
+		};
+
+		settings.Columns.Add(commandEditColumn);
+	});
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}
+
+<script src="~/Scripts/InventoryPeriod/_details.js"></script>

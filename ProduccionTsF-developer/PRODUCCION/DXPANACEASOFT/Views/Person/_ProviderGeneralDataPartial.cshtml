@@ -1,0 +1,902 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ProviderGeneralData
+
+@{
+	var code_identification = (Model != null && Model.Provider != null && Model.Provider.Person != null && Model.Provider.Person.id_identificationType != 0) ? Model.Provider.Person.IdentificationType.codeSRI : "";
+	var rolPlantaExport = (Model != null && Model.Provider != null && Model.Provider.Person != null && Model.Provider.Person.Rol != null)
+		? Model.Provider.Person.Rol.FirstOrDefault(a => a.name == "Planta Exportadora")
+		: null;
+	var plantaExport = rolPlantaExport != null ? rolPlantaExport.name : String.Empty;
+
+	var codeCountrySystem = DataProviderSetting.ValueSetting("COSCO");
+}
+
+<table id="tabGeneralDataProviderTable" class="table table-condensed" style="margin: 0px;">
+
+	@Html.Hidden("codeCountrySystem", codeCountrySystem)
+	<tr>
+		<td colspan="6" class="ps-bar-collapse" dtx="psn-Principales">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Principales</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-Principales">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_providerType, settings =>
+	   {
+		   settings.Name = "id_providerTypeLabel";
+		   settings.Text = "Tipo Proveedor:";
+		   settings.AssociatedControlName = "id_providerType";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_providerType = (Model != null && Model.id_providerType != 0) ? (int?)Model.id_providerType : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_providerType, settings =>
+	   {
+		   settings.Name = "id_providerType";
+		   settings.Properties.ClientInstanceName = "id_providerType";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 50);
+		   settings.Properties.Columns.Add("name", "Nombre", 100);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProviderType_SelectedIndexChanged";
+	   }).BindList(DataProviderPerson.ProviderTypeWithCurrent(id_providerType)).Bind(id_providerType).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_economicGroup, settings =>
+	   {
+		   settings.Name = "id_economicGroupLabel";
+		   settings.Text = "Grupo Económico:";
+		   settings.AssociatedControlName = "id_economicGroup";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_economicGroup = (Model != null && Model.id_economicGroup != 0) ? (int?)Model.id_economicGroup : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_economicGroup, settings =>
+	   {
+		   settings.Name = "id_economicGroup";
+		   settings.Properties.ClientInstanceName = "id_economicGroup";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 50);
+		   settings.Properties.Columns.Add("name", "Nombre", 100);
+		   settings.ShowModelErrors = true;
+	   }).BindList(DataProviderPerson.EconomicGroupWithCurrent(id_economicGroup)).Bind(id_economicGroup).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-Principales">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.cod_alternate, settings =>
+	   {
+		   settings.Name = "cod_alternateLabel";
+		   settings.Text = "Cod. Alterno:";
+		   settings.AssociatedControlName = "cod_alternate";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.cod_alternate, settings =>
+	   {
+		   settings.Name = "cod_alternate";
+		   settings.Properties.ClientInstanceName = "cod_alternate";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpTabContainer"] = "tabProvider";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "false";
+					e.Properties["cpMaximunLength"] = 8;
+					e.Properties["cpTabControl"] = "tabControl";
+				};
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.buyerLabel, settings =>
+		   {
+			   settings.Name = "buyerLabelLabel";
+			   settings.Text = "Etiqueta Comprador:";
+			   settings.AssociatedControlName = "buyerLabel";
+		   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.buyerLabel, settings =>
+	   {
+		   settings.Name = "buyerLabel";
+		   settings.Properties.ClientInstanceName = "buyerLabel";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "buyerLabelValidate";
+		   settings.Properties.MaxLength = 10;
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpTabContainer"] = "tabProvider";
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpIsRequired"] = "false";
+			   e.Properties["cpMaximunLength"] = 8;
+			   e.Properties["cpTabControl"] = "tabControl";
+		   };
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-Principales">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.accountExecutive, settings =>
+	   {
+		   settings.Name = "accountExecutiveLabel";
+		   settings.Text = "Ejecutivo Cta:";
+		   settings.AssociatedControlName = "accountExecutive";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.accountExecutive, settings =>
+	   {
+		   settings.Name = "accountExecutive";
+		   settings.Properties.ClientInstanceName = "accountExecutive";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ShowModelErrors = true;
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.reference, settings =>
+	   {
+		   settings.Name = "referenceLabel";
+		   settings.Text = "Referencia:";
+		   settings.AssociatedControlName = "reference";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.reference, settings =>
+	   {
+		   settings.Name = "reference";
+		   settings.Properties.ClientInstanceName = "reference";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ShowModelErrors = true;
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-Principales">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.observation, settings =>
+	   {
+		   settings.Name = "observationLabel";
+		   settings.Text = "Observación:";
+		   settings.AssociatedControlName = "tradeName";
+	   }).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().TextBoxFor(m => m.observation, settings =>
+	   {
+		   settings.Name = "observation";
+		   settings.Properties.ClientInstanceName = "observation";
+		   settings.Width = Unit.Percentage(100);
+		   settings.ShowModelErrors = true;
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6" class="ps-bar-collapse" dtx="psn-Ubicacion">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Ubicación</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-Ubicacion">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_origin, settings =>
+	   {
+		   settings.Name = "id_originLabel";
+		   settings.Text = "Origen:";
+		   settings.AssociatedControlName = "id_origin";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_origin = (Model != null && Model.id_origin != 0) ? (int?)Model.id_origin : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_origin, settings =>
+	   {
+		   settings.Name = "id_origin";
+		   settings.Properties.ClientInstanceName = "id_origin";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Init = "ComboOrigin_Init";
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboOrigin_SelectedIndexChanged";
+	   }).BindList(DataProviderPerson.OriginWithCurrent(id_origin)).Bind(id_origin).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_country, settings =>
+	   {
+		   settings.Name = "id_countryLabel";
+		   settings.Text = "País:";
+		   settings.AssociatedControlName = "id_country";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_country = (Model != null && Model.id_country != 0) ? (int?)Model.id_country : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_country, settings =>
+	   {
+		   settings.Name = "id_country";
+		   settings.Properties.ClientInstanceName = "id_country";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 50);
+		   settings.Properties.Columns.Add("name", "Nombre", 100);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboContry_SelectedIndexChanged";
+	   }).BindList(DataProviderCountry.CountryWithCurrent(id_country)).Bind(id_country).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-Ubicacion">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_city, settings =>
+	   {
+		   settings.Name = "id_cityLabel";
+		   settings.Text = "Ciudad:";
+		   settings.AssociatedControlName = "id_city";
+	   }).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_city = (Model != null && Model.id_city != 0) ? (int?)Model.id_city : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_city, settings =>
+	   {
+		   settings.Name = "id_city";
+		   settings.Properties.ClientInstanceName = "id_city";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.ShowModelErrors = true;
+	   }).BindList(DataProviderCountry.CityWithCurrent(id_city)).Bind(id_city).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.cellPhoneNumber, settings =>
+	   {
+		   settings.Name = "cellPhoneNumberLabel";
+		   settings.Text = "Celular*:";
+		   settings.AssociatedControlName = "cellPhoneNumber";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.cellPhoneNumber, settings =>
+	   {
+		   settings.Name = "cellPhoneNumber";
+		   settings.Properties.ClientInstanceName = "cellPhoneNumber";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.MaskSettings.Mask = "(00)-000-00000";
+		   settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+		   settings.Properties.MaskSettings.ErrorText = "Número telefónico inválido (09)-000-0000";
+		   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpTabContainer"] = "tabProvider";
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpInitialCondition"] = "(  )-   -";
+			   e.Properties["cpIsRequired"] = "true";
+			   e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (09)-XXX-XXXXX.";
+			   e.Properties["cpTabControl"] = "tabControl";
+
+		   };
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_stateOfContry, settings =>
+	   {
+		   settings.Name = "id_stateOfContryLabel";
+		   settings.Text = "Estado:";
+		   settings.AssociatedControlName = "id_stateOfContry";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_stateOfContry = (Model != null && Model.id_stateOfContry != 0) ? (int?)Model.id_stateOfContry : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_stateOfContry, settings =>
+	   {
+		   settings.Name = "id_stateOfContry";
+		   settings.Properties.ClientInstanceName = "id_stateOfContry";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.ShowModelErrors = true;
+	   }).BindList(DataProviderCountry.StateOfContryWithCurrent(id_stateOfContry)).Bind(id_stateOfContry).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-Ubicacion">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.noFax, settings =>
+			{
+				settings.Name = "noFaxLabel";
+				settings.Text = "No. Fax:";
+				settings.AssociatedControlName = "noFax";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.noFax, settings =>
+			{
+				settings.Name = "noFax";
+				settings.Properties.ClientInstanceName = "noFax";
+				settings.Width = Unit.Percentage(100);
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+				settings.Properties.ValidationSettings.Display = Display.Dynamic;
+				settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpTabContainer"] = "tabProvider";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "false";
+					e.Properties["cpMinimunLength"] = 10;
+					e.Properties["cpMaximunLength"] = 20;
+					e.Properties["cpTabControl"] = "tabControl";
+				};
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.phoneNumber1, settings =>
+	   {
+		   settings.Name = "phoneNumber1Label";
+		   settings.Text = "Telf 1*:";
+		   settings.AssociatedControlName = "phoneNumber1";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.phoneNumber1, settings =>
+	   {
+		   settings.Name = "phoneNumber1";
+		   settings.Properties.ClientInstanceName = "phoneNumber1";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.MaskSettings.Mask = "(00)-000-0000";
+		   settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+		   settings.Properties.MaskSettings.ErrorText = "Número telefónico inválido (00)-000-0000";
+		   //settings.Properties.ValidationSettings.CausesValidation = false;
+		   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpTabContainer"] = "tabProvider";
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpInitialCondition"] = "(  )-   -";
+			   e.Properties["cpIsRequired"] = "true";
+			   e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (XX)-XXX-XXXX.";
+			   e.Properties["cpTabControl"] = "tabControl";
+		   };
+		   //settings.Properties.ClientSideEvents.Validation = "OnPhoneNumber1Validation";
+	   }).GetHtml()
+
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.phoneNumber2, settings =>
+		   {
+			   settings.Name = "phoneNumber2Label";
+			   settings.Text = "Telf 2:";
+			   settings.AssociatedControlName = "phoneNumber2";
+		   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.phoneNumber2, settings =>
+	   {
+		   settings.Name = "phoneNumber2";
+		   settings.Properties.ClientInstanceName = "phoneNumber2";
+		   settings.Width = Unit.Percentage(93);
+		   settings.Properties.MaskSettings.Mask = "(99)-999-9999";
+		   settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+		   settings.Properties.MaskSettings.ErrorText = "Número telefónico inválido (99)-999-9999";
+		   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ValidationSettings.RequiredField.IsRequired = false;
+		   //settings.Properties.ClientSideEvents.Validation = "OnPhoneNumber2Validation";
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpTabContainer"] = "tabProvider";
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpInitialCondition"] = "(  )-   -";
+			   e.Properties["cpIsRequired"] = "false";
+			   e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (XX)-XXX-XXXX.";
+			   e.Properties["cpTabControl"] = "tabControl";
+		   };
+	   }).GetHtml()
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="6" class="ps-bar-collapse" dtx="psn-Contacto">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Contacto</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-Contacto">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.contactName, settings =>
+		   {
+			   settings.Name = "contactNameLabel";
+			   settings.Text = "Nombre:";
+			   settings.AssociatedControlName = "contactName";
+		   }).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().TextBoxFor(m => m.contactName, settings =>
+		   {
+			   settings.Name = "contactName";
+			   settings.Properties.ClientInstanceName = "contactName";
+			   settings.Width = Unit.Percentage(100);
+			   settings.ShowModelErrors = true;
+		   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-Contacto">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.contactPhoneNumber, settings =>
+	   {
+		   settings.Name = "contactPhoneNumberLabel";
+		   settings.Text = "Teléfono:";
+		   settings.AssociatedControlName = "contactPhoneNumber";
+	   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.contactPhoneNumber, settings =>
+	   {
+		   settings.Name = "contactPhoneNumber";
+		   settings.Properties.ClientInstanceName = "contactPhoneNumber";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.MaskSettings.Mask = "(99)-999-9999";
+		   settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.All;
+		   settings.Properties.MaskSettings.ErrorText = "Número telefónico inválido (99)-999-9999";
+		   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+		   settings.Properties.ValidationSettings.RequiredField.IsRequired = false;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpTabContainer"] = "tabProvider";
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpInitialCondition"] = "(  )-   -";
+			   e.Properties["cpMessageErrorFormart"] = "Número telefónico inválido (XX)-XXX-XXXX.";
+			   e.Properties["cpTabControl"] = "tabControl";
+			   e.Properties["cpIsRequired"] = "false";
+		   };
+		   //settings.Properties.ClientSideEvents.Validation = "OnContactPhoneNumberValidation";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.contactNoFax, settings =>
+		   {
+			   settings.Name = "contactNoFaxLabel";
+			   settings.Text = "Fax:";
+			   settings.AssociatedControlName = "contactNoFax";
+		   }).GetHtml()
+		</td>
+		<td colspan="2">
+			@Html.DevExpress().TextBoxFor(m => m.contactNoFax, settings =>
+	   {
+		   settings.Name = "contactNoFax";
+		   settings.Properties.ClientInstanceName = "contactNoFax";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+		   //settings.Properties.MaskSettings.ErrorText = "Número de fax invalido (99)-000-0000";
+		   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpTabContainer"] = "tabProvider";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpMinimunLength"] = 10;
+					e.Properties["cpMaximunLength"] = 20;
+					e.Properties["cpIsRequired"] = "false";
+					e.Properties["cpTabControl"] = "tabControl";
+				};
+	   }).GetHtml()
+		</td>
+	</tr>
+
+
+	<tr>
+		<td colspan="6" class="ps-bar-collapse" dtx="psn-PagoElec">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Pago Electrónico</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-PagoElec">
+		<td style="border-spacing: 1px;">
+			@Html.DevExpress().LabelFor(m => m.electronicPayment, settings =>
+					   {
+						   settings.Name = "electronicPaymentLabel";
+						   settings.Text = "Pago Electrónico:";
+						   settings.AssociatedControlName = "electronicPayment";
+					   }).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().CheckBoxFor(m => m.electronicPayment, settings =>
+					   {
+						   settings.Name = "electronicPayment";
+						   settings.Properties.ClientInstanceName = "electronicPayment";
+						   settings.Properties.ClientSideEvents.CheckedChanged = "ShowDetailElectronicPayment";
+						   settings.ShowModelErrors = true;
+					   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-PagoElec">
+		<td colspan="6">
+			@{
+				var display = (!Model.electronicPayment) ? "none" : "";
+			}
+			<div id="detailElectronicPayment" style="display: @Html.Raw(display);">
+				<table class="table table-condensed">
+					<tr>
+						<td>
+							@{
+								var providerGeneralDataEP = (Model != null && Model.Provider != null && Model.Provider.ProviderGeneralDataEP != null) ? Model.Provider.ProviderGeneralDataEP : new ProviderGeneralDataEP();
+								Html.RenderPartial("_FormEditProviderGeneralDataEP", providerGeneralDataEP);
+							}
+						</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+
+
+
+	<tr>
+		<td colspan="6" class="ps-bar-collapse" dtx="psn-ConfigTribut">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Configuración Tributaria</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr class="psn-ConfigTribut">
+		<td style="border-spacing: 1px;">
+			@Html.DevExpress().LabelFor(m => m.rise, settings =>
+		   {
+			   settings.Name = "riseLabel";
+			   settings.Text = "RIMPE:";
+			   settings.AssociatedControlName = "rise";
+		   }).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().CheckBoxFor(m => m.rise, settings =>
+	   {
+		   settings.Name = "rise";
+		   settings.Properties.ClientInstanceName = "rise";
+		   settings.Properties.ClientSideEvents.CheckedChanged = "ShowDetailRise";
+		   settings.ShowModelErrors = true;
+	   }).GetHtml()
+			<table>
+				<tr>
+					<td colspan="6">
+						@{
+							var displayRise = (!Model.rise) ? "none" : "";
+						}
+						<div id="detailRise" style="display: @Html.Raw(displayRise);">
+							<table class="table table-condensed">
+								<tr>
+									<td>
+										@{
+											var providerGeneralDataRise = (Model != null && Model.Provider != null && Model.Provider.ProviderGeneralDataRise != null) ? Model.Provider.ProviderGeneralDataRise : new ProviderGeneralDataRise();
+											Html.RenderPartial("_FormEditProviderGeneralDataRise", providerGeneralDataRise);
+										}
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
+	<tr class="psn-ConfigTribut">
+		<td style="border-spacing: 1px;">
+			@Html.DevExpress().LabelFor(m => m.specialTaxPayer, settings =>
+		   {
+			   settings.Name = "specialTaxPayerLabel";
+			   settings.Text = "Contribuyente Especial:";
+			   settings.AssociatedControlName = "specialTaxPayer";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().CheckBoxFor(m => m.specialTaxPayer, settings =>
+	   {
+		   settings.Name = "specialTaxPayer";
+		   settings.Properties.ClientInstanceName = "specialTaxPayer";
+		   settings.ShowModelErrors = true;
+		   //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   //settings.CustomJSProperties = (s, e) =>
+		   //{
+		   //    e.Properties["cpTabContainer"] = "tabProvider";
+		   //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+		   //    e.Properties["cpIsRequired"] = "true";
+		   //    e.Properties["cpTabControl"] = "tabControl";
+		   //};
+	   }).GetHtml()
+		</td>
+		<td style="border-spacing: 1px;">
+			@Html.DevExpress().LabelFor(m => m.forcedToKeepAccounts, settings =>
+		   {
+			   settings.Name = "forcedToKeepAccountsLabel";
+			   settings.Text = "Obligado llevar Contabilidad:";
+			   settings.AssociatedControlName = "forcedToKeepAccounts";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().CheckBoxFor(m => m.forcedToKeepAccounts, settings =>
+	   {
+		   settings.Name = "forcedToKeepAccounts";
+		   settings.Properties.ClientInstanceName = "forcedToKeepAccounts";
+		   settings.ShowModelErrors = true;
+		   //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   //settings.CustomJSProperties = (s, e) =>
+		   //{
+		   //    e.Properties["cpTabContainer"] = "tabProvider";
+		   //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+		   //    e.Properties["cpIsRequired"] = "true";
+		   //    e.Properties["cpTabControl"] = "tabControl";
+		   //};
+	   }).GetHtml()
+		</td>
+		<td style="border-spacing: 1px;">
+			@Html.DevExpress().LabelFor(m => m.habitualExporter, settings =>
+		   {
+			   settings.Name = "habitualExporterLabel";
+			   settings.Text = "Exportador Habitual:";
+			   settings.AssociatedControlName = "habitualExporter";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().CheckBoxFor(m => m.habitualExporter, settings =>
+	   {
+		   settings.Name = "habitualExporter";
+		   settings.Properties.ClientInstanceName = "habitualExporter";
+		   settings.ShowModelErrors = true;
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr class="psn-ConfigTribut">
+		<td style="border-spacing: 1px;">
+			@Html.DevExpress().LabelFor(m => m.taxHavenExporter, settings =>
+		   {
+			   settings.Name = "taxHavenExporterLabel";
+			   settings.Text = "Exportador Paraíso Fiscal:";
+			   settings.AssociatedControlName = "taxHavenExporter";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().CheckBoxFor(m => m.taxHavenExporter, settings =>
+		   {
+			   settings.Name = "taxHavenExporter";
+			   settings.Properties.ClientInstanceName = "taxHavenExporter";
+			   settings.ShowModelErrors = true;
+		   }).GetHtml()
+		</td>
+		<td style="border-spacing: 1px;">
+			@Html.DevExpress().LabelFor(m => m.sponsoredLinks, settings =>
+		   {
+			   settings.Name = "sponsoredLinksLabel";
+			   settings.Text = "Ley Solidaria:";
+			   settings.AssociatedControlName = "sponsoredLinks";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().CheckBoxFor(m => m.sponsoredLinks, settings =>
+	   {
+		   settings.Name = "sponsoredLinks";
+		   settings.Properties.ClientInstanceName = "sponsoredLinks";
+		   settings.ShowModelErrors = true;
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.isCRAFTSMAN, settings =>
+	   {
+		   settings.Name = "isCRAFTSMANLabel";
+		   settings.Text = "Artesano:";
+		   settings.AssociatedControlName = "isCRAFTSMANLabel";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().CheckBoxFor(m => m.isCRAFTSMAN, settings =>
+	   {
+		   settings.Name = "isCRAFTSMAN";
+		   settings.Properties.ClientInstanceName = "isCRAFTSMAN";
+		   settings.ShowModelErrors = true;
+		   settings.Checked = false;
+	   }).GetHtml()
+		</td>
+		@*<td></td>
+			<td></td>*@
+	</tr>
+	<tr class="psn-ConfigTribut">
+		<td colspan="6">
+			@{
+				var displayPassportImportData = (code_identification != "06") ? "none" : "";//"06" CodeSRI de Pasaporte
+			}
+			<div id="detailPassportImportData" style="display: @Html.Raw(displayPassportImportData);">
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td colspan="6">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Datos de Importación</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@{
+								var providerPassportImportData = (Model != null && Model.Provider != null && Model.Provider.ProviderPassportImportData != null) ? Model.Provider.ProviderPassportImportData : new ProviderPassportImportData();
+								Html.RenderPartial("_FormEditProviderPassportImportData", providerPassportImportData);
+							}
+						</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="6" class="ps-bar-collapse" dtx="DatosAdic">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Datos Adicionales</span>
+			<span class="arrow fa fa-angle-down ps_floatrt"> </span>
+		</td>
+	</tr>
+	<tr style="border-bottom: 1px Solid #C0C0C0;" class="psn-Descuento">
+		<td>
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>
+		</td>
+	</tr>
+	<tr class="psn-Descuento">
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_typeBoxCardAndBankAD, settings =>
+				{
+					settings.Name = "id_typeBoxCardAndBankADLabel";
+					settings.Text = "Repos/TC:";
+					settings.AssociatedControlName = "id_typeBoxCardAndBankAD";
+				}).GetHtml()
+		</td>
+		<td colspan="2">
+			@{
+				int? id_typeBoxCardAndBankAD = (Model != null && Model.id_typeBoxCardAndBankAD != 0) ? (int?)Model.id_typeBoxCardAndBankAD : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_typeBoxCardAndBankAD, settings =>
+	   {
+		   settings.Name = "id_typeBoxCardAndBankAD";
+		   settings.Properties.ClientInstanceName = "id_typeBoxCardAndBankAD";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Init = "ComboTypeBoxCardAndBankAD_Init";
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboTypeBoxCardAndBankAD_SelectedIndexChanged";
+	   }).BindList(DataProviderBoxCardAndBank.TypeBoxCardWithCurrent(id_typeBoxCardAndBankAD)).Bind(id_typeBoxCardAndBankAD).GetHtml()
+		</td>
+
+		<td colspan="3">
+			@{
+				int? id_boxCardAndBankAD = (Model != null && Model.id_boxCardAndBankAD != 0) ? (int?)Model.id_boxCardAndBankAD : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_boxCardAndBankAD, settings =>
+	   {
+		   settings.Name = "id_boxCardAndBankAD";
+		   settings.Properties.ClientInstanceName = "id_boxCardAndBankAD";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.Columns.Add("code", "Cod.", 50);
+		   settings.Properties.Columns.Add("name", "Nombre", 100);
+		   settings.ShowModelErrors = true;
+	   }).BindList(DataProviderBoxCardAndBank.BoxCardWithCurrent(id_boxCardAndBankAD)).Bind(id_boxCardAndBankAD).GetHtml()
+		</td>
+	</tr>
+
+
+	<tr class="psn-ConfigTribut">
+		<td colspan="6">
+			@{
+				var displayplantExport = (plantaExport != "Planta Exportadora") ? "none" : "";
+			}
+			<div id="detailExportPlant" style="display: @Html.Raw(displayplantExport);">
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td colspan="6">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información de Planta Exportadora</span>
+						</td>
+					</tr>
+					<tr class="psn-ConfigTribut">
+						<td style="border-spacing: 1px;">
+							@Html.DevExpress().LabelFor(m => m.plantCode, settings =>
+						   {
+							   settings.Name = "plantCodeLabel";
+							   settings.Text = "Cod. Planta:";
+							   settings.AssociatedControlName = "plantCode";
+						   }).GetHtml()
+						</td>
+						<td colspan="2">
+							@Html.DevExpress().TextBoxFor(m => m.plantCode, settings =>
+					   {
+						   settings.Name = "plantCode";
+						   settings.Properties.ClientInstanceName = "plantCode";
+						   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+						   settings.ShowModelErrors = true;
+						   settings.Properties.ClientSideEvents.Validation = "OnPlantCodeValidation";
+
+					   }).GetHtml()
+
+						</td>
+						<td style="border-spacing: 1px;">
+							@Html.DevExpress().LabelFor(m => m.fda, settings =>
+						   {
+							   settings.Name = "fdaLabel";
+							   settings.Text = "FDA:";
+							   settings.AssociatedControlName = "fda";
+						   }).GetHtml()
+						</td>
+						<td colspan="2">
+							@Html.DevExpress().TextBoxFor(m => m.fda, settings =>
+					   {
+						   settings.Name = "fda";
+						   settings.Properties.ClientInstanceName = "fda";
+						   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+						   settings.ShowModelErrors = true;
+						   settings.Properties.ClientSideEvents.Validation = "OnFdaValidation";
+
+					   }).GetHtml()
+
+						</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+
+
+</table>
+
+<script src="~/Scripts/person/_providerGeneralData.js"></script>

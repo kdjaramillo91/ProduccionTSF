@@ -1,0 +1,71 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ProductionSchedule
+@{
+    int id_productionSchedule = (Model != null) ? Model.id : 0;
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) ? Model.Document.DocumentState.code : "";
+}
+@{
+//var code_identification = (Model != null && Model.Provider != null && Model.Provider.Person != null && Model.Provider.Person.id_identificationType != 0) ? Model.Provider.Person.IdentificationType.codeSRI : "";
+//string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+
+<table class="table table-condensed" style="margin: 0px;">
+    @*@Html.Hidden("code_purchaseReason", code_purchaseReason)*@
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Requerimiento de Compra</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+           @{
+               ViewData["id_productionSchedule"] = id_productionSchedule;
+               var productionSchedulePurchaseRequestsDetail = (Model != null && Model.ProductionSchedulePurchaseRequestDetail != null) ? Model.ProductionSchedulePurchaseRequestDetail.OrderByDescending(od => od.id).ToList() : new List<ProductionSchedulePurchaseRequestDetail>();
+               Html.RenderPartial("_ProductionScheduleViewFormProductionSchedulePurchaseRequestsDetailPartial", productionSchedulePurchaseRequestsDetail);
+        }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Planificación</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @{
+                var productionScheduleSchedulesDetail = (Model != null && Model.ProductionScheduleScheduleDetail != null) ? Model.ProductionScheduleScheduleDetail.OrderBy(od => od.datePlanning).ToList() : new List<ProductionScheduleScheduleDetail>();
+                if (codeState == "01")
+                {
+                    ViewData["dataSourceProductionSchedulePurchaseRequestDetail"] = productionSchedulePurchaseRequestsDetail.
+                                                                                    Select(s => new
+                                                                                    {
+                                                                                        id = s.id,
+                                                                                        numberRequest = (s.ProductionScheduleProductionOrderDetail.ProductionScheduleRequestDetail.SalesRequestOrQuotationDetailProductionScheduleRequestDetail != null &&
+                                                                                                         s.ProductionScheduleProductionOrderDetail.ProductionScheduleRequestDetail.SalesRequestOrQuotationDetailProductionScheduleRequestDetail.Count() > 0) ?
+                                                                                                        (s.ProductionScheduleProductionOrderDetail.ProductionScheduleRequestDetail.SalesRequestOrQuotationDetailProductionScheduleRequestDetail.FirstOrDefault().SalesRequest.Document.number) :
+                                                                                                        ("Stock"),
+                                                                                        itemRequest = s.ProductionScheduleProductionOrderDetail.ProductionScheduleRequestDetail.Item.name,
+                                                                                        codeRequest = (s.ProductionScheduleProductionOrderDetail.ProductionScheduleRequestDetail.Item.ItemSaleInformation != null &&
+                                                                                                       s.ProductionScheduleProductionOrderDetail.ProductionScheduleRequestDetail.Item.ItemSaleInformation.MetricUnit != null) ?
+                                                                                                       s.ProductionScheduleProductionOrderDetail.ProductionScheduleRequestDetail.Item.ItemSaleInformation.MetricUnit.code : "",
+                                                                                        namePurchase = s.Item.name,
+                                                                                        codePurchase = (s.Item.ItemPurchaseInformation != null && s.Item.ItemPurchaseInformation.MetricUnit != null) ? s.Item.ItemPurchaseInformation.MetricUnit.code : ""
+
+                                                                                    }).ToList();
+                    Html.RenderPartial("ProductionScheduleButtons/_ProductionScheduleScheduleDetailsActionsButtons");
+                    Html.RenderPartial("_ProductionScheduleEditFormProductionScheduleSchedulesDetailPartial", productionScheduleSchedulesDetail);
+                }
+                else
+                {
+                    ViewData["id_productionSchedule"] = id_productionSchedule;
+                    Html.RenderPartial("_ProductionScheduleViewFormProductionScheduleSchedulesDetailPartial", productionScheduleSchedulesDetail);
+                }
+
+            }
+            
+        </td>
+    </tr>
+</table>
+

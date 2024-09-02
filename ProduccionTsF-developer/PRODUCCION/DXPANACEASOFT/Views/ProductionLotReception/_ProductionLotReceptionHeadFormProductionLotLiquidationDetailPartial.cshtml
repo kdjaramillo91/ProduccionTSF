@@ -1,0 +1,1353 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+
+@{
+    string codeState = (Model != null) ? Model.ProductionLotState.code : "";
+    //string _tipoProceso = Model.ProcessType.code;
+
+    // Verificación del parámetro de Romaneo
+    var romaneoHabilitado = DataProviderSetting.ValueSetting("ROMANEO") == "1";
+
+    string settPDESCABEZADO = DataProviderSetting.ValueSetting("PDESCABEZADO");//db.Setting.FirstOrDefault(fod => fod.code == "PDESCABEZADO")?.value ?? "";
+
+    bool? deshbilitarENTERO = (Model != null && Model.Headless != null &&
+                       Model.Headless.FirstOrDefault(fod => fod.Document.DocumentState.code == "03") != null) ? Model.Headless.FirstOrDefault(fod => fod.Document.DocumentState.code == "03" &&
+                                                                                                                                                     fod.lbsWholeSurplus != null &&
+                                                                                                                                                     fod.lbsWholeSurplus > 0) != null : (bool?)null;
+    var aLbsWholeSurplus = Model.Headless.FirstOrDefault(fod => fod.Document.DocumentState.code == "03" &&
+                                                                               fod.lbsWholeSurplus != null &&
+                                                                               fod.lbsWholeSurplus > 0);
+    decimal lbsWholeSurplus = deshbilitarENTERO == true && settPDESCABEZADO == "SI" && aLbsWholeSurplus != null? aLbsWholeSurplus.lbsWholeSurplus.Value : 0.00M;
+
+    var aLbsDirect = Model.Headless.FirstOrDefault(fod => fod.Document.DocumentState.code == "03" &&
+                                                                                       fod.lbsDirect != null &&
+                                                                                       fod.lbsDirect > 0);
+    decimal lbsDirect = /*deshbilitarENTERO == false &&*/ settPDESCABEZADO == "SI" && aLbsDirect != null ? aLbsDirect.lbsDirect.Value : 0.00M;
+    @Html.Hidden("lbsWholeSurplusLiq", lbsWholeSurplus);
+    @Html.Hidden("lbsDirectLiq", lbsDirect);
+    Html.DevExpress<ProductionLot>().FormLayout(settings =>
+    {
+        settings.Name = "formLayoutEditProductionLotSummaryLiq";
+        settings.Width = Unit.Percentage(100);
+        settings.ColCount = 10;//5, 2, 2, 1, 1
+
+        //GroupItem1
+        #region GroupItem1
+        var groupItem1 = settings.Items.AddGroupItem(i =>
+        {
+            i.Caption = "";
+            i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+            i.ColCount = 10;
+            i.ColSpan = 10;
+        });
+
+        //Fila 1
+        #region Fila 1
+
+        //Total de libras Ordenadas
+        groupItem1.Items.Add(m => m.totalQuantityOrdered, item =>
+        {
+            item.Name = "totalQuantityOrderedSumaryLiq";
+            item.Caption = DataProviderSetting.ValueSetting("UCO");
+            item.CaptionStyle.Font.Bold = true;
+            item.ColSpan = 5;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+            item.Width = Unit.Percentage(50);
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalQuantityOrderedSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Total de libras Remitidas
+        groupItem1.Items.Add(m => m.totalQuantityRemitted, item =>
+        {
+            item.Name = "totalQuantityRemittedSumaryLiq";
+            item.Caption = DataProviderSetting.ValueSetting("UER");
+            item.CaptionStyle.Font.Bold = true;
+            item.ColSpan = 5;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+            item.Width = Unit.Percentage(50);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalQuantityRemittedSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        #endregion
+
+        #endregion
+
+        //GroupItem2
+        #region GroupItem2
+        var groupItem2 = settings.Items.AddGroupItem(i =>
+        {
+            i.Caption = "";
+            i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+            i.ColCount = 11;
+            i.ColSpan = 10;
+        });
+
+        //Fila 2
+        #region Fila 2
+
+        //Titulo: Proceso 7
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleProcessSumaryLiq";
+            item.Caption = "Proceso";
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleProcessSumaryLiq";
+                label.Text = "Proceso";
+                label.ControlStyle.Font.Bold = true;
+            });
+        });
+
+        //Titulo: Lbs Procesadas    12
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleProcessedLbsSumaryLiq";
+            item.Caption = "Lbs Procesadas";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(12);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleProcessedLbsSumaryLiq";
+                label.Text = "Lbs Procesadas";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: Ajuste 7
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleAdjustmentSumaryLiq";
+            item.Caption = "Ajuste";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(7);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleAdjustmentSumaryLiq";
+                label.Text = "Ajuste";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: Lbs Procesadas Ajustadas   12
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleAdjustedProcessedLbsSumaryLiq";
+            item.Caption = "Lbs Procesadas Ajustadas";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(12);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleAdjustedProcessedLbsSumaryLiq";
+                label.Text = "Lbs Procesadas Ajustadas";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: Porciento de Rendimiento Ajustado 7
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titlePercentPerformanceSubtotalAdjustLiq";
+            item.Caption = "Porciento de Rendimiento Ajustado";
+            item.CaptionStyle.Font.Bold = true;
+            //item.RowSpan = 5;
+            //item.ColSpan = 2;
+            item.ShowCaption = DefaultBoolean.False;
+            //settings.Width = Unit.Percentage(7);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titlePercentPerformanceSubtotalAdjustLiq";
+                label.Text = "% Rendimiento";
+                label.ControlStyle.Font.Bold = true;
+            });
+        });
+
+        //Titulo: Sobrante Entero 10
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleWholeSurplusSumaryLiq";
+            item.Caption = "Sobrante";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(10);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleWholeSurplusSumaryLiq";
+                label.Text = "Sobrante";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: Desperdicio 7
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleWasteSumaryLiq";
+            item.Caption = "Desperdicio";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(7);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleWasteSumaryLiq";
+                label.Text = "Desperdicio";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: Basura   7
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleTrashSumaryLiq";
+            item.Caption = "Basura";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(7);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleTrashSumaryLiq";
+                label.Text = "Basura";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: Lbs Recibidas 12
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleReceivedLbsSumaryLiq";
+            item.Caption = "Lbs Recibidas";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(12);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleReceivedLbsSumaryLiq";
+                label.Text = "Lbs Recibidas";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: Lbs Netas   12
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleNetLbsSumaryLiq";
+            item.Caption = "Lbs Netas";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(12);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleNetLbsSumaryLiq";
+                label.Text = "Lbs Netas";
+                label.ControlStyle.Font.Bold = true;
+            });
+
+        });
+
+        //Titulo: % Rendimiento   7
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titlePercentPerformanceSumaryLiq";
+            item.Caption = "% Rendimiento";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.Width = Unit.Percentage(7);
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titlePercentPerformanceSumaryLiq";
+                label.Text = "% Rendimiento";
+                label.ControlStyle.Font.Bold = true;
+            });
+        });
+
+        #endregion
+
+        //Fila 3
+        #region Fila 3
+
+        //Proceso Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeProcessLiq";
+            item.Caption = "ENTERO";
+            item.CaptionStyle.Font.Bold = true;
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "wholeProcessLiq";
+                label.Text = "ENTERO";
+            });
+
+        });
+
+        //Lbs Procesadas Entero
+        groupItem2.Items.Add(m => m.wholeSubtotal, item =>
+        {
+            item.Name = "wholeSubtotalSumaryLiq";
+            item.Caption = "Lbs Procesadas Entero";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeSubtotalSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Lbs Ajustadas Entero
+        groupItem2.Items.Add(m => m.totalAdjustmentWholePounds, item =>
+        {
+            item.Name = "totalAdjustmentWholePoundsSumaryLiq";
+            item.Caption = "Lbs Ajustadas Entero";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalAdjustmentWholePoundsSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+            });
+        });
+
+        //Lbs Entero Ajustadas
+        groupItem2.Items.Add(m => m.wholeSubtotalAdjust, item =>
+        {
+            item.Name = "wholeSubtotalAdjustSumaryLiq";
+            item.Caption = "Lbs Entero Ajustadas";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeSubtotalAdjustSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Porciento de Rendimiento de Entero Ajustado
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentPerformanceWholeSubtotalAdjustLiq";
+            item.Caption = "% Rendimiento Entero Ajustado";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                spinedit.Properties.DecimalPlaces = 4;
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentPerformanceWholeSubtotalAdjustLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Sobrante Entero
+        groupItem2.Items.Add(m => m.wholeLeftover, item =>
+        {
+            item.Name = "wholeLeftoverLiq";
+            item.Caption = "Sobrante";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeLeftoverLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.DisplayFormatInEditMode = true;
+                spinedit.RightToLeft = DefaultBoolean.True;
+                spinedit.Properties.HelpTextStyle.ForeColor = Color.DarkBlue;
+                spinedit.Properties.HelpTextStyle.Font.Bold = true;
+
+                spinedit.ReadOnly = ((codeState != "02" && codeState != "03") || Model.wholeSubtotal <= 0 || /*deshbilitarENTERO == true ||*/ settPDESCABEZADO == "SI") || romaneoHabilitado;
+
+                spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+                spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+                spinedit.Properties.ValidationSettings.CausesValidation = true;
+                spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+                spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+                spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+                spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+                spinedit.Properties.ClientSideEvents.ValueChanged = "UpdateTotalWholeLeftoverSumaryLiq";
+                spinedit.Properties.ClientSideEvents.Init = "SpineditWholeLeftover_InitLiq";//Spinedit_Init
+                spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+                //spinedit.ShowModelErrors = true;
+
+            });
+
+        });
+
+        //Desperdicio Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeTotalQuantityTrashSumaryLiq";
+            item.Caption = "Desperdicio Entero";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeTotalQuantityTrashSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;//(codeState != "04" && codeState != "05" && Model.wholeSubtotalAdjust > 0);
+
+            });
+        });
+
+        //Basura Entero
+        groupItem2.Items.Add(m => m.wholeGarbagePounds, item =>
+        {
+            item.Name = "wholeGarbagePoundsLiq";
+            item.Caption = "Basura Entero";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeGarbagePoundsLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.DisplayFormatInEditMode = true;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = ((codeState != "02" && codeState != "03") || Model.wholeSubtotal <= 0) || romaneoHabilitado;
+
+                spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+                spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+                spinedit.Properties.ValidationSettings.CausesValidation = true;
+                spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+                spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+                spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+                spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+                //spinedit.Properties.ClientSideEvents.Validation = "OnWholeQuantityRecivedValidation";
+                spinedit.Properties.ClientSideEvents.ValueChanged = "OnWholeGarbagePoundsValueChangedLiq";
+                spinedit.Properties.ClientSideEvents.Init = "Spinedit_InitLiq";
+                spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+            });
+        });
+
+        //Lbs Entero Recibidas
+        groupItem2.Items.Add(/*m => m.totalQuantityRecived,*/ item =>
+        {
+            item.Name = "wholeTotalQuantityRecivedSumaryLiq";
+            item.Caption = "Lbs Entero Recibidas";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeTotalQuantityRecivedSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Lbs Entero Netas
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeNetSumaryLiq";
+            item.Caption = "Lbs Entero Netas";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeNetSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //% Rendimiento Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentWholePerformanceSumaryLiq";
+            item.Caption = "% Rendimiento Entero";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentWholePerformanceSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        #endregion
+
+        //Fila 4
+        #region Fila 4
+
+        //Proceso Cola
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "TailProcessLiq";
+            item.Caption = "COLA";
+            item.CaptionStyle.Font.Bold = true;
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "TailProcessLiq";
+                label.Text = "COLA";
+            });
+
+        });
+
+        //Lbs Procesadas Cola
+        groupItem2.Items.Add(m => m.subtotalTail, item =>
+        {
+            item.Name = "subtotalTailSumaryLiq";
+            item.Caption = "Lbs Procesadas Cola";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "subtotalTailSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Lbs Ajustadas Cola
+        groupItem2.Items.Add(m => m.totalAdjustmentTailPounds, item =>
+        {
+            item.Name = "totalAdjustmentTailPoundsSumaryLiq";
+            item.Caption = "Lbs Ajustadas Cola";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalAdjustmentTailPoundsSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Lbs Cola Ajustadas
+        groupItem2.Items.Add(m => m.subtotalTailAdjust, item =>
+        {
+            item.Name = "subtotalTailAdjustSumaryLiq";
+            item.Caption = "Lbs Cola Ajustadas";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "subtotalTailAdjustSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Porciento de Rendimiento de Cola Ajustado
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentPerformanceSubtotalTailAdjustLiq";
+            item.Caption = "% Rendimiento Cola Ajustado";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+            //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+            //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                spinedit.Properties.DecimalPlaces = 4;
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentPerformanceSubtotalTailAdjustLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Sobrante Cola
+        groupItem2.Items.Add(m => m.tailLeftOver, item =>
+        {
+            item.Name = "tailLeftOverLiq";
+            item.Caption = "Sobrante";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailLeftOverLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.DisplayFormatInEditMode = true;
+                spinedit.RightToLeft = DefaultBoolean.True;
+                spinedit.Properties.HelpTextStyle.ForeColor = Color.DarkBlue;
+                spinedit.Properties.HelpTextStyle.Font.Bold = true;
+
+                spinedit.ReadOnly = ((codeState != "02" && codeState != "03") || Model.wholeSubtotal > 0/*_tipoProceso == "ENT"*/ || /*deshbilitarENTERO == false ||*/ settPDESCABEZADO == "SI") || romaneoHabilitado;
+
+                spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+                spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+                spinedit.Properties.ValidationSettings.CausesValidation = true;
+                spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+                spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+                spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+                spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+                //spinedit.Properties.ClientSideEvents.Validation = "OnWholeQuantityRecivedValidation";//"WholeLeftover_Validate";
+                spinedit.Properties.ClientSideEvents.ValueChanged = "UpdateTotaltailLeftoverSumaryLiq";
+                spinedit.Properties.ClientSideEvents.Init = "SpineditTailLeftOver_InitLiq";//"Spinedit_Init";
+                spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+                //spinedit.ShowModelErrors = true;
+            });
+
+            //item.NestedExtension().SpinEdit(spinedit =>
+            //{
+            //    spinedit.Width = Unit.Percentage(100);
+            //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            //    spinedit.Properties.DecimalPlaces = 2;
+            //    spinedit.Properties.DisplayFormatString = "N2";
+            //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            //    spinedit.Properties.ClientInstanceName = "tailLeftoverSumary";
+            //    spinedit.Properties.MaxLength = 17;
+            //    spinedit.Properties.MinValue = 0.01M;
+            //    spinedit.Properties.MaxValue = 99999999999999.99M;
+            //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+            //    spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+            //    spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+            //    spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+            //    spinedit.ReadOnly = true;// (codeState != "04" && codeState != "05" && Model.wholeSubtotalAdjust > 0);
+
+            //});
+        });
+
+        //Desperdicio Cola
+        groupItem2.Items.Add(m => m.totalQuantityTrash, item =>
+        {
+            item.Name = "tailTotalQuantityTrashSumaryLiq";
+            item.Caption = "Desperdicio Cola";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailTotalQuantityTrashSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;//(codeState != "04" && codeState != "05" && Model.wholeSubtotalAdjust > 0);
+
+            });
+        });
+
+        //Basura Cola
+        groupItem2.Items.Add(m => m.poundsGarbageTail, item =>
+        {
+            item.Name = "poundsGarbageTailLiq";
+            item.Caption = "Basura Cola";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "poundsGarbageTailLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.DisplayFormatInEditMode = true;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = (codeState != "02" && codeState != "03") || romaneoHabilitado;
+
+                spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+                spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+                spinedit.Properties.ValidationSettings.CausesValidation = true;
+                spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+                spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+                spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+                spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+                spinedit.Properties.ClientSideEvents.ValueChanged = "OnPoundsGarbageTailValueChangedLiq";
+                spinedit.Properties.ClientSideEvents.Init = "Spinedit_InitLiq";
+                spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+            });
+        });
+
+        //Lbs Cola Recibidas
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "tailTotalQuantityRecivedSumaryLiq";
+            item.Caption = "Lbs Cola Recibidas";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailTotalQuantityRecivedSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Lbs Cola Netas
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "tailNetSumaryLiq";
+            item.Caption = "Lbs Cola Netas";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailNetSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //% Rendimiento Cola
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentTailPerformanceSumaryLiq";
+            item.Caption = "% Rendimiento Cola";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                spinedit.Properties.DecimalPlaces = 4;
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentTailPerformanceSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        #endregion
+
+        //Fila 5
+        #region Fila 5
+
+        //Proceso Total
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "TotalProcessLiq";
+            item.Caption = "TOTAL";
+            item.CaptionStyle.Font.Bold = true;
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "TotalProcessLiq";
+                label.Text = "TOTAL";
+            });
+
+        });
+
+        //Lbs Procesadas Total
+        groupItem2.Items.Add(m => m.totalQuantityLiquidation, item =>
+        {
+            item.Name = "totalQuantityLiquidationSumaryLiq";
+            item.Caption = "Lbs Procesadas Total";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalQuantityLiquidationSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Lbs Ajustadas Total
+        groupItem2.Items.Add(m => m.totalAdjustmentPounds, item =>
+        {
+            item.Name = "totalAdjustmentPoundsSumaryLiq";
+            item.Caption = "Lbs Ajustadas Total";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalAdjustmentPoundsSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Lbs Total Ajustadas
+        groupItem2.Items.Add(m => m.totalQuantityLiquidationAdjust, item =>
+        {
+            item.Name = "totalQuantityLiquidationAdjustSumaryLiq";
+            item.Caption = "Lbs Total Ajustadas";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalQuantityLiquidationAdjustSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Columna en blanco
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "blankColumn4Liq";
+            item.Caption = "";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "blankColumn4Liq";
+                label.Text = "";
+            });
+        });
+
+        //Sobrante Total
+        groupItem2.Items.Add(m => m.wholeLeftover, item =>
+        {
+            item.Name = "totalWholeLeftoverSumaryLiq";
+            item.Caption = "Sobrante Total";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalWholeLeftoverSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;// (codeState != "04" && codeState != "05" && Model.wholeSubtotalAdjust > 0);
+
+            });
+        });
+
+        //Desperdicio Total
+        groupItem2.Items.Add(m => m.totalQuantityTrash, item =>
+        {
+            item.Name = "totalTotalQuantityTrashSumaryLiq";
+            item.Caption = "Desperdicio Total";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+                                                                         //item.Width = Unit.Percentage(35);
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalTotalQuantityTrashSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;//(codeState != "04" && codeState != "05" && Model.wholeSubtotalAdjust > 0);
+
+            });
+        });
+
+        //Basura Total
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "poundsGarbageTotalLiq";
+            item.Caption = "Basura Total";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "poundsGarbageTotalLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;// (codeState != "04" && codeState != "05");
+
+            });
+        });
+
+        //Lbs Total Recibidas
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "totalTotalQuantityRecivedSumaryLiq";
+            item.Caption = "Lbs Total Recibidas";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalTotalQuantityRecivedSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+                spinedit.ReadOnly = true;
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+            });
+        });
+
+        //Lbs Total Netas
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "totalNetSumaryLiq";
+            item.Caption = "Lbs Total Netas";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalNetSumaryLiq";
+                spinedit.Properties.MaxLength = 17;
+                spinedit.Properties.MinValue = 0.01M;
+                spinedit.Properties.MaxValue = 99999999999999.99M;
+                //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+            });
+        });
+
+        //Columna en Blanco
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "columnWhiteSumaryLiq";
+            item.Caption = "";
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "columnWhiteSumaryLiq";
+                label.Text = "";
+            });
+
+        });
+
+        #endregion
+
+        #endregion
+
+        //formLayoutEditProductionLotSubtotalClose
+
+        //GroupItem3
+        #region GroupItem3
+
+
+        //Fila 6 Titulos
+        #region Fila 6 Titulos
+
+
+
+        #endregion
+
+        //Fila 7
+        #region Fila 7
+
+
+
+        #endregion
+
+        //Fila 8
+        #region Fila 8
+
+
+        #endregion
+
+        //Fila 9
+        #region Fila 9
+
+
+        #endregion
+
+        #endregion
+
+    }).Render();
+
+}
+
+
+<script src="~/Scripts/productionlotreception/_productionLotReceptionHeadFormProductionLotLiquidation.js"></script>

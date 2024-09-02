@@ -1,0 +1,162 @@
+﻿@using DataExport = DXPANACEASOFT.Controllers.DataExportController
+@{ 
+	var reportes = (Dictionary<DataExport.TipoReporte, string>)this.ViewBag.ListaReportesAutorizados;
+}
+<table id="dataExportQueryForm" class="table table-condensed" style="border: 0px solid #ffffff;">
+    <tr>
+        <td style="width: 30%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="2">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Modelo de Exportación</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(
+                            label =>
+                            {
+                                label.Name = "TipoReporteQueryLabel";
+                                label.Text = "Tipo de Reporte:";
+                                label.AssociatedControlName = "TipoReporteQueryText";
+                            }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBox(
+                            comboBox =>
+                            {
+                                comboBox.Name = "TipoReporteQueryText";
+                                comboBox.Width = Unit.Percentage(100);
+
+                                var p = comboBox.Properties;
+                                p.ClientInstanceName = "TipoReporteQueryText";
+                                p.ValueField = "Key";
+                                p.TextField = "Value";
+                                p.ValueType = typeof(DataExport.TipoReporte);
+
+                                p.DropDownStyle = DropDownStyle.DropDownList;
+                                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                p.EnableSynchronization = DefaultBoolean.False;
+                                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                                p.ClientSideEvents.Init = "OnTipoReporteQueryTextInit";
+                                p.ClientSideEvents.Validation = "OnTipoReporteQueryTextValidate";
+                                p.ClientSideEvents.SelectedIndexChanged = "OnTipoReporteQueryTextSelectedIndexChanged";
+
+                            }).BindList(reportes).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 35%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="3">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Rangos de Fechas</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(
+                            label =>
+                            {
+                                label.Name = "FechaInicioQueryLabel";
+                                label.Text = "Fecha de emisión:";
+                                label.AssociatedControlName = "FechaInicioQueryText";
+                            }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().DateEdit(
+                            dateEdit =>
+                            {
+                                dateEdit.Name = "FechaInicioQueryText";
+                                dateEdit.Properties.ClientInstanceName = "FechaInicioQueryText";
+                                dateEdit.Width = Unit.Percentage(100);
+
+                                dateEdit.Properties.NullDisplayText = "Desde";
+                                dateEdit.Properties.NullText = "Desde";
+
+                                dateEdit.Properties.DisplayFormatInEditMode = true;
+                                dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                dateEdit.Properties.EditFormat = EditFormat.Custom;
+                                dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+                                /*dateEdit.Properties.DateRangeSettings.MaxDayCount = 7;*/
+                            }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().DateEdit(
+                            dateEdit =>
+                            {
+                                dateEdit.Name = "FechaFinalQueryText";
+                                dateEdit.Properties.ClientInstanceName = "FechaFinalQueryText";
+                                dateEdit.Width = Unit.Percentage(100);
+
+                                dateEdit.Properties.NullDisplayText = "Hasta";
+                                dateEdit.Properties.NullText = "Hasta";
+
+                                dateEdit.Properties.DisplayFormatInEditMode = true;
+                                dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                dateEdit.Properties.EditFormat = EditFormat.Custom;
+                                dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                dateEdit.Properties.DateRangeSettings.StartDateEditID = "FechaInicioQueryText";
+                                dateEdit.Properties.ClientSideEvents.Validation = "OnDataExportEmissionDateValidation";
+                                //dateEdit.Properties.DateRangeSettings.MaxDayCount = 7;
+                            }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 20%"></td>
+        <td style="width: 15%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(
+                            button =>
+                            {
+                                button.Name = "ConsultarDatosButton";
+                                button.UseSubmitBehavior = false;
+                                button.Text = "Consultar";
+                                button.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                                button.Width = Unit.Percentage(100);
+                                button.ClientSideEvents.Click = "OnConsultarDatosButtonClick";
+                            }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "LimpiarDatosButton";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Limpiar";
+                            settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "OnLimpiarDatosButtonClick";
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                   {
+                       settings.Name = "ReporteButton";
+                       settings.UseSubmitBehavior = false;
+                       settings.Text = "Imprimir Reporte";
+                       settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+                       settings.Width = Unit.Percentage(100);
+                       settings.ClientSideEvents.Click = "OnCuentasCobrar";
+                       settings.ClientVisible = false;
+                   }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,344 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.Controllers
+
+@model DXPANACEASOFT.Models.ProductionLot
+
+@{
+	string codeState = (Model != null && Model.ProductionLotState != null) ? Model.ProductionLotState.code : "";
+	int? id_MachineForProd = (Model != null) ? Model.id_MachineForProd : (int?)null;
+	int? id_MachineProdOpening = (Model != null) ? Model.id_MachineProdOpening : (int?)null;
+	@Html.Hidden("id_MachineProdOpeningDetailInit", (int?)ViewBag.id_MachineProdOpeningDetailInit)
+	@Html.Hidden("timeInitMachineProdOpeningDetail", (TimeSpan?)ViewBag.timeInitMachineProdOpeningDetail)
+	@Html.HiddenFor(m => m.id_MachineForProd, new { @id = "id_MachineForProd" })
+	@Html.HiddenFor(m => m.id_MachineProdOpening, new { @id = "id_MachineProdOpening" })
+	@Html.Hidden("id_MachineForProdT2", id_MachineForProd)
+	@Html.Hidden("id_MachineProdOpeningT2", id_MachineProdOpening)
+	@Html.HiddenFor(m => m.id_personRequesting)
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+
+	<tr>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.internalNumber, settings =>
+			{
+				settings.Name = "nlotLabel";
+				settings.Text = "No. Lote:";
+				settings.ControlStyle.Font.Bold = true;
+				settings.AssociatedControlName = "internalNumber";
+			}).GetHtml()
+		</td>
+		<td width="25%">
+			@Html.DevExpress().TextBoxFor(m => m.julianoNumber, settings =>
+			{
+				settings.Name = "julianoNumber";
+				settings.Properties.ClientInstanceName = "julianoNumber";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = true;
+				settings.Properties.ClientSideEvents.Validation = "OnInternalNumberValidation";
+
+			}).GetHtml()
+		</td>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.internalNumber, settings =>
+		   {
+			   settings.Name = "internalNumberLabel";
+			   settings.Text = "Secuencia:";
+			   settings.AssociatedControlName = "internalNumber";
+		   }).GetHtml()
+		</td>
+		<td width="25%">
+			<table width="100%">
+				<tr>
+					<td width="30%" style="padding-right: 3px">
+						@Html.DevExpress().TextBoxFor(m => m.internalNumber, settings =>
+						{
+							settings.Name = "internalNumber";
+							settings.Properties.ClientInstanceName = "internalNumber";
+							settings.Width = Unit.Percentage(100);
+							settings.ReadOnly = @Model.ProductionLotState.code != "01";
+							settings.Properties.HelpTextStyle.ForeColor = Color.DarkBlue;
+							settings.Properties.HelpTextStyle.Font.Bold = true;
+							settings.ShowModelErrors = true;
+							settings.Properties.MaxLength = 15;
+							settings.Properties.ClientSideEvents.Validation = "OnInternalNumberValidation";
+							settings.Properties.ClientSideEvents.TextChanged = "OnInternalNumberTextChanged";
+							settings.Properties.ValidationSettings.Display = Display.Dynamic;
+						}).GetHtml()
+					</td>
+					<td width="70%">
+						@Html.DevExpress().TextBoxFor(m => m.internalNumberConcatenated, settings =>
+						{
+							settings.Name = "internalNumberConcatenated";
+							settings.Properties.ClientInstanceName = "internalNumberConcatenated";
+							settings.Width = Unit.Percentage(100);
+							settings.ReadOnly = @Model.ProductionLotState.code != "01";
+							settings.ShowModelErrors = true;
+							settings.ReadOnly = true;
+							settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+							settings.CustomJSProperties = (s, e) =>
+							{
+								e.Properties["cpTabContainer"] = "tabProcess";
+								e.Properties["cpMessageError"] = "Campo Obligatorio.";
+								e.Properties["cpIsRequired"] = "true";
+								e.Properties["cpTabControl"] = "tabControl";
+
+							};
+						}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.Employee.Department.name, settings =>
+			{
+				settings.Name = "employeeDepartamentLabel";
+				settings.Text = "Departamento:";
+				settings.AssociatedControlName = "employeeDepartament";
+			}).GetHtml()
+		</td>
+		<td width="20%">
+			@Html.DevExpress().TextBoxFor(m => m.Employee.Department.name, settings =>
+			{
+				settings.Name = "employeeDepartament";
+				settings.Properties.ClientInstanceName = "employeeDepartament";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = true;
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.receptionDate, settings =>
+			{
+				settings.Name = "receptionDateLabel";
+				settings.Text = "Fecha de Proceso:";
+				settings.AssociatedControlName = "receptionDate";
+			}).GetHtml()
+		</td>
+		<td width="25%">
+			@Html.DevExpress().DateEditFor(m => m.receptionDate, settings =>
+			   {
+				   settings.Name = "receptionDate";
+				   settings.Properties.ClientInstanceName = "receptionDate";
+				   settings.Width = Unit.Percentage(100);
+				   settings.ReadOnly = @Model.ProductionLotState.code != "01";
+
+				   settings.Properties.UseMaskBehavior = true;
+				   settings.Properties.EditFormat = EditFormat.Custom;
+				   settings.Properties.EditFormatString = "dd/MM/yyyy hh:mm tt";
+				   settings.Properties.TimeSectionProperties.Visible = true;
+				   settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+				   settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "hh:mm tt";
+				   settings.Properties.ClientSideEvents.ValueChanged = "OnReceptionDateChanged";
+				   settings.Properties.MinDate = new DateTime(1900, 01, 01);
+
+				   settings.ShowModelErrors = true;
+
+			   }).GetHtml()
+		</td>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.id_personProcessPlant, settings =>
+			{
+				settings.Name = "personProcessPlantLabel";
+				settings.Text = "Planta Proceso:";
+				settings.AssociatedControlName = "personProcessPlant";
+			}).GetHtml()
+		</td>
+		<td width="25%">
+			@Html.DevExpress().ComboBoxFor(m => m.id_personProcessPlant, settings =>
+			{
+				settings.Name = "id_personProcessPlant";
+				settings.Properties.ClientInstanceName = "id_personProcessPlant";
+				settings.Properties.NullDisplayText = "Seleccione...";
+				settings.Properties.NullText = "Seleccione...";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextFormatString = "{1}";
+				settings.Properties.Columns.Add("planta", "Planta", 50);
+				settings.Properties.Columns.Add("processPlant", "Nombre", 100);
+				settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+				settings.Properties.ValueType = typeof(int);
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.Validation = "OnPersonProcessPlantValidation";
+				settings.ReadOnly = @Model.ProductionLotState.code != "01";
+			}).BindList(DataProviderPerson.GetPersonProcesPlant()).GetHtml()
+		</td>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.Employee.Person.fullname_businessName, settings =>
+			{
+				settings.Name = "personRequestingLabel";
+				settings.Text = "Solicitado Por:";
+				settings.AssociatedControlName = "personRequesting";
+			}).GetHtml()
+		</td>
+		<td width="20%">
+			@Html.DevExpress().TextBoxFor(m => m.Employee.Person.fullname_businessName, settings =>
+			{
+				settings.Name = "personRequesting";
+				settings.Properties.ClientInstanceName = "personRequesting";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = true;
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.expirationDate, settings =>
+				{
+					settings.Name = "expirationDateLabel";
+					settings.Text = "Fecha de Caducidad:";
+					settings.AssociatedControlName = "expirationDate";
+				}).GetHtml()
+		</td>
+		<td width="25%">
+			@{
+				int maxDiasCaducidad = 0;
+				string valueDescription2 = DataProviderSetting.ValueSetting("DCLP");
+				int.TryParse(valueDescription2, out maxDiasCaducidad);
+
+			}
+			@Html.DevExpress().DateEditFor(m => m.expirationDate, settings =>
+			{
+				settings.Name = "expirationDate";
+				settings.Properties.ClientInstanceName = "expirationDate";
+				settings.Width = Unit.Percentage(100);
+				//settings.ReadOnly = true;
+				settings.ReadOnly = @Model.ProductionLotState.code != "01";
+				settings.ShowModelErrors = true;
+				settings.Properties.UseMaskBehavior = true;
+				settings.Properties.EditFormat = EditFormat.Custom;
+				settings.Properties.EditFormatString = "dd/MM/yyyy";
+				settings.Properties.ClientSideEvents.Validation = "OnExpirationDateValidation";
+
+				settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpMaxDiasCaducidad"] = maxDiasCaducidad;
+				};
+
+			}).GetHtml()
+		</td>
+		<td width="10%">
+			@Html.DevExpress().LabelFor(m => m.Turn.name, settings =>
+				{
+					settings.Name = "id_TurnLabel";
+					settings.Text = "Turno:";
+					settings.AssociatedControlName = "id_Turn";
+				}).GetHtml()
+		</td>
+		<td width="25%">
+			<table width="100%">
+				<tr>
+					<td width="40%" style="padding-right: 3px">
+						@Html.DevExpress().ComboBoxFor(m => m.id_Turn, settings =>
+						{
+							settings.Name = "id_Turn";
+							settings.Properties.ClientInstanceName = "id_Turn";
+							settings.Width = Unit.Percentage(100);
+							settings.Properties.ValueField = "id";
+							settings.Properties.TextField = "name";
+							settings.Properties.ValueType = typeof(int);
+							settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							settings.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+							settings.Properties.ValidationSettings.CausesValidation = true;
+							settings.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+							settings.Properties.ValidationSettings.ValidateOnLeave = true;
+							settings.Properties.ValidationSettings.SetFocusOnError = true;
+							settings.ReadOnly = @Model.ProductionLotState.code != "01";
+							settings.ShowModelErrors = true;
+							settings.Properties.ClientSideEvents.Validation = "OnProcessLotTurnValidation";
+							settings.Properties.ClientSideEvents.SelectedIndexChanged = "Turn_SelectedIndexChanged";
+							settings.Properties.ValidationSettings.Display = Display.Dynamic;
+
+						}).BindList(DataProviderTurn.AllTurns()).GetHtml()
+					</td>
+					<td width="30%" style="padding-right: 3px">
+						@Html.DevExpress().TextBoxFor(m => m.Turn.timeInit, settings =>
+					   {
+						   settings.Name = "timeInitTurn";
+						   settings.Properties.ClientInstanceName = "timeInitTurn";
+						   settings.Width = Unit.Percentage(100);
+						   settings.Properties.DisplayFormatString = "HH:mm:ss";
+						   settings.ReadOnly = true;
+						   settings.ShowModelErrors = true;
+						   settings.Properties.ValidationSettings.Display = Display.Dynamic;
+					   }).GetHtml()
+					</td>
+					<td width="30%">
+						@Html.DevExpress().TextBoxFor(m => m.Turn.timeEnd, settings =>
+						{
+							settings.Name = "timeEndTurn";
+							settings.Properties.ClientInstanceName = "timeEndTurn";
+							settings.Width = Unit.Percentage(100);
+							settings.Properties.DisplayFormatString = "HH:mm:ss";
+							settings.ReadOnly = true;
+							settings.ShowModelErrors = true;
+							settings.Properties.ValidationSettings.Display = Display.Static;
+						}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td width="10%"></td>
+		<td width="20%"></td>
+	</tr>
+	@if (ViewBag.solicitaMaquina)
+	{
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Name = "idMachineLabel";
+					settings.Text = "Máquina:";
+				}).GetHtml()
+			</td>
+			<td width="25%">
+				@{
+					var machinesForProdModel = new ProductionLotProcessController.ComboBoxMachinesProdOpeningModel()
+					{
+						id_MachineForProd = id_MachineForProd,
+						id_MachineProdOpening = id_MachineProdOpening,
+						documentStateCode = codeState,
+						emissionDate = this.Model.receptionDate,
+						id_PersonProcessPlant = this.Model.id_personProcessPlant,
+						id_Turn = this.Model.id_Turn,
+					};
+
+					Html.RenderPartial("ProducionComboBox/_ComboBoxMachinesProdOpening", machinesForProdModel);
+				}
+			</td>
+			<td width="10%">
+				@Html.DevExpress().LabelFor(m => m.id_liquidator, settings =>
+			   {
+				   settings.Name = "id_liquidatorLabel";
+				   settings.Text = "Liquidador:";
+				   settings.AssociatedControlName = "id_liquidator";
+			   }).GetHtml()
+			</td>
+			<td width="25%">
+				@{
+					int? id_liquidator = (Model != null && Model.id_liquidator != 0) ? (int?)Model.id_liquidator : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_liquidator, settings =>
+				{
+					settings.Name = "id_liquidator";
+					settings.Properties.ClientInstanceName = "id_liquidator";
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "fullname_businessName";
+					settings.Properties.ValueType = typeof(int);
+					settings.Width = Unit.Percentage(85);
+					settings.ReadOnly = @Model.ProductionLotState.code != "01";
+					settings.ShowModelErrors = true;
+					settings.Properties.ClientSideEvents.Validation = "OnLiquidatorValidation";
+				}).BindList(DataProviderPerson.liquidatorsByCompanyAndCurrent((int?)ViewData["id_company"], id_liquidator, (int?)ViewData["id_user"])).Bind(id_liquidator).GetHtml()
+			</td>			
+			<td width="10%"></td>
+			<td width="20%"></td>
+		</tr>
+	}
+</table>
+
+<script src="~/Scripts/productionlotprocess/_productionLotProcessEditForm.js"></script>

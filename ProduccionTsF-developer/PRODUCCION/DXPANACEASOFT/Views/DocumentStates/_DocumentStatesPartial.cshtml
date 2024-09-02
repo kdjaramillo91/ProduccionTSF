@@ -1,0 +1,157 @@
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models;
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "gvDocumentStates";
+        settings.CallbackRouteValues = new { Controller = "DocumentStates", Action = "DocumentStatesPartial" };
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "DocumentStates", Action = "DocumentStatesPartialAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "DocumentStates", Action = "DocumentStatesPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "DocumentStates", Action = "DocumentStatesPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"">Seleccionar Todos</a>
+                  <a id=""lnkClearSelection"" style=""cursor: pointer;"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.Width = Unit.Percentage(10);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Tipos de Documentos";
+            column.UnboundType = UnboundColumnType.String;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                List<DocumentType> documentTypes = new List<DocumentType>();
+                try
+                {
+                    documentTypes = (List<DocumentType>)DataBinder.Eval(c.DataItem, "DocumentType");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        HashSet<DocumentType> tempDocumentTypes = (HashSet<DocumentType>)DataBinder.Eval(c.DataItem, "DocumentType");
+                        documentTypes = (tempDocumentTypes != null) ? tempDocumentTypes.Where(t => t.isActive).ToList() : new List<DocumentType>();
+                    }
+                    catch (Exception)
+                    {
+                        documentTypes = new List<DocumentType>();
+                    }
+                }
+
+                if (documentTypes != null)
+                {
+                    ViewContext.Writer.Write(string.Join(",", documentTypes.Select(x => x.name).ToArray()));
+                }
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "description";
+            column.Caption = "Descripción";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            Visible = true,
+            VisibleIndex = 10,
+            Width = Unit.Percentage(5),
+            Caption = "Acciones"
+        };
+        settings.Columns.Add(commandColumn);
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_documentState = (int?)DataBinder.Eval(c.DataItem, "id");
+            DocumentState documentState = DataProviderDocumentState.DocumentStateById(id_documentState);
+
+            documentState = documentState ?? new DocumentState();
+
+            Html.RenderPartial("_DocumentStateEditForm", documentState);
+        });
+
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SetDetailRowTemplateContent(colum =>
+        {
+            var idCompany = DataBinder.Eval(colum.DataItem, "id");
+            ViewData["id_company"] = idCompany;
+
+            int idMetricUnit = (int)DataBinder.Eval(colum.DataItem, "id");
+            DocumentState metricUnits = DataProviderDocumentState.DocumentStateById(idMetricUnit);
+            Html.RenderAction("DocumentStatesDetailPartial", new { metricunit = metricUnits });
+        });
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+<script src="~/Scripts/documentstates/validation.js"></script>

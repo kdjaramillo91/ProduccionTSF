@@ -1,0 +1,216 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ProductionCost
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditProductionCost", name = "formEditProductionCost" }))
+{
+	@Html.Hidden("id_productionCost", this.Model.id)
+
+	<table id="productionCostTable" class="table table-condensed">
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "codeLabel";
+						label.Text = "Código:*";
+						label.AssociatedControlName = "code";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@Html.DevExpress().TextBoxFor(
+					m => m.code,
+					textBox =>
+					{
+						textBox.Name = "code";
+						textBox.Properties.ClientInstanceName = "code";
+						textBox.Width = Unit.Percentage(100);
+						textBox.Properties.MaxLength = 20;
+						textBox.ShowModelErrors = true;
+
+						textBox.Properties.ClientSideEvents.Validation = "OnCodeProductionCostValidation";
+					}).GetHtml()
+			</td>
+			<td width="2%"></td>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "nameLabel";
+						label.Text = "Nombre: *";
+						label.AssociatedControlName = "name";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@Html.DevExpress().TextBoxFor(
+					m => m.name,
+					textBox =>
+					{
+						textBox.Name = "name";
+						textBox.Properties.ClientInstanceName = "name";
+						textBox.Width = Unit.Percentage(100);
+						textBox.Properties.MaxLength = 50;
+						textBox.ShowModelErrors = true;
+						textBox.Properties.ClientSideEvents.Validation = "OnNameProductionCostValidation";
+					}).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "id_executionTypeLabel";
+						label.Text = "Tipo de Ejecución:*";
+						label.AssociatedControlName = "id_executionType";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@{
+					var id_executionType = (this.Model.id_executionType > 0)
+						? (int?)this.Model.id_executionType
+						: null;
+				}
+				@Html.DevExpress().ComboBoxFor(
+					m => m.id_executionType,
+					comboBox =>
+					{
+						comboBox.Name = "id_executionType";
+						comboBox.Properties.ClientInstanceName = "id_executionType";
+						comboBox.Width = Unit.Percentage(100);
+
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.ValueType = typeof(int);
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ClientSideEvents.Validation = "OnExecutionTypeProductionCostValidation";
+
+					}).BindList(DataProviderProductionCostExecutionType.ProductionCostExecutionTypes()).Bind(id_executionType).GetHtml()
+			</td>
+			<td width="2%"></td>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "orderLabel";
+						label.Text = "Orden: *";
+						label.AssociatedControlName = "order";
+					}).GetHtml()
+			</td>
+			<td width="39%">
+				@Html.DevExpress().SpinEditFor(
+					m => m.order,
+					spinEdit =>
+					{
+						spinEdit.Name = "order";
+						spinEdit.Properties.ClientInstanceName = "order";
+						spinEdit.Width = Unit.Percentage(100);
+
+						spinEdit.Properties.MinValue = 0.00m;
+						spinEdit.Properties.MaxValue = 100000000.00m;
+						spinEdit.Properties.NumberType = SpinEditNumberType.Integer;
+						spinEdit.Properties.NumberFormat = SpinEditNumberFormat.Number;
+						spinEdit.Properties.DisplayFormatString = "G";
+						spinEdit.Properties.DecimalPlaces = 0;
+						spinEdit.Properties.DisplayFormatInEditMode = true;
+
+						spinEdit.ShowModelErrors = true;
+						spinEdit.Properties.ClientSideEvents.Validation = "OnOrderProductionCostValidation";
+					}).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "descriptionLabel";
+						label.Text = "Descripción:";
+						label.AssociatedControlName = "description";
+					}).GetHtml()
+			</td>
+			<td colspan="4">
+				@Html.DevExpress().MemoFor(
+					m => m.description,
+					memo =>
+					{
+						memo.Name = "description";
+						memo.Properties.ClientInstanceName = "description";
+						memo.Width = Unit.Percentage(100);
+						memo.ShowModelErrors = true;
+					}).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td width="10%">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "isActiveLabel";
+						label.Text = "¿Activo?:";
+						label.AssociatedControlName = "isActive";
+					}).GetHtml()
+			</td>
+			<td colspan="4">
+				@Html.DevExpress().CheckBoxFor(
+					m => m.isActive,
+					checkBox =>
+					{
+						checkBox.Name = "isActive";
+						checkBox.Properties.ClientInstanceName = "isActive";
+						checkBox.Width = Unit.Percentage(100);
+					}).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5">
+				@{ 
+					var detallesModel = (this.Model.ProductionCostDetails != null)
+						? this.Model.ProductionCostDetails.OrderBy(t => t.order).ThenBy(t => t.code).ToList()
+						: new List<ProductionCostDetail>();
+				}
+				@Html.Partial("_ProductionCostDetailsPartial", detallesModel)
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5" style="text-align: right;">
+				@Html.DevExpress().Button(
+					button =>
+					{
+						button.Name = "btnUpdate";
+						button.Text = "Actualizar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "ButtonUpdate_Click";
+					}).GetHtml()
+
+				@Html.DevExpress().Button(
+					button =>
+					{
+						button.Name = "btnCancel";
+						button.Text = "Cancelar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "ButtonCancel_Click";
+					}).GetHtml()
+			</td>
+		</tr>
+		<tr id="productionCostAlertRow" style="display: none;">
+			<td colspan="5">
+				<div class="alert alert-danger fade in" style="margin-top:18px;">
+					<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+					<span id="productionCostErrorMessage"></span>
+				</div>
+			</td>
+		</tr>
+	</table>
+}

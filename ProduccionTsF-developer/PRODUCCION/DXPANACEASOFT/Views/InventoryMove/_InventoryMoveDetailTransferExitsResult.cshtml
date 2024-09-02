@@ -1,0 +1,25 @@
+﻿
+@{
+    string natureMove = (string)ViewData["_natureMove"];
+
+    Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorMaterialsDetail");
+}
+@Html.Hidden("natureMoveIM", natureMove)
+
+@*@Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorMaterialsDetail");*@
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGenerateMoveTransferEntry";
+    settings.Text = "Generar Ingreso";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "GenerateInventoryMoveTransferEntry";
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@Html.Action("InventoryMoveDetailTransferExitsPartial")
+<script src="~/Scripts/inventorymove/_InventoryMoveDetailTransferExitsResults.js"></script>

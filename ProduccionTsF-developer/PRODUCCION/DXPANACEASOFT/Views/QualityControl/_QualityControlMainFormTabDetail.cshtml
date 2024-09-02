@@ -1,0 +1,1208 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.QualityControl
+
+@{
+	string labelValidator = DataProviderSetting.ValueSetting("TOTALMU");
+	string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) ? Model.Document.DocumentState.code : "";
+	bool isSystem = (Model != null && Model.QualityControlConfiguration != null) ? Model.QualityControlConfiguration.isSystem : false;
+	int id_QualityControlResultConformity = 0;
+	bool isConformityOnHeader = (Model.id == 0) ? (Model.isConformityOnHeader != null ? (bool)Model.isConformityOnHeader : false) : (bool)Model.QualityControlConfiguration.QualityControlConfigurationConformity.isConformityOnHeader;
+
+	if (isConformityOnHeader)
+	{
+		id_QualityControlResultConformity = (Model.QualityControlResultConformityOnHeaderValue.QualityControlResultConformity != null) ? (int)Model.QualityControlResultConformityOnHeaderValue.QualityControlResultConformity.id : 0;
+	}
+	var qct = Model.qualityControlDate;
+	string aValueSettingGRAMCLA = DataProviderSetting.ValueSetting("GRAMCLA");
+	bool aValueSettingGRAMCLASI = aValueSettingGRAMCLA == "SI";
+}
+@Html.Hidden("qualityControlDate", qct)
+@Html.Hidden("totalUnit", ViewBag.totalUnit != null ? (decimal)ViewBag.totalUnit : 0.00M)
+@if (isConformityOnHeader == true)
+{
+    <table id="mainTabConformity" class="table table-condensed" style="margin: 0px auto;">
+
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="4">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Resultado Conformidad</span>
+            </td>
+        </tr>
+    </table>
+    <br />
+
+    <div id="conformityHeader" align="center" style="margin: 0px auto; float:none !important;">
+
+        @Html.DevExpress().ComboBoxFor(m => m.QualityControlResultConformityOnHeaderValue.QualityControlResultConformity.id, settings =>
+   {
+       settings.Properties.ClientInstanceName = "id_qualityControlResultConformity";
+       settings.Width = Unit.Percentage(30);
+
+
+       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+       settings.Properties.EnableSynchronization = DefaultBoolean.False;
+       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+       settings.Properties.ValueField = "id";
+       settings.Properties.TextField = "name";
+       settings.Properties.ValueType = typeof(int);
+       settings.ReadOnly = codeState != "01";//Pendiente
+       settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+       settings.CustomJSProperties = (s, e) =>
+       {
+           e.Properties["cpMessageError"] = "Campo Obligatorio.";
+           e.Properties["cpIsRequired"] = "true";
+           e.Properties["cpHasTab"] = "false";
+           e.Properties["cpInitialCondition"] = "0";
+       };
+       settings.ShowModelErrors = true;
+
+   }).BindList(DataProviderQualityControl.QualityControlConformityResult((int)ViewData["id_company"])).Bind(id_QualityControlResultConformity).GetHtml()
+    </div>
+}
+
+<table id="mainTabDetailOld" class="table table-condensed" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="12">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información Lote</span>
+		</td>
+	</tr>
+	<!--Lote-->
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.remissionGuideNumber, settings =>
+			{
+				settings.Name = "remissionGuideNumberLabel";
+				settings.Text = "Guía de Remisión:";
+				settings.AssociatedControlName = "remissionGuideNumberLabel";
+			}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().TextBoxFor(m => m.remissionGuideNumber, settings =>
+			{
+				settings.Name = "remissionGuideNumber";
+				settings.Properties.ClientInstanceName = "remissionGuideNumber";
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(
+				settings =>
+				{
+					settings.Name = "guiaExternaLabel";
+					settings.Text = "Guía Externa:";
+					settings.Properties.EnableClientSideAPI = true;
+					settings.AssociatedControlName = "guiaExternaLabel";
+				}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.remissionGuideExternalGuide, settings =>
+			{
+				settings.Name = "guiaExternaName";
+				settings.Properties.ClientInstanceName = "guiaExternaName";
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.Lot.ProductionLot.receptionDate, settings =>
+			{
+				settings.Name = "receptionDate_Label";
+				settings.Text = "Fecha y Hora Llegada:";
+				settings.AssociatedControlName = "receptionDate_Label";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.Lot.ProductionLot.receptionDate, settings =>
+		{
+			settings.Name = "receptionDate";
+			settings.Properties.ClientInstanceName = "receptionDate";
+			settings.Width = Unit.Percentage(100);
+			settings.ReadOnly = true;
+
+			settings.Properties.UseMaskBehavior = true;
+			settings.Properties.EditFormat = EditFormat.Custom;
+			settings.Properties.EditFormatString = "dd/MM/yyyy hh:mm tt";
+			settings.Properties.TimeSectionProperties.Visible = true;
+			settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+			settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "hh:mm tt";
+
+			settings.ShowModelErrors = true;
+
+
+		}).GetHtml()
+		</td>
+
+
+	</tr>
+	<!--Gavetas, Lote Interno, -->
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.QuantityPoundsReceived, settings =>
+			{
+				settings.Name = "poundRecibed_Label";
+				settings.Text = "Libras Remitidas:";
+				settings.AssociatedControlName = "poundRecibed_Label";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.QuantityPoundsReceived, settings =>
+		   {
+			   settings.Name = "QuantityPoundsReceived";
+			   settings.Properties.ClientInstanceName = "QuantityPoundsReceived";
+			   settings.Width = Unit.Percentage(100);
+			   settings.ReadOnly = true;
+
+			   settings.Properties.DisplayFormatString = "N2";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(
+				settings =>
+				{
+					settings.Name = "dispatchMaterial_Label";
+					settings.Text = "N. Gavetas:";
+
+					settings.Properties.EnableClientSideAPI = true;
+					settings.AssociatedControlName = "dispatchMaterial_Label";
+				}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.DrawersReceived, settings =>
+			{
+				settings.Name = "DrawersReceived";
+				settings.Properties.ClientInstanceName = "DrawersReceived";
+				settings.Width = Unit.Percentage(100);
+
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+
+			}).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().Label(
+				settings =>
+				{
+					//CAMBIO FEO
+					settings.Name = "internalLotLabel";
+					settings.Text = "No. Lote:";
+					settings.Properties.EnableClientSideAPI = true;
+					settings.AssociatedControlName = "internalLotLabel";
+				}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.internalNumber, settings =>
+			{
+				settings.Name = "internalNumber";
+				settings.Properties.ClientInstanceName = "internalNumber";
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(
+				settings =>
+				{
+					settings.Name = "poolNameLabel";
+					settings.Text = "Piscina:";
+					settings.Properties.EnableClientSideAPI = true;
+					settings.AssociatedControlName = "poolNameLabel";
+				}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.poolName, settings =>
+			{
+				settings.Name = "poolName";
+				settings.Properties.ClientInstanceName = "poolName";
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Text = "Proceso:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.remissionGuideProcess, settings =>
+			{
+				settings.Name = "process";
+				settings.Properties.ClientInstanceName = "process";
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(
+				settings =>
+				{
+					settings.Name = "certificationLabel";
+					settings.Text = "Certificado:";
+					settings.Properties.EnableClientSideAPI = true;
+					settings.AssociatedControlName = "certificationLabel";
+				}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.Certification.name, settings =>
+			{
+				settings.Name = "certificationName";
+				settings.Properties.ClientInstanceName = "certificationName";
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+
+	</tr>
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="12">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información Proveedor</span>
+		</td>
+	</tr>
+	<!--Proveedor-->
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.Lot.ProductionLot.Provider.Person.fullname_businessName, settings =>
+		{
+			settings.Name = "nameProvider_Label";
+			settings.Text = "Proveedor:";
+			settings.AssociatedControlName = "nameProvider_Label";
+		}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.Provider.Person.fullname_businessName, settings =>
+		{
+			settings.Name = "fullname_businessName";
+			settings.Properties.ClientInstanceName = "nameProvider";
+			settings.ReadOnly = true;
+			settings.ShowModelErrors = true;
+			settings.Width = Unit.Percentage(100);
+		}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.Lot.ProductionLot.ProductionUnitProvider.INPnumber, settings =>
+		{
+			settings.Name = "nameINPnumber_Label";
+			settings.Text = "INP:";
+			settings.AssociatedControlName = "nameINPnumber_Label";
+		}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.ProductionUnitProvider.INPnumber, settings =>
+		{
+			settings.Name = "INPnumber";
+			settings.Properties.ClientInstanceName = "INPnumber";
+			settings.ReadOnly = true;
+			settings.ShowModelErrors = true;
+			settings.Width = Unit.Percentage(100);
+		}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Text = "Carta de Garantía (PCC):";
+		   }).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().ComboBoxFor(m => m.PCC, settings =>
+		   {
+			   settings.Name = "PCC";
+			   settings.Properties.ClientInstanceName = "PCC";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ValueField = "Value";
+			   settings.Properties.TextField = "Text";
+			   settings.Properties.ValueType = typeof(string);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			   settings.ReadOnly = (codeState != "01");
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpHasTab"] = "false";
+				   e.Properties["cpInitialCondition"] = "0";
+			   };
+		   }).BindList(ViewBag.OptionYesORNo).Bind(Model.PCC).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@{
+				string labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+			}
+			@Html.DevExpress().Label(settings =>
+	   {
+		   settings.Name = "productionUnitProviderLabel";
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Text = labelPup != "" ? (labelPup + ":") : "Unidad de Producción:";
+		   settings.AssociatedControlName = "productionUnitProviderLabel";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.ProductionUnitProvider.name, settings =>
+			{
+				settings.Name = "productionUnitProviderName";
+				settings.Properties.ClientInstanceName = "productionUnitProviderName";
+				settings.ReadOnly = true;
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.Lot.ProductionLot.ProductionUnitProvider.address, settings =>
+		{
+			settings.Name = "nameaddress_Label";
+			settings.Text = "Dirección:";
+			settings.AssociatedControlName = "nameaddress_Label";
+		}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.ProductionUnitProvider.address, settings =>
+		{
+			settings.Name = "address";
+			settings.Properties.ClientInstanceName = "address";
+			settings.ReadOnly = true;
+			settings.ShowModelErrors = true;
+			settings.Width = Unit.Percentage(100);
+		}).GetHtml()
+		</td>
+	</tr>
+
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="12">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información General</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.qualityControlDate, settings =>
+	   {
+		   settings.Name = "qualityControlDateLabel";
+		   settings.Text = DataProviderSetting.ValueSetting("NOMFEAN") + "*:";//"Fecha de Análisis*:";
+		   settings.ControlStyle.Font.Bold = true;
+		   settings.AssociatedControlName = "qualityControlDateLabel";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.qualityControlDate, settings =>
+			{
+				settings.Name = "qualityControlDate";
+				settings.Properties.ClientInstanceName = "qualityControlDate";
+				settings.Properties.UseMaskBehavior = true;
+				settings.Properties.EditFormat = EditFormat.Custom;
+				settings.Properties.EditFormatString = "dd/MM/yyyy";
+				settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = codeState != "01";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Init = "qualityControlDateOnInit";
+				settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpTabContainer"] = "tabDetail";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "true";
+					e.Properties["cpTabControl"] = "tabControl";
+				};
+			}).GetHtml()
+		</td>
+		<td></td>
+		<td></td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.qualityControlTime, settings =>
+	   {
+		   settings.Name = "qualityControlTimeLabel";
+		   settings.Text = DataProviderSetting.ValueSetting("NOMHOAN") + "*:";//"Hora de Análisis*:";
+		   settings.ControlStyle.Font.Bold = true;
+		   settings.AssociatedControlName = "qualityControlTimeLabel";
+	   }).GetHtml()
+		</td>
+		<td>
+			@{
+				TimeSpan? qualityControlTime = (Model != null) ? (TimeSpan?)Model.qualityControlTime : null;
+			}
+
+			@Html.DevExpress().TimeEdit(settings =>
+		{
+			settings.Name = "qualityControlTime";
+			settings.Properties.ClientInstanceName = "qualityControlTime";
+
+			settings.Properties.EditFormat = EditFormat.Time;
+			settings.Properties.EditFormatString = "HH:mm";
+			settings.Properties.DisplayFormatString = "HH:mm";
+			settings.Width = Unit.Percentage(100);
+			settings.ReadOnly = codeState != "01";
+			if (qualityControlTime != null)
+			{
+				settings.DateTime = new DateTime(2017, 1, 1, qualityControlTime.Value.Hours, qualityControlTime.Value.Minutes, 0);
+			}
+			settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			settings.CustomJSProperties = (s, e) =>
+			{
+				e.Properties["cpTabContainer"] = "tabDetail";
+				e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				e.Properties["cpIsRequired"] = "true";
+				e.Properties["cpTabControl"] = "tabControl";
+			};
+
+		}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+
+			@Html.DevExpress().LabelFor(m => m.residual, settings =>
+		{
+			settings.Name = "residualLabel";
+			settings.Text = "Residual S02:";
+			settings.ControlStyle.Font.Bold = true;
+			settings.AssociatedControlName = "residualLabel";
+		}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.residual, settings =>
+			{
+				settings.Name = "residual";
+				settings.Properties.ClientInstanceName = "residual";
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.DisplayFormatString = "N2";
+				settings.Properties.MaxValue = 999;
+				settings.Properties.MinValue = 0;
+				settings.ReadOnly = codeState != "01";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpTabContainer"] = "tabDetail";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "true";
+					e.Properties["cpTabControl"] = "tabControl";
+				};
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.temperature, settings =>
+			{
+				settings.Name = "temperatureLabel";
+				settings.Text = "Temperatura Promedio:";
+				settings.ControlStyle.Font.Bold = true;
+				settings.AssociatedControlName = "temperatureLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.temperature, settings =>
+			{
+				settings.Name = "temperature";
+				settings.Properties.ClientInstanceName = "temperature";
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.DisplayFormatString = "N2";
+				settings.Properties.MaxValue = 9999;
+				settings.Properties.MinValue = -270;
+				settings.ReadOnly = codeState != "01";
+				settings.ShowModelErrors = true;
+
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_processType, settings =>
+		{
+			settings.Name = "id_processTypeLabel";
+			settings.Text = "Tipo Proceso*:";
+			settings.ControlStyle.Font.Bold = true;
+			settings.AssociatedControlName = "id_processType";
+		}).GetHtml()
+
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_processType, settings =>
+			{
+				settings.Name = "id_processType";
+				settings.Properties.ClientInstanceName = "id_processType";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.ReadOnly = (codeState != "01");
+				//Es de Sistema el Tipo de Analisis
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "ProcessType_SelectedIndexChanged";
+				settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "true";
+					e.Properties["cpHasTab"] = "false";
+					e.Properties["cpInitialCondition"] = "0";
+				};
+			}).BindList(DataProviderProcessType.ProcessTypeByCompanyAndProcessType((int?)ViewData["id_company"], Model.id_processType)).Bind(Model.id_processType).GetHtml()
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.totalWeightSample, settings =>
+			{
+				settings.Name = "totalWeightSampleLabel";
+				settings.Text = "Peso Total Muestras(GR):";
+				settings.ControlStyle.Font.Bold = true;
+				settings.AssociatedControlName = "totalWeightSampleLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.totalWeightSample, settings =>
+		   {
+			   settings.Name = "totalWeightSample";
+			   settings.Properties.ClientInstanceName = "totalWeightSample";
+			   settings.ReadOnly = (codeState != "01");
+			   settings.Properties.DisplayFormatString = "N2";
+			   settings.Properties.MaxValue = decimal.MaxValue;
+			   settings.Properties.MinValue = 0;
+			   settings.ShowModelErrors = true;
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.ValueChanged = "OnValueChangedTotalWeightSample";
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpTabContainer"] = "tabDetail";
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpTabControl"] = "tabControl";
+				   if(labelValidator == "SI")
+				   e.Properties["cpInitialCondition"] = "0";
+			   };
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.grammageReference, settings =>
+			{
+				settings.Name = "grammageReferenceLabel";
+				settings.Text = "Gramaje:";
+				settings.ControlStyle.Font.Bold = true;
+				settings.AssociatedControlName = "grammageReferenceLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.grammageReference, settings =>
+	   {
+		   settings.Name = "grammageReference";
+		   settings.Properties.ClientInstanceName = "grammageReference";
+		   settings.ReadOnly = (codeState != "01" || aValueSettingGRAMCLASI);
+		   settings.Properties.DisplayFormatString = "N2";
+		   settings.Properties.MaxValue = 99;
+		   settings.Properties.MinValue = 0;
+		   settings.ShowModelErrors = true;
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+
+		   //settings.Properties.NumberType = SpinEditNumberType.Float;
+		   //settings.Properties.NumberFormat = SpinEditNumberFormat.Percent;
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpTabContainer"] = "tabDetail";
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpIsRequired"] = "true";
+			   e.Properties["cpTabControl"] = "tabControl";
+		   };
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_size, settings =>
+		{
+			settings.Name = "id_sizeLabel";
+			settings.Text = "Talla:";
+			settings.ControlStyle.Font.Bold = true;
+			settings.AssociatedControlName = "id_size";
+		}).GetHtml()
+
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_size, settings =>
+	   {
+		   settings.Name = "id_size";
+		   settings.Properties.ClientInstanceName = "id_size";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.CallbackRouteValues = new
+		   {
+			   Controller = "QualityControl",
+			   Action = "ComboBoxSize",
+		   };
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ClientSideEvents.BeginCallback = "Size_OnBeginCallback";
+		   settings.Properties.ClientSideEvents.EndCallback = "Size_OnEndCallback";
+		   settings.Properties.ClientSideEvents.Init = "Size_OnInit";
+
+		   settings.ReadOnly = (codeState != "01");
+		   //Es de Sistema el Tipo de Analisis
+		   settings.ShowModelErrors = true;
+		   //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   //settings.CustomJSProperties = (s, e) =>
+		   //{
+		   //    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+		   //    e.Properties["cpIsRequired"] = "true";
+		   //    e.Properties["cpHasTab"] = "false";
+		   //    e.Properties["cpInitialCondition"] = "0";
+		   //};
+	   }).BindList(DataProviderItemSize.ItemSizebyProcessTypeAndCurrentCOL(Model.id_processType, Model.id_size)).Bind(Model.id_size).GetHtml()
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+		   {
+			   settings.ControlStyle.Font.Bold = true;
+			   settings.Text = "Contaminación del hielo:";
+		   }).GetHtml()
+		</td>
+		<td>
+			@*@Html.DevExpress().TextBoxFor(m => m.iceContamination, settings =>
+			{
+				settings.Name = "iceContamination";
+				settings.Properties.ClientInstanceName = "iceContamination";
+				settings.ReadOnly = (codeState != "01");
+				settings.ShowModelErrors = true;
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()*@
+			@Html.DevExpress().ComboBoxFor(m => m.iceContamination, settings =>
+		   {
+			   settings.Name = "iceContamination";
+			   settings.Properties.ClientInstanceName = "iceContamination";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ValueField = "Value";
+			   settings.Properties.TextField = "Text";
+			   settings.Properties.ValueType = typeof(string);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			   settings.ReadOnly = (codeState != "01");
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpHasTab"] = "false";
+				   e.Properties["cpInitialCondition"] = "0";
+			   };
+		   }).BindList(ViewBag.OptionYesORNo).Bind(Model.iceContamination).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+		   {
+			   settings.ControlStyle.Font.Bold = true;
+			   settings.Text = "Piezas Totales:";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEdit(settings =>
+		   {
+			   settings.Name = "totalWeightSampleNonEditable";
+			   settings.Properties.ClientInstanceName = "totalWeightSampleNonEditable";
+			   settings.ReadOnly = true;
+			   settings.Enabled = false;
+			   settings.Properties.DisplayFormatString = "N2";
+			   settings.Properties.MaxValue = decimal.MaxValue;
+			   settings.Properties.MinValue = 0;
+			   settings.ShowModelErrors = true;
+			   settings.Width = Unit.Percentage(100);
+			   //settings.Properties.ClientSideEvents.NumberChanged = "OnValueChangedTotalWeightSampleNonEditable";
+			   //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			   //settings.CustomJSProperties = (s, e) =>
+			   //{
+			   // e.Properties["cpTabContainer"] = "tabDetail";
+			   // e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   // e.Properties["cpIsRequired"] = "true";
+			   // e.Properties["cpTabControl"] = "tabControl";
+			   // if (labelValidator == "SI")
+			   // e.Properties["cpInitialCondition"] = "0";
+			   //};
+		   }).GetHtml()
+		</td>
+		<td></td>
+		
+		<td>
+			@if (labelValidator == "SI")
+			{
+				<button type="button" onclick="OnSizeListDetailClick()" class="btn btn-info btn-md">Ver Detalle de Tallas</button>
+			}
+		</td>
+	</tr>
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="4">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Datos de Transporte</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+	   {
+		   settings.ControlStyle.Font.Bold = true;
+		   settings.Text = "Condición del Transporte:";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.transportCondition, settings =>
+	   {
+		   settings.Name = "transportCondition";
+		   settings.Properties.ClientInstanceName = "transportCondition";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ValueField = "Value";
+		   settings.Properties.TextField = "Text";
+		   settings.Properties.ValueType = typeof(string);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		   settings.ReadOnly = (codeState != "01");
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpIsRequired"] = "true";
+			   e.Properties["cpHasTab"] = "false";
+			   e.Properties["cpInitialCondition"] = "0";
+		   };
+	   }).BindList(ViewBag.OptionCleanORDirty).Bind(Model.transportCondition).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+	   {
+		   settings.ControlStyle.Font.Bold = true;
+		   settings.Text = "Buen estado del Transporte:";
+	   }).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().ComboBoxFor(m => m.transportState, settings =>
+	   {
+		   settings.Name = "transportState";
+		   settings.Properties.ClientInstanceName = "transportState";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ValueField = "Value";
+		   settings.Properties.TextField = "Text";
+		   settings.Properties.ValueType = typeof(string);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		   settings.ReadOnly = (codeState != "01");
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpIsRequired"] = "true";
+			   e.Properties["cpHasTab"] = "false";
+			   e.Properties["cpInitialCondition"] = "0";
+		   };
+	   }).BindList(ViewBag.OptionYesORNo).Bind(Model.transportState).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+	   {
+		   settings.ControlStyle.Font.Bold = true;
+		   settings.Text = "Sólo transporta camarón:";
+	   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.transportOnlyShrimp, settings =>
+	   {
+		   settings.Name = "transportOnlyShrimp";
+		   settings.Properties.ClientInstanceName = "transportOnlyShrimp";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ValueField = "Value";
+		   settings.Properties.TextField = "Text";
+		   settings.Properties.ValueType = typeof(string);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		   settings.ReadOnly = (codeState != "01");
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+		   settings.CustomJSProperties = (s, e) =>
+		   {
+			   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+			   e.Properties["cpIsRequired"] = "true";
+			   e.Properties["cpHasTab"] = "false";
+			   e.Properties["cpInitialCondition"] = "0";
+		   };
+	   }).BindList(ViewBag.OptionYesORNo).Bind(Model.transportOnlyShrimp).GetHtml()
+		</td>
+		<td></td>
+	</tr>
+</table>
+
+
+
+<table id="mainTabDetail" class="table table-condensed" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="4">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Producto a Analizar</span>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_warehouse, settings =>
+		{
+			settings.Name = "id_warehouseLabel";
+			settings.Text = "Bodega*:";
+			settings.AssociatedControlName = "id_warehouse";
+		}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_warehouse = (Model != null && Model.id_warehouse != 0) ? (int?)Model.id_warehouse : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_warehouse, settings =>
+				{
+					settings.Name = "id_warehouse";
+					settings.Properties.ClientInstanceName = "id_warehouse";
+					settings.Width = Unit.Percentage(100);
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+					settings.Properties.Width = Unit.Percentage(100);
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+					settings.ClientEnabled = (codeState == "01");
+					settings.ReadOnly = (isSystem);//Es de Sistema el Tipo de Analisis
+					settings.ShowModelErrors = true;
+					settings.Properties.ClientSideEvents.Validation = "OnWarehouseValidation";
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseCombo_SelectedIndexChanged";
+
+				}).BindList(DataProviderWarehouse.WarehousesByCompanyAndCurrent((int?)ViewData["id_company"], id_warehouse)).Bind(id_warehouse).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_warehouseLocation, settings =>
+			{
+				settings.Name = "locationLabel";
+				settings.Text = "Ubicación*:";
+				settings.AssociatedControlName = "id_warehouseLocation";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_warehouseLocation = (Model != null && Model.id_warehouseLocation != 0) ? (int?)Model.id_warehouseLocation : null;
+			}
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_warehouseLocation";
+				settings.Properties.ClientInstanceName = "id_warehouseLocation";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.Properties.Width = Unit.Percentage(100);
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				//settings.ClientEnabled = (id_inventoryMove == 0);
+				settings.ClientEnabled = (codeState == "01");
+				settings.ReadOnly = (isSystem);//Es de Sistema el Tipo de Analisis
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationValidation";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseLocationCombo_SelectedIndexChanged";
+
+			}).BindList(DataProviderWarehouseLocation.WarehouseLocationsByWarehouseAndCurrent(id_warehouse, id_warehouseLocation)).Bind(id_warehouseLocation).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_item, settings =>
+			{
+				settings.Name = "id_itemLabel";
+				settings.Text = "Producto*:";
+				settings.AssociatedControlName = "id_item";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_item = (Model != null && Model.id_item != 0) ? (int?)Model.id_item : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_item, settings =>
+			{
+				settings.Name = "id_item";
+				settings.Properties.ClientInstanceName = "id_item";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+				settings.Properties.Width = Unit.Percentage(100);
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				//settings.ClientEnabled = (id_inventoryMove == 0);
+				settings.ClientEnabled = (codeState == "01");
+				settings.ReadOnly = (isSystem);//Es de Sistema el Tipo de Analisis
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnItemValidation";
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemCombo_SelectedIndexChanged";
+
+			}).BindList(DataProviderItem.ItemsByWarehousesWarehouseLocationAndCurrent(id_warehouse, id_warehouseLocation, id_item)).Bind(id_item).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_lot, settings =>
+			{
+				//CAMBIO FEO
+				settings.Name = "lotLabel";
+				settings.Text = "Sec. Transaccional:";
+				settings.AssociatedControlName = "id_lot";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_lot = (Model != null && Model.id_lot != 0) ? (int?)Model.id_lot : null;
+				id_lot = (id_lot == null && (Model.id != 0 || isSystem)) ? 0 : id_lot;
+			}
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_lot";
+				settings.Properties.ClientInstanceName = "id_lot";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "number";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				//settings.ClientEnabled = (id_inventoryMove == 0);
+				settings.ClientEnabled = (codeState == "01");
+				settings.ReadOnly = (isSystem);//Es de Sistema el Tipo de Analisis
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnLotValidation";
+				//settings.Properties.ClientSideEvents.SelectedIndexChanged = "LotCombo_SelectedIndexChanged";
+
+			}).BindList(DataProviderProductionLot.LotsByWarehousesWarehouseLocationItemAndCurrent(id_warehouse, id_warehouseLocation, id_item, id_lot)).Bind(id_lot).GetHtml()
+		</td>
+	</tr>
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="4">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Moner William</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.monerDate, settings =>
+		{
+			settings.Name = "monerDateLabel";
+			settings.Text = "Fecha Moner William:";
+			settings.AssociatedControlName = "monerDateLabel";
+		}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().DateEditFor(m => m.monerDate, settings =>
+			{
+				settings.Name = "monerDate";
+				settings.Properties.ClientInstanceName = "monerDate";
+				settings.Properties.UseMaskBehavior = true;
+				settings.Properties.EditFormat = EditFormat.Custom;
+				settings.Properties.EditFormatString = "dd/MM/yyyy";
+				settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+				settings.Width = Unit.Percentage(100);
+				settings.ReadOnly = codeState != "01";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Init = "monerDateLabelOnInit";
+				settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpTabContainer"] = "tabDetail";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "true";
+					e.Properties["cpTabControl"] = "tabControl";
+				};
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.monerTime, settings =>
+			{
+				settings.Name = "monerTimeLabel";
+				settings.Text = "Hora Moner William:";
+				settings.AssociatedControlName = "monerTimeLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				TimeSpan? monerTime = (Model != null) ? (TimeSpan?)Model.monerTime : null;
+			}
+
+			@Html.DevExpress().TimeEdit(settings =>
+		{
+			settings.Name = "monerTime";
+			settings.Properties.ClientInstanceName = "monerTime";
+
+			settings.Properties.EditFormat = EditFormat.Time;
+			settings.Properties.EditFormatString = "HH:mm";
+			settings.Properties.DisplayFormatString = "HH:mm";
+			settings.Width = Unit.Percentage(100);
+			settings.ReadOnly = codeState != "01";
+			if (monerTime != null)
+			{
+				settings.DateTime = new DateTime(2017, 1, 1, monerTime.Value.Hours, monerTime.Value.Minutes, 0);
+			}
+			settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+			settings.CustomJSProperties = (s, e) =>
+			{
+				e.Properties["cpTabContainer"] = "tabDetail";
+				e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				e.Properties["cpIsRequired"] = "true";
+				e.Properties["cpTabControl"] = "tabControl";
+			};
+
+		}).GetHtml()
+		</td>
+		<td>
+
+			@Html.DevExpress().LabelFor(m => m.monerResultados, settings =>
+		{
+			settings.Name = "monerResultadosLabel";
+			settings.Text = "Resultados PPM:";
+			settings.AssociatedControlName = "monerResultadosLabel";
+		}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.monerResultados, settings =>
+			{
+				settings.Name = "monerResultados";
+				settings.Properties.ClientInstanceName = "monerResultados";
+				settings.Width = Unit.Percentage(100);
+
+				settings.Properties.DisplayFormatString = "N2";
+				settings.Properties.MaxValue = 999;
+				settings.Properties.MinValue = 0;
+				settings.ReadOnly = codeState != "01";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+				settings.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpTabContainer"] = "tabDetail";
+					e.Properties["cpMessageError"] = "Campo Obligatorio.";
+					e.Properties["cpIsRequired"] = "true";
+					e.Properties["cpTabControl"] = "tabControl";
+				};
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="4">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Rendimiento Entero</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.wholePerformance, settings =>
+			{
+				settings.Name = "wholePerformanceLabel";
+				settings.Text = "Rendimiento Entero*:";
+				settings.AssociatedControlName = "wholePerformanceLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.wholePerformance, settings =>
+		{
+			settings.Name = "wholePerformance";
+			settings.Properties.ClientInstanceName = "wholePerformance";
+			settings.Width = Unit.Percentage(100);
+
+			settings.Properties.DisplayFormatString = "N2";
+			settings.Properties.DecimalPlaces = 2;
+			settings.Properties.MaxValue = 100;
+			settings.ReadOnly = codeState != "01";
+			settings.ReadOnly = true;
+		}).GetHtml()
+		</td>
+	</tr>
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="4">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Detalles</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4">
+			@{
+				List<QualityControlDetail> qualityControlDetails = (Model != null && Model.QualityControlDetail != null)
+																				? Model.QualityControlDetail.ToList()
+																				: new List<QualityControlDetail>();
+
+				List<QualityControlAnalysisGroup> qualityControlAnalysisGroup = (List<QualityControlAnalysisGroup>)DataProviderQualityAnalysis.QualityControlAnalysisGroup((int)ViewData["id_company"]);
+
+				TempData["qualityControlDetailsTmp"] = qualityControlDetails;
+				TempData.Keep("qualityControlDetailsTmp");
+				ViewData["codeState"] = codeState;
+				if (codeState == "01" || (!Model.isConforms && codeState != "05"))//01: PENDIENTE y "05": ANULADO
+				{
+
+					Html.RenderPartial("_GridMessageErrorQualityControlDetail");
+					Html.RenderPartial("_QualityControlDetailsMasterPartial", qualityControlAnalysisGroup.OrderBy(od => od.id).ToList());
+				}
+				else
+				{
+					var id_qualityControl = (Model != null && Model.id != 0)
+														? Model.id
+														: 0;
+					ViewData["id_qualityControl"] = id_qualityControl;
+
+					Html.RenderPartial("_QualityControlDetailsMasterPartial", qualityControlAnalysisGroup.OrderBy(od => od.id).ToList());
+				}
+			}
+		</td>
+	</tr>
+</table>
+

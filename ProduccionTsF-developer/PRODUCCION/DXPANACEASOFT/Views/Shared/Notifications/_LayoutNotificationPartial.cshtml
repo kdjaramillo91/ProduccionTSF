@@ -1,0 +1,63 @@
+﻿
+@{
+    int countNotifications = @DataProviderNotification.CountNewNotificationsForUser((int)ViewData["id_user"]);
+}
+<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+    <i class="ace-icon fa fa-envelope icon-animated-vertical"></i>
+    <span class="badge badge-success" id="layout_notificacion_badge">
+        @countNotifications
+    </span>
+</a>
+<ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
+    <li class="dropdown-header">
+        <i class="ace-icon fa fa-envelope-o"></i>
+        Nuevas Notificaciones
+    </li>
+
+    <li class="dropdown-content">
+        <ul class="dropdown-menu dropdown-navbar">
+            @{
+                int activeUserId = (int)ViewData["id_user"];
+                using (var db = new DBContext())
+                {
+                    var notifications = db.Notification.Where(n => n.id_user == activeUserId && !n.reading);
+                    foreach (var notification in notifications)
+                    {
+                        <li>
+                            <a href="#" class="clearfix">
+                                <span class="msg-body" style="margin-left: 2px;">
+                                    <span class="msg-title blue">
+                                        <u>@notification.title</u>
+                                    </span>
+                                    <br />
+                                    @notification.description
+                                    <span class="msg-time">
+                                        <i class="ace-icon fa fa-clock-o"></i>
+                                        <span>
+                                            @notification.dateTime
+                                        </span>
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    }
+                }
+            }
+        </ul>
+    </li>
+
+    <li class="dropdown-footer">
+        <a href="#" id="btn_go_notifications">
+            Ver Todas
+            <i class="ace-icon fa fa-arrow-right"></i>
+        </a>
+    </li>
+</ul>
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#btn_go_notifications").click(GoToNotifications);
+    });
+
+</script>

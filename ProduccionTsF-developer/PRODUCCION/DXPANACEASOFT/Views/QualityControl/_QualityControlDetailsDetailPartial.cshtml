@@ -1,0 +1,48 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.QualityCorrectiveAction
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="4">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acción Correctiva</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_correctingPerson, settings =>
+               {
+                   settings.Name = "correctingPersonDetailLabel";
+                   settings.Text = "Corrector:";
+                   settings.AssociatedControlName = "correctingPersonDetail";
+               }).GetHtml()
+        </td>
+        <td>
+            @Html.Raw(Model.Employee.Person.fullname_businessName)
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.reference, settings =>
+               {
+                   settings.Name = "referenceQualityCorrectiveActionDetailLabel";
+                   settings.Text = "Referencia:";
+                   settings.AssociatedControlName = "referenceQualityCorrectiveActionDetail";
+               }).GetHtml()
+        </td>
+        <td>
+            @Html.Raw(Model.reference)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+               {
+                   settings.Name = "descriptionQualityCorrectiveActionDetailLabel";
+                   settings.Text = "Acción Correctiva:";
+                   settings.AssociatedControlName = "descriptionQualityCorrectiveActionDetail";
+               }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.Raw(Model.description)
+        </td>
+    </tr>
+</table>
+

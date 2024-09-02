@@ -1,0 +1,153 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.Filter
+
+@{
+    var grid = Html.DevExpress().GridView<FilterType>(settings =>
+    {
+        settings.Name = "gFilterBoxTextGridViewLeft";
+        settings.CallbackRouteValues = new { Controller = "ProductionLot", Action = "FilterBoxTextGridViewLeftPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.Height = Unit.Pixel(100); //Percentage(100);
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible; //Percentage(100);
+        settings.Settings.VerticalScrollableHeight = 100; //Percentage(100);
+        settings.SettingsPager.PageSize = 100;
+
+        //settings.SettingsSearchPanel.Visible = true;
+        //settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        //settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = false;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = false;
+        settings.Settings.ShowFilterRowMenu = false;
+
+        settings.Settings.ShowTitlePanel = false;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        //settings.Settings.ShowFooter = true;
+
+        //settings.ClientSideEvents.Init = "PurchaseOrdersOnGridViewInit";
+        //settings.ClientSideEvents.SelectionChanged = "PurchaseOrdersOnGridViewSelectionChanged";
+        //settings.ClientSideEvents.EndCallback = "GridViewFilterBoxDateLeft_OnGridViewEndCallback";
+        //settings.ClientSideEvents.RowDblClick = "OnRowDoubleClick";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        //settings.SetTitlePanelTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Ordenes de Compras</span>");
+        //});
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        //settings.SetFooterRowTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+        //    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+        //    {
+        //        ViewContext.Writer.Write(
+        //            @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""PurchaseOrdersSelectAllRows()"">Seleccionar Todos</a>
+        //              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""PurchaseOrdersClearSelection()"">Anular Selección</a>"
+        //        );
+        //    }
+        //});
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = false;
+
+        //DETALLES EN GRID LLAMADA A OTRA TABLA
+        //settings.SetDetailRowTemplateContent(column =>
+        //{
+        //    int? id_purchaseOrder = (int?)DataBinder.Eval(column.DataItem, "id");
+        //    PurchaseOrder order = DataProviderPurchaseOrder.PurchaseOrder(id_purchaseOrder);
+        //    Html.RenderPartial("_PurchaseOrderResultsDetailViewPartial", order);
+        //});
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //Document
+        settings.Columns.Add(m => m.alias, column =>
+        {
+            column.Name = "alias";
+            column.Caption = "Campo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(25);
+            //column.Width = Unit.Percentage(8);
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    PurchaseOrder order = (PurchaseOrder)Model[c.ItemIndex];
+            //    ViewContext.Writer.Write(order.Document.number);
+            //});
+        });
+
+        // COMMAND COLUMN
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = false,
+            ShowDeleteButton = false,
+            Visible = false,
+            VisibleIndex = 14,
+            Caption = "Acciones",
+            Width = Unit.Percentage(10)
+        };
+
+        //commandColumn.CustomButtons.Add(
+        //    new GridViewCommandColumnCustomButton
+        //    {
+        //        ID = "btnEditRow",
+        //        Text = "Editar"
+        //    }
+        //);
+        //settings.ClientSideEvents.CustomButtonClick = "PurchaseOrdersGridViewCustomCommandButton_Click";
+        //settings.Columns.Add(commandColumn);
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+    
+}

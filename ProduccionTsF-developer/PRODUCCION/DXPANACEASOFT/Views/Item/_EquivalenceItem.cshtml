@@ -1,0 +1,29 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ItemEquivalence
+
+
+<table id="tabTariffItemTable" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Equivalencia</span>
+        </td>
+    </tr>
+
+    <tr>
+        <td >
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "itemEquivalenceLabel";
+           settings.Text = "Producto Terminado:";
+       }).GetHtml()
+        </td>
+        <td colspan="3">
+            @{ 
+                Html.RenderPartial("ComboBox/_EquivalenceItem", this.Model);
+            }
+        </td>
+    </tr>
+</table>
+<br />

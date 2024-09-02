@@ -1,0 +1,401 @@
+﻿
+@model  ProductionProcess
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+	int? idSubCenter = (Model != null) ? Model.id_SubCostCenter : 0;
+	string solicitaMaquina = DataProviderSetting.ValueSetting("SMAQPINT");
+	string liqNoValorizada = DataProviderSetting.ValueSetting("LIQNOVAL");
+}
+@Html.Hidden("idSubCenter", idSubCenter)
+<table class="table table-condensed">
+
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.code, settings =>
+			{
+				settings.Text = "Código:*";
+				settings.AssociatedControlName = "code";
+
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+			{
+				settings.Properties.ClientInstanceName = "code";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.NullText = "Código";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnCodeProductionProcessValidation";
+
+			}).GetHtml()
+	</tr>
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.name, settings =>
+			{
+				settings.Text = "Nombre:*";
+				settings.AssociatedControlName = "name";
+
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.name, settings =>
+			{
+				settings.Properties.ClientInstanceName = "ProductionProcessName";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.NullText = "Nombre";
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnProductionProcessNameValidation";
+
+			}).GetHtml()
+	</tr>
+	<tr>
+		<td style="width: 8%;">
+			@Html.DevExpress().LabelFor(m => m.sequential, settings =>
+			{
+				settings.Text = "Secuencial:*";
+				settings.AssociatedControlName = "sequential";
+
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.sequential, settings =>
+			{
+				settings.Properties.ClientInstanceName = "sequential";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.NullText = "Secuencial";
+				settings.ShowModelErrors = true;
+
+
+			}).GetHtml()
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_ProductionUnit, settings =>
+			{
+				settings.Name = "id_ProductionUnitLabel";
+				settings.Text = "Unidad de Producción:";
+				settings.AssociatedControlName = "id_ProductionUnit";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_ProductionUnit = (Model != null && Model.id_ProductionUnit != 0) ? (int?)Model.id_ProductionUnit : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_ProductionUnit, settings =>
+			   {
+					settings.Name = "id_ProductionUnit";
+					settings.Properties.ClientInstanceName = "id_ProductionUnit";
+					settings.Properties.NullDisplayText = "Seleccione...";
+					settings.Properties.NullText = "Seleccione...";
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ValueType = typeof(int);
+					settings.Properties.Columns.Add("name", "Nombre", 200);
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+					settings.Properties.EnableClientSideAPI = true;
+					settings.Properties.CallbackPageSize = 20;
+					settings.Properties.ClientSideEvents.Validation = "OnProductionUnit";
+					//settings.Properties.ClientSideEvents.SelectedIndexChanged = "ProductionUnitCombo_SelectedIndexChanged";
+
+			   }).BindList(DataProviderProductionUnit.ProductionUnitByCompany((int?)ViewData["id_company"])).Bind(id_ProductionUnit).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_warehouse, settings =>
+			{
+				settings.Name = "id_warehouseLabel";
+				settings.Text = "Bodega:";
+				settings.AssociatedControlName = "id_warehouse";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_warehouse = (Model != null && Model.id_warehouse != 0) ? (int?)Model.id_warehouse : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_warehouse, settings =>
+			   {
+					settings.Name = "id_warehouse";
+					settings.Properties.ClientInstanceName = "id_warehouse";
+					settings.Properties.NullDisplayText = "Seleccione...";
+					settings.Properties.NullText = "Seleccione...";
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ValueType = typeof(int);
+					settings.Properties.Columns.Add("name", "Nombre", 200);
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+					settings.Properties.EnableClientSideAPI = true;
+					settings.Properties.CallbackPageSize = 20;
+					settings.Properties.ClientSideEvents.Validation = "OnWarehouse";
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseCombo_SelectedIndexChanged";
+
+			   }).BindList(DataProviderWarehouse.WarehouseByCompany((int?)ViewData["id_company"])).Bind(id_warehouse).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_WarehouseLocation, settings =>
+			{
+				settings.Name = "id_WarehouseLocationLabel";
+				settings.Text = "Ubicación:";
+				settings.AssociatedControlName = "id_WarehouseLocation";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_WarehouseLocation, settings =>
+			   {
+				   settings.Name = "id_WarehouseLocation";
+				   settings.Properties.ClientInstanceName = "id_WarehouseLocation";
+				   settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+				   settings.Properties.ValueField = "id";
+				   settings.Properties.TextField = "name";
+				   settings.Properties.ValueType = typeof(int);
+
+				   settings.Properties.NullDisplayText = "Todas";
+				   settings.Properties.NullText = "Todas";
+
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   settings.Properties.ClientSideEvents.Init = "OnWarehouseLocationEntryInit";
+				   settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationValidation";
+			   }).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_CostCenter, settings =>
+				{
+				settings.Name = "id_CostCenterLabel";
+				settings.Text = "Centro de Costo:";
+				settings.AssociatedControlName = "id_CostCenter";
+				}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_CostCenter, settings =>
+			   {
+					settings.Name = "id_CostCenter";
+					settings.Properties.ClientInstanceName = "id_CostCenter";
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.Validation = "OnCenterCostValidation";
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "SubCostCenterCombo_SelectedIndexChanged";
+			   }).BindList(DataProviderCostCenter.AllCostCenters()).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_SubCostCenter, settings =>
+			{
+			settings.Name = "id_SubCostCenterLabel";
+			settings.Text = "SubCentro de Costo:";
+			settings.AssociatedControlName = "id_SubCostCenter";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBoxFor(m => m.id_SubCostCenter, settings =>
+			   {
+					settings.Name = "id_SubCostCenter";
+					settings.Properties.ClientInstanceName = "id_SubCostCenter";
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.Init = "OnSubCostCenterEntryInit";
+					settings.Properties.ClientSideEvents.Validation = "OnSubCenterCostValidation";
+
+			   }).BindList(DataProviderCostCenter.SubCostCenters()).GetHtml()
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.description, settings =>
+			{
+				settings.Text = "Descripción:";
+				settings.AssociatedControlName = "description";
+
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().MemoFor(m => m.description, settings =>
+			{
+				settings.Properties.ClientInstanceName = "description";
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.NullText = "";
+				settings.ShowModelErrors = true;
+
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+			{
+				settings.Text = "¿Activo?:";
+				settings.AssociatedControlName = "isActive";
+
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			{
+				settings.Properties.ClientInstanceName = "isActive";
+				settings.Width = Unit.Percentage(100);
+
+			}).GetHtml()
+		</td>
+	</tr>
+
+	@if (solicitaMaquina == "SI")
+	{
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.generateTransfer, settings =>
+				{
+					settings.Text = "¿Genera Transferencia?:";
+					settings.AssociatedControlName = "generateTransfer";
+
+				}).GetHtml()
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().CheckBoxFor(m => m.generateTransfer, settings =>
+				{
+					settings.Properties.ClientInstanceName = "generateTransfer";
+					settings.Width = Unit.Percentage(100);
+
+				}).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.requestliquidationmachine, settings =>
+				{
+					settings.Text = "¿Solicita Máquina/Liquidador?:";
+					settings.AssociatedControlName = "requestliquidationmachine";
+
+				}).GetHtml()
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().CheckBoxFor(m => m.requestliquidationmachine, settings =>
+				{
+					settings.Properties.ClientInstanceName = "requestliquidationmachine";
+					settings.Width = Unit.Percentage(100);
+
+				}).GetHtml()
+			</td>
+		</tr>
+	}
+	@if (liqNoValorizada == "SI")
+	{ 
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.requestCarMachine, settings =>
+                {
+                    settings.Text = "¿Solicita Carro y Máquina?:";
+                    settings.AssociatedControlName = "requestCarMachine";
+
+                }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().CheckBoxFor(m => m.requestCarMachine, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "requestCarMachine";
+                    settings.Width = Unit.Percentage(100);
+
+                }).GetHtml()
+            </td>
+        </tr>
+	}
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.generatesAbsorption, settings =>
+			{
+				settings.Text = "¿Genera Absorción?:";
+				settings.AssociatedControlName = "generatesAbsorption";
+
+			}).GetHtml()
+		</td>
+		<td colspan="5">
+			@Html.DevExpress().CheckBoxFor(m => m.generatesAbsorption, settings =>
+			{
+				settings.Properties.ClientInstanceName = "generatesAbsorption";
+				settings.Width = Unit.Percentage(100);
+
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6" style="text-align: right;">
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnUpdate";
+				settings.Text = "Actualizar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+			}).GetHtml()
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnCancel";
+				settings.Text = "Cancelar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonCancel_Click";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr id="productionLotState_AlertRow" style="display: none;">
+		<td colspan="6">
+			<div class="alert alert-danger fade in" style="margin-top: 18px;">
+				<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+				<span id="productionLotState_ErrorMessage"></span>
+			</div>
+		</td>
+	</tr>
+</table>
+
+
+<script src="~/Scripts/productionprocess/editform.js"></script>
+

@@ -1,0 +1,478 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    bool OnlyRead = (ViewData["OnlyRead"] != null) ? (bool)ViewData["OnlyRead"] : false;
+}
+@{
+    var grid = Html.DevExpress().GridView<SalesQuotationDetail>(settings =>
+    {
+        settings.Name = "gvSalesQuotationDetails";
+        settings.CallbackRouteValues = new { Controller = "SalesQuotation", Action = "SalesQuotationDetailsPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "SalesQuotation", Action = "SalesQuotationDetailsAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "SalesQuotation", Action = "SalesQuotationDetailsUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "SalesQuotation", Action = "SalesQuotationDetailsDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = !OnlyRead;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+
+        settings.SettingsBehavior.ConfirmDelete = false;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+
+        settings.KeyFieldName = "id";
+
+        //Eventos
+        settings.ClientSideEvents.Init = "SaleQuotationDetailsOnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "SaleQuotationDetailsOnGridViewSelectionChanged";
+        settings.ClientSideEvents.BeginCallback = "SaleQuotationDetailsOnGridViewBeginCallback";
+        settings.ClientSideEvents.EndCallback = "SaleQuotationDetailsOnGridViewEndCallback";
+
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<SalesQuotationDetail> rows = (Model as List<SalesQuotationDetail>);
+            rows = (rows != null) ? rows.Where(d => d.isActive).ToList() : new List<SalesQuotationDetail>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+            e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : (0);
+
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SalesQuotationDetailsSelectAllRows();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""SalesQuotationDetailsClearSelection();"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["quantity"] = 0.00M;
+            e.NewValues["quantityTypeUMPresentation"] = 1.00M;
+            e.NewValues["price"] = 0.00M;
+            e.NewValues["iva"] = 0.00M;
+            e.NewValues["subtotal"] = 0.00M;
+            e.NewValues["total"] = 0.00M;
+        };
+
+        #region Columns
+
+        //"masterCode"
+        settings.Columns.Add(m => m.Item.masterCode, column =>
+        {
+            column.Caption = "Código";
+            column.Width = Unit.Percentage(7);
+            column.ReadOnly = true;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.PropertiesEdit.ClientInstanceName = "masterCode";
+            //column.PropertiesEdit.va ErrorDisplayMode = ErrorDisplayMode.None;
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+
+                string masterCode = (item != null) ? item.masterCode : "";
+
+                Html.DevExpress().TextBox(p =>
+                {
+                    p.Name = "masterCode";
+                    p.Properties.ClientInstanceName = "masterCode";
+
+                    p.Width = Unit.Percentage(100);
+
+                    p.ReadOnly = true;
+                    p.ShowModelErrors = false;
+                }).Bind(masterCode).GetHtml();//.Render();//.Bind(metricUnit).Render();
+            });
+
+        });
+
+        //"id_item"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Name = "id_item";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(15);
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_item";
+                p.DataSource = DataProviderItem.AllSaleItemsByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                //p.TextField = "name";
+                p.TextFormatString = "{1}";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 15;
+                p.Width = Unit.Percentage(100);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                p.Columns.Add("masterCode", "Código", 70);
+                p.Columns.Add("name", "Nombre del Producto", 300);
+                p.Columns.Add("ItemSaleInformation.MetricUnit.code", "UM", 50);
+                p.ClientSideEvents.Init = "ItemCombo_OnInit";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ClientSideEvents.SelectedIndexChanged = "ItemCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnItemValidation";
+                p.CallbackRouteValues = new { Controller = "SalesQuotation", Action = "GetItem"};
+                p.ClientSideEvents.BeginCallback = "SalesQuotationItem_BeginCallback";
+                p.ClientSideEvents.EndCallback = "SalesQuotationItem_EndCallback";
+            });
+        });
+
+        //"quantity"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantity";
+            column.Name = "quantity";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantity = (decimal)DataBinder.Eval(c.DataItem, "quantity");
+                ViewContext.Writer.Write(quantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "quantity";
+                p.Width = Unit.Percentage(100);
+                p.DisplayFormatString = "N2";
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+            });
+        });
+
+        //"id_metricUnitSale"
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_metricUnitSale";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(3);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "metricUnitSale";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.ItemSaleInformation != null) ? item.ItemSaleInformation.MetricUnit.code : "";
+                ViewContext.Writer.Write(metricUnit);
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+
+                string metricUnit = (item != null && item.ItemSaleInformation != null) ? item.ItemSaleInformation.MetricUnit.code : "";
+
+                Html.DevExpress().TextBox(p =>
+                {
+                    p.Name = "metricUnitSale";
+                    p.Properties.ClientInstanceName = "metricUnitSale";
+
+                    p.Width = Unit.Percentage(100);
+
+                    p.ReadOnly = true;
+                    p.ShowModelErrors = false;
+                }).Bind(metricUnit).GetHtml();//.Render();//.Bind(metricUnit).Render();
+            });
+
+        });
+
+        //"quantityTypeUMPresentation"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityTypeUMPresentation";
+            column.Caption = "Cantidad Total";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityTypeUMPresentation = (decimal)DataBinder.Eval(c.DataItem, "quantityTypeUMPresentation");
+                ViewContext.Writer.Write(quantityTypeUMPresentation.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "quantityTypeUMPresentation";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.SpinButtons.ShowIncrementButtons = true;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ClientSideEvents.ValueChanged = "QuantityTypeUMPresentation_ValueChanged";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ClientSideEvents.Init = "QuantityTypeUMPresentation_Init";
+                p.ClientSideEvents.Validation = "OnQuantityTypeUMPresentationValidation";
+            });
+        });
+
+        //id_metricUnitTypeUMPresentation
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_metricUnitTypeUMPresentation";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_metricUnitTypeUMPresentation = (int?)DataBinder.Eval(c.DataItem, "id_metricUnitTypeUMPresentation");
+
+                MetricUnit metricUnit = DataProviderMetricUnit.MetricUnit(id_metricUnitTypeUMPresentation);
+
+                string text = (metricUnit != null) ? metricUnit.code : "";
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_metricUnitTypeUMPresentation";
+                p.DataSource = DataProviderMetricUnit.MetricUnitsByCompanyAndCurrent((int?)ViewData["id_company"], null);
+                //p.TextFormatString = "{1}";
+                p.ValueField = "id";
+                p.TextField = "code";
+                p.Width = Unit.Percentage(100);
+                p.ValueType = typeof(int);
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                p.ClientSideEvents.SelectedIndexChanged = "MetricUnitTypeUMPresentationCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnMetricUnitTypeUMPresentationValidation";
+                p.CallbackRouteValues = new { Controller = "SalesQuotation", Action = "GetMetricUnitTypeUMPresentation" };
+                p.ClientSideEvents.BeginCallback = "SalesQuotationMetricUnitTypeUMPresentation_BeginCallback";
+                p.ClientSideEvents.EndCallback = "SalesQuotationMetricUnitTypeUMPresentation_EndCallback";
+            });
+        });
+
+        //"price"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "price";
+            column.Caption = "Precio";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+            column.ReadOnly = true;
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+
+                p.ClientInstanceName = "price";
+                p.DisplayFormatString = "C6";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 6;
+                p.SpinButtons.ShowIncrementButtons = false;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Currency;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                //p.ClientSideEvents.ValueChanged = "Price_ValueChanged";
+                p.ClientSideEvents.Validation = "PriceValidation";
+            });
+        });
+
+        //"iva"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "iva";
+            column.Caption = "IVA";
+            column.Name = "iva";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(7);
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "iva";
+                p.DisplayFormatString = "C2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.SpinButtons.ShowIncrementButtons = false;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Currency;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+
+        });
+
+        //"subtotal"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "subtotal";
+            column.Caption = "Subtotal";
+            column.Name = "subtotal";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(7);
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "subtotal";
+                p.DisplayFormatString = "C2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.SpinButtons.ShowIncrementButtons = false;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Currency;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+
+        });
+
+        //"total"
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "total";
+            column.Caption = "Total";
+            column.Name = "total";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(7);
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "total";
+                p.DisplayFormatString = "C2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.SpinButtons.ShowIncrementButtons = false;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Currency;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+        });
+
+        #endregion
+        if (!OnlyRead)
+        {
+            MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+            {
+                ShowEditButton = !OnlyRead,
+                ShowDeleteButton = !OnlyRead,
+                ShowCancelButton = !OnlyRead,
+                ShowUpdateButton = !OnlyRead,
+                Visible = !OnlyRead,
+                VisibleIndex = 13,
+                Caption = "Acciones",
+                Width = Unit.Percentage(5)
+            };
+
+            settings.Columns.Add(commandColumn);
+        }
+
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

@@ -1,0 +1,36 @@
+﻿@using DXPANACEASOFT.Models
+<div>
+
+    @Html.DevExpress().PopupControl(settings =>
+    {
+        settings.Name = "popupRemissionGuide";
+        settings.Width = Unit.Pixel(800);
+        settings.CallbackRouteValues = new { Controller = "LiquidationFreight", Action = "RemissionGuideForLiquidationPopupPartial" };
+        settings.AllowResize = false;
+        settings.ShowHeader = true;
+        settings.ShowOnPageLoad = true;
+        settings.AllowDragging = true;
+        settings.ShowCloseButton = true;
+        settings.EnableHotTrack = true;
+        settings.CloseAction = CloseAction.OuterMouseClick;
+        settings.CloseOnEscape = false;
+        settings.Modal = true;
+        settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+        settings.LoadContentViaCallback = LoadContentViaCallback.OnFirstShow;
+        
+
+        settings.PopupElementID = "ShowButton";
+
+        settings.HeaderText = "Guías de Remisión";
+        settings.SetContent(() =>
+        {
+            settings.Height = Unit.Pixel(300);
+            ViewContext.Writer.Write(
+                "<div>");
+            Html.RenderPartial("_RemissionGuidesPartial", new List<RemissionGuide>());
+            ViewContext.Writer.Write(
+            "</div>");
+        });
+    }).GetHtml()
+</div>

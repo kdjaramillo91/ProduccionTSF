@@ -1,0 +1,135 @@
+﻿@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InventoryMove
+
+@{
+    int id_inventoryMove = (Model != null) ? Model.id : 0;
+    string codeDocumentType = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+    string natureMove = (string)ViewData["_natureMove"];
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditInventoryMove", name = "formEditInventoryMove" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_inventoryMove", id_inventoryMove)
+    @Html.Hidden("codeDocumentType", codeDocumentType)
+    @Html.Hidden("natureMoveIM", natureMove)
+    @Html.Hidden("withLotSystem", (bool)ViewBag.withLotSystem)
+    @Html.Hidden("withLotCustomer", (bool)ViewBag.withLotCustomer)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var document = (Model != null && Model.Document != null) ? Model.Document : new Document();
+            Html.RenderPartial("DocumentTemplates/_DocumentFormEditCut", document);
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabInventoryMove";
+        tab.Text = "Movimiento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_InventoryMoveMainFormTabMove");
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDetails";
+        tab.Text = "Detalles    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            if (codeState == "01")
+            {
+                Html.RenderPartial("_InventoryMoveMainFormTabDetails");
+            }
+            else
+            {
+                ViewData["code"] = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+                ViewData["id_inventoryMove"] = (Model != null) ? Model.id : 0;
+                var details = (Model != null && Model.InventoryMoveDetail != null) ? Model.InventoryMoveDetail.ToList() : new List<InventoryMoveDetail>();
+                Html.RenderPartial("_InventoryMoveDetailsPartial", details);
+            }
+            
+        });
+    });
+
+}).GetHtml()
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdate";
+                        button.Text = "Guardar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.ClientEnabled = codeState == "01";//(id_inventoryMove == 0);
+                        button.UseSubmitBehavior = false;
+                        button.EnableClientSideAPI = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.ClientEnabled = true;
+                        button.UseSubmitBehavior = false;
+                        button.EnableClientSideAPI = true;
+                        button.ClientSideEvents.Click = "ButtonClose_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/inventorymovetransfer/editform.js"></script>

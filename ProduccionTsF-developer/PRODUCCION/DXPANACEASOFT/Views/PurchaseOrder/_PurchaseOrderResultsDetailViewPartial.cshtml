@@ -1,0 +1,61 @@
+
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PurchaseOrder
+
+@{
+    int id_purchaseOrder = (Model != null) ? Model.id : 0;
+    Document document = (Model != null) ? Model.Document : new Document();
+}
+
+@Html.Hidden("id_purchaseOrder", id_purchaseOrder)
+
+<table style="width: 100%">
+    <tr>
+        <td>Clave de Acceso:</td>
+        <td colspan="4">@Html.Raw(document.accessKey)</td>
+    </tr>
+    <tr>
+        <td style="width: 8%;">No. Autorización:</td>
+        <td>@Html.Raw(document.authorizationNumber)</td>
+        <td style="width: 8%;">Fecha Autorización:</td>
+        <td>@Html.Raw(document.authorizationDate)</td>
+    </tr>
+    <tr>
+        <td>Referencia:</td>
+        <td>@Html.Raw(document.reference)</td>
+        <td>Descripción:</td>
+        <td>@Html.Raw(document.description)</td>
+    </tr>
+    <tr>
+        <td>Creado por:</td>
+        <td>@Html.Raw(GetUserName(document.id_userCreate))</td>
+        <td>Fecha de Creación:</td>
+        <td>@Html.Raw(document.dateCreate)</td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>@Html.Raw(GetUserName(document.id_userUpdate))</td>
+        <td>Fecha de Modificación:</td>
+        <td>@Html.Raw(document.dateUpdate)</td>
+    </tr>
+</table>
+
+<br />
+
+@{
+    var purchaseOrderDetails = (Model != null && Model.PurchaseOrderDetail != null) ? Model.PurchaseOrderDetail.ToList() : new List<PurchaseOrderDetail>();
+    Html.RenderPartial("_PurchaseOrderResultsDetailViewDetailsPartial", purchaseOrderDetails);
+}
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+
+        if (user == null)
+            return string.Empty;
+
+        return user.username;
+    }
+}

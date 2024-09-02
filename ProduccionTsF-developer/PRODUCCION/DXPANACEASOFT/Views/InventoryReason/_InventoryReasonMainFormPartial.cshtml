@@ -1,0 +1,549 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InventoryReason
+
+@{
+	int id_InventoryReason = (Model != null) ? Model.id : 0;
+	bool modifi = (Model != null && Model.isSystem) ? true : false;
+	string codeNatureMove = DataProviderInventoryReason.GetCodeNatureMoveById(Model.idNatureMove);
+}
+
+
+@{
+	if (ViewData["EditMessage"] != null)
+	{
+		@Html.Raw(ViewData["EditMessage"]);
+	}
+
+	@Html.Hidden("id_InventoryReason", id_InventoryReason)
+	@Html.Hidden("codeNatureMove", codeNatureMove)
+
+
+	<div id="GridMessageError" style="display: none;">
+
+	</div>
+	<table class="table table-condenced" style="margin: 0px;">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="6">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+			</td>
+		</tr>
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.code, settings =>
+			{
+				settings.Name = "codeLabel";
+				settings.Text = "Código:";
+				settings.AssociatedControlName = "code";
+			}).GetHtml()
+
+
+			</td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+		   {
+			   settings.Name = "code";
+			   settings.Properties.ClientInstanceName = "code";
+
+			   settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 20;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+			   settings.ReadOnly = modifi;
+			   //settings.Width = Unit.Percentage(50);
+			   //settings.Height = Unit.Percentage(50);
+		   }).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td colspan="5"></td>
+
+		</tr>
+
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.name, settings =>
+			{
+				settings.Name = "nameLabel";
+				settings.Text = " Nombre:";
+				settings.AssociatedControlName = "name";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="6">
+				@Html.DevExpress().TextBoxFor(m => m.name, settings =>
+	   {
+		   settings.Name = "name";
+		   settings.Properties.ClientInstanceName = "name";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.MaxLength = 100;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+		   settings.ReadOnly = modifi;
+	   }).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+
+
+		</tr>
+
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.description, settings =>
+			{
+				settings.Name = "descriptionLabel";
+				settings.Text = " Descripción:";
+				settings.AssociatedControlName = "description";
+			}).GetHtml()
+
+			</td>
+			<td colspan="6">
+				@Html.DevExpress().TextBoxFor(m => m.description, settings =>
+	   {
+		   settings.Name = "description";
+		   settings.Properties.ClientInstanceName = "description";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ClientSideEvents.Validation = "OnDescriptionValidation";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.MaxLength = 100;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+		   settings.ReadOnly = modifi;
+	   }).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+
+
+		</tr>
+
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_documentType, settings =>
+			{
+				settings.Name = "id_documentTypeLabel";
+				settings.Text = "Tipo Documento:";
+				settings.AssociatedControlName = "id_documentType";
+			}).GetHtml()
+
+
+			</td>
+			<td colspan="2">
+				@{
+					int? id_documentType = (Model != null && Model.id_documentType != 0) ? (int?)Model.id_documentType : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_documentType, settings =>
+		   {
+			   settings.Name = "id_documentType";
+			   settings.Properties.ClientInstanceName = "id_documentType";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+			   settings.ReadOnly = modifi;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OndocumentTypeValidation";
+
+		   }).BindList(DataProviderDocumentType.DocumentTypesByCompany((int?)ViewData["id_company"])).Bind(id_documentType).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td>
+				@Html.DevExpress().LabelFor(m => m.idNatureMove, settings =>
+			{
+				settings.Name = "idNatureMoveLabel";
+				settings.Text = "Naturaleza:";
+				settings.AssociatedControlName = "idNatureMove";
+			}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? idNatureMove = (Model != null && Model.idNatureMove != 0) ? (int?)Model.idNatureMove : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.idNatureMove, settings =>
+		   {
+			   settings.Name = "idNatureMove";
+			   settings.Properties.ClientInstanceName = "idNatureMove";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+			   settings.ReadOnly = modifi;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnNatureMoveReason";
+			   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnChangeNatureMoveReason";
+
+		   }).BindList(DataProviderAdvanceParameters.AdvanceParametersByCode("NMMGI")).Bind(idNatureMove).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.CategoriaCosto, settings =>
+				{
+					settings.Name = "idCategoriaCostoLabel";
+					settings.Text = "Categoría de Costo:";
+					settings.AssociatedControlName = "categoriaCosto";
+				}).GetHtml()
+			</td>
+			<td colspan="2">
+				@{
+					string categoriaCosto = (Model != null && !string.IsNullOrEmpty(Model.CategoriaCosto)) ? (string)Model.CategoriaCosto : string.Empty;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.CategoriaCosto, settings =>
+				{
+					settings.Name = "categoriaCosto";
+
+					var p = settings.Properties;
+					p.ClientInstanceName = "categoriaCosto";
+					p.ValueField = "codigo";
+					p.TextField = "nombre";
+					p.ValueType = typeof(string);
+
+					p.Columns.Add("nombre", "Nombre", Unit.Percentage(100));
+					p.ValidationSettings.Display = Display.Static;
+
+					p.DropDownStyle = DropDownStyle.DropDownList;
+					p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					p.EnableSynchronization = DefaultBoolean.False;
+					p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+					p.ClientSideEvents.Validation = "OnCategoriaCostoValidation";
+				}).BindList(DataProviderInventoryReason.GetCategoriaCosto()).Bind(categoriaCosto).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<!--FECHA Inicio-->
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.isSystem, settings =>
+			   {
+				   settings.Name = "isSystem";
+				   settings.Properties.ClientInstanceName = "isSystem";
+				   settings.Text = "¿Sistema?";
+				   settings.ReadOnly = true;
+			   }).GetHtml()
+
+
+			</td>
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.isAuthomatic, settings =>
+			   {
+				   settings.Name = "isAuthomatic";
+				   settings.Properties.ClientInstanceName = "isAuthomatic";
+				   settings.Text = "¿Automático?";
+				   settings.ReadOnly = modifi;
+			   }).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.requiereSystemLotNubmber, settings =>
+			   {
+				   settings.Name = "requiereSystemLotNubmber";
+				   settings.Properties.ClientInstanceName = "requiereSystemLotNubmber";
+				   settings.Text = "¿Lote Sistema?";
+				   settings.ReadOnly = modifi;
+			   }).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.requiereUserLotNubmber, settings =>
+			   {
+				   settings.Name = "requiereUserLotNubmber";
+				   settings.Properties.ClientInstanceName = "requiereUserLotNubmber";
+				   settings.Text = "¿Lote Cliente?";
+				   settings.ReadOnly = modifi;
+			   }).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.isForTransfer, settings =>
+			   {
+				   settings.Name = "isForTransfer";
+				   settings.Properties.ClientInstanceName = "isForTransfer";
+				   settings.Text = "¿Transferencia?";
+				   settings.ReadOnly = modifi;
+			   }).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.op, settings =>
+				{
+					settings.Name = "op";
+					settings.Properties.ClientInstanceName = "op";
+					settings.Text = "OP";
+					settings.ReadOnly = modifi;
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			   {
+				   settings.Name = "isActive";
+				   settings.Properties.ClientInstanceName = "isActive";
+				   settings.Text = "Activo";
+				   settings.ReadOnly = modifi;
+			   }).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.valorization, settings =>
+				{
+					settings.Name = "valorizationLabel";
+					settings.Text = "Valorización:";
+					settings.AssociatedControlName = "valorization";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+
+
+					string valorization = (Model != null && Model.valorization != "" && Model.valorization != null) ? (string)Model.valorization : (Model != null ? (codeNatureMove == "I" ? "Manual" : "Automático") : null);
+				}
+				@Html.Hidden("valorizationAux", valorization)
+				@Html.DevExpress().ComboBoxFor(m => m.valorization, settings =>
+			   {
+				   settings.Name = "valorization";
+				   settings.Properties.ClientInstanceName = "valorization";
+				   settings.Properties.ValueField = "Value";
+				   settings.Properties.TextField = "Text";
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   settings.Properties.ValueType = typeof(string);
+				   settings.Width = Unit.Percentage(50);
+				   settings.Height = Unit.Percentage(50);
+				   settings.Properties.EnableClientSideAPI = true;
+				   settings.Properties.CallbackPageSize = 20;
+				   settings.ReadOnly = modifi;
+				   settings.ShowModelErrors = true;
+				   settings.Properties.ClientSideEvents.Validation = "OnValorizationReason";
+				   settings.Properties.ClientSideEvents.Init = "function (s, e) {valorization.SetEnabled($('#codeNatureMove').val()==='I');}";
+				   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnChangeValorizationReason";
+
+			   }).BindList(DataProviderInventoryReason.GetValorizations()).Bind(valorization).GetHtml()
+			</td>
+
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.typeOfCalculation, settings =>
+			{
+				settings.Name = "typeOfCalculationLabel";
+				settings.Text = "Tipo De Cálculo:";
+				settings.AssociatedControlName = "typeOfCalculation";
+			}).GetHtml()
+			</td>
+			<td>
+				@{
+
+					string typeOfCalculation = (Model != null && Model.typeOfCalculation != "" && Model.typeOfCalculation != null) ? (string)Model.typeOfCalculation : (Model != null ? (codeNatureMove == "I" ? "Heredado" : "Promedio") : null);
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.typeOfCalculation, settings =>
+		   {
+			   settings.Name = "typeOfCalculation";
+			   settings.Properties.ClientInstanceName = "typeOfCalculation";
+			   settings.Properties.ValueField = "Value";
+			   settings.Properties.TextField = "Text";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(string);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+			   settings.ReadOnly = modifi;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnTypeOfCalculationReason";
+			   settings.Properties.ClientSideEvents.Init = "function (s, e) {typeOfCalculation.SetEnabled($('#codeNatureMove').val()==='I' && $('#valorizationAux').val()!=='Automático');}";
+			   //settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnChangeTypeOfCalculationReason";
+
+		   }).BindList(DataProviderInventoryReason.GetTypeOfCalculations(valorization)).Bind(typeOfCalculation).GetHtml()
+			</td>
+
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_inventoryReasonRelated, settings =>
+			{
+				settings.Name = "id_inventoryReasonRelatedLabel";
+				settings.Text = "Motivo Relacionado:";
+				settings.AssociatedControlName = "id_inventoryReasonRelated";
+			}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_inventoryReasonRelated = (Model != null && Model.id_inventoryReasonRelated != 0) ? (int?)Model.id_inventoryReasonRelated : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => id_inventoryReasonRelated, settings =>
+		   {
+			   settings.Name = "id_inventoryReasonRelated";
+			   settings.Properties.ClientInstanceName = "id_inventoryReasonRelated";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+			   settings.ReadOnly = modifi;
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnInventoryReasonRelated";
+			   settings.Properties.ClientSideEvents.Init = "function (s, e) {id_inventoryReasonRelated.SetEnabled(typeOfCalculation.GetValue()==='Heredado');}";
+
+		   }).BindList(DataProviderInventoryReason.GetInventoryReasonExit()).Bind(id_inventoryReasonRelated).GetHtml()
+			</td>
+
+			<td>
+				@Html.DevExpress().CheckBoxFor(m => m.applyinCost, settings =>
+	   {
+		   settings.Name = "applyinCost";
+		   settings.Properties.ClientInstanceName = "applyinCost";
+		   settings.Text = "Aplicar a Costo?";
+		   settings.ReadOnly = modifi;
+	   }).GetHtml()
+			</td>
+
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.MotivoCosto, settings =>
+				{
+					settings.Name = "idMotivoCostoLabel";
+					settings.Text = "Calculo de Costo Manual:";
+					settings.AssociatedControlName = "motivoCosto";
+				}).GetHtml()
+			</td>
+			<td colspan="2">
+				@{
+					//string motivoCosto = (Model != null && !string.IsNullOrEmpty(Model.MotivoCosto)) ? (string)Model.MotivoCosto : string.Empty;
+					string motivoCosto = (Model != null && !string.IsNullOrEmpty(Model.MotivoCosto) && Model.valorization != null) ? (string)Model.MotivoCosto : (Model != null ? (codeNatureMove == "I" ? "Ninguno" : "Ninguno") : null);
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.MotivoCosto, settings =>
+				{
+					settings.Name = "motivoCosto";
+					settings.Width = Unit.Percentage(100);
+					settings.ClientEnabled = false;
+
+					var p = settings.Properties;
+					p.ClientInstanceName = "motivoCosto";
+					p.ValueField = "Codigo";
+					p.TextField = "Nombre";
+					p.CallbackPageSize = 20;
+					p.ValueType = typeof(string);
+
+					p.Columns.Add("nombre", "Nombre", Unit.Percentage(100));
+					p.ValidationSettings.Display = Display.Static;
+
+					p.DropDownStyle = DropDownStyle.DropDownList;
+					p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					p.EnableSynchronization = DefaultBoolean.False;
+					p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+					p.ClientSideEvents.Init = "OnMotivoCostoInit";
+					p.ClientSideEvents.Validation = "OnMotivoCostoValidation";					
+					p.ClientSideEvents.SelectedIndexChanged = "OnMotivoCostoSelectedIndexChanged";
+
+				}).BindList(DataProviderInventoryReason.GetMotivosCosto()).Bind(motivoCosto).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.IdMotivoEgreso, settings =>
+				{
+					settings.Name = "idMotivoEgresoLabel";
+					settings.Text = "Motivo de Egreso:";
+					settings.AssociatedControlName = "idMotivoEgreso";
+				}).GetHtml()
+			</td>
+			<td colspan="2">
+				@{
+					int? idMotivoEgreso = (Model != null && Model.IdMotivoEgreso != 0) ? (int?)Model.IdMotivoEgreso : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.IdMotivoEgreso, settings =>
+			   {
+				   settings.Name = "idMotivoEgreso";
+				   settings.Width = Unit.Percentage(100);
+				   settings.ClientEnabled = false;
+
+				   var p = settings.Properties;
+				   p.ClientInstanceName = "idMotivoEgreso";
+				   p.ValueType = typeof(int);
+				   p.CallbackPageSize = 20;
+
+				   p.ValueField = "id";
+				   p.TextFormatString = "{0} | {1}";
+				   p.Columns.Add("code", "Código", Unit.Percentage(20));
+				   p.Columns.Add("name", "Nombre", Unit.Percentage(80));
+				   p.NullDisplayText = "Seleccione un producto";
+
+				   p.DropDownStyle = DropDownStyle.DropDownList;
+				   p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   p.EnableSynchronization = DefaultBoolean.False;
+				   p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				   p.ClientSideEvents.Init = "OnMotivoEgresoInit";
+
+			   }).BindList(DataProviderInventoryReason.GetMotivosEgreso()).Bind(idMotivoEgreso).GetHtml()
+			</td>
+		</tr>
+
+	</table>
+
+	<table class="table table-condensed">
+		<tr style="border-top: 1px Solid #C0C0C0;">
+			<td colspan="7" style="text-align: right; margin-top: 5px;">
+				@{
+					Html.DevExpress().Button(button =>
+					{
+
+						button.Name = "btnUpdate";
+						button.Text = "Actualizar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.UseSubmitBehavior = false;
+						button.ValidateInvisibleEditors = true;
+						button.ClientSideEvents.Click = "ButtonUpdate_Click";
+						button.Enabled = !modifi;
+					}).Render();
+
+					ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnClose";
+						button.Text = "Cerrar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "ButtonCancel_Click";
+					}).Render();
+				}
+			</td>
+		</tr>
+	</table>
+}
+
+<script src="~/Scripts/InventoryReason/editform.js"></script>
+
+<script src="~/Scripts/InventoryReason/validations.js"></script>

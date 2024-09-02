@@ -1,0 +1,23 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingDTO
+
+@Html.DevExpress().TokenBoxFor(model => model.ids_freezerWarehouseLocation, settings =>
+{
+    settings.Name = "TokenBoxFreezerWarehouseLocations";
+    settings.Width = Unit.Percentage(100);
+    //settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "OpeningClosingPlateLying",
+        Action = "TokenBoxFreezerWarehouseLocations",
+    };
+    settings.Properties.ClientSideEvents.BeginCallback = "TokenBoxFreezerWarehouseLocations_BeginCallback";
+    settings.Properties.ClientSideEvents.EndCallback = "TokenBoxFreezerWarehouseLocations_EndCallback";
+    settings.Properties.ClientSideEvents.ValueChanged = "TokenBoxFreezerWarehouseLocations_ValueChanged";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.AllowCustomTokens = false;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["FreezerWarehouseLocations"]).GetHtml()

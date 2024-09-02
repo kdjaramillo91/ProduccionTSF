@@ -1,0 +1,405 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PaymentTerm
+
+@{
+    int id_PaymentTerm = (Model != null) ? Model.id : 0;
+   
+}
+
+
+@{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_PaymentTerm", id_PaymentTerm)
+
+
+    <div id="GridMessageError" style="display: none;">
+      
+    </div>
+    <table class="table table-condenced" style="margin: 0px;">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+            </td>
+        </tr>
+        <tr>
+
+            <td>
+                @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Name = "codeLabel";
+                settings.Text = "Código:";
+                settings.AssociatedControlName = "code";
+            }).GetHtml()
+
+
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+           {
+               settings.Name = "code";
+               settings.Properties.ClientInstanceName = "code";
+
+               settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+               settings.ShowModelErrors = true;
+               settings.Properties.MaxLength = 20;
+               settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+          
+               //settings.Width = Unit.Percentage(50);
+               //settings.Height = Unit.Percentage(50);
+           }).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+            <td>
+           
+            </td>
+            <td colspan="3">
+             
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>
+           
+                @Html.DevExpress().LabelFor(m => m.name, settings =>
+            {
+                settings.Name = "nameLabel";
+                settings.Text = " Nombre:";
+                settings.AssociatedControlName = "name";
+
+            }).GetHtml()
+
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "name";
+           settings.Properties.ClientInstanceName = "name";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+    ;
+       }).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+           
+
+        </tr>
+
+        <tr>
+
+            <td>
+
+                @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Name = "descriptionLabel";
+                settings.Text = " Descripción:";
+                settings.AssociatedControlName = "description";
+            }).GetHtml()
+
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().TextBoxFor(m => m.description, settings =>
+       {
+           settings.Name = "description";
+           settings.Properties.ClientInstanceName = "description";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnDescriptionValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 500;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+       
+       }).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+
+
+        </tr>
+
+        <tr>
+
+            <td>
+
+                @Html.DevExpress().LabelFor(m => m.descriptionEnglish, settings =>
+            {
+                settings.Name = "descriptionEnglishLabel";
+                settings.Text = " Descripción Inglés:";
+                settings.AssociatedControlName = "descriptionEnglish";
+            }).GetHtml()
+
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().TextBoxFor(m => m.descriptionEnglish, settings =>
+       {
+           settings.Name = "descriptionEnglish";
+           settings.Properties.ClientInstanceName = "descriptionEnglish";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OndescriptionEnglishValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 250;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+         
+       }).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+
+
+        </tr>
+        <tr>
+     
+            <td>
+                @Html.DevExpress().LabelFor(m => m.firstPaymentDays, settings =>
+            {
+                settings.Name = "firstPaymentDaysLabel";
+                settings.Text = "Día de Pago:";
+                settings.AssociatedControlName = "firstPaymentDays";
+            }).GetHtml()
+
+
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.firstPaymentDays, settings =>
+       {
+           settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.ClientInstanceName = "firstPaymentDays";
+           settings.Properties.DisplayFormatString = "N0";
+           settings.Properties.DisplayFormatInEditMode = true;
+           settings.Properties.DecimalPlaces = 0;
+           settings.Properties.SpinButtons.ShowIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.Properties.Increment = 1M;
+           settings.Properties.LargeIncrement = 1M;
+           settings.Properties.MinValue = 1;
+           settings.Properties.MaxValue = 30;
+           settings.Properties.NumberType = SpinEditNumberType.Integer;
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+           settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+           settings.Properties.ClientSideEvents.Validation = "OnfirstPaymentDays";
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+        
+
+       }).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+            <td>
+                @Html.DevExpress().LabelFor(m => m.numberPeriods, settings =>
+            {
+                settings.Name = "numberPeriodsLabel";
+                settings.Text = "Numero de Periodo:";
+                settings.AssociatedControlName = "numberPeriods";
+            }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.numberPeriods, settings =>
+               {
+                   settings.Properties.Width = Unit.Percentage(100);
+                   settings.Properties.ClientInstanceName = "numberPeriods";
+                   settings.Properties.DisplayFormatString = "N0";
+                   settings.Properties.DisplayFormatInEditMode = true;
+                   settings.Properties.DecimalPlaces = 0;
+                   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                   settings.Properties.Increment = 1M;
+                   settings.Properties.LargeIncrement = 1M;
+                   settings.Properties.MinValue = 1;
+                   settings.Properties.MaxValue = 30;
+                   settings.Properties.NumberType = SpinEditNumberType.Integer;
+                   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+                   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                   settings.Properties.ClientSideEvents.Validation = "OnnumberPeriods";
+                   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+
+               }).GetHtml()
+            </td>
+
+        </tr>
+        <tr>
+            <!--FECHA Inicio-->
+            <td>
+             @Html.DevExpress().LabelFor(m => m.id_PeriodType, settings =>
+            {
+                settings.Name = "id_PeriodTypeLabel";
+                settings.Text = "Tipo Periodo:";
+                settings.AssociatedControlName = "id_PeriodType";
+            }).GetHtml()
+
+
+            </td>
+            <td>
+                @{
+                    int? id_PeriodType = (Model != null && Model.id_PeriodType != 0) ? (int?)Model.id_PeriodType : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_PeriodType, settings =>
+       {
+           settings.Name = "id_PeriodType";
+           settings.Properties.ClientInstanceName = "id_PeriodType";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Columns.Add("name", "Nombre", 200);
+           settings.Width = Unit.Percentage(50);
+           settings.Height = Unit.Percentage(50);
+           settings.Properties.EnableClientSideAPI = true;
+           settings.Properties.CallbackPageSize = 20;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPeriodType";
+  
+
+       }).BindList(DataProviderAdvanceParameters.AdvanceParametersByCode("TPGV1")).Bind(id_PeriodType).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+            <td>
+                @Html.DevExpress().LabelFor(m => m.PercentAnticipation, settings =>
+            {
+                settings.Name = "PercentAnticipationLabel";
+                settings.Text = "% Anticipo:";
+                settings.AssociatedControlName = "PercentAnticipation";
+            }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.PercentAnticipation, settings =>
+       {
+
+
+           settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.ClientInstanceName = "PercentAnticipation";
+           settings.Properties.DisplayFormatString = "N2";
+           settings.Properties.DisplayFormatInEditMode = true;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.SpinButtons.ShowIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.Properties.Increment = 0.01M;
+           settings.Properties.LargeIncrement = 1.0M;
+           settings.Properties.MinValue = 0;
+           settings.Properties.MaxValue = 100;
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+           settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+           settings.Properties.ClientSideEvents.Validation = "OnPercentAnticipation";
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+       }).GetHtml()
+            </td>
+            <td >
+                @Html.DevExpress().LabelFor(m => m.PercentBalance, settings =>
+            {
+                settings.Name = "PercentBalanceLabel";
+                settings.Text = "% Balance:";
+                settings.AssociatedControlName = "PercentBalance";
+            }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.PercentBalance, settings =>
+       {
+
+
+           settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.ClientInstanceName = "PercentBalance";
+           settings.Properties.DisplayFormatString = "N2";
+           settings.Properties.DisplayFormatInEditMode = true;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.SpinButtons.ShowIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.Properties.Increment = 0.01M;
+           settings.Properties.LargeIncrement = 1.0M;
+           settings.Properties.MinValue = 0;
+           settings.Properties.MaxValue = 100;
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+           settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+           settings.Properties.ClientSideEvents.Validation = "OnPercentBalance";
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+       }).GetHtml()
+
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+       {
+           settings.Name = "isActive";
+           settings.Properties.ClientInstanceName = "isActive";
+           settings.Text = "Activo";
+       }).GetHtml()
+            </td>
+             <td>
+            
+            </td>
+            <td colspan="2">
+             
+            </td>
+
+          
+
+            <td></td>
+        </tr>
+
+        <tr></tr>
+
+    </table>
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+             
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/PaymentTerm/editform.js"></script>
+
+<script src="~/Scripts/PaymentTerm/validations.js"></script>

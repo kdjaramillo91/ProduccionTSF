@@ -1,0 +1,25 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.QualityControlResultConformity
+@{
+    int id = (int)ViewData["id_QualityControlResultConformity"];
+}
+@Html.DevExpress().ComboBoxFor(m => m.id, settings =>
+{
+    settings.Properties.ClientInstanceName = "id";
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.CallbackRouteValues = new { Controller = "QualityControl", Action = "GetQualityControlResultConformity"/*, TextField = "CityName"*/ };
+    settings.Properties.CallbackPageSize = 5;
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+    settings.ShowModelErrors = true;
+
+}).BindList(DataProviderQualityControl.QualityControlConformityResult((int)ViewData["id_company"],id)).Bind(id).GetHtml()
+

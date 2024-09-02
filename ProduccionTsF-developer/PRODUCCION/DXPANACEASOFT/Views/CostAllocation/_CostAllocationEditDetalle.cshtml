@@ -1,0 +1,352 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.Dto
+
+@{
+
+    var grid = Html.DevExpress().GridView<CostAllocationDetalleDto>(settings =>
+    {
+
+        settings.Name = "gvCostAllocationEditDetalle";
+        settings.CallbackRouteValues = new { Controller = "CostAllocation", Action = "CostAllocationEditDetallePartial" };
+        settings.Width = Unit.Percentage(100);
+        settings.SettingsBehavior.AllowFixedGroups = true;
+        settings.KeyFieldName = "id";
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+        settings.ClientSideEvents.BeginCallback = "OnGridViewCostAllocationDetalleBeginCallback";
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsExport.EnableClientSideExportAPI = true;
+        settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+        settings.SettingsExport.FileName = "AsignacionCostosDetallado_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+        settings.Toolbars.Add(t =>
+        {
+            t.EnableAdaptivity = true;
+            t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+        });
+
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView detailsGrid = s as MVCxGridView;
+            if (detailsGrid == null) return;
+
+            e.Properties["cpSettingCostDetalla"] = null;
+
+            List<CostAllocationDetalleDto> rows = (Model as List<CostAllocationDetalleDto>);
+            rows = (rows != null) ? rows.ToList() : new List<CostAllocationDetalleDto>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+
+        };
+
+
+        settings.Columns.Add(m => m.WarehouseName, column =>
+        {
+            column.Name = "WarehouseName";
+            column.Caption = "Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.WarehouseLocationName, column =>
+        {
+            column.Name = "WarehouseLocationName";
+            column.Caption = "Ubicación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.InventoryLineName, column =>
+        {
+            column.Name = "InventoryLineName";
+            column.Caption = "Línea de Inventario";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.ItemTypeName, column =>
+        {
+            column.Name = "ItemTypeName";
+            column.Caption = "Tipo de Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.ItemTypeCategoryName, column =>
+        {
+            column.Name = "ItemTypeCategoryName";
+            column.Caption = "Categoria";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.CodigoProducto, column =>
+        {
+            column.Name = "CodigoProducto";
+            column.Caption = "Cod. Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.NombreProducto, column =>
+        {
+            column.Name = "NombreProducto";
+            column.Caption = "Nombre Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.PresentationName, column =>
+        {
+            column.Name = "PresentationName";
+            column.Caption = "Presentación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.ItemSizeName, column =>
+        {
+            column.Name = "ItemSizeName";
+            column.Caption = "Talla";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.ItemTrademarkName, column =>
+        {
+            column.Name = "ItemTrademarkName";
+            column.Caption = "Marca";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.ItemGroupName, column =>
+        {
+            column.Name = "ItemGroupName";
+            column.Caption = "Grupo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.ItemSubGroupName, column =>
+        {
+            column.Name = "ItemSubGroupName";
+            column.Caption = "SubGrupo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.ItemTrademarkModelName, column =>
+        {
+            column.Name = "ItemTrademarkModelName";
+            column.Caption = "Modelo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.LotNumber, column =>
+        {
+            column.Name = "LotNumber";
+            column.Caption = "No. Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+        settings.Columns.Add(m => m.InventaryNumber, column =>
+        {
+            column.Name = "InventaryNumber";
+            column.Caption = "No. Movimiento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.MotivoInventarioName, column =>
+        {
+            column.Name = "MotivoInventarioName";
+            column.Caption = "Tipo Mov.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.NaturalezaMovimeinto, column =>
+        {
+            column.Name = "NaturalezaMovimeinto";
+            column.Caption = "Naturaleza";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.DateMovement, column =>
+        {
+            column.Name = "DateMovement";
+            column.Caption = "Fecha";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.amountBox, column =>
+        {
+            column.Name = "amountBox";
+            column.Caption = "No. de Cajas";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal amountBox = (decimal)DataBinder.Eval(c.DataItem, "amountBox");
+                string text = amountBox.ToString("#,##0.00");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.productionCost, column =>
+        {
+            column.Name = "productionCost";
+            column.Caption = "Costo Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal productionCost = (decimal)DataBinder.Eval(c.DataItem, "productionCost");
+                string text = productionCost.ToString("#,##0.00000");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.totalCost, column =>
+        {
+            column.Name = "totalCost";
+            column.Caption = "Costo Total";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal totalCost = (decimal)DataBinder.Eval(c.DataItem, "totalCost");
+                string text = totalCost.ToString("#,##0.00");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.amountPound, column =>
+        {
+            column.Name = "amountPound";
+            column.Caption = "Cant. Libras";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal amountPound = (decimal)DataBinder.Eval(c.DataItem, "amountPound");
+                string text = amountPound.ToString("#,##0.00");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.costPounds, column =>
+        {
+            column.Name = "costPounds";
+            column.Caption = "Costo Lbs.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal costPounds = (decimal)DataBinder.Eval(c.DataItem, "costPounds");
+                string text = costPounds.ToString("#,##0.00000");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.totalCostPounds, column =>
+        {
+            column.Name = "totalCostPounds";
+            column.Caption = "Costo Total Lbs";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal totalCostPounds = (decimal)DataBinder.Eval(c.DataItem, "totalCostPounds");
+                string text = totalCostPounds.ToString("#,##0.00");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.amountKg, column =>
+        {
+            column.Name = "amountKg";
+            column.Caption = "Cantidad/Kg.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal amountKg = (decimal)DataBinder.Eval(c.DataItem, "amountKg");
+                string text = amountKg.ToString("#,##0.00");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.costKg, column =>
+        {
+            column.Name = "costKg";
+            column.Caption = "Costo Kg.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal costKg = (decimal)DataBinder.Eval(c.DataItem, "costKg");
+                string text = costKg.ToString("#,##0.00000");
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.totalCostKg, column =>
+        {
+            column.Name = "totalCostKg";
+            column.Caption = "Costo Total Kg.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal totalCostKg = (decimal)DataBinder.Eval(c.DataItem, "totalCostKg");
+                string text = totalCostKg.ToString("#,##0.00");
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountBox").DisplayFormat = "<b>Total Cajas: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalCost").DisplayFormat = "<b>Costo Total: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountPound").DisplayFormat = "<b>Total Lbs.: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalCostPounds").DisplayFormat = "<b>Costo Total Lbs.: {0:#,##0.00}</b>";
+        
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountKg").DisplayFormat = "<b>Total Kg.: {0:#,##0.00}</b>";
+        settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "totalCostKg").DisplayFormat = "<b>Costo Total Kg.: {0:#,##0.00}</b>";
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+<script src="~/Scripts/costallocation/_editdetaildetalle.js"></script>

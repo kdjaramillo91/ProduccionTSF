@@ -1,0 +1,158 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Auxiliares
+@using System.Web.Script.Serialization
+@using DXPANACEASOFT.Models.IntegrationProcessDetailDTO
+@model DXPANACEASOFT.Models.IntegrationProcess
+
+
+
+
+
+
+
+@{
+    int[] idsDocument;
+
+}
+
+
+
+
+
+<table class="table table-condensed ps-100">
+    <tr>
+        <td colspan="2">
+            @{
+
+                string code_IntegrationState = "";
+                IntegrationState _integrationState = new IntegrationState();
+                if ((Model.id_StatusLote != 0))
+                {
+                    _integrationState = DataProviderIntegrationProcess.StatesById(Model.id_StatusLote);
+                    if (_integrationState != null)
+                    {
+                        // error
+                    }
+
+                }
+                else
+                {
+                    // error
+                }
+
+
+                var integrationProcessDetail = (Model != null && Model.IntegrationProcessDetail != null)
+                    ? Model.IntegrationProcessDetail.Where(r => (r.IntegrationState != null) &&
+                                                                r.IntegrationState.code == EnumIntegrationProcess.States.Added).ToList()
+                    : new List<IntegrationProcessDetail>();
+
+                idsDocument = integrationProcessDetail.Select(r => r.id_Document).ToArray();
+
+
+                if (_integrationState.code == "01")
+                {
+                    Html.RenderPartial("IntegrationProcessButtons/_IntegrationProcessDetailActionsButtons", _integrationState);
+
+                }
+
+
+                if (Model.DocumentType != null && Model.DocumentType.code.Equals("95"))
+                {
+                    Html.RenderPartial("_IntegrationProcessDetailEditLMIPartial", IntegrationProcessDetailFmiDTO.GetListIntegrationProcessDetailDTO(integrationProcessDetail));
+                }
+                else
+                {
+                    Html.RenderPartial("_IntegrationProcessDetailEditPartial", IntegrationProcessDetailDTO.GetListIntegrationProcessDetailDTO(integrationProcessDetail));
+
+                }
+            }
+
+        </td>
+
+    </tr>
+    <tr>
+        <td style="float: right;">
+
+            <table>
+                <tr>
+                    <td>Número de Documentos: </td>
+                    <td>
+                        @Html.DevExpress().TextBoxFor(m => m.countTotalDocuments, settings =>
+                   {
+                       settings.Name = "countTotalDocuments";
+                       settings.Properties.ClientInstanceName = "countTotalDocuments";
+                       settings.Width = Unit.Percentage(100);
+                       settings.ControlStyle.HorizontalAlign = HorizontalAlign.Right;
+                       settings.ShowModelErrors = false;
+                       settings.ReadOnly = true;
+
+                   }).GetHtml()
+                    </td>
+                    <td style="width: 50px;"></td>
+                    <td>Valor Total Lote: </td>
+                    <td>
+                        @{
+
+                            //string totalValueLote = "$ " + Model.totalValue.ToString("0,0.0000");
+                        }
+                        @Html.DevExpress().SpinEditFor(m => m.totalValue, settings =>
+                       {
+                           settings.Name = "totalValue";
+                           settings.Properties.ClientInstanceName = "totalValue";
+                           settings.Width = Unit.Percentage(100);
+
+                           settings.ReadOnly = true;
+                           settings.ControlStyle.HorizontalAlign = HorizontalAlign.Right;
+
+                           var SpinEdit = settings.Properties as SpinEditProperties;
+                           SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+                           SpinEdit.DisplayFormatString = "C2";
+                           SpinEdit.DecimalPlaces = 0;
+
+
+                       }).GetHtml()
+
+                    </td>
+
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+
+</table>
+
+
+@{
+
+    JavaScriptSerializer jsSerializer = new JavaScriptSerializer();
+    var idsDocumentsSerialize = Html.Raw(jsSerializer.Serialize(idsDocument));
+
+
+}
+
+<script type="text/javascript">
+
+        $(function () {
+
+
+            var chkReadyStateMain = setInterval(function ()
+            {
+                if (document.readyState === "complete")
+                {
+                    clearInterval(chkReadyStateMain);
+
+                    sessionStorage.setItem("iDocumentsIP", @idsDocumentsSerialize);
+
+                }
+            }, 100);
+
+
+        });
+
+
+
+
+</script>

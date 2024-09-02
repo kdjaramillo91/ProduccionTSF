@@ -1,0 +1,52 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    tbsysTypeMachineForProd typeMachineForProd = Model ?? new tbsysTypeMachineForProd();
+}
+
+@Html.Hidden("id_tbsysTypeMachineForProd", typeMachineForProd.id)
+
+	<table style="width: 100%;">
+		<tr>
+			<td>
+				<strong>
+					C&oacute;digo:
+				</strong>
+			</td>
+			<td colspan="4">
+				@Html.Raw(typeMachineForProd.code)
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<strong>
+					Nombre:
+				</strong>
+			</td>
+			<td colspan="4">
+				@Html.Raw(typeMachineForProd.name)
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>
+					Rol:
+				</strong>
+			</td>
+			<td colspan="4">
+				@Html.Raw(typeMachineForProd.Rol.name)
+			</td>
+		</tr>
+	</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

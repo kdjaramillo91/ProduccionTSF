@@ -1,0 +1,159 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+
+@*<script src="~/Scripts/procpresconstruccion/comentariopospuesto.js"></script>*@
+
+@{
+	@*@Html.Hidden("id_typeFiltersConfiguration", null)
+		@Html.Hidden("code_typeFiltersConfiguration", null)
+		@Html.Hidden("datasource_advancedFiltersConfiguration", null)*@
+	@*@Html.HiddenFor(m => m.ciacodigo, new { @id = "ciacodigoPopup" })*@
+
+	Html.DevExpress<ProductionLot>().FormLayout(settings =>
+	{
+		settings.Name = "formLayoutEditProductionLotSubtotal";
+		settings.Width = Unit.Percentage(100);
+		settings.ColCount = 4;
+
+
+		settings.Items.Add(m => m.wholeSubtotal, item =>
+		{
+			item.Name = "wholeSubtotal";
+			item.Caption = "SubTotal Lbs Entero";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+																		 //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+																		 //item.Width = Unit.Percentage(35);
+
+item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+	//spinedit.Properties.DisplayFormatString = "$#,##0.00";
+	spinedit.Properties.DisplayFormatString = "N2";
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+				spinedit.Properties.MaxLength = 17;
+				spinedit.Properties.MinValue = 0.01M;
+				spinedit.Properties.MaxValue = 99999999999999.99M;
+	//textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+	spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+	spinedit.ReadOnly = true;
+
+	//spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+	//textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+	//textBox.Properties.ValidationSettings.CausesValidation = true;
+	//textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+	//textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+	//textBox.Properties.ValidationSettings.SetFocusOnError = true;
+	//textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+	//textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+	//textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+	//textBox.ShowModelErrors = true;
+});
+		});
+
+		settings.Items.Add(m => m.subtotalTail, item =>
+		{
+			item.Name = "subtotalTail";
+			item.Caption = "SubTotal Lbs Cola";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+//item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+//item.Width = Unit.Percentage(35);
+
+item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+	//spinedit.Properties.DisplayFormatString = "$#,##0.00";
+	spinedit.Properties.DisplayFormatString = "N2";
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "subtotalTail";
+				spinedit.Properties.MaxLength = 17;
+				spinedit.Properties.MinValue = 0.01M;
+				spinedit.Properties.MaxValue = 99999999999999.99M;
+	//textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+	spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+	spinedit.ReadOnly = true;
+
+	//spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+	//textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+	//textBox.Properties.ValidationSettings.CausesValidation = true;
+	//textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+	//textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+	//textBox.Properties.ValidationSettings.SetFocusOnError = true;
+	//textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+	//textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+	//textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+	//textBox.ShowModelErrors = true;
+});
+		});
+
+		settings.Items.Add(m => m.totalQuantityLiquidation, item =>
+		{
+			item.Name = "totalQuantityLiquidationSubtotalLiq";
+			item.Caption = "Total Lbs";
+			item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+//item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+//item.Width = Unit.Percentage(35);
+
+item.NestedExtension().SpinEdit(spinedit =>
+			{
+				spinedit.Width = Unit.Percentage(100);
+	//spinedit.Properties.DisplayFormatString = "$#,##0.00";
+	spinedit.Properties.DisplayFormatString = "N2";
+				spinedit.Properties.NumberType = SpinEditNumberType.Float;
+				spinedit.Properties.ClientInstanceName = "totalQuantityLiquidationSubtotalLiq";
+				spinedit.Properties.MaxLength = 17;
+				spinedit.Properties.MinValue = 0.01M;
+				spinedit.Properties.MaxValue = 99999999999999.99M;
+	//textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+	spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+	spinedit.ReadOnly = true;
+
+	//spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+	//textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+	//textBox.Properties.ValidationSettings.CausesValidation = true;
+	//textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+	//textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+	//textBox.Properties.ValidationSettings.SetFocusOnError = true;
+	//textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+	//textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+	//textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+	//textBox.ShowModelErrors = true;
+});
+		});
+
+		settings.Items.Add(item =>
+		{
+			string labelLiquidation = Model.sequentialLiquidation != null ? Model.sequentialLiquidation.ToString() : "";
+
+//item.Caption = "Liquidación No: " + labelLiquidation;
+//item.CaptionSettings.HorizontalAlign = FormLayoutHorizontalAlign.Center;
+//item.HorizontalAlign = FormLayoutHorizontalAlign.Center;
+//item.CaptionStyle.Font.Size = FontUnit.Large;
+//item.CaptionStyle.Font.Bold = true;
+item.ShowCaption = DefaultBoolean.False;
+
+			item.NestedExtension().Label(label =>
+			{
+				label.Name = "labelLiquidation";
+				label.ControlStyle.Font.Size = FontUnit.Large;
+				label.ControlStyle.Font.Bold = true;
+				label.Width = Unit.Percentage(100);
+				label.Text = "Liquidación No: " + labelLiquidation;
+			});
+		});
+
+	}).Render();
+}
+

@@ -1,0 +1,236 @@
+﻿@using DXPANACEASOFT.Models.ProductionLotCloseDTO
+@model IList<LotePendienteCierre>
+@{
+	var agrupacionLotes = this.ViewBag.agrupacionLotes;
+}
+@{
+	var gridView = Html.DevExpress().GridView(
+		grid =>
+		{
+			grid.Name = "gvLotePendienteCierreResult";
+			grid.Width = Unit.Percentage(100);
+			grid.KeyFieldName = "IdLote;NumeroLote";
+
+			grid.CallbackRouteValues = new { Controller = "productionLotFinalize", Action = "ProductionLotPendingCloseResults" };
+
+			#region GridView Behavior
+
+			grid.SettingsBehavior.AllowSelectByRowClick = true;
+
+			grid.CustomJSProperties = (s, e) =>
+			{
+				var gv = s as MVCxGridView;
+				if (gv == null) { return; }
+
+				e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+				e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+				e.Properties["cpAgrupacionLotes"] = agrupacionLotes;
+			};
+			grid.SetFooterRowTemplateContent(c =>
+			{
+				ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+				if (grid.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+				{
+					ViewContext.Writer.Write(
+						@"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""ProductionLotFinalizeSelectAllRows()"">Seleccionar Todos</a>
+						<a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""ProductionLotFinalizeClearSelection()"">Anular Selección</a>"
+					);
+				}
+			});
+
+			grid.SettingsExport.EnableClientSideExportAPI = true;
+			grid.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+			grid.SettingsExport.FileName = "productionLotPendingClose_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+			grid.Toolbars.Add(t =>
+			{
+				t.EnableAdaptivity = true;
+				t.Items.Add(GridViewToolbarCommand.ExportToXls);
+				t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+				t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+			});
+
+			#endregion
+
+			#region Pager
+
+			grid.SettingsPager.Visible = true;
+
+			#endregion
+
+			#region Client Side Events
+
+			grid.ClientSideEvents.Init = "OnProductionLotPendingCloseGridViewInit";
+			grid.ClientSideEvents.SelectionChanged = "OnProductionLotPendingCloseGridViewSelectionChanged";
+			grid.ClientSideEvents.BeginCallback = "OnProductionLotPendingCloseGridViewBeginCallback";
+			grid.ClientSideEvents.EndCallback = "OnProductionLotPendingCloseGridViewEndCallback";
+			grid.ClientSideEvents.CustomButtonClick = "OnProductionLotPendingCloseGridViewCustomButtonClick";
+
+			#endregion
+
+			#region Search Panel
+
+			grid.SettingsSearchPanel.Visible = true;
+			grid.Styles.SearchPanel.CssClass = "searchPanel";
+
+			#endregion
+
+			#region Title Panel
+
+			grid.Settings.ShowTitlePanel = true;
+			grid.Styles.TitlePanel.CssClass = "titleContainer";
+
+			grid.SetTitlePanelTemplateContent(c =>
+			{
+				ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Lotes Pendientes de cierre</span>");
+			});
+
+			#endregion
+
+			#region Group Panel
+
+			grid.Settings.ShowGroupPanel = true;
+
+			#endregion
+
+			#region Filter Row
+
+			grid.Settings.ShowFilterRow = true;
+			grid.Settings.ShowFilterRowMenu = true;
+			grid.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+			#endregion
+
+			#region Footer Row
+
+			grid.Settings.ShowFooter = true;
+
+			grid.SetFooterRowTemplateContent(c =>
+			{
+				ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			});
+
+			#endregion
+
+			// Activamos el modo de selección de elementos
+			grid.SettingsBehavior.AllowSelectByRowClick = true;
+			grid.SettingsBehavior.AllowSelectSingleRowOnly = false;
+
+			grid.CommandColumn.Visible = true;
+			grid.CommandColumn.Width = Unit.Percentage(8);
+			grid.CommandColumn.ShowSelectCheckbox = true;
+			grid.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.AllPages;
+			grid.CommandColumn.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+			#region Adaptivity Settings
+
+			grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+			grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+			grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+			grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+			grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+			#endregion
+
+			#region Columns
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "TipoLote";
+				column.Name = "TipoLote";
+				column.Caption = "Tipo de Lote";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "NumeroLote";
+				column.Name = "NumeroLote";
+				column.Caption = "Número Lote";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "SecuenciaTransaccional";
+				column.Name = "SecuenciaTransaccional";
+				column.Caption = "Sec. Transaccional";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "FechaProceso";
+				column.Name = "FechaProceso";
+				column.Caption = "Fecha Proceso";
+				column.ColumnType = MVCxGridViewColumnType.DateEdit;
+				column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "UnidadProduccion";
+				column.Name = "UnidadProduccion";
+				column.Caption = "Unidad de Producción";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "Proceso";
+				column.Name = "Proceso";
+				column.Caption = "Proceso";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(10);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "Stock";
+				column.Name = "Stock";
+				column.Caption = "Saldo Actual";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.IntegerFormat;
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "Estado";
+				column.Name = "documentState";
+				column.Caption = "Estado";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(12);
+			});
+
+			#endregion
+		});
+
+	if (ViewData["EditError"] != null)
+	{
+		gridView.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@gridView.Bind(this.Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		var selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("IdLote"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+			{
+				selectedRowsOnPage++;
+			}
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+}

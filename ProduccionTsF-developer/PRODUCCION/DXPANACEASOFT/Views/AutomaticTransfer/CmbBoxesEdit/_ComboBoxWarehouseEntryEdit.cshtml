@@ -1,0 +1,26 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string _id_WarehouseEntry = Model.id_WarehouseEntry != null ? Model.id_WarehouseEntry.ToString() : "";
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+}
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxWarehouseEntryEdit";
+	settings.Properties.ClientInstanceName = "ComboBoxWarehouseEntryEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxWarehouseEntryEdit",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxWarehouseEntryEdit_SelIndexChanged";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.ReadOnly = !(this.ViewBag.Editable);
+}).BindList(ViewData["CmbBoxWarehouseEntryEdit"]).Bind(_id_WarehouseEntry).GetHtml()

@@ -1,0 +1,56 @@
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "AditionalField";
+        settings.CallbackRouteValues = new { Controller = "Item", Action = "AditionalField" };
+
+        settings.ClientSideEvents.BeginCallback = "AditionalField_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Item", Action = "AditionalFieldAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Item", Action = "AditionalFieldUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Item", Action = "AditionalFieldDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.KeyFieldName = "id_aditionalField";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "label";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "value";
+            column.Caption = "Valor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });        
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

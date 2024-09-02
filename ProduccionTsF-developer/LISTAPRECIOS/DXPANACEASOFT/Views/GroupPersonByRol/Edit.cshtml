@@ -1,0 +1,110 @@
+﻿
+
+@model DXPANACEASOFT.Models.DTOModel.GroupPersonByRolDTO
+
+<head>
+    <style>
+        .panelEdition {
+            background: #fdf5ea;
+            border: solid 1px #8e8e8e;
+            padding: 10px;
+            max-width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            padding-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Grupo según rol</h3>
+    @Html.Partial("PanelButtonsEdit")
+
+    <form class="panelEdition" id="EditGroupPersonByRol">
+        @Html.Hidden("id", Model.id)
+
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "LabelNombre";
+                    settings.Text = "Nombre: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.name, settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "TextBoxGroupName";
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = !ViewBag.enabled;
+                }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "LabelActive";
+                    settings.Text = "Esta Activo ?: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().CheckBoxFor(model => model.isActive, settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "CheckBoxGroupActive";
+                    settings.ReadOnly = !ViewBag.enabled;
+                }).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "LabelCompany";
+                    settings.Text = "Compañia: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxCompany", Model)
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "LabelRol";
+                    settings.Text = "Rol: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxRol", Model)
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "LabelDescripcion";
+                    settings.Text = "Descripción: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-10">
+                @Html.DevExpress().TextBoxFor(model => model.description, settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Name = "TextBoxGroupDescription";
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = !ViewBag.enabled;
+                }).GetHtml()
+            </div>
+        </div>
+    </form>
+    @Html.Partial("_GridViewGroupPersonByRolDetails", Model.ListGroupPersonByRolDetailDTO)
+</body>
+
+<script src="~/Scripts/group_person_by_rol/edit.js"></script>
+

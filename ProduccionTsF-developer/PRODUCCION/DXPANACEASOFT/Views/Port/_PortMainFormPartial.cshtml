@@ -1,0 +1,292 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Port
+
+@{
+    int id_Port = (Model != null) ? Model.id : 0;
+
+}
+
+
+@{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_Port", id_Port)
+
+
+    <div id="GridMessageError" style="display: none;">
+      
+    </div>
+	<table class="table table-condenced" style="margin: 0px;">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="6">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+			</td>
+		</tr>
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.code, settings =>
+			{
+				settings.Name = "codeLabel";
+				settings.Text = "Código:";
+				settings.AssociatedControlName = "code";
+			}).GetHtml()
+
+
+			</td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+		   {
+			   settings.Name = "code";
+			   settings.Properties.ClientInstanceName = "code";
+
+			   settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 20;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+			   //settings.Width = Unit.Percentage(50);
+			   //settings.Height = Unit.Percentage(50);
+		   }).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td></td>
+			<td colspan="3"></td>
+
+		</tr>
+
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.nombre, settings =>
+			{
+				settings.Name = "nameLabel";
+				settings.Text = " Nombre:";
+				settings.AssociatedControlName = "nombre";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.nombre, settings =>
+	   {
+		   settings.Name = "nombre";
+		   settings.Properties.ClientInstanceName = "nombre";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.MaxLength = 100;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+	   }).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+
+
+		</tr>
+
+
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_city, settings =>
+			{
+				settings.Name = "id_cityLabel";
+				settings.Text = "Ciudad:";
+				settings.AssociatedControlName = "id_city";
+			}).GetHtml()
+
+
+			</td>
+			<td>
+				@{
+					int? id_city = (Model != null && Model.id_city != 0) ? (int?)Model.id_city : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_city, settings =>
+		   {
+		   settings.Name = "id_city";
+		   settings.Properties.ClientInstanceName = "id_city";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Properties.Columns.Add("name", "Nombre", 200);
+		   settings.Width = Unit.Percentage(50);
+		   settings.Height = Unit.Percentage(50);
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Properties.CallbackPageSize = 20;
+
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OncityValidation";
+
+		   //}).BindList(DataProviderDocumentType.DocumentTypesByCompany((int?)ViewData["id_company"])).Bind(id_documentType).GetHtml()
+
+
+				}).BindList(DataProviderCity.CityAll((int?)id_city)).Bind(id_city).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td></td>
+			<td></td>
+
+		</tr>
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_portType, settings =>
+			{
+				settings.Name = "id_portTypeLabel";
+				settings.Text = "Tipo Puerto:";
+				settings.AssociatedControlName = "id_portType";
+			}).GetHtml()
+
+
+			</td>
+			<td>
+				@{
+					int? id_portType = (Model != null && Model.id_portType != 0) ? (int?)Model.id_portType : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_portType, settings =>
+		   {
+			   settings.Name = "id_portType";
+			   settings.Properties.ClientInstanceName = "id_portType";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnportTypeValidation";
+
+
+		   }).BindList(DataProviderPort.AllTypePorts()).GetHtml()
+
+
+			</td>
+			<!-- FECHA FIn-->
+			<td></td>
+			<td></td>
+
+		</tr>
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.transitDays, settings =>
+			{
+				settings.Name = "transitDaysLabel";
+				settings.Text = "Días de Transito:";
+				settings.AssociatedControlName = "transitDays";
+			}).GetHtml()
+
+			</td>
+			<td>
+				@Html.DevExpress().SpinEditFor(m => m.transitDays, settings =>
+		   {
+			   settings.Name = "transitDays";
+			   settings.Properties.ClientInstanceName = "transitDays";
+			   settings.ControlStyle.CssClass = "editor";
+
+			   settings.Properties.Width = Unit.Percentage(100);
+			   settings.Properties.DisplayFormatInEditMode = true;
+			   settings.Properties.DecimalPlaces = 0;
+			   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+			   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+			   settings.Properties.Increment = 1M;
+			   settings.Properties.LargeIncrement = 1M;
+			   settings.Properties.MinValue = 0;
+			   settings.Properties.MaxValue = 100;
+			   settings.Properties.NumberType = SpinEditNumberType.Integer;
+			   settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+			   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+		   }).GetHtml()
+			</td>
+			
+			<!-- FECHA FIn-->
+			<td></td>
+			<td></td>
+
+		</tr>
+
+		<tr>
+			<!--FECHA Inicio-->
+			<td colspan="2">
+
+				@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+	   {
+		   settings.Name = "isActive";
+		   settings.Properties.ClientInstanceName = "isActive";
+		   settings.Text = "Activo";
+
+	   }).GetHtml()
+
+			</td>
+			<td></td>
+			<!-- FECHA FIn-->
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+
+
+
+		<tr></tr>
+
+	</table>
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+               
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/Port/editform.js"></script>
+
+<script src="~/Scripts/Port/validations.js"></script>

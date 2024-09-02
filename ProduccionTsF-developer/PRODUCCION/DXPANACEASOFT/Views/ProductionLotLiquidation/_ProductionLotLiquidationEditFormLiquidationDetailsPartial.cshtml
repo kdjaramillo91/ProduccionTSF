@@ -1,0 +1,89 @@
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ProductionLotLiquidationDetails";
+        settings.CallbackRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationEditFormLiquidationDetailsPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationEditFormLiquidationDetailsPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationEditFormLiquidationDetailsPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ProductionLotLiquidation", Action = "ProductionLotLiquidationEditFormLiquidationDetailsPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_purchaseRequest";
+            column.Caption = "No. Requerimiento";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_purchaseOrder";
+            column.Caption = "No. Orden Compra";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "No. Lote";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "No. Lote Interno";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Caption = "Producto";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "UM";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Tipo de Producto";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityOrdered";
+            column.Caption = "Cantidad Ordenada";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityRecived";
+            column.Caption = "Cantidad Recibida";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Bodega";
+        });
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Ubicación";
+        });        
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

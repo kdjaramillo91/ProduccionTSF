@@ -1,0 +1,230 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+	var grid = Html.DevExpress().GridView<InventoryPeriodDetail>(settings =>
+	{
+		settings.Name = "gvInventoryPeriod";
+		settings.CallbackRouteValues = new { Controller = "InventoryPeriodCloseMassive", Action = "InventoryPeriodCloseMassivePartial" };
+		//settings.CallbackRouteValues = new { Controller = "InventoryPeriodCloseMassive", Action = "InventoryPeriodCloseMassiveResults" };
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		settings.CommandColumn.Visible = true;
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsExport.EnableClientSideExportAPI = true;
+		settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+		settings.SettingsExport.FileName = "Cierre_Periodo_Masivo_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+		settings.Toolbars.Add(t =>
+		{
+			t.EnableAdaptivity = true;
+			t.Items.Add(GridViewToolbarCommand.ExportToXls);
+			t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+			t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+			//
+
+			//
+
+		});
+		//
+
+		//
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		settings.CommandColumn.Width = Unit.Percentage(3);
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		//
+
+		//
+		settings.Settings.ShowFooter = true;
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Periodo</span>");
+		});
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+					@"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+	<a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+				);
+			}
+		});
+
+		//MASTER DETAILS
+		settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+		settings.SettingsDetail.ShowDetailRow = false;
+
+
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		//Document
+
+
+		settings.Columns.Add(m => m.InventoryPeriod.year, column =>
+		{
+			column.Caption = "Año";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.periodNumber, column =>
+		{
+			column.Caption = "Periodo";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.dateInit, column =>
+		{
+			column.Caption = "Fecha Desde";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.dateEnd, column =>
+		{
+			column.Caption = "Fecha Hasta";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.InventoryPeriod.Warehouse.code, column =>
+		{
+			column.Caption = "Cod. Bodega";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		settings.Columns.Add(m => m.InventoryPeriod.Warehouse.name, column =>
+		{
+			column.Caption = "Bodega";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(20);
+		});
+		settings.Columns.Add(m => m.InventoryPeriod.Warehouse.WarehouseType.name, column =>
+		{
+			column.Caption = "Tipo Bodega";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+		//settings.Columns.Add(column =>
+		//{
+		//	column.FieldName = "id_warehouse";
+
+		//	column.Caption = "Bodega";
+		//	column.Visible = true;
+		//	//column.ColumnType = MVCxGridViewColumnType.TextBox;
+		//	column.Width = Unit.Percentage(30);
+		//	column.ColumnType = MVCxGridViewColumnType.ComboBox;
+		//	var ColProp = column.PropertiesEdit as ComboBoxProperties;
+		//	ColProp.DataSource = DataProviderWarehouse.WarehouseByCompany((int?)ViewData["id_company"]);
+		//	ColProp.ValueField = "id";
+		//	ColProp.TextField = "name";
+		//	ColProp.ValueType = typeof(int);
+
+		//	column.SetDataItemTemplateContent(c =>
+		//	{
+		//		int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+		//		var warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+		//		string text = "";
+		//		if (warehouse != null)
+		//		{
+		//			text = warehouse.name;
+
+
+		//		}
+
+
+		//		ViewContext.Writer.Write(text);
+		//	});
+
+
+
+
+		//});
+
+		settings.Columns.Add(m => m.AdvanceParametersDetail.description, column =>
+		{
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+		});
+
+
+		settings.Columns.Add(m => m.InventoryPeriod.isActive, column =>
+		{
+			column.Caption = "Activo";
+			column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			column.Width = Unit.Percentage(5);
+		});
+
+
+		// COMMAND COLUMN
+
+		//MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+		//commandColumn.ShowEditButton = false;
+		//commandColumn.ShowDeleteButton = false;
+		//commandColumn.Visible = false;
+		//commandColumn.VisibleIndex = 14;
+		//commandColumn.Caption = "Acciones";
+		//commandColumn.Width = Unit.Percentage(3);
+
+		//commandColumn.CustomButtons.Add(
+		//	new GridViewCommandColumnCustomButton
+		//	{
+		//		ID = "btnEditRow",
+		//		Text = "Editar"
+		//	}
+		//);
+		//settings.ClientSideEvents.CustomButtonClick = "GridViewlgvInventoryPeriodCustomCommandButton_Click";
+		//settings.Columns.Add(commandColumn);
+	});
+
+
+	//if (ViewData["EditError"] != null)
+	//{
+	//	grid.SetEditErrorText((string)ViewData["EditError"]);
+	//}
+
+
+}
+
+@grid.Bind(Model).GetHtml()
+
+

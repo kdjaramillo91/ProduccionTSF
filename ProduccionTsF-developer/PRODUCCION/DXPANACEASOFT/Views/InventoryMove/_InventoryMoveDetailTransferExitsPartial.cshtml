@@ -1,0 +1,295 @@
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.Models
+@{
+	var grid = Html.DevExpress().GridView<InventoryMoveDetail>(settings =>
+	{
+		settings.Name = "gvInventoryMoveDetailTransferExits";
+		settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "InventoryMoveDetailTransferExitsPartial" };
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowNewButton = false;
+		settings.CommandColumn.ShowDeleteButton = false;
+		settings.CommandColumn.ShowEditButton = false;
+		settings.CommandColumn.Width = Unit.Percentage(3);
+		settings.CommandColumn.ShowSelectCheckbox = true;
+
+
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+			int startIndex = gv.PageIndex * gv.SettingsPager.PageSize;
+			int end = Math.Min(gv.VisibleRowCount, startIndex + gv.SettingsPager.PageSize);
+			object[] Ids = new object[end - startIndex];//, titles = new object[end - startIndex];
+			for (int n = startIndex; n < end; n++)
+			{
+				Ids[n - startIndex] = gv.GetRowValues(n, "id");
+				//titles[n - startIndex] = grid.GetRowValues(n, "title");
+			}
+			e.Properties["cpIds"] = Ids;
+			//e.Properties["cpTitles"] = titles;
+
+		};
+
+		#region SearchPanel
+
+		//Panel de Busqueda
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		#endregion
+
+		settings.Settings.ShowFooter = true;
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+					@"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""GridViewInventoryMoveDetailTransferExitsSelectAllRow();"">Seleccionar Todos</a>
+              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""GridViewInventoryMoveDetailTransferExitsClearSelection();"">Anular Selección</a>"
+				);
+			}
+		});
+
+		settings.ClientSideEvents.Init = "OnGridViewInventoryMoveDetailTransferExitsInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewInventoryMoveDetailTransferExitsSelectionChanged";
+		settings.ClientSideEvents.EndCallback = "OnGridViewInventoryMoveDetailTransferExitsEndCallback";
+
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		//settings.SettingsBehavior.SortMode = DevExpress.XtraGrid.ColumnSortMode.Custom;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SettingsPager.PageSize = 40;
+		settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(m => m.id, column =>
+		{
+			column.FieldName = "id";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(m => m.InventoryMove.Document.number, column =>
+		{
+			//column.FieldName = "id_inventoryMove";
+			column.FieldName = "InventoryMove.Document.number";
+			column.Caption = "No. Egreso por Transferencia";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+			/*
+            column.SetDataItemTemplateContent(c =>
+            {
+                InventoryMoveDetail detail = (InventoryMoveDetail)Model[c.ItemIndex];
+                ViewContext.Writer.Write(detail.InventoryMove.Document.number);
+            });
+            */
+		});
+
+		settings.Columns.Add(m => m.InventoryMove.Document.emissionDate, column =>
+		{
+			//column.FieldName = "id_inventoryMove";
+			column.FieldName = "InventoryMove.Document.emissionDate";
+			column.Caption = "Fecha Movimiento";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+		});
+
+		settings.Columns.Add(m => m.SecureInternalNumber, column =>
+		{
+			column.FieldName = "SecureInternalNumber";
+			column.Caption = "No. Lote";
+			column.Width = Unit.Percentage(15);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+		});
+		/*
+        settings.Columns.Add(m => m.Lot.internalNumber, column =>
+        {
+            column.FieldName = "internalNumber";
+            column.Caption = "No. Lote";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                InventoryMoveDetail detail = (InventoryMoveDetail)Model[c.ItemIndex];
+                Lot _lot = DataProviderProductionLot.LotById(detail.id_lot);
+                string internalNumber = string.Empty;
+                if ( _lot.internalNumber != null)
+                {
+                    internalNumber = _lot.internalNumber;
+                }
+                else if (_lot.ProductionLot != null && _lot.ProductionLot.internalNumber != null)
+                {
+                    internalNumber = _lot.ProductionLot.internalNumber;
+                }
+                ViewContext.Writer.Write(internalNumber);
+            });
+        });
+*/
+
+
+		settings.Columns.Add(m => m.Item.name, column =>
+		{
+			column.FieldName = "Item.name";
+			column.Caption = "Nombre del Producto";
+			column.Width = Unit.Percentage(30);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+			/*
+            column.SetDataItemTemplateContent(c =>
+            {
+                InventoryMoveDetail detail = (InventoryMoveDetail)Model[c.ItemIndex];
+                ViewContext.Writer.Write(detail.Item.name);
+            });
+*/
+		});
+
+		settings.Columns.Add(m => m.id_warehouseEntry, column =>
+		{
+			column.FieldName = "id_warehouseEntry";
+			column.Visible = false;
+			column.Caption = "Bodega Id";
+			column.Width = Unit.Percentage(15);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+
+		});
+
+
+		settings.Columns.Add(m => m.Warehouse1.name, column =>
+		{
+			column.FieldName = "Warehouse1.name";
+			column.Caption = "Bodega de Ingreso";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				//InventoryMoveDetail detail = (InventoryMoveDetail)Model[c.ItemIndex];
+
+				string _bodega = string.Empty;
+				List<InventoryMoveDetail> _list = ((List<InventoryMoveDetail>)Model);
+				if (_list != null && _list.Count > 0)
+				{
+					var _currentInventoryMoveDetail = _list.FirstOrDefault(r => r.id == (int)c.KeyValue);
+					if (_currentInventoryMoveDetail != null )
+					{
+
+						_bodega = (_currentInventoryMoveDetail != null && _currentInventoryMoveDetail.Warehouse1 != null) ? _currentInventoryMoveDetail.Warehouse1.name : "";
+					}
+				}
+
+				ViewContext.Writer.Write(_bodega);
+
+			});
+
+		});
+
+		settings.Columns.Add(m => m.QuantityPending, column =>
+		{
+			column.FieldName = "QuantityPending";
+			column.Name = "QuantityPending";
+			column.Caption = "Cant. Pendiente "+ "<br>"+ " de Recepción";
+			column.Width = Unit.Percentage(2);
+			column.UnboundType = UnboundColumnType.Decimal;
+			column.PropertiesEdit.DisplayFormatString = "N2";
+			//column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "id_metricUnitPurchase";
+			column.Caption = "UM";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(3);
+			//column.ReadOnly = true;
+			//column.PropertiesEdit.ClientInstanceName = "metricUnit";
+
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				//InventoryMoveDetail detail = (InventoryMoveDetail)Model[c.ItemIndex];
+				//string metricUnit = (detail != null && detail.MetricUnit1 != null) ? detail.MetricUnit1.code : "";
+				//ViewContext.Writer.Write(metricUnit);
+
+				string metricUnit = string.Empty;
+				List <InventoryMoveDetail> _list = ((List<InventoryMoveDetail>)Model);
+				if (_list != null && _list.Count > 0)
+				{
+					var _currentInventoryMoveDetail = _list.FirstOrDefault(r => r.id == (int)c.KeyValue);
+					if (_currentInventoryMoveDetail != null)
+					{
+						metricUnit = (_currentInventoryMoveDetail != null && _currentInventoryMoveDetail.MetricUnit1 != null) ? _currentInventoryMoveDetail.MetricUnit1.code : "";
+
+					}
+				}
+
+				ViewContext.Writer.Write(metricUnit);
+
+			});
+
+		});
+
+
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

@@ -1,0 +1,186 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.Presentation
+
+@using (Html.BeginForm("", "", FormMethod.Post, new {@id = "formFilterPresentation", name = "formFilterPresentation" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr>
+    
+        <td style="width: 40%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="4">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Enmpaque</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 35%;">
+                        @Html.DevExpress().LabelFor(m => m.id_itemPackingMinimum, settings =>
+                        {
+                            settings.Name = "startDateLabel";
+                            settings.Text = "Empaque:";
+                            settings.AssociatedControlName = "startDate";
+                        }).GetHtml()
+                    </td>
+                    <td>
+
+
+                        @Html.DevExpress().ComboBox( settings =>
+                   {
+                       settings.Name = "id_itemPackingMinimum";
+                       settings.Properties.ClientInstanceName = "id_itemPackingMinimum";
+                       settings.Properties.ValueField = "id";
+                       settings.Properties.TextField = "name";
+                       settings.Properties.NullDisplayText = "Minimo";
+                       settings.Properties.NullText = "Minimo";
+                       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                       settings.Properties.ValueType = typeof(int);
+                       settings.Properties.Columns.Add("name", "description", 200);
+                       settings.Width = Unit.Percentage(100);
+                   
+                       settings.Properties.EnableClientSideAPI = true;
+                       settings.Properties.CallbackPageSize = 20;
+                    
+
+                   }).BindList(DataProviderItem.ItemsByCompany((int?)ViewData["id_company"])).GetHtml()
+
+
+
+         
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBox(settings =>
+                      {
+                          settings.Name = "id_itemPackingMaximum";
+                          settings.Properties.ClientInstanceName = "id_itemPackingMaximum";
+                          settings.Properties.ValueField = "id";
+                          settings.Properties.TextField = "name";
+                          settings.Properties.NullDisplayText = "Maximo";
+                          settings.Properties.NullText = "Maximo";
+                          settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                          settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                          settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                          settings.Properties.ValueType = typeof(int);
+                          settings.Properties.Columns.Add("name", "description", 200);
+                          settings.Width = Unit.Percentage(100);
+                        
+                          settings.Properties.EnableClientSideAPI = true;
+                          settings.Properties.CallbackPageSize = 20;
+
+
+                      }).BindList(DataProviderItem.ItemsByCompany((int?)ViewData["id_company"])).GetHtml()
+                    </td>
+                </tr>
+      
+            </table>
+        </td>
+        <td style="width: 45%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td colspan="2">
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Medida</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 35%">
+                       @Html.DevExpress().LabelFor(m => m.id_metricUnit, settings =>
+                        {
+                            settings.Name = "id_metricUnitLabel";
+                            settings.Text = "Unidad de Medida:";
+                            settings.AssociatedControlName = "id_metricUnit";
+                        }).GetHtml()*
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBox(settings =>
+                        {
+                            settings.Name = "id_metricUnit";
+                            settings.Properties.ClientInstanceName = "id_metricUnit";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.ValueField = "id";
+                            settings.Properties.TextField = "name";
+                            settings.Properties.ValueType = typeof(int);
+                            settings.Properties.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Todos";
+                            settings.Properties.NullText = "Todos";
+
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        }).BindList(DataProviderMetricUnit.MetricUnits((int)ViewData["id_company"])).GetHtml()
+                    </td>
+                </tr>
+            
+            </table>
+        </td>
+        <td style="width: 15%">
+            <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                <tr style="border-bottom: 1px Solid #C0C0C0;">
+                    <td>
+                        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "btnSearch";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Buscar";
+                            settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnSearch_click";
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "Clear";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Limpiar";
+                            settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnClear_click";
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="btn-group" style="width: 100%;">
+                            <button type="button" class="btn-default custom-button" onclick="AddNewDocument()" aria-haspopup="true" aria-expanded="false">
+                                <img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nueva</span>
+                            </button>
+                     
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+					<td>
+						@Html.DevExpress().Button(settings =>
+				   {
+					   settings.Name = "Import";
+					   settings.UseSubmitBehavior = false;
+					   settings.Text = "Importar";
+					   settings.ToolTip = "Importar Presentaciones";
+					   settings.Images.Image.IconID = IconID.ActionsExport16x16devav;
+					   settings.Width = Unit.Percentage(100);
+					   settings.ClientSideEvents.Click = "importFile";
+				   }).GetHtml()
+					</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+}

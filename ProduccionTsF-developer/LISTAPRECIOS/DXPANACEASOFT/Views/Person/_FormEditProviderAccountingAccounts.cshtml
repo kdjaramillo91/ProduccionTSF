@@ -1,0 +1,357 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProviderAccountingAccounts>
+
+@{
+    var grid = Html.DevExpress().GridView<ProviderAccountingAccounts>(settings => {
+        settings.Name = "ProviderAccountingAccounts";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "ProviderAccountingAccounts" };
+
+        settings.ClientSideEvents.BeginCallback = "ProviderPaymentTerm_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "ProviderAccountingAccountsAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "ProviderAccountingAccountsUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "ProviderAccountingAccountsDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_company";
+            column.Caption = "Cía.";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_company = (int)DataBinder.Eval(c.DataItem, "id_company");
+                Company company = DataProviderCompany.CompanyById(id_company);
+
+                if (company != null)
+                {
+                    ViewContext.Writer.Write(company.code);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_company";
+                p.DataSource = DataProviderCompany.AllCompanies();
+                //p.TextField = "businessName";
+                p.TextFormatString = "{0}";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("businessName", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                p.ClientSideEvents.Init = "ProviderAccountingAccountsCompanyCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "ProviderRelatedCompanyCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_division";
+            column.Caption = "Div.";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_division = (int)DataBinder.Eval(c.DataItem, "id_division");
+                Division division = DataProviderDivision.DivisionById(id_division);
+
+                if (division != null)
+                {
+                    ViewContext.Writer.Write(division.code);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_division";
+                p.DataSource = DataProviderDivision.AllDivisions();
+                //p.TextField = "name";
+                p.TextFormatString = "{0}";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "ProviderRelatedCompanyDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_branchOffice";
+            column.Caption = "Suc.";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_branchOffice = (int)DataBinder.Eval(c.DataItem, "id_branchOffice");
+                BranchOffice branchOffice = DataProviderBranchOffice.BranchOfficeById(id_branchOffice);
+
+                if (branchOffice != null)
+                {
+                    ViewContext.Writer.Write(branchOffice.code);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_branchOffice";
+                p.DataSource = DataProviderBranchOffice.AllBranchOffices();
+                //p.TextField = "name";
+                p.TextFormatString = "{0}";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemBranchOfficeCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_accountFor";
+            column.Caption = "Cuenta Para";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_accountFor = (int)DataBinder.Eval(c.DataItem, "id_accountFor");
+                AccountFor accountFor = DataProviderAccount.AccountForById(id_accountFor);
+
+                if (accountFor != null)
+                {
+                    ViewContext.Writer.Write(accountFor.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_accountFor";
+                p.DataSource = DataProviderAccount.AllAccountFors();
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemBranchOfficeCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_accountPlan";
+            column.Caption = "Plan";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_accountPlan = (int)DataBinder.Eval(c.DataItem, "id_accountPlan");
+                AccountPlan accountPlan = DataProviderAccount.AccountPlanById(id_accountPlan);
+
+                if (accountPlan != null)
+                {
+                    ViewContext.Writer.Write(accountPlan.code);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_accountPlan";
+                p.DataSource = DataProviderAccount.AllAccountPlans();
+                p.ValueField = "id";
+                p.TextFormatString = "{0}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "ProviderAccountingAccountsAccountPlanCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_account";
+            column.Caption = "Cuenta";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_account = (int)DataBinder.Eval(c.DataItem, "id_account");
+                Account account = DataProviderAccount.AccountById(id_account);
+
+                if (account != null)
+                {
+                    ViewContext.Writer.Write(account.number);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_account";
+                p.DataSource = DataProviderAccount.AllAccountMoves();
+                p.ValueField = "id";
+                p.TextFormatString = "{0}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("number", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "ProviderAccountingAccountsAccountPlanCombo_SelectedIndexChanged";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemBranchOfficeCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_accountingAssistantDetailType";
+            column.Caption = "Auxiliar";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_accountingAssistantDetailType = (int)DataBinder.Eval(c.DataItem, "id_accountingAssistantDetailType");
+                AccountingAssistantDetailType accountingAssistantDetailType = DataProviderAccount.AccountingAssistantDetailTypeById(id_accountingAssistantDetailType);
+
+                if (accountingAssistantDetailType != null)
+                {
+                    ViewContext.Writer.Write(accountingAssistantDetailType.AccountingAssistant.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_accountingAssistantDetailType";
+                p.DataSource = DataProviderAccount.AllAccountingAssistantDetailTypes();
+                p.ValueField = "id";
+                p.TextFormatString = "{2}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("AssistantType.code", "Tipo", 50);
+                p.Columns.Add("AccountingAssistant.code", "Cod.", 50);
+                p.Columns.Add("AccountingAssistant.name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemBranchOfficeCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

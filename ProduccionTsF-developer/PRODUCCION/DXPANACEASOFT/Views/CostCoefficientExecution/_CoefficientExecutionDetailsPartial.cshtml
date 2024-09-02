@@ -1,0 +1,398 @@
+﻿
+@model ProductionCostCoefficientExecution
+
+@* Cuadrícula con el resumen seleccionable de costos *@
+
+<strong>Asignación de Costos</strong>
+
+@{
+	var costosAsignacionAgrupados = this.Model.ProductionCostCoefficientExecutionDetails
+		.GroupBy(d => new
+		{
+			d.id_productionCost,
+			d.anio,
+			d.mes,
+			d.accountingValue,
+			d.coeficiente,
+		})
+		.Select(g => new
+		{
+			g.Key.id_productionCost,
+			name_productionCost = g.First().ProductionCost.name,
+			g.Key.anio,
+			g.Key.mes,
+			g.Key.accountingValue,
+			g.Key.coeficiente,
+			idsDetalles = g
+				.Select(d => d.id)
+				.Distinct()
+				.ToArray(),
+			documentosRelacionados = g
+				.Select(d => d.ProductionCostAllocationPeriod.Document.number)
+				.Distinct()
+				.ToArray(),
+		})
+		.ToArray();
+
+	var numCostosAsignacionAgrupados = costosAsignacionAgrupados.Length;
+}
+
+<div class="row" style="padding-top: 10px">
+	<div class="col-sm-12">
+		@Html.DevExpress().GridView(
+			grid =>
+			{
+				grid.Name = "gvCostCoefficientExecutionCostGroup";
+				grid.Width = Unit.Percentage(100);
+
+				#region GridView Behavior
+
+				grid.SettingsBehavior.AllowSort = false;
+				grid.SettingsBehavior.AllowSelectByRowClick = true;
+				grid.SettingsBehavior.AllowDragDrop = false;
+
+				grid.SettingsPager.Visible = false;
+				grid.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+				grid.SettingsSearchPanel.Visible = false;
+				grid.Settings.ShowTitlePanel = false;
+				grid.Settings.ShowGroupPanel = false;
+				grid.Settings.ShowFooter = false;
+
+				grid.Settings.ShowFilterRow = false;
+				grid.Settings.ShowFilterRowMenu = false;
+
+				grid.CommandColumn.Visible = false;
+				grid.SettingsDetail.ShowDetailRow = false;
+
+				grid.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpGruposCosto"] = costosAsignacionAgrupados;
+				};
+
+				#endregion
+
+				#region Adaptivity Settings
+
+				grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+				grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+				grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+				grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+				grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+				#endregion
+
+				grid.CustomUnboundColumnData = (s, e) =>
+				{
+					if (e.Column.FieldName == "periodo")
+					{
+						var anio = (int)e.GetListSourceFieldValue("anio");
+						var mes = (int)e.GetListSourceFieldValue("mes");
+						e.Value = String.Format("{0}-{1:00}", anio, mes);
+					}
+					else if (e.Column.FieldName == "trazabilidad")
+					{
+						var documentosRelacionados = (string[])e.GetListSourceFieldValue("documentosRelacionados");
+						e.Value = String.Join(", ", documentosRelacionados);
+					}
+				};
+
+				#region Columns
+
+				if (this.ViewBag.DetailsEditable)
+				{
+					grid.Columns.Add(column =>
+					{
+						column.Caption = " ";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+						column.HeaderStyle.Wrap = DefaultBoolean.True;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+						column.Width = Unit.Percentage(5);
+
+						column.SetDataItemTemplateContent(content =>
+						{
+							var indiceItem = content.VisibleIndex;
+							var checkBoxName = String.Concat("UsarDetalleGrupoCostoEditCheckBox_", indiceItem);
+
+							Html.DevExpress().CheckBox(checkBox =>
+							{
+								checkBox.Name = checkBoxName;
+								checkBox.Checked = true;
+								checkBox.CustomJSProperties = (s, e) =>
+								{
+									e.Properties["cpIndice"] = indiceItem;
+								};
+
+								checkBox.Properties.ClientSideEvents.CheckedChanged = "onUsarDetalleGrupoCostoEditCheckedChanged";
+
+							}).Render();
+						});
+					});
+				}
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "name_productionCost";
+					column.Name = "name_productionCost";
+					column.Caption = "Costo";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(25);
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "periodo";
+					column.Name = "periodo";
+					column.Caption = "Período";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(12);
+					column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "accountingValue";
+					column.Name = "accountingValue";
+					column.Caption = "¿Valores Contables?";
+					column.Width = Unit.Percentage(10);
+					column.ColumnType = MVCxGridViewColumnType.CheckBox;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "coeficiente";
+					column.Name = "coeficiente";
+					column.Caption = "¿Coeficiente?";
+					column.Width = Unit.Percentage(10);
+					column.ColumnType = MVCxGridViewColumnType.CheckBox;
+				});
+
+				grid.Columns.Add(column =>
+				{
+					column.FieldName = "trazabilidad";
+					column.Name = "trazabilidad";
+					column.Caption = "Trazabilidad";
+					column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+					column.Width = Unit.Percentage(25);
+					column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+				});
+
+				#endregion
+
+			}).Bind(costosAsignacionAgrupados).GetHtml()
+	</div>
+</div>
+
+@if (this.ViewBag.DetailsEditable && this.Model.processed)
+{
+	<div class="row" style="padding-top: 10px">
+		<div class="col-sm-8"></div>
+		<div class="col-sm-4">
+			<div style="text-align:right;">
+				@Html.DevExpress().Button(
+					button =>
+					{
+						button.Name = "EjecutarDistribucionEditButton";
+						button.Text = "Calcular Distribución";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.SpreadsheetCreatefromselection16x16;
+						button.UseSubmitBehavior = false;
+
+						button.Style.Add("margin-right", "25px");
+
+						button.ClientSideEvents.Click = "onCalcularDistribucionButtonClick";
+			 }).GetHtml()
+			</div>
+		</div>
+	</div>
+}
+
+@* Cuadrículas con detalles de subcostos *@
+
+@for (var index = 0; index < numCostosAsignacionAgrupados; index++)
+{
+	var costoAsignacionGrupo = costosAsignacionAgrupados[index];
+	var subCostosGrupo = this.Model.ProductionCostCoefficientExecutionDetails
+		.Where(d => d.id_productionCost == costoAsignacionGrupo.id_productionCost
+			&& d.anio == costoAsignacionGrupo.anio
+			&& d.mes == costoAsignacionGrupo.mes
+			&& d.accountingValue == costoAsignacionGrupo.accountingValue
+			&& d.coeficiente == costoAsignacionGrupo.coeficiente)
+		.Select(d => new
+		{
+			d.id_productionCostDetail,
+			name_productionCostDetail = d.ProductionCostDetail.name,
+			d.id_productionPlant,
+			d.ProductionPlant,
+			d.coeficiente,
+			d.valor,
+		})
+		.ToArray();
+
+	<div class="row" style="padding-top: 10px" id="detalleSubCosto-@index">
+		<div class="col-sm-12">
+			<hr style="margin-top: 15px; margin-bottom: 4px;" />
+			<strong>Detalles de @costoAsignacionGrupo.name_productionCost</strong>
+
+			@Html.DevExpress().GridView(
+				grid =>
+				{
+					grid.Name = String.Concat("gvCostCoefficientExecutionSubCostGroup_", index);
+					grid.Width = Unit.Percentage(100);
+
+					#region GridView Behavior
+
+					grid.SettingsBehavior.AllowSort = false;
+					grid.SettingsBehavior.AllowSelectByRowClick = true;
+					grid.SettingsBehavior.AllowDragDrop = false;
+
+					grid.SettingsPager.Visible = false;
+					grid.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+					grid.SettingsSearchPanel.Visible = false;
+					grid.Settings.ShowTitlePanel = false;
+					grid.Settings.ShowGroupPanel = false;
+					grid.Settings.ShowFooter = true;
+
+					grid.Settings.ShowFilterRow = false;
+					grid.Settings.ShowFilterRowMenu = false;
+
+					grid.CommandColumn.Visible = false;
+					grid.SettingsDetail.ShowDetailRow = false;
+
+					#endregion
+
+					#region Adaptivity Settings
+
+					grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+					grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+					grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+					grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+					grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+					#endregion
+
+					grid.CustomUnboundColumnData = (s, e) =>
+					{
+						if (e.Column.FieldName == "plantaProceso")
+						{
+							var productionPlant = (Person)e.GetListSourceFieldValue("ProductionPlant");
+							e.Value = (productionPlant == null) ? "Todos"
+								: String.IsNullOrEmpty(productionPlant.processPlant) ? productionPlant.fullname_businessName
+								: productionPlant.processPlant;
+						}
+					};
+
+					#region Columns
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "name_productionCostDetail";
+						column.Name = "name_productionCostDetail";
+						column.Caption = "SubCosto";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(25);
+
+						column.FooterCellStyle.Font.Bold = true;
+						column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Left;
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "plantaProceso";
+						column.Name = "plantaProceso";
+						column.Caption = "Planta Proceso";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+						column.ColumnType = MVCxGridViewColumnType.TextBox;
+						column.Width = Unit.Percentage(12);
+						column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "coeficiente";
+						column.Name = "coeficiente";
+						column.Caption = "¿Coeficiente?";
+						column.Width = Unit.Percentage(10);
+						column.ColumnType = MVCxGridViewColumnType.CheckBox;
+					});
+
+					grid.Columns.Add(column =>
+					{
+						column.FieldName = "valor";
+						column.Name = "valor";
+						column.Caption = "Valor";
+						column.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+						column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+						column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+						column.PropertiesEdit.DisplayFormatString = "N2";
+						column.Width = Unit.Percentage(25);
+
+						column.FooterCellStyle.Font.Bold = true;
+						column.FooterCellStyle.HorizontalAlign = HorizontalAlign.Right;
+					});
+
+					#endregion
+
+					#region Totals
+
+					if (subCostosGrupo.Any())
+					{
+						grid.TotalSummary.Add(new ASPxSummaryItem()
+						{
+							FieldName = "name_productionCostDetail",
+							SummaryType = DevExpress.Data.SummaryItemType.Custom,
+							ShowInColumn = "name_productionCostDetail",
+						});
+
+						grid.TotalSummary.Add(new ASPxSummaryItem()
+						{
+							FieldName = "valor",
+							DisplayFormat = "N2",
+							SummaryType = DevExpress.Data.SummaryItemType.Sum,
+							ShowInColumn = "valor",
+						});
+
+						grid.CustomSummaryCalculate = (s, e) =>
+						{
+							var item = e.Item as ASPxSummaryItem;
+
+							if (item != null)
+							{
+								if (item.FieldName == "name_productionCostDetail")
+								{
+									if (e.SummaryProcess == DevExpress.Data.CustomSummaryProcess.Finalize)
+									{
+										e.TotalValue = "TOTAL";
+										e.TotalValueReady = true;
+									}
+								}
+							}
+						};
+					}
+
+					#endregion
+
+				}).Bind(subCostosGrupo).GetHtml()
+		</div>
+	</div>
+}
+
+<div id="detallesDistribucion" style="width: 100%;">
+	@if (this.Model.ProductionCostCoefficientExecutionPlants.Any())
+	{
+		@Html.Partial("_CoefficientExecutionDistributionDetailsPartial", this.Model)
+	}
+</div>

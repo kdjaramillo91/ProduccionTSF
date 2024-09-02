@@ -1,0 +1,339 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+
+@{
+    var grid = Html.DevExpress().GridView<InventoryReason>(settings =>
+    {
+        settings.Name = "gvInventoryReason";
+        settings.CallbackRouteValues = new { Controller = "InventoryReason", Action = "InventoryReasonPartial" };
+
+
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "InventoryReason", Action = "InventoryReasonPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InventoryReason", Action = "InventoryReasonPartialUpdate" };
+
+
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsExport.EnableClientSideExportAPI = true;
+        settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+        settings.SettingsExport.FileName = "Motivo_Inventario_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+        settings.Toolbars.Add(t =>
+        {
+            t.EnableAdaptivity = true;
+            t.Items.Add(GridViewToolbarCommand.ExportToXls);
+            t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+            t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+        });
+
+        #region EDITFORM
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Añadir Motivos Inventario";
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 800;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+
+        #endregion
+
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+        //Eventos
+        settings.ClientSideEvents.BeginCallback = "OnGridViewInventoryReasonBeginCallback";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+        #region BOTONES DE COMANDO PARA REGISTRO
+
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 16,
+            Width = Unit.Percentage(5),
+            Caption = "Acciones"
+        };
+
+
+
+
+
+        settings.Columns.Add(commandColumn);
+
+
+        #endregion
+        #region
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+            if (ViewData["EditMessage"] != null)
+            {
+                e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+            }
+        };
+
+        #endregion
+
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Motivos Inventario</span>");
+        });
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+			  <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+
+
+
+
+        #region ColumnsEdit
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_InventoryReason = (int?)DataBinder.Eval(c.DataItem, "id");
+            InventoryReason InventoryReason = DataProviderInventoryReason.InventoryReasonById(id_InventoryReason);
+
+            InventoryReason = InventoryReason ?? new InventoryReason();
+
+
+
+            Html.RenderPartial("_FormEditInventoryReason", InventoryReason);
+        });
+
+        #endregion
+
+        #region MASTER DETAILS
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            int? id_InventoryReason = (int?)DataBinder.Eval(c.DataItem, "id");
+            InventoryReason InventoryReason = DataProviderInventoryReason.InventoryReasonById(id_InventoryReason);
+
+            Html.RenderPartial("_InventoryReasonDetailPartial", InventoryReason);
+        });
+        #endregion
+
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //Document
+
+        settings.Columns.Add(m => m.id, column =>
+        {
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+
+        });
+
+
+        settings.Columns.Add(m => m.code, column =>
+        {
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+
+        });
+        settings.Columns.Add(m => m.name, column =>
+        {
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(30);
+
+        });
+
+
+
+        settings.Columns.Add(m => m.AdvanceParametersDetail.description, column =>
+        {
+            column.Caption = "Naturaleza";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.DocumentType.description, column =>
+        {
+            column.Caption = "Tipo de Documento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(30);
+
+
+
+        });
+
+        settings.Columns.Add(m => m.requiereSystemLotNubmber, column =>
+        {
+            column.Caption = "¿Lote Sistema?";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(15);
+
+
+
+        });
+
+        settings.Columns.Add(m => m.requiereUserLotNubmber, column =>
+        {
+            column.Caption = "¿Lote Cliente?";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(15);
+
+
+
+        });
+
+        settings.Columns.Add(m => m.isAuthomatic, column =>
+        {
+            column.Caption = "¿Automático";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(15);
+
+
+
+        });
+
+        settings.Columns.Add(m => m.isSystem, column =>
+        {
+            column.Caption = "¿Sistema";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.isForTransfer, column =>
+        {
+            column.Caption = "¿Transferencia";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.op, column =>
+        {
+            column.Caption = "OP";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.isActive, column =>
+        {
+            column.Caption = "¿Activo";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.valorization, column =>
+        {
+            column.Caption = "Valorización";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(m => m.typeOfCalculation, column =>
+        {
+            column.Caption = "Tipo De Cálculo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(m => m.InventoryReason2.name, column =>
+        {
+            column.Caption = "Motivo Relacionado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+        });
+    });
+
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	String GetUserName(int id)
+	{
+		var user = DataProviderUser.UserById(id);
+		return user.username;
+	}
+
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+}
+<script src="~/Scripts/InventoryReason/editform.js"></script>
+
+<script src="~/Scripts/InventoryReason/validations.js"></script>

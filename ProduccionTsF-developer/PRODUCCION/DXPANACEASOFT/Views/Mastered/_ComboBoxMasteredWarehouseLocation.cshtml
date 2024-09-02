@@ -1,0 +1,22 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.MasteredDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.id_masteredWarehouseLocation, settings =>
+{
+    settings.Name = "ComboBoxMasteredWarehouseLocation";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Mastered",
+        Action = "ComboBoxMasteredWarehouseLocation",
+    };
+    settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxMasteredWarehouseLocation_BeginCallback";
+    //settings.Properties.ClientSideEvents.EndCallback = "ComboBoxMasteredWarehouseLocation_EndCallback";
+    //settings.Properties.ClientSideEvents.ValueChanged = "ComboBoxMasteredWarehouseLocation_ValueChanged";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["MasteredWarehouseLocation"]).GetHtml()
+

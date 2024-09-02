@@ -1,0 +1,127 @@
+﻿
+@model DXPANACEASOFT.Models.Notification
+
+<div class="row" style="padding-bottom: 2px; display: none">
+    @Html.DevExpress().TextBoxFor(model => model.id, settings =>
+    {
+        settings.Name = "idNotification";
+        settings.Width = Unit.Percentage(100);
+        settings.ReadOnly = true;
+    }).GetHtml()
+</div>
+<div class="row" style="padding-bottom: 2px;">
+    <div class="col-lg-2">
+        Visto:
+    </div>
+    <div class="col-lg-10">
+        @Html.DevExpress().CheckBoxFor(model => model.reading, settings =>
+        {
+            settings.Name = "reading";
+            settings.Width = Unit.Percentage(100);
+        }).GetHtml()
+    </div>
+</div>
+<div class="row" style="padding-bottom: 2px;">
+    <div class="col-lg-2">
+        Titulo:
+    </div>
+    <div class="col-lg-10">
+        @Html.DevExpress().TextBoxFor(model => model.title, settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.ReadOnly = true;
+        }).GetHtml()
+    </div>
+</div>
+<div class="row" style="padding-bottom: 2px;">
+    <div class="col-lg-2">
+        Documento:
+    </div>
+    <div class="col-lg-10">
+        @Html.DevExpress().TextBoxFor(model => model.noDocument, settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.ReadOnly = true;
+        }).GetHtml()
+    </div>
+</div>
+<div class="row" style="padding-bottom: 2px;">
+    <div class="col-lg-2">
+        Tipo de Documento:
+    </div>
+    <div class="col-lg-10">
+        @Html.DevExpress().TextBoxFor(model => model.documentType, settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.ReadOnly = true;
+        }).GetHtml()
+    </div>
+</div>
+<div class="row" style="padding-bottom: 2px;">
+    <div class="col-lg-2">
+        Modificado A:
+    </div>
+    <div class="col-lg-10">
+        @Html.DevExpress().TextBoxFor(model => model.documentState, settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.ReadOnly = true;
+        }).GetHtml()
+    </div>
+</div>
+<div class="row" style="padding-bottom: 2px;">
+    <div class="col-lg-2">
+        Descripción:
+    </div>
+    <div class="col-lg-10">
+        @Html.DevExpress().TextBoxFor(model => model.description, settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Height = Unit.Pixel(50);
+            settings.ReadOnly = true;
+        }).GetHtml()
+    </div>
+</div>
+
+<div class="row" style="padding-bottom: 2px;">
+    <table style="margin: 10px;" class="pull-right">
+        <tr>
+            <td style="padding: 5px;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsRemove16x16;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+            </td>
+            <td style="padding: 5px;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnRemove";
+                    settings.Text = "Eliminar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonRemove_Click";
+                }).GetHtml()
+            </td>
+            <td style="padding: 5px;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cerrar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>

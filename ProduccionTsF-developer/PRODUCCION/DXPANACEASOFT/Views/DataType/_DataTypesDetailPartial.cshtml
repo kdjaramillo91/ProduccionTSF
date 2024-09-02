@@ -1,0 +1,117 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    DataType dataType = Model ?? new DataType();
+}
+
+@Html.Hidden("id_dataType", dataType.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Lugar Decimal en Compra:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.purchase_decimalPlace)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Lugar Decimal en Venta:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.sale_decimalPlace)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Lugar Decimal en Inventario:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.inventory_decimalPlace)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(dataType.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(dataType.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(dataType.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

@@ -1,0 +1,126 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using System.Collections
+@*@model List<DXPANACEASOFT.Models.QualityControlAnalysisGroup>*@
+
+@model IEnumerable
+
+<script>
+    OnBatchStartEditing = function (s, e) {
+        s.batchEditApi.SetCellValue(e.visibleIndex, 'id_qualityAnalysis', -1);
+    };
+    OnBatchEditDetailEndCallback = function (s, e) {
+        // 
+        var nombreControl = s.name;
+        var hasWholePerformance = nombreControl.slice(0, 1);
+        var valorTmp = 0.0;
+        var valorTotal = parseFloat(0);
+        var nTmp;
+        if (hasWholePerformance == "1") {
+            for (var i = 0; i <= (s.pageRowCount - 1) ; i++) {
+                // 
+                valorTmp = 0.0;
+                valorTmp = s.batchEditApi.GetCellValue(i, "resultValue", -1)
+                if (valorTmp != null || valorTmp != undefined) {
+                    if (valorTmp != "") {
+                        nTmp = valorTmp.replace(",", ".");
+                        valorTotal += parseFloat(nTmp);
+                    }
+
+                }
+            }
+            if (valorTotal <= 100) {
+                valorTotal = 100.0 - (valorTotal - s.cpAmoutNADCTD);
+            }
+
+            wholePerformance.SetValue(parseFloat(valorTotal));
+        }
+    };
+</script>
+
+@{
+    var grid = Html.DevExpress().GridView<QualityControlAnalysisGroup>(settings =>
+    {
+        settings.Name = "gvQualityControlMaster";
+
+
+        settings.CallbackRouteValues = new { Controller = "QualityControl", Action = "QualityControlDetailsMasterPartial" };
+
+        //settings.ClientSideEvents.EndCallback = "QualityControlDetilsMaster_OnEndCallback";
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+        settings.SettingsBehavior.AllowSort = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.CommandColumn.Visible = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailButtons = false;
+        settings.SettingsDetail.ShowDetailRow = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Styles.Header.Font.Bold = true;
+        settings.HtmlDataCellPrepared = (s, e) =>
+        {
+            e.Cell.Font.Bold = true;
+        };
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Name = "analysisGroupName";
+            column.Caption = "Grupo de Análisis";
+            column.Width = Unit.Percentage(90);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            ViewData["id_analysisGroup"] = DataBinder.Eval(c.DataItem, "id");
+            List<QualityControlDetail> detail = (List<QualityControlDetail>)TempData["qualityControlDetailsTmp"];
+            detail = detail ?? new List<QualityControlDetail>();
+
+            TempData.Keep("qualityControlDetailsTmp");
+            string codeVisualizationType = DataProviderQualityControl.QualityControlVisualizationTypeDataByAnalysis((int)ViewData["id_analysisGroup"]);
+
+            TempData["codeVisualizationTypeTemporal"] = codeVisualizationType;
+            TempData.Keep("codeVisualizationTypeTemporal");
+            if (codeVisualizationType == "CMBBOX")
+            {
+                ViewContext.Writer.Write(
+                    "Se selecciona una opción del Combobox." +
+                    "<br />" +
+                    "<br />");
+            }
+
+            if (detail != null)
+            {
+
+                Html.RenderAction("QualityControlDetailsDetailPartial", new { id_analysisGroup = (int)ViewData["id_analysisGroup"] });
+
+            }
+        });
+        settings.PreRender = (sender, e) =>
+        {
+            ((MVCxGridView)sender).DetailRows.ExpandAllRows();
+        };
+
+
+        settings.ClientSideEvents.RowCollapsing = "OnRowCollapsing";
+        #region EditorLayout
+
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

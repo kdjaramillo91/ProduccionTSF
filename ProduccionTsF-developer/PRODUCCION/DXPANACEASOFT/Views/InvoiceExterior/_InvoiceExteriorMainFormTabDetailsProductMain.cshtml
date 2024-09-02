@@ -1,0 +1,16 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.InvoiceDetail>
+
+
+@{
+
+    Invoice invoice = (Model != null) ? ((Model.Count() > 0) ? ((Model[0].Invoice != null) ? Model[0].Invoice : new Invoice()) : new Invoice()) : new Invoice();
+
+    Html.RenderPartial("_InvoiceExteriorMainFormTabDetailsTariffHeading", invoice);
+
+    Html.RenderPartial("_InvoiceExteriorMainFormTabDetailsProduct", Model);
+
+
+}

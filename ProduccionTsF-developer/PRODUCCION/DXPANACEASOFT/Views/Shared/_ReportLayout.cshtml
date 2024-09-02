@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+@{
+	if (this.ViewBag.ReportCommand == "export")
+	{
+		var excelFileName = String.IsNullOrEmpty(this.ViewBag.ExcelFileName) ? "ReportExcelData.xls" : this.ViewBag.ExcelFileName;
+		this.Response.ContentType = "application/vnd.ms-excel";
+		this.Response.AppendHeader("content-disposition", "attachment; filename=\"" + excelFileName + "\"");
+	}
+	if (this.ViewBag.ReportCommand == "export-doc")
+	{
+		var wordFileName = String.IsNullOrEmpty(this.ViewBag.WordFileName) ? "ReportWordData.doc" : this.ViewBag.WordFileName;
+		this.Response.ContentType = "application/vnd.ms-word";
+		this.Response.AppendHeader("content-disposition", "attachment; filename=\"" + wordFileName + "\"");
+	}
+}
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+	  xmlns:x="urn:schemas-microsoft-com:office:excel"
+	  xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<meta name="author" content="Pedro Luna Montalvo [pedro.luna.montalvo@outlook.com]" />
+	<meta name="description" content="Sistema de Empacadoras de Panaceasoft" />
+	<title>@this.ViewBag.ReportTitle</title>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+			outline: 0;
+		}
+
+		body {
+			font-family: sans-serif;
+			background-color: #ffffff;
+			color: #000;
+		}
+	</style>
+	@RenderSection("ReportStyles", false)
+</head>
+<body>
+	@RenderBody()
+	@if (this.ViewBag.ReportCommand == "print")
+	{
+		<script type="text/javascript">
+			window.onload = function() { window.print(); };
+		</script>
+	}
+</body>
+</html>

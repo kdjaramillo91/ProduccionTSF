@@ -1,0 +1,46 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryMove
+
+@{
+
+    string codeWareHouseCustom = (string)ViewData["_customWarehousePackingM"];
+    //int? idWarehouseFilter = Model.idWarehousePackagingMaterials;
+
+    int? idWarehouseLocation = null;
+    int? idWarehouse = null;
+    if(Model != null)
+    {
+
+        idWarehouseLocation = Model.idWarehouseLocationPackagingMaterials;
+        idWarehouse = Model.idWarehouse;
+
+    }
+
+    //(Model == null) ? null :
+    //codeWareHouseCustom = (codeWareHouseCustom == null) ? (string)ViewData["_codeWareHouse"] : codeWareHouseCustom;
+
+}
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "id_LocationFilter";
+    settings.Properties.ClientInstanceName = "id_LocationFilter";
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextFormatString = "{1}";
+    settings.Properties.ValueType = typeof(int);
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "GetLocationFilter" /*, TextField = "CityName"*/ };
+    settings.Properties.ClientSideEvents.BeginCallback = "LocationFilter_InitCallBack";
+    //settings.Properties.CallbackPageSize = 15;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "LocationFilter_OnSelectedIndexChanged";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.Columns.Add("code", "Cod.", 50);
+    settings.Properties.Columns.Add("name", "Descripcion", 160);
+    settings.ShowModelErrors = true;
+
+
+
+
+}).BindList(DataProviderWarehouseLocation.WarehouseLocationsByWarehouse(idWarehouse)).Bind(idWarehouseLocation).GetHtml()

@@ -1,0 +1,600 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.LiquidationCartOnCartDetail>
+@{
+	string loteManual = DataProviderSetting.ValueSetting("PLOM");
+	var _liquidationCartOnCartDetail = (Model != null) ? this.Model.FirstOrDefault() : null;
+	var id_loteManual = (_liquidationCartOnCartDetail != null) ? _liquidationCartOnCartDetail.id_ProductionLotManual : (int?)this.ViewBag.id_ProductionLotManual;
+}
+
+@{
+	var grid = Html.DevExpress().GridView<LiquidationCartOnCartDetail>(settings =>
+			{
+				settings.Name = "gvLiquidationCartOnCartDetailEditForm";
+				settings.CallbackRouteValues = new { Controller = "LiquidationCartOnCart", Action = "LiquidationCartOnCartEditFormDetailPartial" };
+
+
+				settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "LiquidationCartOnCart", Action = "LiquidationCartOnCartEditFormDetailAddNew" };
+				settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "LiquidationCartOnCart", Action = "LiquidationCartOnCartEditFormDetailUpdate" };
+				settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "LiquidationCartOnCart", Action = "LiquidationCartOnCartEditFormDetailDelete" };
+				settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+
+				settings.CommandColumn.Visible = true;
+				settings.CommandColumn.ShowSelectCheckbox = true;
+				settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+				settings.SettingsBehavior.ConfirmDelete = false;
+
+				settings.Width = Unit.Percentage(100);
+
+				settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId";
+
+				settings.SettingsPager.Visible = true;
+				settings.Settings.ShowGroupPanel = false;
+				settings.Settings.ShowFilterRow = false;
+				settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+				//Checkbox de registros de tabla
+				settings.CommandColumn.ShowSelectCheckbox = true;
+				settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+				settings.ClientSideEvents.BeginCallback = "OnGridViewDetailBeginCallback";
+				settings.ClientSideEvents.EndCallback = "OnGridViewDetailEndCallback";
+
+
+				//Pie de tabla
+				settings.Settings.ShowFooter = true;
+
+				//Panel para cantidad de registros
+				settings.CustomJSProperties = (s, e) =>
+				{
+					MVCxGridView gv = s as MVCxGridView;
+					if (gv == null) return;
+
+					e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+					e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+					List<LiquidationCartOnCartDetail> rows = (Model as List<LiquidationCartOnCartDetail>);
+					rows = (rows != null) ? rows.ToList() : new List<LiquidationCartOnCartDetail>();
+
+					e.Properties["cpEditingRowSalesOrderDetail"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id_SalesOrderDetail") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id_SalesOrderDetail") : 0;
+
+					e.Properties["cpidItemLiq"] = ViewBag.idItemLiq;
+					e.Properties["cpRowsCount"] = rows.Count;
+
+					int index = gv.EditingRowVisibleIndex >= 0 ? gv.EditingRowVisibleIndex : -1;
+					e.Properties["cpRowIndex"] = index;
+					if (gv.EditingRowVisibleIndex >= 0)
+					{
+						e.Properties["cpRowKey"] = gv.GetRowValues(index, "id");
+					}
+				};
+
+				settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+				settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+				settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+				settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+				settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+				settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+				settings.InitNewRow = (s, e) =>
+				{
+					e.NewValues["quantityBoxesIL"] = 0.00M;
+					e.NewValues["quantityKgsIL"] = 0.00M;
+					e.NewValues["quantityPoundsIL"] = 0.00M;
+					e.NewValues["quantityKgsITW"] = 0.00M;
+					e.NewValues["quantityPoundsITW"] = 0.00M;
+					e.NewValues["id_Client"] = (int?)this.ViewBag.IdCliente;
+					e.NewValues["id_ProductionLotManual"] = (int?)this.ViewBag.id_ProductionLotManual;
+				};
+
+				settings.Styles.Header.Font.Bold = true;
+
+
+				settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quatityBoxesIL").DisplayFormat = "<b>{0:n2}</b>";
+				settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quantityKgsIL").DisplayFormat = "<b>{0:n2}</b>";
+				settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quantityPoundsIL").DisplayFormat = "<b>{0:n2}</b>";
+				settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quantityKgsITW").DisplayFormat = "<b>{0:n2}</b>";
+				settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "quantityPoundsITW").DisplayFormat = "<b>{0:n2}</b>";
+				settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "boxesReceived").DisplayFormat = "<b>{0:n2}</b>";
+
+				#region ColumnsAdd
+
+				//id_SalesOrder 10
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "id_SalesOrder";
+					column.Caption = "Orden de Pedido";
+					column.ColumnType = MVCxGridViewColumnType.ComboBox;
+					column.Width = Unit.Percentage(10);
+					column.Visible = false;
+
+					column.EditorProperties().ComboBox(p =>
+					{
+						p.ClientInstanceName = "id_SalesOrder";
+						p.DataSource = DataProviderSalesOrder.SalesOrdersByCompanyForProduction((int?)ViewData["id_company"]);
+						//p.TextFormatString = "{1}";
+						p.ValueField = "id";
+						p.TextField = "number";
+						p.Width = Unit.Percentage(20);
+						p.ValueType = typeof(int);
+						p.DropDownStyle = DropDownStyle.DropDownList;
+						p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+						//p.ClientSideEvents.DropDown = "ItemProductionLotLiquidationDetailCombo_DropDown";
+						p.ClientSideEvents.Init = "SalesOrderLiquidationCartOnCartDetailCombo_Init";
+						p.ClientSideEvents.SelectedIndexChanged = "SalesOrderLiquidationCartOnCartDetailCombo_SelectedIndexChanged";
+						//p.ClientSideEvents.Validation = "OnItemProductionLotLiquidationDetailValidation";
+					});
+				});
+
+				//id_ProductionCart 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "id_ProductionCart";
+					column.Caption = "Carro";
+					column.Width = Unit.Percentage(7);
+					column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+					column.EditorProperties().ComboBox(p =>
+					{
+						p.ClientInstanceName = "id_ProductionCart";
+						p.DataSource = DataProviderProductionCart.ProductionCarts();
+						p.ValueField = "id";
+						p.TextField = "name";
+						p.Width = Unit.Percentage(100);
+						p.ValueType = typeof(int);
+						p.DropDownStyle = DropDownStyle.DropDownList;
+						p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+						p.ValidationSettings.RequiredField.IsRequired = true;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						//p.ClientSideEvents.SelectedIndexChanged = "ComboWarehouseProductionLotLiquidationDetail_SelectedIndexChanged";
+						p.ClientSideEvents.Validation = "OnProductionCartLiquidationCartOnCartDetailValidation";
+					});
+				});
+
+				//id_ItemLiquidation 15
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "id_ItemLiquidation";
+					column.Caption = "Producto Liquidación";
+					column.ColumnType = MVCxGridViewColumnType.ComboBox;
+					column.Width = Unit.Percentage(15);
+
+					column.EditFormCaptionStyle.Font.Size = 10;
+
+					column.SetEditItemTemplateContent(c =>
+					{
+						var detIM = new LiquidationCartOnCartDetail();
+						if (c.ItemIndex >= 0)
+						{
+							detIM = Model[c.ItemIndex];
+						}
+						else
+						{
+							detIM.id_ItemLiquidation = this.ViewBag.idItemLiq ?? 0;
+						}
+						Html.RenderPartial("ComponentsDetail/_ComboBoxItems", detIM);
+					});
+					column.SetDataItemTemplateContent(c =>
+					{
+
+						var cellText = DataProviderItem.Item((int?)DataBinder.Eval(c.DataItem, "id_ItemLiquidation"));
+						string nombreProducto = "";
+						if (cellText != null)
+						{
+							nombreProducto = cellText.name;
+						}
+						ViewContext.Writer.Write(string.Format("{0}", nombreProducto));
+					});
+				});
+
+				//quantityBoxesIL 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "quatityBoxesIL";
+					column.Name = "quantityBoxesIL";
+					column.Caption = "Cajas";
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.Width = Unit.Percentage(7);
+					//column.ReadOnly = false;
+					column.SetDataItemTemplateContent(c =>
+					{
+						decimal quantity = (decimal)DataBinder.Eval(c.DataItem, "quatityBoxesIL");
+						ViewContext.Writer.Write(quantity.ToString("N2"));
+					});
+
+					column.EditorProperties().SpinEdit(p =>
+					{
+						p.Width = Unit.Percentage(100);
+						p.ClientInstanceName = "quantityBoxesIL";
+						p.DisplayFormatString = "N2";
+						p.DisplayFormatInEditMode = true;
+						p.DecimalPlaces = 2;
+						p.MinValue = 0;
+						p.NumberType = SpinEditNumberType.Float;
+						p.NumberFormat = SpinEditNumberFormat.Number;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+						p.ClientSideEvents.NumberChanged = "Quantity_NumberChange";
+						p.ClientSideEvents.Validation = "OnQuantityBoxesILLiquidationCartOnCartDetailValidation";
+					});
+				});
+
+				//quantityKgsIL 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "quantityKgsIL";
+					column.Name = "quantityKgsIL";
+					column.Caption = "Kg";
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.Width = Unit.Percentage(7);
+					column.ReadOnly = true;
+
+					column.SetDataItemTemplateContent(c =>
+					{
+						decimal quantityTotal = (decimal)DataBinder.Eval(c.DataItem, "quantityKgsIL");
+						ViewContext.Writer.Write(quantityTotal.ToString("N2"));
+					});
+
+					column.EditorProperties().SpinEdit(p =>
+					{
+						p.Width = Unit.Percentage(100);
+						p.ClientInstanceName = "quantityKgsIL";
+						p.DisplayFormatString = "N2";
+						p.DisplayFormatInEditMode = true;
+						p.DecimalPlaces = 2;
+						p.MinValue = 0;
+						p.NumberType = SpinEditNumberType.Float;
+						p.NumberFormat = SpinEditNumberFormat.Number;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+					});
+				});
+
+				//quantityPoundsIL 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "quantityPoundsIL";
+					column.Name = "quantityPoundsIL";
+					column.Caption = "Lbs";
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.Width = Unit.Percentage(7);
+					column.ReadOnly = true;
+
+					column.SetDataItemTemplateContent(c =>
+					{
+						decimal quantityTotal = (decimal)DataBinder.Eval(c.DataItem, "quantityPoundsIL");
+						ViewContext.Writer.Write(quantityTotal.ToString("N2"));
+					});
+
+					column.EditorProperties().SpinEdit(p =>
+					{
+						p.Width = Unit.Percentage(100);
+						p.ClientInstanceName = "quantityPoundsIL";
+						p.DisplayFormatString = "N2";
+						p.DisplayFormatInEditMode = true;
+						p.DecimalPlaces = 2;
+						p.MinValue = 0;
+						p.NumberType = SpinEditNumberType.Float;
+						p.NumberFormat = SpinEditNumberFormat.Number;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+					});
+				});
+
+				//id_ItemToWarehouse 15
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "id_ItemToWarehouse";
+					column.Name = "id_ItemToWarehouse";
+					column.Caption = "Producto a Congelación";
+					column.ColumnType = MVCxGridViewColumnType.ComboBox;
+					column.Width = Unit.Percentage(15);
+
+					column.EditFormCaptionStyle.Font.Size = 10;
+
+					column.SetEditItemTemplateContent(c =>
+					{
+						var detIM = new LiquidationCartOnCartDetail();
+						if (c.ItemIndex >= 0)
+						{
+							detIM = Model[c.ItemIndex];
+						}
+						else
+						{
+							detIM.id_ItemToWarehouse = this.ViewBag.idItemToWarehouse ?? 0;
+						}
+						Html.RenderPartial("ComponentsDetail/_ComboBoxItemsWarehouse", detIM);
+					});
+					column.SetDataItemTemplateContent(c =>
+					{
+
+						var cellText = DataProviderItem.Item((int?)DataBinder.Eval(c.DataItem, "id_ItemToWarehouse"));
+						string nombreProducto = "";
+						if (cellText != null)
+						{
+							nombreProducto = cellText.name;
+						}
+						ViewContext.Writer.Write(string.Format("{0}", nombreProducto));
+					});
+				});
+
+				//quantityKgsITW 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "quantityKgsITW";
+					column.Name = "quantityKgsITW";
+					column.Caption = "Kg";
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.Width = Unit.Percentage(7);
+					column.ReadOnly = true;
+
+					column.SetDataItemTemplateContent(c =>
+					{
+						decimal quantityTotal = (decimal)DataBinder.Eval(c.DataItem, "quantityKgsITW");
+						ViewContext.Writer.Write(quantityTotal.ToString("N2"));
+					});
+
+					column.EditorProperties().SpinEdit(p =>
+					{
+						p.Width = Unit.Percentage(100);
+						p.ClientInstanceName = "quantityKgsITW";
+						p.DisplayFormatString = "N2";
+						p.DisplayFormatInEditMode = true;
+						p.DecimalPlaces = 2;
+						p.MinValue = 0;
+						p.NumberType = SpinEditNumberType.Float;
+						p.NumberFormat = SpinEditNumberFormat.Number;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+					});
+				});
+
+				//quantityPoundsITW 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "quantityPoundsITW";
+					column.Name = "quantityPoundsITW";
+					column.Caption = "Lbs";
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.Width = Unit.Percentage(7);
+					column.ReadOnly = true;
+
+					column.SetDataItemTemplateContent(c =>
+					{
+						decimal quantityTotal = (decimal)DataBinder.Eval(c.DataItem, "quantityPoundsITW");
+						ViewContext.Writer.Write(quantityTotal.ToString("N2"));
+					});
+
+					column.EditorProperties().SpinEdit(p =>
+					{
+						p.Width = Unit.Percentage(100);
+						p.ClientInstanceName = "quantityPoundsITW";
+						p.DisplayFormatString = "N2";
+						p.DisplayFormatInEditMode = true;
+						p.DecimalPlaces = 2;
+						p.MinValue = 0;
+						p.NumberType = SpinEditNumberType.Float;
+						p.NumberFormat = SpinEditNumberFormat.Number;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+						//p.ClientSideEvents.NumberChanged = "Quantity_NumberChange";
+						//p.ClientSideEvents.Validation = "OnQuantityTotalProductionLotLiquidationDetailValidation";
+					});
+				});
+
+
+				if (this.ViewBag.IsCopaking)
+				{
+					settings.Columns.Add(column =>
+					{
+						column.FieldName = "id_Client";
+						column.Caption = "Cliente Local";
+						column.Width = Unit.Percentage(9);
+						column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+						column.EditorProperties().ComboBox(p =>
+						{
+							p.ClientInstanceName = "id_Client";
+							p.DataSource = DataProviderPerson.AllPersonsLocalByCompany((int?)ViewData["id_company"]);
+							p.ValueField = "id";
+							p.TextField = "name";
+							p.Width = Unit.Percentage(100);
+							p.ValueType = typeof(int);
+							p.DropDownStyle = DropDownStyle.DropDownList;
+							p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+							p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+							p.ValidationSettings.RequiredField.IsRequired = true;
+							p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+							//p.ClientSideEvents.SelectedIndexChanged = "ComboWarehouseProductionLotLiquidationDetail_SelectedIndexChanged";
+							p.ClientSideEvents.Validation = "OnClientLiquidationCartOnCartDetailValidation";
+						});
+					});
+				}
+				else
+				{
+					settings.Columns.Add(column =>
+					{
+						column.FieldName = "id_Client";
+						column.Caption = "Cliente Exterior";
+						column.Width = Unit.Percentage(9);
+						column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+						column.EditorProperties().ComboBox(p =>
+						{
+							p.ClientInstanceName = "id_Client";
+							p.DataSource = DataProviderPerson.CustomersExteriorByCompany((int?)ViewData["id_company"]);
+							p.ValueField = "id";
+							p.TextField = "fullname_businessName";
+							p.Width = Unit.Percentage(100);
+							p.ValueType = typeof(int);
+							p.DropDownStyle = DropDownStyle.DropDownList;
+							p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+							p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+							p.ValidationSettings.RequiredField.IsRequired = true;
+							p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+							//p.ClientSideEvents.SelectedIndexChanged = "ComboWarehouseProductionLotLiquidationDetail_SelectedIndexChanged";
+							p.ClientSideEvents.Validation = "OnClientLiquidationCartOnCartDetailValidation";
+						});
+					});
+				}
+
+				//boxesReceived 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "boxesReceived";
+					column.Name = "boxesReceived";
+					column.Caption = "Cj. Recibidas";
+					column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+					column.Width = Unit.Percentage(7);
+					column.ReadOnly = true;
+					column.SetDataItemTemplateContent(c =>
+					{
+						decimal quantity = (decimal)DataBinder.Eval(c.DataItem, "quatityBoxesIL");
+						decimal boxesReceived = (decimal?)DataBinder.Eval(c.DataItem, "boxesReceived") ?? 0;
+						if (boxesReceived < quantity)
+						{
+							ViewContext.Writer.Write("<FONT COLOR='#FF0000'><B>" + boxesReceived.ToString("N2") + "</B></FONT>");
+						}
+						else
+						{
+							ViewContext.Writer.Write(boxesReceived.ToString("N2"));
+						}
+					});
+
+					column.EditorProperties().SpinEdit(p =>
+					{
+						p.Width = Unit.Percentage(100);
+						p.ClientInstanceName = "boxesReceived";
+						p.DisplayFormatString = "N2";
+						p.DisplayFormatInEditMode = true;
+						p.DecimalPlaces = 2;
+						p.MinValue = 0;
+						p.NumberType = SpinEditNumberType.Float;
+						p.NumberFormat = SpinEditNumberFormat.Number;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+					});
+				});
+
+				//id_subProcessIOProductionProcess 7
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "id_subProcessIOProductionProcess";
+					column.Caption = "Destino";
+					column.Width = Unit.Percentage(7);
+					column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+					column.EditorProperties().ComboBox(p =>
+					{
+						p.ClientInstanceName = "id_subProcessIOProductionProcess";
+						p.DataSource = DataProviderProductionProcess.ProductionProcessByCodeSubProcessAndType("LCXC", "Output");
+						p.ValueField = "id";
+						p.TextField = "name";
+						p.Width = Unit.Percentage(100);
+						p.ValueType = typeof(int);
+						p.DropDownStyle = DropDownStyle.DropDownList;
+						p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+						p.ValidationSettings.RequiredField.IsRequired = true;
+						p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+						p.ClientSideEvents.Init = "SubProcessIOProductionProcess_OnInit";
+						p.ClientSideEvents.Validation = "OnSubProcessIOProductionProcessLiquidationCartOnCartDetailValidation";
+					});
+				});
+
+
+				if(loteManual == "SI")
+				{
+
+					settings.Columns.Add(column =>
+					{
+						column.FieldName = "id_ProductionLotManual";
+						column.Caption = "No. Lote";
+						column.Width = Unit.Percentage(7);
+						column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+						column.EditorProperties().ComboBox(p =>
+						{
+							p.ClientInstanceName = "id_ProductionLotManual";
+							p.DataSource = DataProviderProductionLot.ProductionLotManual(id_loteManual);
+							p.ValueField = "id";
+							p.TextField = "internalNumber";
+							p.Width = Unit.Percentage(100);
+							p.ValueType = typeof(int);
+							p.DropDownStyle = DropDownStyle.DropDownList;
+							p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+							p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+							//p.ValidationSettings.RequiredField.IsRequired = true;
+							p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+							//p.ClientSideEvents.Init = "ProductionLotOrigen_OnInit";
+							p.ClientSideEvents.Validation = "OnProductionLotManualLiquidationCartOnCartDetailValidation";
+						});
+
+					});
+				}
+
+				// Observacion
+				settings.Columns.Add(column =>
+				{
+					column.FieldName = "observation";
+					column.Caption = "Observación";
+					column.Width = Unit.Percentage(7);
+					column.ReadOnly = false;
+
+					column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+					column.EditorProperties().TextBox(p =>
+					{
+						p.MaxLength = 254;
+					});
+
+
+				});
+
+				//Botones de comandos para registros de la tabla
+				MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+				{
+					ShowEditButton = true,
+					ShowDeleteButton = true,
+					ShowCancelButton = true,
+					ShowUpdateButton = true,
+					Visible = true,
+					VisibleIndex = 21,
+					Caption = "Acciones"
+				};
+				commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+				commandColumn.Width = Unit.Percentage(5);
+
+				settings.Columns.Add(commandColumn);
+
+				settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+
+				#endregion
+
+			});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+
+}

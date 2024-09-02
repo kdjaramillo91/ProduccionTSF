@@ -1,0 +1,434 @@
+﻿@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.InventoryMove
+
+@{
+	string valInvFact = DataProviderSetting.ValueSetting("INVFACT");
+
+	string code = (ViewData["code"] != null) ? (string)ViewData["code"] : "";
+	string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+	int id_inventoryMove = (Model != null) ? Model.id : 0;
+	int? id_receiver = (Model != null && Model.InventoryEntryMove != null && Model.InventoryEntryMove.id_receiver != 0) ? (int?)Model.InventoryEntryMove.id_receiver : null;
+
+	bool? mostrar = null;
+	var dev = Model.id_provider;
+	if (dev == null)
+	{
+		mostrar = false;
+	}
+	else
+	{
+		mostrar = true;
+	}
+}
+
+
+@Html.Hidden("IdInventoryMov", Model.id)
+@Html.Hidden("IdReceiver", id_receiver)
+@Html.Hidden("valInvFact", valInvFact)
+
+<tr>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "natureLable";
+			settings.Text = "Naturaleza:";
+			settings.AssociatedControlName = "id_inventoryReason";
+		}).GetHtml()
+	</td>
+	<td>
+		@{
+			int? idNatureMove = (Model != null && Model.idNatureMove != null && Model.idNatureMove != 0) ? (int?)Model.idNatureMove : null;
+		}
+		@Html.DevExpress().ComboBox(settings =>
+		{
+			settings.Name = "idNatureMove";
+			settings.Width = Unit.Percentage(100);
+			settings.Properties.ValueField = "idAdvanceDetailModelP";
+			settings.Properties.TextField = "nameAdvanceDetailModelP";
+			settings.Properties.ValueType = typeof(int);
+			settings.Properties.Width = Unit.Percentage(100);
+			settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			settings.ClientEnabled = (codeState == "01");
+			settings.ReadOnly = true;
+
+			settings.ShowModelErrors = true;
+
+		}).BindList(DataProviderAdvanceParametersDetail.GetAdvanceParameterDetailByCode("NMMGI")).Bind(idNatureMove).GetHtml()
+
+	</td>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "receiverLabel";
+			settings.Text = "Recibidor:";
+			settings.AssociatedControlName = "id_receiver";
+		}).GetHtml()
+	</td>
+	<td>
+		@{
+
+			var rols = new List<string>() { "Recibidor", "Empleado" };
+			//rols.Add("Recibidor");
+			//rols.Add("Empleado");
+		}
+		@Html.DevExpress().ComboBox(settings =>
+   {
+	   settings.Name = "id_receiver";
+	   settings.Width = Unit.Percentage(100);
+	   settings.Properties.ValueField = "id";
+	   settings.Properties.TextField = "fullname_businessName";
+	   settings.Properties.ValueType = typeof(int);
+	   settings.Properties.Width = Unit.Percentage(100);
+	   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+	   settings.ClientEnabled = (codeState == "01");//(id_inventoryMove == 0);
+
+	   //settings.Properties.ClientSideEvents.Init = "OnReceiverInit";
+	   settings.ShowModelErrors = true;
+	   settings.Properties.ClientSideEvents.Validation = "OnReceiverValidation";
+
+   }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], id_receiver, rols)).Bind(id_receiver).GetHtml()
+	</td>
+</tr>
+<tr>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "reasonLabel";
+			settings.Text = "Motivo:";
+			settings.AssociatedControlName = "id_inventoryReason";
+		}).GetHtml()
+	</td>
+	<td>
+		@{
+			int? id_inventoryReason = (Model != null && Model.id_inventoryReason != null && Model.id_inventoryReason != 0) ? (int?)Model.id_inventoryReason : null;
+			bool mostrarOP = (Model != null && Model.InventoryReason != null && Model.InventoryReason.op != null) ? Model.InventoryReason.op.Value : false;
+			//ViewData["mostrarOP"] = mostrarOP;
+		}
+		@Html.Hidden("mostrarOP", mostrarOP)
+
+		@Html.DevExpress().ComboBox(settings =>
+		{
+			settings.Name = "id_inventoryReason";
+			settings.Width = Unit.Percentage(100);
+			settings.Properties.ValueField = "id";
+			settings.Properties.TextField = "name";
+			settings.Properties.ValueType = typeof(int);
+			settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			settings.ClientEnabled = (codeState == "01");
+			settings.ShowModelErrors = true;
+			settings.Properties.ClientSideEvents.Init = "OnReasonInit";
+			settings.Properties.ClientSideEvents.Validation = "OnReasonValidation";
+			settings.Properties.ClientSideEvents.SelectedIndexChanged = (!code.Equals("34")) ? "OnSelectedInventoryReasonChanged" : "";
+		}).BindList(DataProviderInventoryMove.InventoryReasonsByCompanyCodeDocumentTypeAndCurrent((int?)ViewData["id_company"], code, id_inventoryReason, true, false)).Bind(id_inventoryReason).GetHtml()
+		@*.BindList(DataProviderInventoryMove.InventoryReasonExit(Model.id_inventoryReason,true)).Bind(id_inventoryReason).GetHtml()*@
+	</td>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "warehouseLabel";
+			settings.Text = "Bodega:";
+		}).GetHtml()
+	</td>
+	<td>
+		@{
+			int? id_Warehouse = (Model != null && Model.idWarehouse != null && Model.idWarehouse != 0) ? (int?)Model.idWarehouse : null;
+		}
+		@Html.DevExpress().ComboBox(settings =>
+		{
+			settings.Name = "idWarehouse";
+			settings.Width = Unit.Percentage(100);
+			settings.Properties.ValueField = "id";
+			settings.Properties.TextField = "name";
+			settings.Properties.ValueType = typeof(int);
+			settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			settings.ClientEnabled = (codeState == "01");
+			settings.ReadOnly = (code == "34");
+
+			settings.ShowModelErrors = true;
+			settings.Properties.ClientSideEvents.Validation = "OnWarehouseValidation";
+			settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnWarehouse_SelectedIndexChanged";
+		}).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"])).Bind(id_Warehouse).GetHtml()
+	</td>
+</tr>
+
+<tr>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "id_costCenterLabel";
+			settings.Text = "C. Costo:";
+			settings.AssociatedControlName = "id_costCenter";
+		}).GetHtml()
+	</td>
+	<td>
+		@{
+			int? id_costCenter = (Model != null && Model.id_costCenter != null && Model.id_costCenter != 0) ? (int?)Model.id_costCenter : null;
+		}
+		@Html.DevExpress().ComboBox(settings =>
+   {
+	   settings.Name = "id_costCenter";
+	   settings.Width = Unit.Percentage(100);
+	   settings.Properties.ValueField = "id";
+	   settings.Properties.TextField = "name";
+	   settings.Properties.ValueType = typeof(int);
+	   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+	   settings.ClientEnabled = (codeState == "01");
+	   settings.ShowModelErrors = true;
+	   //settings.Properties.ClientSideEvents.Validation = "OnReasonValidation";
+	   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnSelectedInventoryCostCenterChanged";
+   }).BindList(DataProviderCostCenter.AllCostCenters()).Bind(id_costCenter).GetHtml()
+	</td>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "subCostCenterLabel";
+			settings.Text = "Sub. C.Costo:";
+		}).GetHtml()
+	</td>
+	<td>
+		@{
+			int? id_subCostCenter = (Model != null && Model.id_subCostCenter != null && Model.id_subCostCenter != 0) ? (int?)Model.id_subCostCenter : null;
+		}
+		@Html.DevExpress().ComboBox(settings =>
+   {
+	   settings.Name = "id_subCostCenter";
+	   settings.Width = Unit.Percentage(100);
+	   settings.Properties.ValueField = "id";
+	   settings.Properties.TextField = "name";
+	   settings.Properties.ValueType = typeof(int);
+	   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+	   settings.ClientEnabled = (codeState == "01");
+	   //settings.ReadOnly = (code == "34");
+
+	   settings.ShowModelErrors = true;
+	   settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "LoadSubCostCenter" };
+	   settings.Properties.ClientSideEvents.BeginCallback = "OnSubCostCenter_BeginCallback";
+	   //settings.Properties.ClientSideEvents.Validation = "OnWarehouseValidation";
+	   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnSubCostCenter_SelectedIndexChanged";
+   }).BindList(DataProviderCostCenter.SubCostCentersByCostCenterAndCurrent(id_costCenter, id_subCostCenter)).Bind(id_subCostCenter).GetHtml()
+	</td>
+</tr>
+<tr>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "requerimentLabel";
+			settings.Text = "Requerimiento No.:";
+		}).GetHtml()
+	</td>
+	<td>
+		@Html.DevExpress().TextBoxFor(m => m.numberReq, settings =>
+   {
+	   settings.Name = "numberReq";
+	   settings.Width = Unit.Percentage(100);
+	   settings.ShowModelErrors = true;
+	   settings.ReadOnly = true;
+   }).GetHtml()
+	</td>
+	<td>
+		@Html.DevExpress().Label(settings =>
+		{
+			settings.Name = "remGuideLabel";
+			settings.Text = "Guía No.:";
+		}).GetHtml()
+	</td>
+	<td>
+		@Html.DevExpress().TextBoxFor(m => m.numberRemGuide, settings =>
+   {
+	   settings.Name = "numberRemGuide";
+	   settings.Width = Unit.Percentage(100);
+	   settings.ShowModelErrors = true;
+	   settings.ReadOnly = true;
+   }).GetHtml()
+	</td>
+</tr>
+@if ((bool)mostrar)
+{
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_provider, settings =>
+	   {
+		   settings.Name = "id_providerLabel";
+		   settings.Text = "Proveedor:";
+		   settings.AssociatedControlName = "id_provider";
+
+	   }).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_provider, settings =>
+	   {
+		   settings.Name = "id_provider";
+		   settings.Properties.ClientInstanceName = "id_provider";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{1}";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				settings.Properties.Columns.Add("id", "Código.", 30);
+		   settings.Properties.Columns.Add("name", "Nombre", 120);
+		   settings.ShowModelErrors = true;
+	   }).BindList(DataProviderPerson.IceProvider()).GetHtml()
+		</td>
+		<td></td>
+		<td></td>
+	</tr>
+}
+@*@if (mostrarOP)
+	{*@
+@*<div id="divOP" style="display: block;">*@
+
+
+<tr>
+	<td>
+		@Html.DevExpress().LabelFor(m => m.id_customer, settings =>
+   {
+	   settings.Name = "id_customerLabel";
+	   settings.Text = "Cliente:";
+	   settings.AssociatedControlName = "id_customer";
+
+   }).GetHtml()
+	</td>
+	<td>
+		@{
+			int? id_customer = (Model != null && Model.id_customer != 0) ? (int?)Model.id_customer : null;
+			List<string> rolsCliente = new List<string>() { "Cliente Local", "Cliente Exterior" };
+		}
+
+		@Html.Partial(
+			"ComboBoxes/_PersonRolComboBoxPartial",
+				InventoryMoveController
+					.GetPersonRolComboBoxModel((int?)ViewData["id_company"], id_customer, "cliente"))
+
+	</td>
+	<td>
+		@Html.DevExpress().LabelFor(m => m.id_seller, settings =>
+   {
+	   settings.Name = "id_sellerLabel";
+	   settings.Text = "Vendedor:";
+	   settings.AssociatedControlName = "id_seller";
+
+   }).GetHtml()
+	</td>
+	<td>
+		@{
+			int? id_seller = (Model != null && Model.id_seller != 0) ? (int?)Model.id_seller : null;
+		}
+		@Html.DevExpress().ComboBoxFor(m => m.id_seller, settings =>
+   {
+	   settings.Name = "id_seller";
+	   settings.Properties.ClientInstanceName = "id_seller";
+	   settings.Properties.ValueField = "id";
+	   settings.Properties.TextFormatString = "{1}";
+	   settings.Properties.ValueType = typeof(int);
+	   settings.Width = Unit.Percentage(100);
+	   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+	   settings.ClientEnabled = (codeState == "01");
+	   settings.Properties.Columns.Add("id", "Código.", 30);
+	   settings.Properties.Columns.Add("fullname_businessName", "Nombre", 120);
+	   settings.ShowModelErrors = true;
+   }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], id_customer, "Vendedor")).Bind(id_seller).GetHtml()
+	</td>
+</tr>
+<tr>
+	<td>
+		@Html.DevExpress().LabelFor(m => m.noFactura, settings =>
+   {
+	   settings.Name = "noFacturaLabel";
+	   settings.Text = "No. de factura:";
+	   settings.AssociatedControlName = "noFactura";
+
+   }).GetHtml()
+	</td>
+	@if (valInvFact == "SI")
+	{
+		<td>
+			@{
+				int? id_invoice = (Model != null && Model.id_Invoice != 0) ? (int?)Model.id_Invoice : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_Invoice, settings =>
+		   {
+			   settings.Name = "id_Invoice";
+			   settings.Properties.ClientInstanceName = "id_Invoice";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextFormatString = "{0}";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.ClientEnabled = (codeState == "01");
+			   settings.Properties.Columns.Add("number", "No. Documento", 100);
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnInvoiceValidation";
+		   }).BindList(DataProviderDocument.DocumentsByCompanyAndInventory((int?)ViewData["id_company"], (int?)Model.id_Invoice)).Bind(id_invoice).GetHtml()
+		</td>
+	}
+	else
+	{
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.noFactura, settings =>
+			{
+				settings.Name = "noFactura";
+				settings.Properties.ClientInstanceName = "noFactura";
+				settings.Width = Unit.Percentage(100);
+				settings.ShowModelErrors = true;
+				settings.ClientEnabled = (codeState == "01");
+			}).GetHtml()
+		</td>
+	}
+
+
+	<td>
+		@Html.DevExpress().LabelFor(m => m.contenedor, settings =>
+   {
+	   settings.Name = "contenedorLabel";
+	   settings.Text = "Contenedor:";
+	   settings.AssociatedControlName = "contenedor";
+
+   }).GetHtml()
+	</td>
+	<td>
+		@Html.DevExpress().TextBoxFor(m => m.contenedor, settings =>
+   {
+	   settings.Name = "contenedor";
+	   settings.Properties.ClientInstanceName = "contenedor";
+	   settings.Width = Unit.Percentage(100);
+	   settings.ShowModelErrors = true;
+	   settings.ClientEnabled = (codeState == "01");
+   }).GetHtml()
+	</td>
+</tr>
+@*</div>*@
+@*//}*@

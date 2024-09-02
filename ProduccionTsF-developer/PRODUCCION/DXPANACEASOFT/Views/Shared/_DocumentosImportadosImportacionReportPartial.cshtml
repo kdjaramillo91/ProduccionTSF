@@ -1,0 +1,139 @@
+﻿@using System.Text;
+@model ImportResult.DocumentoImportado[]
+@{
+	this.Layout = "~/Views/Shared/_ReportLayout.cshtml";
+
+	var numColumnas = 18;
+	var filaEsquemaColumnas = new StringBuilder();
+	var filaVaciaColumnas = new StringBuilder();
+
+	filaEsquemaColumnas.Append(@"<tr class=""layout-setup"">");
+	filaVaciaColumnas.Append(@"<tr>");
+
+	for (var c = 0; c < numColumnas; c++)
+	{
+		filaEsquemaColumnas.Append(@"<td style=""width:12px;""></td>");
+		filaVaciaColumnas.Append(@"<td></td>");
+	}
+
+	filaEsquemaColumnas.Append(@"</tr>");
+	filaVaciaColumnas.Append(@"</tr>");
+}
+@section ReportStyles {
+	<style type="text/css">
+		@@page {
+			size: A4;
+			margin: 8mm 8mm 12mm 8mm;
+		}
+
+		thead {
+			display: table-header-group;
+		}
+
+		tfoot {
+			display: table-footer-group;
+		}
+	</style>
+	<style type="text/css">
+		.report-content, .report-content table {
+			width: 100%;
+			padding: 0;
+			border: none;
+			border-collapse: collapse;
+			table-layout: fixed;
+		}
+
+			.report-content .layout-setup td {
+				padding: 0;
+				height: 0;
+			}
+
+			.report-content td {
+				font-size: 12px;
+				vertical-align: text-top;
+				text-align: left;
+				padding: 1px;
+			}
+
+			.report-content .h1 {
+				font-size: 20px;
+				font-weight: 700;
+				text-align: center;
+				margin: 0;
+			}
+
+		.header-row {
+			background-color: #9fb482;
+			border: thin solid #2e2e2e;
+		}
+
+		.regular-row {
+			background-color: #e5eaea;
+			border: thin solid #2e2e2e;
+		}
+
+		.alternative-row {
+			background-color: #bec3c3;
+			border: thin solid #2e2e2e;
+		}
+	</style>
+}
+<table class="report-content">
+	<thead>
+		<tr>
+			<td>
+				<div style="page-break-inside:avoid;">
+					<table>
+						@Html.Raw(filaEsquemaColumnas)
+						<tr>
+							<td class="h1" style="vertical-align:middle;" colspan="12">
+								@this.ViewBag.ReportTitle
+							</td>
+						</tr>
+						@Html.Raw(filaVaciaColumnas)
+					</table>
+				</div>
+			</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<div style="page-break-inside:avoid;">
+					<table>
+						@Html.Raw(filaEsquemaColumnas)
+						<tr class="header-row">
+							<td class="center">
+								<b>Filas</b>
+							</td>
+							<td class="center" colspan="2">
+								<b>Núm. Documento</b>
+							</td>
+							<td class="center" colspan="2">
+								<b>Fecha de Proceso</b>
+							</td>
+							<td class="center" colspan="7">
+								<b>Descripción</b>
+							</td>
+						</tr>
+						@if (Model != null)
+						{
+							for (var i = 0; i < this.Model.Length; i++)
+							{
+								var documentoImportado = this.Model[i];
+								var csClass = (i % 2 == 0) ? "regular-row" : "alternative-row";
+								<tr class=@csClass>
+									<td>@documentoImportado.Filas</td>
+									<td colspan="2">@documentoImportado.NumDocumento</td>
+									<td colspan="2">@documentoImportado.FechaProceso.ToShortDateString()</td>
+									<td colspan="7">@documentoImportado.Descripcion</td>
+								</tr>
+							}
+						}
+						@Html.Raw(filaVaciaColumnas)
+					</table>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>

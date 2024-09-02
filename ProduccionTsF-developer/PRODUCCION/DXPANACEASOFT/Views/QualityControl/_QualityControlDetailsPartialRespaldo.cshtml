@@ -1,0 +1,159 @@
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.QualityControlDetail>
+
+@{
+    var grid = Html.DevExpress().GridView<QualityControlDetail>(settings => {
+        settings.Name = "gvQualityControlDetails";
+
+
+        settings.CallbackRouteValues = new { Controller = "QualityControl", Action = "QualityControlDetailsPartial" };
+        
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "QualityControl", Action = "QualityControlDetailsPartialUpdate" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+
+        settings.SettingsText.PopupEditFormCaption = "Editar Análisis";
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 640;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.CommandColumn.Visible = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            QualityControlDetail detail = (QualityControlDetail)Model[c.ItemIndex];
+            
+            if (detail != null && detail.QualityCorrectiveAction != null)
+            {
+                Html.RenderPartial("_QualityControlDetailsDetailPartial", detail.QualityCorrectiveAction);
+            }
+        });
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+
+            if (gv == null) return;
+
+            e.Properties["cpEditingRowIDQualityControlDetail"] = gv.GetRowValues(gv.EditingRowVisibleIndex, "id");
+
+            List<QualityControlDetail> rows = (Model as List<QualityControlDetail>);
+            rows = (rows != null) ? rows.ToList() : new List<QualityControlDetail>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        //id_qualityAnalysis
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_qualityAnalysis";
+            column.Name = "id_qualityAnalysis";
+            column.Width = Unit.Percentage(30);
+            column.Caption = "Análisis";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_qualityAnalysis = (int)DataBinder.Eval(c.DataItem, "id_qualityAnalysis");
+                var qualityAnalysis = DataProviderQualityAnalysis.QualityAnalysis(id_qualityAnalysis);
+                ViewContext.Writer.Write(qualityAnalysis !=  null ?  qualityAnalysis.name : "");
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "result";
+            column.Name = "result";
+            column.Width = Unit.Percentage(50);
+            column.Caption = "Resultado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var resultValue = (string)DataBinder.Eval(c.DataItem, "resultValue");
+                ViewContext.Writer.Write(resultValue);
+
+            });
+
+        });
+        
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isConforms";
+            column.Name = "isConformsQualityControlDetail";
+            column.Caption = "Conforme";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var isConforms = (bool)DataBinder.Eval(c.DataItem, "isConforms");
+                string text = (isConforms ? "<font color='green'>" + "Conforme" + "</font>" : "<font color='red'>" + "No Conforme" + "</font>");
+                ViewContext.Writer.Write(text);
+
+            });
+        });
+
+
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 4,
+            Caption = "Acciones",
+            Width = Unit.Percentage(5)
+        };
+
+        settings.Columns.Add(commandColumn);
+
+        #region EditorLayout
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            QualityControlDetail detail = new QualityControlDetail();
+            if (c.ItemIndex >= 0)
+            {
+                detail = Model[c.ItemIndex];
+            }
+            Html.RenderPartial("_QualityControlDetailsEditPartial", detail);
+            
+        });
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

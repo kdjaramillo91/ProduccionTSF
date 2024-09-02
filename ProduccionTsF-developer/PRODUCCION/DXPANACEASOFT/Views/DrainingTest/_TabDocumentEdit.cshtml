@@ -1,0 +1,172 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.DrainingTestDTO
+
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Tipo de Documento: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().TextBoxFor(model => model.documentType,
+            settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;
+            }).GetHtml()
+    </div>
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "No. Prueba: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().TextBoxFor(model => model.number,
+            settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;
+            }).GetHtml()
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Fecha de Emisión: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().DateEditFor(model => model.dateTimeEmision,
+            settings =>
+            {
+                settings.Name = "DateEmision";
+                settings.Properties.UseMaskBehavior = true;
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                settings.ReadOnly = Model != null && Model.idSate != 1 ? true : false;
+            }).GetHtml()
+    </div>
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Estado: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().TextBoxFor(model => model.state,
+            settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;
+            }).GetHtml()
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Fecha y Hora de la Prueba: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().DateEditFor(model => model.dateTimeTesting,
+            settings =>
+            {
+                settings.Name = "DateTimeTesting";
+                settings.Properties.UseMaskBehavior = true;
+                //settings.Properties.EditFormat = EditFormat.DateTime;
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy HH:mm";
+                settings.Properties.TimeSectionProperties.Visible = true;
+                settings.Properties.TimeSectionProperties.Adaptive = true;
+                settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+                settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "HH:mm";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                settings.ReadOnly = Model != null && Model.idSate != 1 ? true : false;
+            }).GetHtml()
+    </div>
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Analista: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.Partial("_ComboBoxAnalist")
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Temperatura: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().SpinEditFor(model => model.temp,
+            settings =>
+            {
+                settings.Name = "SpinEditTemp";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.Properties.MaxValue = 999;
+                settings.Properties.MinValue = -999;
+                settings.ReadOnly = !((bool)ViewBag.enabled);
+            }).GetHtml()
+    </div>
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Referencia: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().TextBoxFor(model => model.reference,
+            settings =>
+            {
+                settings.Name = "TextBoxReference";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = !((bool)ViewBag.enabled);
+            }).GetHtml()
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Descripción: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-10">
+        @Html.DevExpress().MemoFor(model => model.description,
+            settings =>
+            {
+                settings.Name = "MemoDescription";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = !((bool)ViewBag.enabled);
+            }).GetHtml()
+    </div>
+</div>

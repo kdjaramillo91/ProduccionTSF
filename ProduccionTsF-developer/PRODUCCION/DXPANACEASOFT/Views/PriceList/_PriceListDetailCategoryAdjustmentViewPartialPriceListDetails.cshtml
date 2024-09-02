@@ -1,0 +1,134 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using Newtonsoft.Json;
+
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.PriceListDetailCategoryAdjustment>
+
+
+@{
+    var grid = Html.DevExpress().GridView<PriceListDetailCategoryAdjustment>(settings =>
+    {
+        settings.Name = "gvPriceListDetailViewCategoryAdjustment" + ViewData["id_priceList"];
+        //settings.SettingsDetail.MasterGridName = "gvPriceList";
+        settings.CallbackRouteValues = new { Controller = "PriceList", Action = "PriceListDetailViewCategoryAdjustmentsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "PriceListDetailViewCategoryAdjustment_OnBeginCallback";
+        //settings.ClientSideEvents.Init = "PriceListDetailViewCategoryAdjustment_Init";
+
+        
+        settings.Width = Unit.Percentage(50);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Ajustes de Categorías</span>");
+        });
+
+        settings.KeyFieldName = "id";
+
+        //settings.BeforeGetCallbackResult += (s, e) =>
+        //{
+        //    var gv = s as MVCxGridView;
+
+        //    //gv.DataColumns["masterCode"].Visible = rowAux[0];//.ShowItem;
+        //    //gv.DataColumns["name"].Visible = rowAux[0];//.ShowItem;
+        //    //gv.DataColumns["itemTypeCategory"].Visible = rowAux[1];//.ShowItemTypeCategory;
+        //    //gv.DataColumns["itemSize"].Visible = rowAux[2];//.Showsize;
+        //    //gv.DataColumns["purchasePrice"].Visible = rowAux[3];//.ShowPurchasePrice;
+        //    //gv.DataColumns["salePrice"].Visible = rowAux[4];//.ShowSalePrice;
+        //    if (ViewData["ShowItem"] != null && ViewData["ShowItemTypeCategory"] != null && ViewData["Showsize"] != null &&
+        //       ViewData["ShowPurchasePrice"] != null && ViewData["ShowSalePrice"] != null)
+        //    {
+        //        gv.DataColumns["masterCode"].Visible = (bool)ViewData["ShowItem"];
+        //        gv.DataColumns["name"].Visible = (bool)ViewData["ShowItem"];
+        //        gv.DataColumns["itemTypeCategory"].Visible = (bool)ViewData["ShowItemTypeCategory"];
+        //        gv.DataColumns["itemSize"].Visible = (bool)ViewData["Showsize"];
+        //        gv.DataColumns["purchasePrice"].Visible = (bool)ViewData["ShowPurchasePrice"];
+        //        gv.DataColumns["salePrice"].Visible = (bool)ViewData["ShowSalePrice"];
+        //    }
+
+
+        //};
+
+        settings.SettingsPager.Visible = true;
+
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.SettingsBehavior.AllowSort = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        //settings.CustomJSProperties = (s, e) =>
+        //{
+        //MVCxGridView gv = s as MVCxGridView;
+        //if (gv == null)
+        //{
+        //    e.Properties["cpIdPriceList"] = 0;
+        //}else
+        //{
+        //    e.Properties["cpIdPriceList"] = ViewData["id_priceList"];
+        //}
+        //};
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "name";
+            column.Name = "id_itemGroupCategory";
+            //column.PropertiesEdit.ClientInstanceName = "name";
+            column.Caption = "Categoría";
+            //column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(70);
+            column.UnboundType = UnboundColumnType.String;
+            //column.Visible = (bool)ViewData["ShowItem"];
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_itemGroupCategory = (int?)DataBinder.Eval(c.DataItem, "id_itemGroupCategory");
+                ItemGroupCategory itemGroupCategory = DataProviderItemGroupCategory.ItemGroupCategoryById(id_itemGroupCategory);
+                if (itemGroupCategory != null)
+                {
+                    ViewContext.Writer.Write(itemGroupCategory.name);
+                }
+                else ViewContext.Writer.Write("");
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "adjustment";
+            column.Name = "adjustment";
+            column.Caption = "Ajuste";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(30);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal adjustment = (decimal)DataBinder.Eval(c.DataItem, "adjustment");
+                ViewContext.Writer.Write(adjustment.ToString("$#,0.000000"));
+            });
+        });
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,230 @@
+﻿
+@using System.Drawing
+@using DevExpress.CodeParser
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+                var grid = Html.DevExpress().GridView<ProductionLot>(settings =>
+                {
+                settings.Name = "gvProductionLotReceptions";
+                settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionsPartial" };
+
+                //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionsAddNew" };
+                //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionsUpdate" };
+                //settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionsDelete" };
+
+                settings.CommandColumn.Visible = true;
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.KeyFieldName = "id";
+
+                settings.SettingsPager.Visible = true;
+                settings.Settings.ShowGroupPanel = true;
+                settings.Settings.ShowFilterRow = true;
+                settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+                //Panel de Busqueda
+                settings.SettingsSearchPanel.Visible = true;
+                settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+                //Checkbox de registros de tabla
+                settings.CommandColumn.ShowSelectCheckbox = true;
+                settings.CommandColumn.Width = Unit.Percentage(3);
+                settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+                //Eventos
+                settings.ClientSideEvents.Init = "OnGridViewInit";
+                settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+                settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+                settings.Settings.ShowTitlePanel = true;
+                settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+                //Pie de tabla
+                settings.Settings.ShowFooter = true;
+
+                //Panel para cantidad de registros
+                settings.CustomJSProperties = (s, e) =>
+                {
+                    MVCxGridView gv = s as MVCxGridView;
+                    if (gv == null) return;
+
+                    e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+                    e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+                };
+
+                settings.SetTitlePanelTemplateContent(c =>
+                {
+                    ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Recepciones Cerradas</span>");
+                });
+
+                settings.SetFooterRowTemplateContent(c =>
+                {
+                    ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+                    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+                    {
+                        ViewContext.Writer.Write(
+                            @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                        );
+                    }
+                });
+
+                //Boton de filtro para las columnas de la tabla
+                settings.Settings.ShowFilterRowMenu = true;
+
+                settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+                settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+                settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+                settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+                settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+                settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+                settings.Styles.Header.Font.Bold = true;
+
+                #region ColumnsAdd
+
+                //Lote
+                settings.Columns.Add(m => m.number, column =>
+                {
+                    column.Name = "number";
+                    column.Caption = "Numero";
+                    column.ColumnType = MVCxGridViewColumnType.TextBox;
+                    column.Width = Unit.Percentage(12);
+                    //column.SortDescending();
+                });
+
+                settings.Columns.Add(m => m.internalNumber, column =>
+                {
+                    column.Name = "number";
+                    column.Caption = "Numero";
+                    column.ColumnType = MVCxGridViewColumnType.TextBox;
+                    column.Width = Unit.Percentage(12);
+                    //column.SortDescending();
+                });
+
+                settings.Columns.Add(m => m.receptionDate, column =>
+                {
+                    column.Name = "receptionDate";
+                    column.Caption = "Fecha de Recepción";
+                    column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+                    //column.EditorProperties().DateEdit(d =>
+                    //{
+                    //    d.EditFormat = "dd/MM/yyyy";
+                    //    d.EditFormatString = "dd/MM/yyyy";
+                    //});
+                    column.Width = Unit.Percentage(12);
+                });
+
+                settings.Columns.Add(m => m.ProductionUnit.name, column =>
+                {
+                    column.Name = "productionUnit";
+                    column.Caption = "Unidad de Producción";
+                    column.ColumnType = MVCxGridViewColumnType.TextBox;
+                    //column.Width = Unit.Percentage(15);
+                });
+
+                settings.Columns.Add(m => m.Provider.Person.fullname_businessName, column =>
+                {
+                column.Name = "proveedor";
+                column.Caption = "Proveedor";
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                //column.Width = Unit.Percentage(15);
+                column.SetDataItemTemplateContent(c =>
+                {
+                ProductionLot productionLot = (ProductionLot)Model[c.ItemIndex];
+                var company = DataProviderCompany.CompanyById(productionLot.id_company);
+                var text = productionLot.id_provider == null ? (company.businessName)  : productionLot.Provider.Person.fullname_businessName;
+                ViewContext.Writer.Write(text);
+                //ViewContext.Writer.Write(remission?.RemissionGuideDetail?.FirstOrDefault().RemissionGuideDetailPurchaseOrderDetail?.FirstOrDefault().PurchaseOrderDetail?.PurchaseOrder.Provider.Person.fullname_businessName ?? "");
+            });
+        });
+
+        //settings.Columns.Add(m => m.ProductionProcess.name, column =>
+        //{
+        //    column.Name = "productionProcess";
+        //    column.Caption = "Proceso";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //    //column.Width = Unit.Percentage(15);
+        //});
+
+        //settings.Columns.Add(m => m.Item.name, column =>
+        //{
+        //    column.Name = "item";
+        //    column.Caption = "Producto";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+        //    //column.Width = Unit.Percentage(15);
+        //    //column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+        //});
+
+        settings.Columns.Add(m => m.ProductionLotState.name, column =>
+        {
+            column.Name = "productionLotState";
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        });
+
+        //Botones de comandos para registros de la tabla
+        //MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+        //commandColumn.ShowEditButton = false;
+        //commandColumn.ShowDeleteButton = false;
+        //commandColumn.Visible = true;
+        //commandColumn.VisibleIndex = 20;
+        //commandColumn.Caption = "Acciones";
+        //commandColumn.Width = Unit.Percentage(5);
+        //commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        //commandColumn.AllowDragDrop = DefaultBoolean.False;
+        //commandColumn.CustomButtons.Add(
+        //    new GridViewCommandColumnCustomButton
+        //    {
+        //        ID = "btnUpdateProductionLotReception",
+        //        Text = "Editar"
+        //    }
+        //);
+        //settings.ClientSideEvents.CustomButtonClick = "OnClickUpdateProductionLotReception";
+        //settings.Columns.Add(commandColumn);
+
+        //settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        //settings.SettingsDetail.ShowDetailRow = true;
+
+        //settings.SetDetailRowTemplateContent(c =>
+        //{
+        //    int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+        //    ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id);
+        //    Html.RenderPartial("_ProductionLotReceptionDetailPartial", productionLot);
+        //});
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}
+
+
+

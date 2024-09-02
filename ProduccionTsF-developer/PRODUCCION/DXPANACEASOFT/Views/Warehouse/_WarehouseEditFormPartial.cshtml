@@ -1,0 +1,529 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.Warehouse
+
+
+<table class="table table-condensed">
+	@Html.Hidden("id_warehouse", Model.id)
+	<tr>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(m => m.code, settings =>
+	   {
+		   settings.Text = "Código:*";
+		   settings.AssociatedControlName = "code";
+
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+	   {
+		   settings.Name = "code";
+		   settings.Properties.ClientInstanceName = "code";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.NullText = "Código";
+		   settings.ShowModelErrors = true;
+		   settings.ClientVisible = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnCodeWarehousesValidation";
+
+	   }).GetHtml()
+		</td>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(m => m.id_warehouseType, settings =>
+	   {
+		   settings.Text = "Tipo de Bodega:*";
+		   settings.AssociatedControlName = "id_warehouseType";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@{
+				int? id_warehouseType = (Model != null && Model.id_warehouseType != 0) ? (int?)Model.id_warehouseType : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_warehouseType, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "id_warehouseType";
+
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.NullText = "Seleccione Tipo de Bodega";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnWarehousesWarehouseTypeValidation";
+	   }).BindList(DataProviderWarehouseType.WarehouseTypesByCompanyAndCurrent((int)ViewData["id_company"], id_warehouseType)).Bind(id_warehouseType).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 15%;">
+			@Html.DevExpress().Label(settings =>
+	   {
+		   settings.Text = "Nombre:*";
+		   settings.AssociatedControlName = "warehouseName";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@Html.DevExpress().TextBoxFor(m => m.name, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "warehouseName";
+
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.NullText = "Nombre de la Bodega";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnWarehousesNameValidation";
+	   }).GetHtml()
+		</td>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(m => m.id_inventoryLine, settings =>
+	   {
+		   settings.Text = "Linea de Inventario:*";
+		   settings.AssociatedControlName = "id_inventoryLine";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@{
+				int? id_inventoryLine = (Model != null && Model.id_inventoryLine != 0) ? (int?)Model.id_inventoryLine : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_inventoryLine, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "id_inventoryLine";
+
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.NullText = "Seleccione Linea de Inventario";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnWarehousesInventoryLineValidation";
+	   }).BindList(DataProviderInventoryLine.InventoryLinesByCompanyAndCurrent((int)ViewData["id_company"], id_inventoryLine)).Bind(id_inventoryLine).GetHtml()
+		</td>
+
+	</tr>
+	<tr>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(m => m.yearPeriod, settings =>
+	   {
+		   settings.Text = "Año:";
+		   settings.AssociatedControlName = "yearPeriod";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@{
+				int? yearPeriod = (Model != null && Model.yearPeriod != 0) ? (int?)Model.yearPeriod : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.yearPeriod, settings =>
+	   {
+		   settings.Name = "yearPeriod";
+		   settings.Properties.ClientInstanceName = "yearPeriod";
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "year";
+		   settings.Properties.ValueType = typeof(int);
+
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.ShowModelErrors = true;
+
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "PeriodNumberCombo_SelectedIndexChanged";
+	   }).BindList(DataProviderWarehouse.WarehouseYearPeriod(yearPeriod)).GetHtml()
+		</td>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(m => m.numberPeriod, settings =>
+	   {
+		   settings.Text = "Período de Inicio:";
+		   settings.AssociatedControlName = "numberPeriod";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@{
+				int? id_inventory = (Model != null && Model.id_inventoryValuaionPeriod != 0) ? (int?)Model.id_inventoryValuaionPeriod : null;
+				int? id_numberPeriod = (Model != null && Model.numberPeriod != 0) ? (int?)Model.numberPeriod : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.numberPeriod, settings =>
+	   {
+		   settings.Name = "numberPeriod";
+		   settings.Properties.ClientInstanceName = "numberPeriod";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "periodNumber";
+		   settings.Properties.ValueType = typeof(int);
+
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.ShowModelErrors = true;
+
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "DateInitCombo_SelectedIndexChanged";
+	   }).BindList(DataProviderWarehouse.ProductionSchedulePeriod(yearPeriod)).Bind(id_numberPeriod).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(m => m.dateInitPeriod, settings =>
+	   {
+		   settings.Text = "Fecha Inicio:";
+		   settings.AssociatedControlName = "dateInitPeriod";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+
+			@Html.DevExpress().DateEditFor(m => m.dateInitPeriod, settings =>
+	   {
+		   settings.Name = "dateInitPeriod";
+		   settings.Properties.ClientInstanceName = "dateInitPeriod";
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.NullDisplayText = "Desde";
+		   settings.Properties.NullText = "Desde";
+
+		   settings.Properties.DisplayFormatInEditMode = true;
+		   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+		   settings.Properties.EditFormat = EditFormat.Custom;
+		   settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+		   settings.Properties.CalendarProperties.Columns = 1;
+
+		   settings.Properties.DateRangeSettings.MinDayCount = 1;
+		   settings.Properties.DateRangeSettings.MaxDayCount = 90;
+		   settings.Properties.ValidationSettings.Display = Display.Static;
+		   settings.Properties.ClientSideEvents.Validation = "function(s, e){}";
+
+	   }).GetHtml()
+		</td>
+		<td style="width: 15%">
+			@Html.DevExpress().LabelFor(m => m.dateEndPeriod, settings =>
+	   {
+		   settings.Text = "Fecha Fin:";
+		   settings.AssociatedControlName = "dateEndPeriod";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+
+			@Html.DevExpress().DateEditFor(m => m.dateEndPeriod, settings =>
+	   {
+		   settings.Name = "dateEndPeriod";
+		   settings.Properties.ClientInstanceName = "dateEndPeriod";
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.NullDisplayText = "Desde";
+		   settings.Properties.NullText = "Desde";
+
+		   settings.Properties.DisplayFormatInEditMode = true;
+		   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+		   settings.Properties.EditFormat = EditFormat.Custom;
+		   settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+		   settings.Properties.CalendarProperties.Columns = 1;
+
+		   settings.Properties.DateRangeSettings.MinDayCount = 1;
+		   settings.Properties.DateRangeSettings.MaxDayCount = 90;
+		   settings.Properties.ValidationSettings.Display = Display.Static;
+		   settings.Properties.ClientSideEvents.Validation = "function(s, e){}";
+
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4">
+			@Html.DevExpress().ComboBoxFor(m => m.id_inventoryValuaionPeriod, settings =>
+		   {
+			   settings.Name = "id_inventoryValuaionPeriod";
+			   settings.Properties.ClientInstanceName = "id_inventoryValuaionPeriod";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "id_InventoryValuationPeriod";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.ClientVisible = false;
+
+		   }).BindList(DataProviderWarehouse.ProductionSchedulePeriodsByCompany((int)ViewData["id_company"], id_inventory)).Bind(id_inventory).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(
+				m => m.enableProductionCost,
+				label =>
+				{
+					label.Name = "costeoProduccionLabel";
+					label.Text = "Costeo de Producción:*";
+					label.AssociatedControlName = "enableProductionCost";
+				}).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@{
+				var enableProductionCost = (this.Model != null)
+					? (bool?)this.Model.enableProductionCost
+					: null;
+
+				var enableProductionCostValues = DataProviderProductionCostPoundType
+					.GetEnableProductionCostValues();
+			}
+			@Html.DevExpress().ComboBox(
+				comboBox =>
+				{
+					comboBox.Name = "enableProductionCost";
+					comboBox.Properties.ClientInstanceName = "enableProductionCost";
+					comboBox.Width = Unit.Percentage(100);
+
+					comboBox.Properties.ValueField = "Value";
+					comboBox.Properties.TextField = "Text";
+					comboBox.Properties.ValueType = typeof(bool);
+
+					comboBox.Properties.NullText = "Seleccione Costo de Producción";
+					comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					comboBox.ShowModelErrors = true;
+
+					comboBox.Properties.ClientSideEvents.Validation = "OnEnableProductionCostType_Validation";
+					comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnEnableProductionCostType_SelectedIndexChanged";
+
+				}).BindList(enableProductionCostValues).Bind(enableProductionCost).GetHtml()
+		</td>
+		<td style="width: 15%;">
+			@Html.DevExpress().LabelFor(
+				m => m.id_productionCostPoundType,
+				label =>
+				{
+					label.Name = "id_productionCostPoundTypeLabel";
+					label.Text = "Tipo de Libras:*";
+					label.AssociatedControlName = "id_productionCostPoundType";
+				}).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@{
+				var id_productionCostPoundType = (this.Model != null)
+					? this.Model.id_productionCostPoundType
+					: null;
+
+				if (id_productionCostPoundType.HasValue && id_productionCostPoundType.Value <= 0)
+				{
+					id_productionCostPoundType = null;
+				}
+
+				var productionCostPoundTypeList = DataProviderProductionCostPoundType
+					.ProductionCostPoundTypeByCurrent(id_productionCostPoundType);
+			}
+			@Html.DevExpress().ComboBoxFor(
+				m => m.id_productionCostPoundType,
+				comboBox =>
+				{
+					comboBox.Name = "id_productionCostPoundType";
+					comboBox.Properties.ClientInstanceName = "id_productionCostPoundType";
+					comboBox.Width = Unit.Percentage(100);
+
+					comboBox.Properties.ValueField = "id";
+					comboBox.Properties.TextField = "name";
+					comboBox.Properties.ValueType = typeof(int);
+
+					comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					comboBox.ShowModelErrors = true;
+
+					if (this.Model != null)
+					{
+						comboBox.ClientEnabled = this.Model.enableProductionCost;
+					}
+					else
+					{
+						comboBox.ClientEnabled = false;
+					}
+
+					comboBox.Properties.ClientSideEvents.Validation = "OnProductionCostPoundTypeCombo_Validation";
+
+				}).BindList(productionCostPoundTypeList).Bind(id_productionCostPoundType).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 15%">
+			@Html.DevExpress().LabelFor(m => m.description, settings =>
+	   {
+		   settings.Text = "Descripción:";
+		   settings.AssociatedControlName = "description";
+	   }).GetHtml()
+		</td>
+		<td colspan="3" style="width: 85%">
+			@Html.DevExpress().MemoFor(m => m.description, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "description";
+
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.NullText = "";
+		   settings.ShowModelErrors = true;
+	   }).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 15%">
+			@Html.DevExpress().LabelFor(m => m.allowsNegativeBalances, settings =>
+	   {
+		   settings.Name = "allowsNegativeBalancesLabel";
+		   settings.Text = "Permite Saldos Negativos:";
+		   settings.AssociatedControlName = "allowsNegativeBalancesLabel";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@Html.DevExpress().CheckBoxFor(m => m.allowsNegativeBalances, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "allowsNegativeBalances";
+		   settings.Width = Unit.Percentage(100);
+
+	   }).GetHtml()
+		</td>
+		<td style="width: 15%">
+			@Html.DevExpress().LabelFor(m => m.applyinCost, settings =>
+	   {
+		   settings.Name = "applyinCostLabel";
+		   settings.Text = "Aplicar a Costo:";
+		   settings.AssociatedControlName = "applyinCostLabel";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@Html.DevExpress().CheckBoxFor(m => m.applyinCost, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "applyinCost";
+		   settings.Width = Unit.Percentage(100);
+
+	   }).GetHtml()
+		</td>
+
+
+	</tr>
+	<tr>
+		<td style="width: 15%">
+			@Html.DevExpress().LabelFor(m => m.requirePerson, settings =>
+	   {
+		   settings.Name = "requirePersonLabel";
+		   settings.Text = "Requiere Persona:";
+		   settings.AssociatedControlName = "requirePersonLabel";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@Html.DevExpress().CheckBoxFor(m => m.requirePerson, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "requirePerson";
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.ClientSideEvents.CheckedChanged = "requierePerson_CheckedChanged";
+
+	   }).GetHtml()
+		</td>
+		<td style="width: 15%">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_rolesLabel";
+				settings.Text = "Roles: ";
+				settings.AssociatedControlName = "ids_Roles";
+			}).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@{
+				var idsRoles = (!String.IsNullOrEmpty(this.Model.ids_Roles))
+					? this.Model.ids_Roles.Split('|')
+						.Select(e => Convert.ToInt32(e))
+						.ToArray()
+					: new int[] { };
+
+				var roles = DataProviderRol.RoByIds(idsRoles);
+			}
+			@Html.DevExpress().TokenBox(settings =>
+		   {
+			   settings.Name = "ids_Roles";
+			   settings.Properties.ClientInstanceName = "ids_Roles";
+			   settings.Width = Unit.Percentage(40);
+			   settings.SetDefaultSettings();
+			   settings.ClientEnabled = false;
+
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ItemValueType = typeof(string);
+
+			   settings.Properties.AllowCustomTokens = true;
+
+			   settings.Properties.Tokens.AddRange(roles.Select(r => r.name).ToList());
+
+			   settings.ShowModelErrors = true;
+			   settings.CustomJSProperties = (s, e) =>
+			   {
+				   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+				   e.Properties["cpIsRequired"] = "true";
+				   e.Properties["cpHasTab"] = "false";
+			   };
+		   }).BindList(DataProviderRol.RolCustomerProvider()).GetHtml()
+		</td>
+
+	</tr>
+	<tr>
+
+		<td style="width: 15%">
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+	   {
+		   settings.Text = "¿Activo?:";
+		   settings.AssociatedControlName = "isActive";
+	   }).GetHtml()
+		</td>
+		<td style="width: 35%">
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "isActive";
+
+		   settings.Width = Unit.Percentage(100);
+	   }).GetHtml()
+		</td>
+		<td colspan="2"></td>
+	</tr>
+	@*<tr class="conf-gasto-plantilla">
+		<td colspan="4" style="width:100%">
+			@{
+				var ls = (Model != null && Model.WarehouseExpenseAccountingTemplate != null) ? Model.WarehouseExpenseAccountingTemplate : new List<WarehouseExpenseAccountingTemplate>();
+				Html.RenderPartial("_WarehousesExpensesTempAccDetailPartial", ls);
+			}
+		</td>
+	</tr>*@
+	<tr>
+		<td colspan="4" style="text-align: right;">
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnUpdate";
+				settings.Text = "Actualizar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+			}).GetHtml()
+			@Html.DevExpress().Button(settings =>
+			{
+				settings.Name = "btnCancel";
+				settings.Text = "Cancelar";
+				settings.RenderMode = ButtonRenderMode.Button;
+				settings.ImagePosition = ImagePosition.Left;
+				settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+				settings.UseSubmitBehavior = false;
+				settings.ClientSideEvents.Click = "ButtonCancel_Click";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr id="warehouseAlertRow" style="display: none;">
+		<td colspan="4">
+			<div class="alert alert-danger fade in" style="margin-top:18px;">
+				<button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+				<span id="warehouseErrorMessage"></span>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<script src="~/Scripts/warehouse/editform.js"></script>

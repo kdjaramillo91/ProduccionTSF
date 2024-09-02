@@ -1,0 +1,300 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    Item _item = (Model as Item);
+    ItemGeneral itemGeneral = _item.ItemGeneral ?? new ItemGeneral();
+}
+
+<div style="width: 100%; overflow: auto;">
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr>
+            <td>
+                <table class="table table-condensed">
+                    <tr class="no-border">
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           settings.Text = "Grupo:";
+                           settings.AssociatedControlName = "id_group";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @{
+                                var itemGroups = DataProviderItemGroup.ItemGroups((int)ViewData["id_company"]);
+
+                                var id_group = itemGeneral.id_group;
+                                ViewData["id_group"] = id_group;
+
+                                Html.RenderPartial("_ComboBoxItemGroupPartial", itemGroups);
+                            }
+                        </td>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           settings.Text = "Fabricante:";
+                           settings.AssociatedControlName = "manufacturer";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBox(settings =>
+                       {
+                           settings.Name = "manufacturer";
+                           settings.ControlStyle.CssClass = "editor";
+                       }).Bind(itemGeneral.manufacturer).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           settings.Text = "País de Origen:";
+                           settings.AssociatedControlName = "id_countryOrigin";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_countryOrigin";
+                           settings.ControlStyle.CssClass = "editor";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.ValueType = typeof(int);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                       }).BindList(DataProviderCountry.Contries((int)ViewData["id_company"])).Bind(itemGeneral.id_countryOrigin).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           settings.Text = "Subgrupo:";
+                           settings.AssociatedControlName = "id_subgroup";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @{
+                                var itemSubGroups = DataProviderItemGroup.ItemSubGroupsOfGroup(itemGeneral.id_group);
+
+                                var id_subgroup = itemGeneral.id_subgroup;
+                                ViewData["id_subgroup"] = id_subgroup;
+
+                                Html.RenderPartial("_ComboBoxItemSubGroupPartial", itemSubGroups);
+                            }
+                        </td>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           //settings.ControlStyle.CssClass = "label";
+                           settings.Text = "Categoría:";
+                           settings.AssociatedControlName = "id_groupCategory";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @{
+                                //int? id_groupAux = itemGeneral.id_subgroup ?? itemGeneral.id_group;
+                                var itemGroupCategories = DataProviderItemGroupCategory.ItemCategories();
+
+                                var id_groupCategory = itemGeneral.id_groupCategory;
+                                ViewData["id_groupCategory"] = id_groupCategory;
+
+                                Html.RenderPartial("_ComboBoxItemGroupCategoryPartial", itemGroupCategories);
+                            }
+                        </td>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           settings.Text = "Marca:";
+                           settings.AssociatedControlName = "id_trademark";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_trademark";
+                           settings.ControlStyle.CssClass = "editor";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.ValueType = typeof(int);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.ClientSideEvents.Validation = "OnFinalProductValidation";
+                       }).BindList(DataProviderItemTrademark.ItemTrademarks((int)ViewData["id_company"])).Bind(itemGeneral.id_trademark).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           //settings.ControlStyle.CssClass = "label";
+                           settings.Text = "Modelo:";
+                           settings.AssociatedControlName = "id_trademarkModel";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_trademarkModel";
+                           settings.ControlStyle.CssClass = "editor";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.ValueType = typeof(int);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.ClientSideEvents.Validation = "OnFinalProductValidation";
+                       }).BindList(DataProviderItemTrademarkModel.ItemTrademarkModels()).Bind(itemGeneral.id_trademarkModel).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           settings.Text = "Color:";
+                           settings.AssociatedControlName = "id_color";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_color";
+                           settings.ControlStyle.CssClass = "editor";
+                           settings.Properties.TextField = "code";
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.ValueType = typeof(int);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.ClientSideEvents.Validation = "OnFinalProductValidation";
+                       }).BindList(DataProviderItemColor.ItemsColors()).Bind(itemGeneral.id_color).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                       {
+                           //settings.ControlStyle.CssClass = "label";
+                           settings.Text = "Talla:";
+                           settings.AssociatedControlName = "id_size";
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_size";
+                           settings.ControlStyle.CssClass = "editor";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.ValueType = typeof(int);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.ClientSideEvents.Validation = "OnFinalProductValidation";
+                       }).BindList(DataProviderItemSize.ItemSizes()).Bind(itemGeneral.id_size).GetHtml()
+                        </td>
+                    </tr>
+					<tr>
+						<td>
+							@{
+								Boolean isVisible = false;
+								int idInventoryLine = _item.id_inventoryLine;
+								if (idInventoryLine != 0)
+								{
+
+									InventoryLine _inventoryLine = DataProviderInventoryLine.InventoryLineById(idInventoryLine);
+									isVisible = (_inventoryLine.code == "PT" || _inventoryLine.code == "PP");
+								}
+
+
+
+							}
+							@Html.DevExpress().Label(settings =>
+					   {
+						   //settings.ControlStyle.CssClass = "label";
+						   settings.Text = "Cliente del Exterior:";
+						   settings.AssociatedControlName = "id_Person";
+						   settings.ClientVisible = isVisible;
+						   settings.Name = "id_PersonLabel";
+						   settings.Properties.ClientInstanceName = "id_PersonLabel";
+					   }).GetHtml()
+						</td>
+						<td>
+
+							@Html.DevExpress().ComboBox(settings =>
+					   {
+						   settings.Name = "id_Person";
+						   settings.Properties.ClientInstanceName = "id_Person";
+						   settings.ControlStyle.CssClass = "editor";
+						   settings.Properties.TextField = "fullname_businessName";
+						   settings.Properties.ValueField = "id";
+						   settings.Properties.ValueType = typeof(int);
+						   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						   settings.ClientVisible = isVisible;
+
+					   }).BindList(DataProviderPerson.CustomersExteriorByCompany((int)ViewData["id_company"])).Bind(itemGeneral.id_Person).GetHtml()
+						</td>
+
+						@*<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Text = "Certificado Asc:";
+				settings.AssociatedControlName = "isASC";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().CheckBox(settings =>
+			{
+				settings.Name = "isASC";
+				settings.Properties.ClientInstanceName = "isASC";
+				settings.ControlStyle.CssClass = "editor";
+			}).Bind(itemGeneral.isASC).GetHtml()
+		</td>*@
+						<td>
+							@Html.DevExpress().Label(settings =>
+						   {
+							   settings.Text = "Certificado:";
+							   settings.AssociatedControlName = "id_certification";
+						   }).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBox(settings =>
+					   {
+						   settings.Name = "id_certification";
+						   settings.Properties.ClientInstanceName = "id_certification";
+						   settings.Width = Unit.Percentage(100);
+						   settings.Properties.ValueField = "id";
+						   settings.Properties.TextField = "name";
+						   settings.Properties.ValueType = typeof(int);
+
+						   settings.ShowModelErrors = true;
+						   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					   }).BindList(DataProviderCertification.CertificationsByCompanyAndCurrent(itemGeneral.id_certification)).Bind(itemGeneral.id_certification).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().Label(settings =>
+							{
+								//settings.ControlStyle.CssClass = "label";
+								settings.Text = "Mes Vida Util:";
+								settings.AssociatedControlName = "mesVidaUtil";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().SpinEdit(settings =>
+							{
+								settings.Name = "mesVidaUtil";
+								settings.Properties.ClientInstanceName = "mesVidaUtil";
+								settings.ControlStyle.CssClass = "editor";
+
+								settings.Properties.NumberType = SpinEditNumberType.Integer;
+								settings.Properties.DecimalPlaces = 0;
+								settings.Properties.AllowMouseWheel = true;
+								settings.Properties.Increment = 0.1M;
+								settings.Properties.LargeIncrement = 1;
+								settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+								settings.ShowModelErrors = true;
+                            }).Bind(itemGeneral.mesVidaUtil).GetHtml()
+							
+						</td>
+					</tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

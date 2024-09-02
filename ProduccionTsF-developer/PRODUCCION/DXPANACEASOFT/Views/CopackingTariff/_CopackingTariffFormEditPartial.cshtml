@@ -1,0 +1,217 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.CopackingTariff
+
+
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditCopackingTariff", name = "formEditCopackingTariff" }))
+{
+    
+
+    @Html.Hidden("id_CopackingTariff", Model.id)
+     
+    <table id="transportTariffTable" class="table table-condensed">
+        <tr>
+            <td  width="18%">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "codeLabel";
+                    settings.Text = "Código: *";
+                    settings.AssociatedControlName = "code";
+                }).GetHtml()
+            </td>
+            <td  width="25%">
+                @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+               {
+                   
+                   settings.Name = "code";
+                   settings.Properties.ClientInstanceName = "code";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Properties.MaxLength = 20;
+                   settings.ShowModelErrors = true;
+                   
+                   settings.Properties.ClientSideEvents.Validation = "OnTTCodeValidation";
+               
+               }).GetHtml()
+            </td>
+            <td width="15%"></td>
+            <td width="18%">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "nameLabel";
+                    settings.Text = "Nombre: *";
+                    settings.AssociatedControlName = "name";
+                }).GetHtml()
+            </td>
+            <td width="25%">
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+               {
+                   settings.Name = "name";
+                   settings.Properties.ClientInstanceName = "name";
+                   settings.Width = Unit.Percentage(100);
+                   settings.Properties.MaxLength = 100;
+                   settings.ShowModelErrors = true;
+                   settings.Properties.ClientSideEvents.Validation = "OnTTNameValidation";
+               }).GetHtml()
+            </td>
+           
+        </tr>        
+        <tr>
+            <td width="18%">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "dateInitTransportTariffLabel";
+                    settings.Text = "Inicio Vigencia Tarifario: *";
+                    settings.AssociatedControlName = "dateInit";
+                }).GetHtml()
+            </td>
+            <td width="25%">
+                @{
+                    var _dateInit = (Model != null && Model.dateInit.Year != 1) ? (DateTime?)Model.dateInit : null;
+                }
+                @Html.DevExpress().DateEditFor(m => m.dateInit, settings =>
+               {
+                   settings.Name = "dateInit";
+                   settings.Properties.ClientInstanceName = "dateInit";
+                   settings.Width = Unit.Percentage(100);
+                   //  settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                   settings.ShowModelErrors = true;
+                   settings.Properties.ClientSideEvents.Validation = "OnTTValidateDatesRangeInit";
+                   settings.Properties.ClientSideEvents.DateChanged = "OnTTChangeDatesRangeInit";
+                   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                   //settings.ReadOnly = (_dateInit == null) ? false : true;
+               }).GetHtml()
+            </td>
+            <td width="15%"></td>
+            <td width="18%">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "dateEndTransportTariffLabel";
+                    settings.Text = "Final Vigencia Tarifario: *";
+                    settings.AssociatedControlName = "dateEnd";
+                }).GetHtml()
+            </td>
+            <td width="25%">
+                @{
+                    var _dateEnd = (Model != null && Model.dateEnd.Year != 1) ? (DateTime?)Model.dateEnd : null;
+                }
+                @Html.DevExpress().DateEditFor(m => m.dateEnd, settings =>
+           {
+               settings.Name = "dateEnd";
+               settings.Properties.ClientInstanceName = "dateEnd";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnTTValidateDatesRangeEnd";
+               settings.Properties.ClientSideEvents.DateChanged = "OnTTChangeDatesRangeEnd";
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               //settings.ReadOnly = (_dateEnd == null) ? false : true;
+           }).GetHtml()
+            </td>
+            
+        </tr>
+
+        <tr>
+            <td width="18%">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "id_providerLabel";
+                    settings.Text = "Proveedor: *";
+                    settings.AssociatedControlName = "dateEnd";
+                }).GetHtml()
+            </td>
+            <td width="25%" colspan="2">
+                @{
+                    var id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_provider, settings =>
+           {
+
+               settings.Name = "id_provider";
+               settings.Properties.ClientInstanceName = "id_provider";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.Columns.Add("id", "Código", 40);
+               settings.Properties.Columns.Add("name", "Proveedor.", 130);
+               settings.Properties.TextFormatString = "{1}";
+               settings.Properties.TextField = "name";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnTTTransportTypeValidation";
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "CopackingTariffType_SelectedIndexChanged";
+
+              // settings.ReadOnly = (id_provider == null) ? false : true;
+
+           }).BindList(DataProviderCopackingTariff.GetPersonCopacking((int)ViewData["id_company"])).Bind(id_provider).GetHtml()
+        </tr>
+         
+        <tr>
+            <td width="18%">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "isActiveLabel";
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "is_Active";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Name = "isActive";
+                    settings.Properties.ClientInstanceName = "isActive";
+
+                    
+                }).GetHtml()
+            </td>
+            <td width="30%" colspan="2"></td>
+        </tr>
+        <tr>
+            <td  colspan="5">
+                <div id="objTariffTransportDetail">
+                </div>
+                        @{
+                            if(Model != null  && Model.CopackingTariffDetail != null && Model.id !=0 )
+                            {
+
+                                var CopackingTariffDetail = Model.CopackingTariffDetail.ToList();
+                                Html.RenderPartial("_CopackingTariffDetailPartial", CopackingTariffDetail);
+                            }
+                             
+                        }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr id="transportTariffAlertRow" style="display: none;">
+            <td colspan="6">
+                <div class="alert alert-danger fade in" style="margin-top:18px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                    <span id="transportTariffErrorMessage"></span>
+                </div>
+            </td>
+        </tr>
+
+    </table>
+ }

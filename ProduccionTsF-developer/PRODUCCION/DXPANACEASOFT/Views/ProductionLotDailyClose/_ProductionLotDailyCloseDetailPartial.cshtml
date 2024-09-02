@@ -1,0 +1,41 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLotDailyClose
+
+<table class="table table-condensed">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{  
+                ViewData["id_productionLotDailyClose"] = (Model != null) ? Model.id : 0;
+
+                Html.DevExpress().PageControl(tabs =>
+                {
+                    tabs.Name = "tabControl" + ViewData["id_productionLotDailyClose"];
+                    tabs.Width = Unit.Percentage(100);
+                    tabs.Height = Unit.Pixel(200);
+
+                    tabs.TabPages.Add(tab =>
+                    {
+                        tab.Name = "tabProductionLotsDetails";
+                        tab.Text = "Detalle";
+                        tab.TabStyle.Width = Unit.Percentage(100);
+                        tab.SetContent(() =>
+                        {
+                            var productionLotsDetail = (Model != null && Model.ProductionLotDailyCloseDetail != null) ? Model.ProductionLotDailyCloseDetail.ToList() : new List<ProductionLotDailyCloseDetail>();
+                            Html.RenderPartial("_ProductionLotDailyCloseDetailProductionLotsPartial", productionLotsDetail.OrderBy(od => od.id_productionLot).ToList());
+                        });
+                    });
+                }).Render();
+            }
+        </td>
+    </tr>
+</table>
+

@@ -1,0 +1,96 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.SalesOrderDTO
+
+<div>
+    <div class="MyContainer" id="divGridViewDetails">
+        @{
+            if (Model.code_documentType == "139" && (ViewBag.enabled == null || (bool)ViewBag.enabled))
+            {
+                @Html.Partial("_OptionalFilters")
+                @*@Html.Partial("PanelButtonsDetailEdit")*@
+            }
+            if (Model.code_documentType == "140" && (ViewBag.enabled == null || (bool)ViewBag.enabled))
+            {
+                @Html.Partial("_HeadDetailsProduct")
+                <br />
+                @*@Html.Partial("PanelButtonsDetailEdit")*@
+            }
+            if ((ViewBag.enabled == null || (bool)ViewBag.enabled))
+            {
+                @Html.Partial("_GridMessageErrorDetail")
+                @Html.Partial("PanelButtonsDetailEdit")
+            }
+        }
+        @Html.Partial("_GridViewDetails", Model.SalesOrderDetails)
+    </div>
+	<div class="Etiqueta"><b>Inf. Adicional</b></div>
+	<hr style="width: 100%; margin: 0px;">
+	<div class="MyContainer">
+		<div class="row">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   //settings.ControlStyle.Font.Size = FontUnit.Large;
+					   settings.ControlStyle.Font.Bold = true;
+					   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+					   settings.Text = "Total CM: ";
+				   }).GetHtml()
+			</div>
+			<div class="col-sm-4">
+				@{
+					var totalCM = Model.totalCM;
+				}
+				@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Name = "labelTotalCM";
+			   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+			   //settings.ControlStyle.Font.Size = FontUnit.Large;
+			   //settings.ControlStyle.Font.Bold = true;
+		   }).Bind(totalCM).GetHtml()
+			</div>
+			<div class="col-sm-2">
+			</div>
+			<div class="col-sm-4">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   //settings.ControlStyle.Font.Size = FontUnit.Large;
+					   settings.ControlStyle.Font.Bold = true;
+					   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+					   settings.Text = "Neto: ";
+				   }).GetHtml()
+			</div>
+			<div class="col-sm-2">
+				@{
+					var netoLbs = Model.netoLbs;
+				}
+				@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Name = "labelNetoLbs";
+			   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+			   //settings.ControlStyle.Font.Size = FontUnit.Large;
+			   //settings.ControlStyle.Font.Bold = true;
+		   }).Bind(netoLbs).GetHtml()
+			</div>
+			<div class="col-sm-2">
+				@{
+					var netoKg = Model.netoKg;
+				}
+				@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Name = "labelNetoKg";
+			   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+			   //settings.ControlStyle.Font.Size = FontUnit.Large;
+			   //settings.ControlStyle.Font.Bold = true;
+		   }).Bind(netoKg).GetHtml()
+			</div>
+			<div class="col-sm-6">
+			</div>
+		</div>
+	</div>
+</div>

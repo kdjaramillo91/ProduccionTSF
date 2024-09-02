@@ -1,0 +1,105 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvSettingNotification";
+        settings.KeyFieldName = "id";
+        settings.CallbackRouteValues = new { Controller = "SettingNotification", Action = "GridViewSettingNotification" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.AllPages;
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+        settings.ClientSideEvents.SelectionChanged = "On_GridView_SelectionChanged";
+        settings.ClientSideEvents.RowDblClick = "On_GridView_DobleClick";
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Columns.Add(c => {
+            c.FieldName = "title";
+            c.Caption = "Titulo";
+            c.EditorProperties().TextBox(p => {
+                p.NullText = "Nombre o Titulo de la Notificación";
+            });
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "description";
+            c.Caption = "Descripción";
+            c.Visible = false;
+            c.EditorProperties().Memo(p => {
+                p.NullText = "Detalles que desee especificar";
+            });
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "id_documentType";
+            c.Caption = "Tipo de Documento";
+            c.EditorProperties().ComboBox(p => {
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+                p.DataSource = DataProviderDocumentType.DocumentTypes();
+                p.NullText = "Tipo de Documento que cambia";
+            });
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "id_documentState";
+            c.Caption = "Modificado A";
+            c.EditorProperties().ComboBox(p => {
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+                p.DataSource = DataProviderDocumentState.DocumentStates();
+                p.NullText = "Nuevo Estado del Tipo de Documento";
+            });
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "sendByMail";
+            c.Caption = "Enviar Correo";
+            c.EditorProperties().CheckBox(p => {
+                p.ValueType = typeof(bool);
+            });
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "addressesMails";
+            c.Caption = "Notificar A";
+            c.Visible = false;
+            c.EditorProperties().Memo(p => {
+                p.NullText = "Escriba los correos separados por (;)";
+            });
+        });
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+            var settingNotification = DataProviderNotification.SettingNotification(id);
+
+            settingNotification = settingNotification ?? new SettingNotification();
+
+            Html.RenderPartial("_FormEdit", settingNotification);
+        });
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

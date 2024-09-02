@@ -1,0 +1,34 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.Document
+
+@{
+    string codeState = "01";
+    if (Model != null)
+    {
+        DocumentState _documentState = DataProviderDocumentState.DocumentStateByCodeCompany(Model.id_documentState, (int)ViewData["id_company"]);
+        codeState = _documentState.code;
+    }
+
+}
+
+
+<tr>
+    <td>
+        @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Name = "descriptionDocumentLabel";
+                settings.Text = "Descripción:";
+                settings.AssociatedControlName = "descriptionDocument";
+            }).GetHtml()
+    </td>
+    <td colspan="5">
+        @Html.DevExpress().MemoFor(m => m.description, settings =>
+            {
+                settings.Name = "descriptionDocument";
+                settings.Properties.ClientInstanceName = "descriptionDocument";
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+    </td>
+</tr>

@@ -1,0 +1,70 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionUnit
+
+
+@{
+    ProductionUnit productionUnit = Model ?? new ProductionUnit();
+}
+
+@Html.Hidden("id_productionUnit", productionUnit.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>Nombre:</td>
+        <td colspan="4">
+            @Html.Raw(productionUnit.name)
+        </td>
+    </tr>
+    <tr>
+        <td>Sucursal:</td>
+        <td colspan="4">
+            @{
+                BranchOffice branchOffice = DataProviderBranchOffice.BranchOfficeById(productionUnit.id_branchOffice);
+                string code = (branchOffice != null) ? branchOffice.code.ToString().PadLeft(3, '0') : "";
+            }
+            @Html.Raw(code)
+        </td>
+    </tr>
+    <tr>
+        <td>Descripción:</td>
+        <td colspan="4">
+            @Html.Raw(productionUnit.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">Creado por:</td>
+        <td style="width: 10%;">
+            @Html.Raw(GetUserName(productionUnit.id_userCreate))
+        </td>
+        <td style="width: 10%;">Fecha de Creación:</td>
+        <td>
+            @Html.Raw(productionUnit.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>
+            @Html.Raw(GetUserName(productionUnit.id_userUpdate))
+        </td>
+        <td>Fecha de Modificaci&oacute;n:</td>
+        <td>
+            @Html.Raw(productionUnit.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}
+
+

@@ -1,0 +1,44 @@
+﻿@*@using DXPANACEASOFT.DataProviders
+    @using DXPANACEASOFT.Models
+    @{
+        Layout = null;
+    }
+
+    <h4>Ordenes de Producción</h4>
+    @{
+        ViewData["Model"] = new DXPANACEASOFT.Models.SalesOrder()
+        {
+            Document = new Document
+            {
+                DocumentType = null//DataProviderDocumentType.DocumentTypeByCode("11")
+            }
+        };
+        Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_SalesOrderFilterFormPartial");
+    }
+    <div id="results">
+
+    </div>
+    <script src="~/Scripts/salesorder/index.js"></script>*@
+
+
+@{
+    Layout = null;
+}
+
+<h4>Orden de Producción</h4>
+
+@{
+    Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_IndexSearch");
+}
+
+<div id="grid"></div>
+
+<script>
+    $("#btnCollapse").click(function (event) {
+        if ($("#filterFormIcon").hasClass("fa-chevron-up")) {
+            $("#grid").css("display", "block");
+        } else {
+            $("#grid").css("display", "none");
+        }
+    });
+</script>

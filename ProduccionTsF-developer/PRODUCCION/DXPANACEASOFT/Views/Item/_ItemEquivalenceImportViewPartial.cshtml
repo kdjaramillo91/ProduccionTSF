@@ -1,0 +1,113 @@
+﻿
+@{
+	Layout = null;
+}
+
+<table id="itemEquivalenceUploadFileForm" class="table table-condensed" style="margin: 0px;">
+	<tr>
+		<td>
+			@Html.DevExpress().Button(
+			button =>
+			{
+			button.Name = "ImportarItemEquivalenceButton";
+			button.Text = "Importar";
+			button.ImagePosition = ImagePosition.Left;
+			button.ToolTip = "Importar Productos Equivalentes";
+			button.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+			button.ClientEnabled = false;
+				button.ClientSideEvents.Click = "createNewFromFileUploadedEquivalence";
+			}).GetHtml()
+
+			@Html.DevExpress().Button(
+			button =>
+			{
+				button.Name = "RefreshImportarItemEquivalenceButton";
+				button.Text = "";
+				button.ToolTip = "Refrescar contenido";
+				button.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+				@*//button.ClientSideEvents.Click = "panaceasoftApp.item.refreshImportFile";*@
+			}).GetHtml()
+
+			@Html.DevExpress().Button(
+			button =>
+			{
+				button.Name = "btnDownloadTemplate";
+				button.Text = "Descargar Plantilla para Importación";
+				button.ImagePosition = ImagePosition.Left;
+				button.ToolTip = "Descargar la Plantilla para la Importación de Equivalencia de Producto";
+				button.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+				button.Style.Add("float", "right");
+				button.ClientSideEvents.Click = "DownloadTemplateImportItemEquivalences";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<hr style="margin-top: 2px; margin-bottom: 2px;" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().FormLayout(
+				formLayout =>
+				{
+					formLayout.Name = "ItemEquivalenceImportFileForm";
+					formLayout.SettingsAdaptivity.SwitchToSingleColumnAtWindowInnerWidth = 1080;
+					formLayout.SettingsAdaptivity.AdaptivityMode = FormLayoutAdaptivityMode.SingleColumnWindowLimit;
+
+					formLayout.UseDefaultPaddings = false;
+
+					formLayout.Items.AddGroupItem(group =>
+					{
+						group.ShowCaption = DevExpress.Utils.DefaultBoolean.False;
+						group.UseDefaultPaddings = true;
+						group.GroupBoxDecoration = GroupBoxDecoration.None;
+						group.ColCount = 2;
+
+						group.Items.Add(item =>
+						{
+							item.Caption = "Archivo de Datos";
+							item.CaptionStyle.CssClass = "mandatory";
+							item.CaptionSettings.VerticalAlign = FormLayoutVerticalAlign.Middle;
+							item.ColSpan = 2;
+							item.SetNestedContent(() =>
+							{
+								Html.RenderPartial("_ItemEquivalenceImportFileUploadPartial");
+							});
+						});
+
+						group.Items.Add(item =>
+						{
+							item.Caption = "";
+							item.ColSpan = 2;
+							item.SetNestedContent(() =>
+							{
+								Html.RenderPartial("_ItemEquivalenceImportFileDragDropPartial");
+							});
+						});
+					});
+				}).GetHtml()
+			@Html.Hidden("GuidArchivoItemEquivalence")
+		</td>
+	</tr>
+</table>
+<div class="row">
+	<div class="col-sm-12">
+		<table class="table table-condensed">
+			<tr style="border-top: 1px solid #c0c0c0;">
+				<td style="text-align: right; margin-top: 5px">
+					@Html.DevExpress().Button(settings =>
+					{
+						settings.Name = "btnCancel";
+						settings.Text = "Cancelar";
+						settings.RenderMode = ButtonRenderMode.Button;
+						settings.UseSubmitBehavior = false;
+						settings.ImagePosition = ImagePosition.Left;
+						settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						settings.ClientSideEvents.Click = "BtnCancel_Click";
+					}).GetHtml()
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>

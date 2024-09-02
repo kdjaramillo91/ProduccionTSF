@@ -1,0 +1,47 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using ValidationSettings = System.Web.UI.ValidationSettings
+@model DXPANACEASOFT.Models.Invoice
+
+
+@{
+    int? id_PaymentMethod2 = (Model != null && Model.InvoiceExterior.id_PaymentMethod != 0) ? (int?)Model.InvoiceExterior.id_PaymentMethod : 0;
+    int? id_PaymentTerm = (Model != null && Model.InvoiceExterior.id_PaymentTerm != 0) ? (int?)Model.InvoiceExterior.id_PaymentTerm : 0;
+
+    DocumentState documentState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) ? Model.Document.DocumentState : DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+    List<tbsysDocumentDocumentStateControlsState> _ControlsState = DataProviderControlState.ControlStateByDocumentByState("07", documentState.code);
+
+}
+@Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.id_PaymentTerm, settings =>
+{
+    settings.Name = "id_PaymentTerm";
+    settings.Properties.ClientInstanceName = "id_PaymentTerm";
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextFormatString = "{1}";
+    settings.Properties.ValueType = typeof(int);
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.Columns.Add("code", "Cod.", 20);
+    settings.Properties.Columns.Add("description", "Plazo", 160);
+    settings.ShowModelErrors = true;
+
+    settings.ReadOnly = _ControlsState.FirstOrDefault(r => r.controlName == "id_PaymentTerm").isReadOnly;
+    if (_ControlsState.FirstOrDefault(r => r.controlName == "id_PaymentTerm").isRequired)
+    {
+        settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+        settings.CustomJSProperties = (s, e) =>
+        {
+
+            e.Properties["cpTabContainer"] = "tabInvoiceExterior";
+            e.Properties["cpMessageError"] = "Campo Obligatorio.";
+            e.Properties["cpIsRequired"] = "true";
+            e.Properties["cpTabControl"] = "tabControl";
+
+        };
+    }
+
+
+}).BindList(DataProviderPaymentTerm.InvoiceExteriorPaymentsTermsByPaymentsMethodandCurrent((int)id_PaymentMethod2, id_PaymentTerm)).Bind(id_PaymentTerm).GetHtml()

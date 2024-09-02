@@ -1,0 +1,511 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+@{ 
+	var copack = this.ViewBag.isCopacking;
+}
+
+@{
+	int id_productionLot = (Model != null) ? Model.id : 0;
+	string codeState = (Model != null) ? Model.ProductionLotState.code : "";
+	string _tipoProceso = (Model != null && Model.ProcessType != null) ? Model.ProcessType.code : "";
+	string settCxC = DataProviderSetting.ValueSetting("HLCXC");
+	string settUMTP = DataProviderSetting.ValueSetting("UMTP");
+	int tabSelected = ViewData["tabSelected"] == null ? 0 : (int)ViewData["tabSelected"];
+
+	var isBtnToReturn = ViewData["isBtnToReturn"] != null ? (bool)ViewData["isBtnToReturn"] : false;
+	if (isBtnToReturn)
+	{
+		<script src="~/Scripts/productionlotreception/index.js"></script>
+		@*<script src="~/Scripts/productionlotprocess/index.js"></script>*@
+		@*<script src = "~/Scripts/productionlotreception/validations.js" ></script >*@
+	}
+	string codeEntero = "";
+	string codeCola = "";
+	if (Model != null && Model.ProductionLotDetail != null && Model.ProductionLotDetail.Count > 0)
+	{
+		var lstItemDetail = Model.ProductionLotLiquidation.ToList();
+		if (lstItemDetail.Where(w => w.Item.ItemProcessType.FirstOrDefault(fod => fod.ProcessType.code.Equals("ENT")) != null).Distinct().Count() > 0)
+		{
+			codeEntero = "E";
+		}
+		if (lstItemDetail.Where(w => w.Item.ItemProcessType.FirstOrDefault(fod => fod.ProcessType.code.Equals("COL")) != null).Distinct().Count() > 0)
+		{
+			codeCola = "C";
+		}
+	}
+
+
+}
+
+@Html.Hidden("codeEnteroReport", codeEntero)
+@Html.Hidden("codeColaReport", codeCola)
+@Html.Hidden("tabSelected", tabSelected)
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditProductionLotReception", name = "formEditProductionLotReception" }))
+{
+	if (ViewBag.WarningDrainedQuantity != null)
+	{
+		@Html.Raw((string)ViewBag.WarningDrainedQuantity);
+	}
+	if (ViewData["EditMessage"] != null)
+	{
+		@Html.Raw(ViewData["EditMessage"]);
+	}
+
+	@Html.Hidden("id_productionLot", id_productionLot)
+	@Html.Hidden("codeState", codeState)
+	@Html.Hidden("tipoProceso", _tipoProceso)
+	@Html.Hidden("settUMTP", settUMTP)
+
+	@Html.DevExpress().PageControl(tabs =>
+{
+	tabs.Name = "tabControl";
+	tabs.Width = Unit.Percentage(100);
+	tabs.ActiveTabIndex = tabSelected;
+
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabDocument";
+		tab.Text = "Documento    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tabs.ClientSideEvents.Init = "SetActiveTab";
+
+		tab.SetContent(() =>
+		{
+			Html.RenderPartial("ProductionTemplates/_ProductionFormEdit");
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabReception";
+		tab.Text = "Recepción    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+		tab.SetContent(() =>
+		{
+			Html.RenderPartial("_ProductionLotReceptionMainFormTabReception");
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabItemsDetails";
+		tab.Text = "Materia Prima    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+		tab.SetContent(() =>
+		{
+			var itemsDetail = (Model != null && Model.ProductionLotDetail != null) ? Model.ProductionLotDetail.ToList() : new List<ProductionLotDetail>();
+			Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorsDetail");
+			if (codeState == "01")
+			{
+				Html.RenderPartial("ProductionTemplates/_ProductionDetailsActionsButtons");
+				Html.RenderPartial("_ProductionLotReceptionEditFormItemsDetailPartial", itemsDetail);
+			}else
+			{
+				Html.RenderPartial("_ProductionLotReceptionDetailItemsPartial", itemsDetail);
+			}
+		});
+	});
+
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotQualityAnalysisDetails";
+		tab.Text = "Análisis de Calidad    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = false;
+
+		tab.SetContent(() =>
+		{
+			var productionLotQualityAnalysisDetail = (Model != null && Model.ProductionLotQualityAnalysis != null) ? Model.ProductionLotQualityAnalysis.ToList() : new List<ProductionLotQualityAnalysis>();
+			if (Model.ProductionLotState.code == "01")
+			{
+				Html.RenderPartial("ProductionLotReceptionButtons/_ProductionQualityAnalysisActionButtons");
+				Html.RenderPartial("_ProductionLotReceptionEditFormProductionLotQualityAnalysisDetailPartial", productionLotQualityAnalysisDetail);
+			}
+			else
+			{
+				Html.RenderPartial("_ProductionLotReceptionDetailProductionLotQualityAnalysisPartial", productionLotQualityAnalysisDetail);
+			}
+
+
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotLiquidationsDetails";
+		tab.NewLine = true;
+		tab.Text = "Liquidación    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState != "01";
+
+		tab.SetContent(() =>
+		{
+
+			var productionLotLiquidationsDetail = ((this.Model != null) && (this.Model.ProductionLotLiquidation != null))
+				? this.Model.ProductionLotLiquidation.ToList()
+				: new List<ProductionLotLiquidation>();
+
+			var productionLotLiquidationTotal = ((this.Model != null) && (this.Model.ProductionLotLiquidationTotal != null))
+				? this.Model.ProductionLotLiquidationTotal.ToList()
+				: new List<ProductionLotLiquidationTotal>();
+
+			bool modoCarroPorCarro;
+
+			if (productionLotLiquidationTotal.Any())
+			{
+				// Si hay detalles acumulados de carro por carro, mostrarlos...
+				modoCarroPorCarro = true;
+			}
+			else if (productionLotLiquidationsDetail.Any())
+			{
+				// Sino...si hay detalles normales, mostrarlos...
+				modoCarroPorCarro = false;
+			}
+			else if (settCxC == "0")
+			{
+				// Sino...si el parámetro está inactivo, usamos vista normal...
+				modoCarroPorCarro = false;
+			}
+			else
+			{
+				// Sino...usar la vista de carro por carro
+				modoCarroPorCarro = true;
+			}
+
+			if (!modoCarroPorCarro)
+			{
+				Html.RenderPartial("ProductionLot/_ProductionLotSubtotal", Model);
+				if (codeState == "02" || codeState == "03")
+				{
+					Html.RenderPartial("ProductionLot/_ProductionLotLiquidationTextForProducts");
+					Html.RenderPartial("ProductionLotReceptionButtons/_ProductionLiquidationsActionButtons");
+					Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotLiquidationsDetailPartial", productionLotLiquidationsDetail);
+				}
+				else
+				{
+					Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotLiquidationsPartial", productionLotLiquidationsDetail);
+				}
+			}
+			else
+			{
+				Html.RenderPartial("_ProductionLotReceptionHeadFormProductionLotLiquidationDetailPartial", Model);
+				Html.RenderPartial("ProductionLotReceptionButtons/_ProductionLiquidationPrintActionsButtonsLiquidation");
+				Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotLiquidationTotalsPartial", productionLotLiquidationTotal);
+			}
+
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotPackingMaterialDetails";
+		tab.Text = "Materiales de Empaque    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState != "01";
+
+		tab.SetContent(() =>
+		{
+			List<ProductionLotPackingMaterial> packingMaterial = (Model != null && Model.ProductionLotPackingMaterial != null)
+																		? Model.ProductionLotPackingMaterial.Where(d => d.isActive && (d.quantity > 0)).ToList()
+																		: new List<ProductionLotPackingMaterial>();
+
+			if (codeState == "02" || codeState == "03")
+			{
+				Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorPackingMaterialDetail");
+				Html.RenderPartial("ProductionLotReceptionButtons/_ProductionPackingMaterialsActionButtons");
+				Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotPackingMaterialsDetailPartial", packingMaterial);
+				//Html.RenderPartial("_ProductionLotReceptionEditFormProductionLotPackingMaterialsDetailPartial", packingMaterial);
+			}
+			else
+			{
+				Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotPackingMaterialsPartial", packingMaterial);
+				//Html.RenderPartial("_ProductionLotReceptionDetailProductionLotPackingMaterialsPartial", packingMaterial);
+			}
+		});
+
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotTrashsDetails";
+		tab.Text = "Desperdicio    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState != "01";
+
+		tab.SetContent(() =>
+		{
+			var productionLotTrashsDetail = (Model != null && Model.ProductionLotTrash != null) ? Model.ProductionLotTrash.ToList() : new List<ProductionLotTrash>();
+			if (codeState == "02" || codeState == "03")
+			{
+				Html.RenderPartial("ProductionLotReceptionButtons/_ProductionTrashActionButtons");
+				Html.RenderPartial("ProductionLot/_ProductionLotEditFormProductionLotTrashsDetailPartial", productionLotTrashsDetail);
+				//Html.RenderPartial("_ProductionLotReceptionEditFormProductionLotTrashsDetailPartial", productionLotTrashsDetail);
+			}
+			else
+			{
+				Html.RenderPartial("ProductionLot/_ProductionLotDetailProductionLotTrashsPartial", productionLotTrashsDetail);
+				//Html.RenderPartial("_ProductionLotReceptionDetailProductionLotTrashsPartial", productionLotTrashsDetail);
+			}
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotCloseDetails";
+		tab.Text = "Cierre    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = codeState == "04" ||
+					  codeState == "05" ||
+					  codeState == "06" ||
+					  codeState == "07" ||
+					  codeState == "08" ||
+					  codeState == "11";
+		tab.SetContent(() =>
+		{
+			Html.RenderPartial("_ProductionLotReceptionHeadFormProductionLotCloseDetailPartial", Model);
+			//Html.RenderPartial("_ProductionLotReceptionSubtotalProductionLotCloseDetailPartial", Model);
+			ViewBag.totalQuantityLiquidationAdjust = Model.totalQuantityLiquidationAdjust;
+			var productionLotPayment = (Model != null && Model.ProductionLotPayment != null) ? Model.ProductionLotPayment.OrderBy(ob => ob.Item.ItemGeneral.ItemSize != null ? ob.Item.ItemGeneral.ItemSize.orderSize : 0).ToList() : new List<ProductionLotPayment>();
+			if ((codeState == "04" || codeState == "05") && !Model.withPrice)
+			{
+				Html.RenderPartial("ProductionLotReceptionButtons/_ProductionLiquidationPrintActionsButtonsClose");
+				Html.RenderPartial("_ProductionLotReceptionEditFormProductionLotCloseDetailPartial", productionLotPayment);
+			}
+			else
+			{
+				Html.RenderPartial("ProductionLotReceptionButtons/_ProductionLiquidationPrintActionsButtonsClose");
+				Html.RenderPartial("_ProductionLotReceptionDetailProductionLotClosesPartial", productionLotPayment);
+			}
+
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotPaymentDetails";
+		tab.Text = "Pago    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = (codeState == "06" ||
+					  codeState == "07" ||
+					  codeState == "08" ||
+					  codeState == "11") && !copack && !Model.withPrice && IsEnabledPago(12);
+		tab.SetContent(() =>
+		{
+			ViewBag.totalToPay = Model.totalToPay;
+
+			if(codeState == "07")
+			{
+				ViewBag.ShowActionDis = true;
+				ViewBag.ShowModifPrecio = true;
+				ViewBag.ShowModifDetalle = true;
+			}
+			else
+			{
+				ViewBag.ShowActionDis = false;
+				ViewBag.ShowModifPrecio = false;
+				ViewBag.ShowModifDetalle = false;
+			}
+
+
+			Html.RenderPartial("_ProductionLotReceptionHeadFormProductionLotPaymentDetailPartial", Model);
+			var productionLotPayment = (Model != null && Model.ProductionLotPayment != null) ? Model.ProductionLotPayment.OrderBy(ob => ob.Item.ItemGeneral.ItemSize != null ? ob.Item.ItemGeneral.ItemSize.orderSize : 0).ToList() : new List<ProductionLotPayment>();
+			Html.RenderPartial("_ProductionLotReceptionSummaryProductionLotPaymentDetailPartial", new List<SummaryProductionLotPaymentDetail>());
+			Html.RenderPartial("ProductionLotReceptionButtons/_ProductionLiquidationPrintActionsButtons");
+			Html.RenderPartial("_ProductionLotReceptionEditFormProductionLotPaymentDetailPartial", productionLotPayment);
+		});
+	});
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotPaymentDetailsCopacking";
+		tab.Text = "Pago Copacking   ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = (codeState == "06" ||
+					  codeState == "07" ||
+					  codeState == "08")&& copack && !Model.withPrice && IsEnabledPago(12);
+		tab.SetContent(() =>
+		{
+			ViewBag.totalToPay = Model.totalToPay;
+			Html.RenderPartial("_ProductionLotReceptionHeadFormProductionLotPaymentDetailPartialCopacking", Model);
+			var productionLotPayment = (Model != null && Model.ProductionLotPayment != null) ? Model.ProductionLotPayment.OrderBy(ob => ob.Item.ItemGeneral.ItemSize != null ? ob.Item.ItemGeneral.ItemSize.orderSize : 0).ToList() : new List<ProductionLotPayment>();
+			Html.RenderPartial("_ProductionLotReceptionSummaryProductionLotPaymentDetailPartialCopacking", new List<SummaryProductionLotPaymentDetail>());
+			Html.RenderPartial("ProductionLotReceptionButtons/_ProductionLiquidationPrintActionsButtons");
+			Html.RenderPartial("_ProductionLotReceptionEditFormProductionLotPaymentDetailPartialCopacking", productionLotPayment);
+		});
+	});
+
+	tabs.TabPages.Add(tab =>
+	{
+		tab.Name = "tabProductionLotLotCost";
+		tab.Text = "Costos del Lote    ";
+		tab.TabStyle.Width = Unit.Percentage(100);
+
+		tab.TabImage.Width = Unit.Pixel(16);
+		tab.TabImage.Height = Unit.Pixel(16);
+		tab.TabImage.Align = ImageAlign.Right;
+		tab.TabImage.Url = "/Content/image/noimage.png";
+		tab.ActiveTabImage.Align = ImageAlign.Right;
+		tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+		tab.Visible = (codeState == "08" ||
+					   codeState == "11") && !Model.withPrice && IsEnabledPago(12);
+		tab.SetContent(() =>
+		{
+			//ViewBag.totalToPay = Model.totalToPay;
+			Html.RenderPartial("_ProductionLotReceptionHeadFormProductionLotLotCostPartial", Model);
+		});
+	});
+
+}).GetHtml()
+
+
+	<table class="table table-condensed">
+		<tr style="border-top: 1px Solid #C0C0C0;">
+			<td colspan="6" style="text-align: right">
+				@{
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnUpdate_EditForm";
+						button.Text = "Actualizar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.ClientEnabled = codeState != "08" && codeState != "09" && !(codeState == "06" && Model.withPrice);
+							//button.UseSubmitBehavior = false;
+							button.ClientVisible = IsEnabled(11);
+							//button.EnableClientSideAPI = true;
+							button.ClientSideEvents.Click = "ButtonUpdate_Click";
+					}).Render();
+
+					ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnCancel_EditForm";
+						button.Text = "Cerrar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+							//button.ClientEnabled = true;
+							//button.UseSubmitBehavior = false;
+							//button.EnableClientSideAPI = true;
+							button.ClientSideEvents.Click = "ButtonCancel_Click";
+					}).Render();
+				}
+			</td>
+		</tr>
+	</table>
+}
+
+<script src="~/Scripts/productionlotreception/editform.js"></script>
+
+
+
+@functions{
+
+	bool IsEnabled(int id_permission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+		return (permission != null);
+	}
+
+	bool IsEnabledPago(int id_permission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+		return (permission != null);
+	}
+
+}

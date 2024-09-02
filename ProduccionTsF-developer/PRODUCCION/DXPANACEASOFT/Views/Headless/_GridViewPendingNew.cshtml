@@ -1,0 +1,135 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<HeadlessPendingNewDTO>(settings =>
+    {
+        settings.Name = "GridViewPendingNew";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "Headless",
+            Action = "GridViewPendingNew",
+        };
+
+        settings.KeyFieldName = "id_productionLot";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        /*settings.Columns.Add(column =>
+        {
+            column.FieldName = "emissionDateStr";
+            column.Name = "emissionDateStr";
+            column.Visible = false;
+        });*/
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_productionLot";
+            column.Name = "id_productionLot";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "secTransaction";
+            column.Caption = "Sec. Transaccional";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberLot";
+            column.Caption = "No. Lote";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "receptionDate";
+            column.Caption = "Fecha de Recepción";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "poundsRemitted";
+            column.Caption = "Libras Remitidas";
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal poundsRemitted = (decimal)DataBinder.Eval(c.DataItem, "poundsRemitted");
+
+                ViewContext.Writer.Write(poundsRemitted.ToString("N2"));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "process";
+            column.Caption = "Proceso";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "provider";
+            column.Caption = "Proveedor";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "productionUnitProvider";
+            column.Caption = "Camaronera";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "productionUnitProviderPool";
+            column.Caption = "Piscina";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "state";
+            column.Caption = "Estado";
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = false,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 11,
+            Caption = "Acción",
+            Width = Unit.Percentage(8)
+        };
+
+        commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+        {
+            ID = "btnProcess",
+            Text = "Registrar"
+        });
+
+        settings.ClientSideEvents.CustomButtonClick = "GridViewGenerate_Click";
+        settings.ClientSideEvents.RowDblClick = "GridViewGenerate_Click";
+        settings.Columns.Add(commandColumn);
+
+    });
+}
+@grid.Bind(Model).GetHtml()

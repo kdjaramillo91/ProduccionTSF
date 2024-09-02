@@ -1,0 +1,224 @@
+﻿
+@{
+    Layout = null;
+}
+
+<style>
+    .row {
+        padding-bottom: 2px;
+    }
+    .dxflGroupBoxCaption_Metropolis {
+        
+    }
+
+    .boxSearch {
+        border-bottom: 1px Solid #C0C0C0;
+        border-top: 1px solid #E5E5E5;
+        margin-left: 0px;
+        margin: 5px;
+        padding: 5px;
+        background-color: White;
+        color: #B2B2B2;
+        font-weight: bold;
+    }
+
+</style>
+
+<div class="form">
+    <div class="panelConsulta">
+        <div class="row">
+            <div class="col-sm-10">
+                <div class="row boxSearch">
+                    Documento
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Fecha desde: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DevExpress().DateEdit(settings =>
+                        {
+                            settings.Name = "DateEditInit";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Fecha hasta: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DevExpress().DateEdit(settings =>
+                        {
+                            settings.Name = "DateEditEnd";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = DateTime.Now.Date;
+                            //settings.Properties.MinDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                        }).GetHtml()
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Estado: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.Partial("_ComboBoxState")
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Número: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DevExpress().TextBox(settings =>
+                        {
+                            settings.Name = "TextBoxNumber";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Properties.NullText = "Todos...";
+                        }).GetHtml()
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Referencia: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DevExpress().TextBox(settings =>
+                        {
+                            settings.Name = "TextBoxReference";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Properties.NullText = "Todos...";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Tipo de Documento: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.Partial("_ComboBoxDocumentTypeIndex")
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Cliente: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.Partial("_ComboBoxCustomerIndex")
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Vendedor: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.Partial("_ComboBoxSellerIndex")
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Productos: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.Partial("_TokenBoxItemsIndex")
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Width = Unit.Percentage(100);
+                            settings.Text = "Logística: ";
+                        }).GetHtml()
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.Partial("_ComboBoxLogisticsIndex")
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div class="row boxSearch">
+                    Acciones
+                </div>
+                <div class="row">
+                    <div class="col-sm-10">
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "btnSearch";
+                            settings.Text = "Buscar";
+                            settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                            settings.Width = Unit.Percentage(100);
+                            settings.Height = 25;
+                            settings.ClientSideEvents.Click = "SearchClick";
+                        }).GetHtml()
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-10">
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "btnClear";
+                            settings.Text = "Limpiar";
+                            settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                            settings.Width = Unit.Percentage(100);
+                            settings.Height = 25;
+                            settings.ClientSideEvents.Click = "ClearClick";
+                        }).GetHtml()
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-10">
+                        @*@Html.DevExpress().Button(settings =>
+        {
+            settings.Name = "btnNew";
+            settings.Text = "Nuevo";
+            settings.Images.Image.IconID = IconID.ActionsAdd16x16;
+            settings.Width = Unit.Percentage(100);
+            settings.Height = 25;
+            settings.ClientSideEvents.Click = "NewClick";
+        }).GetHtml()*@
+                        <div class="btn-group" style="width: 100%;">
+                            <button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nuevo</span><span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="javascript:;" onclick="NewClickFromOrderStock();">Manual</a></li>
+                                @*<li><a href="javascript:;" onclick="NewClickFromOrderLocalClient();">Desde Requerimiento de Pedido</a></li>*@
+                                <li><a href="javascript:;" onclick="NewClickFromOrderForeignCustomers();">Desde Proforma</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/salesorder/index.js"></script>
+

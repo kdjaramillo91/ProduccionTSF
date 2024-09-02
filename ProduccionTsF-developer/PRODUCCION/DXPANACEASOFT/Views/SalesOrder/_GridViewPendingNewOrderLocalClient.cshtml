@@ -1,0 +1,81 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+	var grid = Html.DevExpress().GridView<SalesOrderPendingNewDTO>(settings =>
+	{
+		settings.Name = "GridViewPendingNewOrderLocalClient";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "SalesOrder",
+			Action = "GridViewPendingNewOrderLocalClient",
+		};
+
+		settings.KeyFieldName = "id_salesRequestDetail";
+
+//settings.ClientSideEvents.SelectionChanged = "OnGridViewPendingNewSelectionChanged";
+
+settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.Settings.ShowFilterRowMenu = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_salesRequestDetail";
+			column.Name = "id_salesRequestDetail";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "numberRequestProforma";
+			column.Caption = "No.Requerimiento de Pedido";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "customer";
+			column.Caption = "Cliente";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "name_item";
+			column.Caption = "Producto";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "cartons";
+			column.Caption = "Cartones";
+			column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal cartons = (decimal)DataBinder.Eval(c.DataItem, "cartons");
+
+				ViewContext.Writer.Write(cartons.ToString("#,#0"));
+			});
+		});
+
+	});
+}
+@grid.Bind(Model).GetHtml()

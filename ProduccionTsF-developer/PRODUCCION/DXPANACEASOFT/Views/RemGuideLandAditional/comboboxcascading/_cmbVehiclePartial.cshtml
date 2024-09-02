@@ -1,0 +1,52 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuideTransportation
+@{
+    string codeState = (Model != null && Model.RemissionGuide != null && Model.RemissionGuide.Document.DocumentState.code != "") ? Model.RemissionGuide.Document.DocumentState.code : "01";
+    int? id_vehicle = (Model != null && Model.id_vehicle != 0) ? (int?)Model.id_vehicle : null;
+    var carRegistration = (Model != null) ? Model.carRegistration : "";
+
+    string aditional = "";
+
+    if(id_vehicle != null && id_vehicle > 0)
+    {
+        aditional= " e.customArgs['id_vehicleCurrent'] = " + id_vehicle.ToString();
+    }
+    if (Model.isOwn)
+    {
+        carRegistration = "";
+    }
+    //   TempData["ProductionUnitProviderByProvider"] = DataProviderProductionUnitProvider.ProductionUnitProviderByProvider(null, id_providerRemisionGuide);
+    TempData.Keep("TransportTariffTypeVehicleType");
+}
+
+
+
+@Html.DevExpress().ComboBoxFor(m => m.id_vehicle, settings =>
+{
+    settings.Name = "id_vehicle";
+    settings.Properties.ClientInstanceName = "id_vehicle";
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "carRegistration";
+    settings.Properties.ValueType = typeof(string);
+
+    settings.Properties.AllowUserInput = true;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Properties.ValidationSettings.ValidationGroup = "tabTransportation";
+    settings.ReadOnly = codeState != "01" || (Model.isOwn);
+    settings.ShowModelErrors = true;
+    //settings.Properties.ClientSideEvents.Validation = "OnVehicleValidation";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "VehicleCombo_SelectedIndexChanged";
+    settings.CallbackRouteValues = new { Controller = "Logistics", Action = "TransportTariffTypeVehicleType" };
+
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_TransportTariffType'] = id_TransportTariffType.GetValue();" + aditional + "}";
+    settings.Properties.CallbackPageSize = 20;
+
+//}).BindList(TempData["TransportTariffTypeVehicleType"]).Bind(id_vehicle).GetHtml()
+}).BindList(TempData["TransportTariffTypeVehicleType"]).Bind((id_vehicle != null) ? id_vehicle.ToString() : carRegistration).GetHtml()

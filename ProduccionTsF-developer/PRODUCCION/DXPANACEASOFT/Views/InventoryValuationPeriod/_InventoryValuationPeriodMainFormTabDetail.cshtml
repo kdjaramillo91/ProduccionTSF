@@ -1,0 +1,119 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using System.Drawing
+@model DXPANACEASOFT.Models.InventoryValuationPeriod
+
+@{
+	String wsActive = Model.id != null && Model.id > 0 ? "S" : "N";
+}
+<div id="GridMessageError" style="display: none;">
+	@Html.DevExpress().Label(settings =>
+	   {
+		   settings.Name = "gridMessageError";
+		   settings.Properties.ClientInstanceName = "gridMessageError";
+		   settings.Text = "";
+	   }).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+		</td>
+	</tr>
+
+	<!--Fila 1 Fecha Inicio y fin -->
+	<tr>
+		<!--FECHA Inicio-->
+		<td>
+			@Html.DevExpress().LabelFor(m => m.year, settings =>
+			{
+				settings.Name = "yearLabel";
+				settings.Text = "Año:";
+				settings.AssociatedControlName = "year";
+			}).GetHtml()
+
+
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.year, settings =>
+	   {
+
+
+		   settings.Properties.Width = Unit.Percentage(100);
+		   settings.Properties.ClientInstanceName = "year";
+		   settings.Properties.DisplayFormatString = "N0";
+		   settings.Properties.DisplayFormatInEditMode = true;
+		   settings.Properties.DecimalPlaces = 0;
+		   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+		   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+		   settings.Properties.Increment = 1M;
+		   settings.Properties.LargeIncrement = 1M;
+		   settings.Properties.MinValue = 1000;
+		   settings.Properties.MaxValue = 2500;
+		   settings.Properties.NumberType = SpinEditNumberType.Integer;
+		   settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+
+		   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+		   settings.Properties.ClientSideEvents.Validation = "Onyear";
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+		   settings.ReadOnly = wsActive != "N";
+
+	   }).GetHtml()
+
+		</td>
+		<!-- FECHA FIn-->
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_PeriodType, settings =>
+			{
+				settings.Name = "id_PeriodTypeLabel";
+				settings.Text = "Tipo Periodo:";
+				settings.AssociatedControlName = "id_PeriodType";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_PeriodType = (Model != null && Model.id_PeriodType != 0) ? (int?)Model.id_PeriodType : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_PeriodType, settings =>
+	   {
+		   settings.Name = "id_PeriodType";
+		   settings.Properties.ClientInstanceName = "id_PeriodType";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Properties.Columns.Add("name", "Nombre", 200);
+		   settings.Width = Unit.Percentage(50);
+		   settings.Height = Unit.Percentage(50);
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Properties.CallbackPageSize = 20;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnPeriodType";
+		   settings.ReadOnly = wsActive != "N";
+
+	   }).BindList(DataProviderAdvanceParameters.AdvanceParametersByCode("TPGV1")).Bind(id_PeriodType).GetHtml()
+		</td>
+		<td colspan="2"></td>
+	</tr>
+
+	<!--Fila 2  -->
+	<tr>
+		<td colspan="2">
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			{
+			   settings.Name = "isActive";
+			   settings.Properties.ClientInstanceName = "isActive";
+			   settings.Text = "Activo";
+			}).GetHtml()
+		</td>
+	</tr>
+
+	<tr></tr>
+</table>
+
+
+
+

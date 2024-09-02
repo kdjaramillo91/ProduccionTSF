@@ -1,0 +1,97 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+	var grid = Html.DevExpress().GridView<SalesQuotationExterior>(settings =>
+	{
+		settings.Name = "GridViewPendingNewOrderForeignCustomers";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "SalesOrder",
+			Action = "GridViewPendingNewOrderForeignCustomers",
+		};
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.Settings.ShowFilterRowMenu = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id";
+			column.Name = "id_";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(m => m.Invoice.Document.number, column =>
+		{
+			column.Name = "number";
+			column.Caption = "No.Proforma";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+		});
+
+		settings.Columns.Add(m => m.Invoice.Person.fullname_businessName, column =>
+		{
+			column.Name = "customerSalesQuotationExterior";
+			column.Caption = "Cliente";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+		});
+		settings.Columns.Add(m => m.Invoice.Document.emissionDate, column =>
+		{
+			column.Caption = "Fecha de Emisión";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+			column.EditorProperties().DateEdit(editorDate =>
+			{
+				editorDate.DisplayFormatInEditMode = true;
+				editorDate.DisplayFormatString = "dd/MM/yyyy";
+				editorDate.EditFormat = EditFormat.Custom;
+				editorDate.EditFormatString = "dd/MM/yyyy";
+			});
+		});
+
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = false,
+			ShowDeleteButton = false,
+			Visible = true,
+			VisibleIndex = 5,
+			Caption = "Acción",
+			Width = Unit.Percentage(8)
+		};
+
+		commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+		{
+			ID = "btnProcess",
+			Text = "Generar"
+		});
+
+		settings.ClientSideEvents.CustomButtonClick = "GridViewGenerate_Click";
+		settings.ClientSideEvents.RowDblClick = "GridViewGenerate_Click";
+		settings.Columns.Add(commandColumn);
+
+	});
+}
+@grid.Bind(Model).GetHtml()

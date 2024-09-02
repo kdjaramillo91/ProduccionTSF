@@ -1,0 +1,134 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<InvoiceDetail>(settings =>
+    {
+        settings.Name = "gvSalesQuotationExteriorDetailView";
+        settings.SettingsDetail.MasterGridName = "gvSalesQuotationExterior";
+        settings.CallbackRouteValues = new { Controller = "SalesQuotationExterior", Action = "SalesQuotationExteriorResultsDetailViewDetailsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "SalesQuotationExteriorResultsDetailViewDetails_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Detalles Factura del Exterior</span>");
+        });
+
+        settings.KeyFieldName = "id_item";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSort = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+        settings.ClientSideEvents.SelectionChanged = "";
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        // Item
+        settings.Columns.Add(c => c.Item.masterCode, column =>
+        {
+            column.Name = "masterCode";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(c => c.Item.auxCode, column =>
+        {
+            column.Name = "auxCode";
+            column.Caption = "Cod. Auxiliar";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(c => c.Item.description, column =>
+        {
+            column.Name = "description";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(c => c.amount, column =>
+        {
+            column.Name = "amount";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal amount = (decimal)DataBinder.Eval(c.DataItem, "amount");
+                ViewContext.Writer.Write(amount.ToString("N2"));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "unitPrice";
+            column.Caption = "Precio";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal unitPrice = (decimal)DataBinder.Eval(c.DataItem, "unitPrice");
+                ViewContext.Writer.Write(unitPrice.ToString("C2"));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "discount";
+            column.Caption = "Descuento";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal discount = (decimal)DataBinder.Eval(c.DataItem, "discount");
+                ViewContext.Writer.Write(discount.ToString("C2"));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "totalPriceWithoutTax";
+            column.Caption = "Total";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal totalPriceWithoutTax = (decimal)DataBinder.Eval(c.DataItem, "totalPriceWithoutTax");
+                ViewContext.Writer.Write(totalPriceWithoutTax.ToString("C2"));
+            });
+        });
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+            
+            e.Properties["cpSelectedRowCount"] = gv.Selection;
+        };
+
+    });
+}
+@grid.Bind(Model).GetHtml()

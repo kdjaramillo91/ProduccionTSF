@@ -1,0 +1,103 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InventoryMove
+
+@{
+	string codeDocumentType = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+	bool readOnlyCode = codeDocumentType != "03" && codeDocumentType != "04" && codeDocumentType != "34" && codeDocumentType != "32" &&
+						codeDocumentType != "05" && codeDocumentType != "129";
+    bool mostrarOP = (Model != null && Model.InventoryReason != null && Model.InventoryReason.op != null) ? Model.InventoryReason.op.Value : false;
+
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+	@if (codeDocumentType != "34")
+	{
+		<tr>
+			<td>
+				<div id="search_option_inventoryMove" class="widget-box">
+					<div class="widget-header">
+						<h6 class="widget-title">Filtros de B&uacute;squeda</h6>
+						<span class="widget-toolbar">
+							<a href="#" id="btnCollapseFilterDetails" data-action="collapse">
+								<i id="filterFormIcon" class="ace-icon fa fa-chevron-up"></i>
+							</a>
+						</span>
+					</div>
+					<div id="filterForm" class="widget-body">
+						<div class="widget-main">
+							@Html.Partial("ComponentsDetail/_FilterDetails", Model)
+						</div>
+					</div>
+				</div>
+			</td>
+		</tr>
+	}
+	<tr>
+		<td>
+			@{
+				ViewData["code"] = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+				ViewData["id_inventoryMove"] = (Model != null) ? Model.id : 0;
+				var details = (Model != null && Model.InventoryMoveDetail != null) ? Model.InventoryMoveDetail.ToList() : new List<InventoryMoveDetail>();
+
+				//if (ViewData["_natureMove"].Equals("I"))
+				//{
+				//    Html.RenderPartial("_InventoryEntryMoveAuxEditFormPartial", Model);
+				//}
+
+				Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorMaterialsDetail");
+
+
+				if ((string)ViewData["_customParamOP"] == "IPXM")
+				{
+
+					<div style="margin: 7px 1px">
+						@{
+
+							Html.RenderPartial("_InventoryMoveExitPackagingMaterialsFilter");
+						}
+
+
+						<script src="~/Scripts/shared/ps.genericfunctions.js"></script>
+						<script src="~/Scripts/inventorymove/_inventoryMovePackagingMaterials.js"></script>
+					</div>
+
+				}
+				else
+				{
+					if (!readOnlyCode)
+					{
+						Html.RenderPartial("DocumentTemplates/_DocumentDetailsActionsButtons");
+					}
+
+				}
+
+				if (codeDocumentType == "129")
+				{
+					<div id="wrapper_InventoryMoveDetailsEditFormPartial">
+
+						@{
+							ViewData["readOnlyCode"] = readOnlyCode;
+							ViewData["mostrarOP"] = mostrarOP;
+							Html.RenderPartial("_InventoryMoveAutoDetailsEditFormPartial", details);
+						}
+
+					</div>
+				}
+				else
+				{
+					<div id="wrapper_InventoryMoveDetailsEditFormPartial">
+
+						@{
+							ViewData["readOnlyCode"] = readOnlyCode;
+							ViewData["mostrarOP"] = mostrarOP;
+							Html.RenderPartial("_InventoryMoveDetailsEditFormPartial", details);
+						}
+
+					</div>
+				}
+
+			}
+		</td>
+	</tr>
+</table>

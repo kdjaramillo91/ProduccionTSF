@@ -1,0 +1,25 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string id_despachador = Model.id_Despachador != null ? Model.id_Despachador.ToString() : "";
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+ }
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxDespachadorEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxDespachadorEdit",
+	};
+	settings.Properties.CallbackPageSize = 10;
+	settings.Properties.TextField = "Text";
+	settings.ReadOnly = true;
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.ReadOnly = !(this.ViewBag.Editable);
+}).BindList(ViewData["CmbBoxUserDispatcherEdit"]).Bind(id_despachador).GetHtml()

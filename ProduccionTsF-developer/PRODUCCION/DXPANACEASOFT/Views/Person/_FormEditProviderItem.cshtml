@@ -1,0 +1,103 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProviderItem>
+
+@{
+    var grid = Html.DevExpress().GridView<ProviderItem>(settings => {
+        settings.Name = "ProviderItems";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "ProviderItem" };
+
+        settings.ClientSideEvents.BeginCallback = "ProviderPaymentTerm_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "ProviderItemAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "ProviderItemUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "ProviderItemDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Caption = "Ítem";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+
+                if (item != null)
+                {
+                    ViewContext.Writer.Write(item.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_item";
+                p.DataSource = DataProviderItem.AllItemsByCompany((int?)ViewData["id_company"]);
+                //p.TextField = "businessName";
+                //p.ValueField = "id";
+                //p.ValueType = typeof(int);
+
+                p.ValueField = "id";
+                p.TextFormatString = "{2}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("masterCode", "Cod.", 50);
+                p.Columns.Add("barCode", "EAN", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderItemItemComboValidation";
+                p.ClientSideEvents.Init = "ProviderItemItemCombo_Init";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

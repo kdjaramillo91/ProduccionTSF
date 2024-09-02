@@ -1,0 +1,148 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Country_IdentificationType
+
+@{
+	int id_CategoryCustomerType = (Model != null) ? Model.id : 0;
+}
+
+
+@{
+	if (ViewData["EditMessage"] != null)
+	{
+		@Html.Raw(ViewData["EditMessage"]);
+	}
+
+	@Html.Hidden("id_Country_IdentificationType", id_CategoryCustomerType)
+
+
+	<div id="GridMessageError" style="display: none;">
+
+	</div>
+	<table class="table table-condenced" style="margin: 0px;">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="6">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+			</td>
+		</tr>
+
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_country, settings =>
+		   {
+			   settings.Name = "id_CountryLabel";
+			   settings.Text = "País:";
+			   settings.AssociatedControlName = "id_Country";
+			   settings.Properties.ClientInstanceName = "id_Country";
+		   }).GetHtml()
+
+
+			</td>
+			<td>
+				@{
+					int? id_Country = (Model != null && Model.id_country != 0) ? (int?)Model.id_country : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_country, settings =>
+			{
+				settings.Name = "id_country";
+				settings.Properties.ClientInstanceName = "id_country";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ValueType = typeof(int);
+				settings.Properties.Columns.Add("name", "Nombre", 200);
+				settings.Width = Unit.Percentage(50);
+				settings.Height = Unit.Percentage(50);
+				settings.Properties.EnableClientSideAPI = true;
+				settings.Properties.CallbackPageSize = 20;
+
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnCategory";
+
+			}).BindList(DataProviderCountry.AllcountryType()).Bind(id_Country).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_identificationType, settings =>
+			{
+				settings.Name = "id_identificationTypeLabel";
+				settings.Text = "Tipo de Identificación:";
+				settings.AssociatedControlName = "id_identificationType";
+			}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_CustomerType = (Model != null && Model.id_identificationType != 0) ? (int?)Model.id_identificationType : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_identificationType, settings =>
+		   {
+			   settings.Name = "id_identificationType";
+			   settings.Properties.ClientInstanceName = "id_identificationType";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnCustomerType";
+
+		   }).BindList(DataProviderIdentificationType.AllIdentificationType()).Bind(id_CustomerType).GetHtml()
+			</td>
+
+		</tr>
+
+		<tr></tr>
+
+	</table>
+
+	<table class="table table-condensed">
+		<tr style="border-top: 1px Solid #C0C0C0;">
+			<td colspan="6" style="text-align: right; margin-top: 5px;">
+				@{
+					Html.DevExpress().Button(button =>
+					{
+
+						button.Name = "btnUpdate";
+						button.Text = "Actualizar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.UseSubmitBehavior = false;
+						button.ValidateInvisibleEditors = true;
+						button.ClientSideEvents.Click = "ButtonUpdate_Click";
+
+					}).Render();
+
+					ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnClose";
+						button.Text = "Cerrar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "ButtonCancel_Click";
+					}).Render();
+				}
+			</td>
+		</tr>
+	</table>
+}
+
+<script src="~/Scripts/Country_IdentificationType/editform.js"></script>
+
+<script src="~/Scripts/Country_IdentificationType/validations.js"></script>

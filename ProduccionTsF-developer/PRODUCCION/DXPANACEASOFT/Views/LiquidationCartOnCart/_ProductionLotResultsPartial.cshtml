@@ -1,0 +1,29 @@
+﻿
+@model List<DXPANACEASOFT.Models.ProductionLot>
+
+<div id="GridMessageErrorProductionLot" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorProductionLot";
+           settings.Properties.ClientInstanceName = "gridMessageErrorProductionLot";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGenerateLiquidationCartOnCart";
+    settings.Text = "Generar Liquidación";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "GenerateLiquidationCartOnCart";
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+    Html.RenderPartial("_ProductionLotsPartial", Model);
+}
+

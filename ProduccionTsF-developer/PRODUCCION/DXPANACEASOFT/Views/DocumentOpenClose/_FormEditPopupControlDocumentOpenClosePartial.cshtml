@@ -1,0 +1,193 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@using DXPANACEASOFT.Models.DocumentOpenCloseDTO
+
+@model DocumentOpenCloseForm
+@{
+   string codeTypeDocument = (Model != null && Model.codeDocumentType != null && Model.codeDocumentType != "") ? Model.codeDocumentType : "";
+}
+<script src="~/Scripts/documentopenclose/index.js"></script>
+
+
+<div id="formPopupControlDocumentOpenClose" class="formLayoutContainer">
+    @using (Ajax.BeginForm("PopupControlDocumentOpenClose", "DocumentOpenClose", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "formPopupControlDocumentOpenClose" }))
+    {
+
+        @Html.Hidden("id_doc", Model.id_doc);
+
+        Html.DevExpress<DocumentOpenCloseForm>().FormLayout(settings =>
+        {
+            settings.Name = "formLayoutEditDocumentOpenClose";
+            settings.Width = Unit.Pixel(650);
+            settings.ColCount = 3;
+
+            var groupItem = settings.Items.AddGroupItem(i =>
+            {
+                i.Caption = "Información del Documento";
+                i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+                i.ColSpan = 2;
+                i.ColCount = 2;
+                i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+            });
+            var groupItem2 = settings.Items.AddGroupItem(i =>
+            {
+                i.Caption = "   ";
+                i.ColCount = 1;
+                i.GroupBoxDecoration = GroupBoxDecoration.None;
+                i.Width = Unit.Percentage(1);
+            });
+
+            //N. Documento
+            groupItem.Items.Add(m => m.numberDoc, item =>
+            {
+                item.Name = "numberDoc";
+                item.Caption = "Número Documento:";
+                item.Width = Unit.Percentage(50);
+
+                item.NestedExtension().TextBox(textBox =>
+                {
+                    textBox.Width = Unit.Percentage(100);
+                    textBox.Properties.MaxLength = 100;
+
+                    textBox.Properties.ClientInstanceName = "numberDocPP";
+                    textBox.ReadOnly = true;
+
+                });
+            });
+
+            //Estado
+            groupItem.Items.Add(m => m.stateDoc, item =>
+            {
+                item.Name = "stateDoc";
+                item.Caption = "Estado:";
+                item.Width = Unit.Percentage(50);
+
+                item.NestedExtension().TextBox(textBox =>
+                {
+                    textBox.Width = Unit.Percentage(100);
+                    textBox.Properties.MaxLength = 100;
+
+                    textBox.Properties.ClientInstanceName = "stateDocPP";
+                    textBox.ReadOnly = true;
+
+                });
+            });
+            groupItem2.Items.AddEmptyItem();
+
+            //Fecha de Emisión
+            groupItem.Items.Add(m => m.emissionDate, item =>
+            {
+                item.Name = "emissionDate";
+                item.Caption = "Fecha De Emisión:";
+
+                item.NestedExtension().DateEdit(dateedit =>
+                {
+                    dateedit.Width = Unit.Percentage(100);
+                    dateedit.Properties.ClientInstanceName = "emissionDatePP";
+                    dateedit.Properties.DisplayFormatString = "dd/MM/yyyy HH:mm";
+                    dateedit.ReadOnly = true;
+
+                });
+            });
+            //Empty Col
+            groupItem.Items.AddEmptyItem();
+            groupItem2.Items.AddEmptyItem();
+            //Proveedor
+            groupItem.Items.Add(m => m.nameProvider, item =>
+            {
+                item.Name = "nameProvider";
+                item.Caption = "Proveedor:";
+                item.ColSpan = 2;
+
+                item.NestedExtension().TextBox(textBox =>
+                {
+                    textBox.Width = Unit.Percentage(100);
+                    textBox.Properties.MaxLength = 200;
+
+                    textBox.Properties.ClientInstanceName = "nameProviderPP";
+                    textBox.ReadOnly = true;
+                });
+            });
+            groupItem2.Items.AddEmptyItem();
+            //Camaronero
+            groupItem.Items.Add(m => m.nameProductionUnitProvider, item =>
+            {
+                item.Name = "nameProductionUnitProvider";
+                item.Caption = "Camaronero:";
+                item.ColSpan = 2;
+
+                item.NestedExtension().TextBox(textBox =>
+                {
+                    textBox.Width = Unit.Percentage(100);
+                    textBox.Properties.MaxLength = 200;
+
+                    textBox.Properties.ClientInstanceName = "nameProductionUnitProviderPP";
+                    textBox.ReadOnly = true;
+                });
+            });
+            groupItem2.Items.AddEmptyItem();
+            //Abrir/Cerrar
+            groupItem.Items.Add(m => m.isOpen, item =>
+            {
+                item.Name = "isOpen";
+                if (codeTypeDocument != "08")
+                {
+                    item.Caption = "Abierto:";
+                }
+                else
+                {
+                    item.Caption = "Cerrado:";
+                }
+
+                item.NestedExtension().CheckBox(textBox =>
+                {
+                    textBox.Width = Unit.Percentage(100);
+
+                    textBox.Properties.ClientInstanceName = "isOpenPP";
+                });
+            });
+            //Empty Col
+            groupItem.Items.AddEmptyItem();
+            groupItem2.Items.AddEmptyItem();
+            //Abrir/Cerrar
+            groupItem.Items.Add(m => m.commentOnAction, item =>
+            {
+                item.Name = "commentOnAction";
+                item.Caption = "Comentario:";
+                item.ColSpan = 2;
+
+                item.NestedExtension().TextBox(textBox =>
+                {
+                    textBox.Width = Unit.Percentage(100);
+                    textBox.Properties.MaxLength = 500;
+                    textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    textBox.Properties.ClientInstanceName = "commentOnAction";
+
+                });
+
+            });
+        }).Render();
+
+        <div class="row" style="text-align: right; padding: 13px 35px 5px 0px; margin-bottom: 20px; margin-right: 20px;">
+            @Html.DevExpress().Button(settings =>
+       {
+           settings.Name = "btnUpdatePopupDocumentOpenClose";
+           settings.Text = "Actualizar";
+           settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+           settings.UseSubmitBehavior = true;
+
+           //settings.ClientSideEvents.Click = "OnBtnUpdatePopupForeignCustomer_Click";
+       }).GetHtml()
+            @Html.DevExpress().Button(settings =>
+       {
+           settings.Name = "btnCancelPopupForeignCustomer";
+           settings.Text = "Cancelar";
+           settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+           settings.UseSubmitBehavior = false;
+           settings.ClientSideEvents.Click = "OnBtnCancelPopupOpeningCloseDocument_Click";
+       }).GetHtml()
+        </div>
+
+
+    }
+</div>

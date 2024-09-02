@@ -1,0 +1,42 @@
+﻿@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    Permission permission = Model ?? new Permission();
+}
+
+@Html.Hidden("id_permission", permission.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 10%;">Creado por:</td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(permission.id_userCreate))
+        </td>
+        <td style="width: 10%;">Fecha de Creación:</td>
+        <td>
+            @Html.Raw(permission.dateCreate)
+        </td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>
+            @Html.Raw(UsernameById(permission.id_userUpdate))
+        </td>
+        <td>Fecha de Modificaci&oacute;n:</td>
+        <td>
+            @Html.Raw(permission.dateUpdate)
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

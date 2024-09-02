@@ -1,0 +1,288 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using Newtonsoft.Json;
+
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.PriceListDetailFilterShow>
+
+
+@*@{
+    List<PriceListDetailFilterShow> rows = Model;//(Model as List<PriceListDetailFilterShow>);
+    rows = (rows != null) ? rows.ToList() : new List<PriceListDetailFilterShow>();
+    var priceList = rows.FirstOrDefault();
+        var id_priceList = priceList != null ? priceList.id_priceList : (int?)null;
+        //ViewData["id_priceList"] = id_priceList;
+    var strAux = DataProviderPriceList.GetColumnVisibles(id_priceList);
+    var rowAux  = JsonConvert.DeserializeObject<List<bool>> (strAux);
+    }*@
+@{
+    var grid = Html.DevExpress().GridView<PriceListDetailFilterShow>(settings =>
+    {
+        settings.Name = "gvPriceListDetail" + ViewData["id_priceList"];
+        //settings.SettingsDetail.MasterGridName = "gvPriceList";
+        settings.CallbackRouteValues = new { Controller = "PriceList", Action = "PriceListDetailFilterShowPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "PriceListDetail_OnBeginCallback";
+        settings.ClientSideEvents.Init = "PriceListDetail_Init";
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Detalles de Precios</span>");
+        });
+
+        settings.KeyFieldName = "id_item";
+
+        settings.BeforeGetCallbackResult += (s, e) =>
+        {
+            var gv = s as MVCxGridView;
+
+            //gv.DataColumns["masterCode"].Visible = rowAux[0];//.ShowItem;
+            //gv.DataColumns["name"].Visible = rowAux[0];//.ShowItem;
+            //gv.DataColumns["itemTypeCategory"].Visible = rowAux[1];//.ShowItemTypeCategory;
+            //gv.DataColumns["itemSize"].Visible = rowAux[2];//.Showsize;
+            //gv.DataColumns["purchasePrice"].Visible = rowAux[3];//.ShowPurchasePrice;
+            //gv.DataColumns["salePrice"].Visible = rowAux[4];//.ShowSalePrice;
+            if (ViewData["ShowItem"] != null && ViewData["ShowItemTypeCategory"] != null && ViewData["Showsize"] != null &&
+               ViewData["ShowPurchasePrice"] != null && ViewData["ShowSalePrice"] != null)
+            {
+                gv.DataColumns["masterCode"].Visible = (bool)ViewData["ShowItem"];
+                gv.DataColumns["name"].Visible = (bool)ViewData["ShowItem"];
+                gv.DataColumns["itemTypeCategory"].Visible = (bool)ViewData["ShowItemTypeCategory"];
+                gv.DataColumns["itemSize"].Visible = (bool)ViewData["Showsize"];
+                gv.DataColumns["purchasePrice"].Visible = (bool)ViewData["ShowPurchasePrice"];
+                gv.DataColumns["salePrice"].Visible = (bool)ViewData["ShowSalePrice"];
+            }
+
+
+        };
+
+        settings.SettingsPager.Visible = true;
+
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.SettingsBehavior.AllowSort = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        //settings.CustomJSProperties = (s, e) =>
+        //{
+        //MVCxGridView gv = s as MVCxGridView;
+        //if (gv == null)
+        //{
+        //    e.Properties["cpIdPriceList"] = 0;
+        //}else
+        //{
+        //    e.Properties["cpIdPriceList"] = ViewData["id_priceList"];
+        //}
+        //};
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "masterCode";
+            //column.PropertiesEdit.ClientInstanceName = "masterCode";
+            column.Caption = "Código";
+            //column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.UnboundType = UnboundColumnType.String;
+            column.Width = 0;//Unit.Percentage(8);
+            //column.Visible = (bool)ViewData["ShowItem"];
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+                //var ShowItem = (bool)ViewData["ShowItem"];
+                if (item != null)// && ShowItem)
+                {
+                    ViewContext.Writer.Write(item.masterCode);
+                }
+                else ViewContext.Writer.Write("");
+            });
+            //column.SetEditItemTemplateContent(c =>
+            //{
+            //    int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+            //    Item item = DataProviderItem.Item(id_item);
+            //    //var ShowItem = (bool)ViewData["ShowItem"];
+            //    if (item != null)// && ShowItem)
+            //    {
+            //        ViewContext.Writer.Write(item.masterCode);
+            //    }
+            //    else ViewContext.Writer.Write("");
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "name";
+            column.Caption = "Nombre del Producto";
+            column.UnboundType = UnboundColumnType.String;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+                //var ShowItem = (bool)ViewData["ShowItem"];
+                if (item != null)// && ShowItem)
+                {
+                    ViewContext.Writer.Write(item.name);
+                }
+                else ViewContext.Writer.Write("");
+            });
+            //column.SetEditItemTemplateContent(c =>
+            //{
+            //    int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+            //    Item item = DataProviderItem.Item(id_item);
+            //    //var ShowItem = (bool)ViewData["ShowItem"];
+            //    if (item != null)// && ShowItem)
+            //    {
+            //        ViewContext.Writer.Write(item.name);
+            //    }
+            //    else ViewContext.Writer.Write("");
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "itemTypeCategory";
+            column.Caption = "Tipo Categoría de Ítem";
+            column.UnboundType = UnboundColumnType.String;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+                //var ShowItemTypeCategory = (bool)ViewData["ShowItemTypeCategory"];
+                if (item != null)// && ShowItemTypeCategory)
+                {
+                    ViewContext.Writer.Write(item.ItemTypeCategory.name);
+                }
+                else ViewContext.Writer.Write("");
+            });
+            //column.SetEditItemTemplateContent(c =>
+            //{
+            //    int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+            //    Item item = DataProviderItem.Item(id_item);
+            //    //var ShowItemTypeCategory = (bool)ViewData["ShowItemTypeCategory"];
+            //    if (item != null)// && ShowItemTypeCategory)
+            //    {
+            //        ViewContext.Writer.Write(item.ItemTypeCategory.name);
+            //    }
+            //    else ViewContext.Writer.Write("");
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "itemSize";
+            column.Caption = "Talla";
+            column.UnboundType = UnboundColumnType.String;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+                //var Showsize = (bool)ViewData["Showsize"];
+                if (item != null)// && Showsize)
+                {
+                    ViewContext.Writer.Write(item.ItemGeneral.ItemSize != null ? item.ItemGeneral.ItemSize.name : "");
+                }
+                else ViewContext.Writer.Write("");
+            });
+            //column.SetEditItemTemplateContent(c =>
+            //{
+            //    int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+            //    Item item = DataProviderItem.Item(id_item);
+            //    //var Showsize = (bool)ViewData["Showsize"];
+            //    if (item != null)// && Showsize)
+            //    {
+            //        ViewContext.Writer.Write(item.ItemGeneral.ItemSize != null ? item.ItemGeneral.ItemSize.name : "");
+            //    }
+            //    else ViewContext.Writer.Write("");
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_metricUnit";
+            column.Name = "id_metricUnit";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_metricUnit = (int?)DataBinder.Eval(c.DataItem, "id_metricUnit");
+                MetricUnit metricUnit = DataProviderMetricUnit.MetricUnitById(id_metricUnit);
+                if (metricUnit != null)
+                {
+                    ViewContext.Writer.Write(metricUnit.code);
+                }
+                else ViewContext.Writer.Write("");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "purchasePrice";
+            column.Name = "purchasePrice";
+            column.Caption = "Precio Compra";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal purchasePrice = (decimal)DataBinder.Eval(c.DataItem, "purchasePrice");
+                ViewContext.Writer.Write(purchasePrice.ToString("C6"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "salePrice";
+            column.Name = "salePrice";
+            column.Caption = "Precio Venta";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal salePrice = (decimal)DataBinder.Eval(c.DataItem, "salePrice");
+                ViewContext.Writer.Write(salePrice.ToString("C6"));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "specialPrice";
+            column.Name = "specialPrice";
+            column.Caption = "Precio Especial";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal specialPrice = (decimal)DataBinder.Eval(c.DataItem, "specialPrice");
+                ViewContext.Writer.Write(specialPrice.ToString("C6"));
+            });
+
+        });
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+
+@grid.Bind(Model).GetHtml()

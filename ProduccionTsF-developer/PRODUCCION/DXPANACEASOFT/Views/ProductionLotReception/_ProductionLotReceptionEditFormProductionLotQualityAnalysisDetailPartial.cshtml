@@ -1,0 +1,283 @@
+﻿@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProductionLotQualityAnalysis>
+
+@{
+    var grid = Html.DevExpress().GridView<ProductionLotQualityAnalysis>(settings =>
+    {
+        settings.Name = "gvProductionLotReceptionEditFormProductionLotQualityAnalysissDetail";
+        settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionEditFormProductionLotQualityAnalysissDetailPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "ProductionLotReceptionItemsDetail_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionEditFormProductionLotQualityAnalysissDetailAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionEditFormProductionLotQualityAnalysissDetailUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionEditFormProductionLotQualityAnalysissDetailDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id_qualityAnalysis";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewQualityAnalysisDetailsInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewQualityAnalysissDetailSelectionChanged";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewQualityAnalysisDetailsBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewQualityAnalysisDetailsEndCallback";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfoQualityAnalysiss""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRowsQualityAnalysiss"" style=""cursor: pointer;"" onclick=""gvEditQualityAnalysisDetailsSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelectionQualityAnalysiss"" style=""cursor: pointer;"" onclick=""gvEditQualityAnalysisDetailsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        //settings.InitNewRow = (s, e) =>
+        //{
+        //    e.NewValues["quantity"] = 0.00M;
+        //};
+
+        #region ColumnsAdd
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_qualityAnalysis";
+            column.Caption = "Nombre del Análisis";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_qualityAnalysis";
+                p.DataSource = DataProviderQualityAnalysis.QualityAnalysiss((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.Width = Unit.Percentage(100);
+                p.ValueType = typeof(int);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.DropDown = "QualityAnalysisProductionLotQualityAnalysisDetailCombo_DropDown";
+                //p.ClientSideEvents.SelectedIndexChanged = "QualityAnalysisProductionLotQualityAnalysisDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnQualityAnalysisProductionLotQualityAnalysisDetailValidation";
+            });
+        });
+
+        settings.Columns.Add(m => m.result, column =>
+        {
+            column.Name = "result";
+            column.Caption = "Resultado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.e
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "result";
+
+                p.Width = Unit.Percentage(100);
+
+                p.ClientSideEvents.Validation = "OnResultProductionLotQualityAnalysisDetailValidation";
+            });
+
+        });
+
+        //@Html.DevExpress().TextBoxFor(m => m.reference, settings =>
+        //    {
+        //        settings.Name = "reference";
+        //        settings.Properties.ClientInstanceName = "reference";
+        //        settings.Width = Unit.Percentage(100);
+
+        //        settings.ShowModelErrors = true;
+
+        //    }).GetHtml()
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.Name = "metricUnit";
+        //    column.Caption = "UM";
+        //    column.Width = Unit.Percentage(5);
+        //    column.UnboundType = UnboundColumnType.String;
+
+        //    column.SetDataItemTemplateContent(c =>
+        //    {
+        //        int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+        //        Item item = DataProviderItem.Item(id_item);
+
+        //        string text = string.Empty;
+
+        //        if (item != null && item.ItemPurchaseInformation != null)
+        //        {
+        //            text = item.ItemPurchaseInformation.MetricUnit.code;
+        //        }
+
+        //        ViewContext.Writer.Write(text);
+        //    });
+        //});
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "id_warehouse";
+        //    column.Caption = "Bodega";
+        //    column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+        //    column.EditorProperties().ComboBox(p =>
+        //    {
+        //        p.ClientInstanceName = "id_warehouse";
+        //        p.DataSource = DataProviderWarehouse.Warehouses((int)ViewData["id_company"]);
+        //        p.ValueField = "id";
+        //        p.TextField = "name";
+        //        p.Width = Unit.Percentage(100);
+        //        p.ValueType = typeof(int);
+        //        p.DropDownStyle = DropDownStyle.DropDownList;
+        //        p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+        //        p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+        //        //p.ClientSideEvents.SelectedIndexChanged = "WarehouseDetailCombo_SelectedIndexChanged";
+        //        p.ClientSideEvents.Validation = "OnWarehouseProductionLotQualityAnalysisDetailValidation";
+        //    });
+        //});
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "id_warehouseLocation";
+        //    column.Caption = "Ubicación";
+        //    column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+        //    column.EditorProperties().ComboBox(p =>
+        //    {
+        //        p.ClientInstanceName = "id_warehouseLocation";
+        //        p.DataSource = DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"]);
+        //        p.ValueField = "id";
+        //        p.TextField = "name";
+        //        p.Width = Unit.Percentage(100);
+        //        p.ValueType = typeof(int);
+        //        p.DropDownStyle = DropDownStyle.DropDownList;
+        //        p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+        //        p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+        //        //p.ClientSideEvents.SelectedIndexChanged = "WarehouseLocationDetailCombo_SelectedIndexChanged";
+        //        p.ClientSideEvents.Validation = "OnWarehouseLocationProductionLotQualityAnalysisDetailValidation";
+        //    });
+        //});
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "quantity";
+        //    column.Name = "quantity";
+        //    column.Caption = "Cantidad";
+        //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        //    column.Width = Unit.Percentage(10);
+
+        //    column.EditorProperties().SpinEdit(p =>
+        //    {
+        //        p.ClientInstanceName = "quantity";
+        //        p.DisplayFormatString = "N2";
+        //        p.DisplayFormatInEditMode = true;
+        //        p.DecimalPlaces = 2;
+        //        p.SpinButtons.ShowIncrementButtons = true;
+        //        p.SpinButtons.ShowLargeIncrementButtons = true;
+        //        p.Increment = 0.01M;
+        //        p.LargeIncrement = 1.0M;
+        //        p.MinValue = 0;
+        //        //p.MaxValue = 100;
+        //        p.NumberType = SpinEditNumberType.Float;
+        //        p.NumberFormat = SpinEditNumberFormat.Number;
+
+        //        //p.ClientSideEvents.NumberChanged = "Quantity_NumberChange";
+        //        //p.ClientSideEvents.Validation = "OnQuantityProductionLotQualityAnalysisDetailValidation";
+        //    });
+        //});
+
+
+        //Botones de comandos para registros de la tabla
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 20,
+            Caption = "Acciones"
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.Width = Unit.Percentage(11);
+
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+        #region ColumnsEdit
+
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+
+<script src="~/Scripts/productionlotreception/_productionLotReceptionProductionLotQualityAnalysisDetailsEditForm.js"></script>

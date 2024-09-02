@@ -1,0 +1,110 @@
+﻿
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<PenalityClassShrimpDTO>(settings =>
+    {
+        settings.Name = "GridViewPenality";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "PenalityClassShrimp",
+            Action = "GridViewPenalityList",
+        };
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.ClientSideEvents.RowClick = "OnGridFocusedRowChanged";
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id";
+            column.Name = "id";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "nameDestination";
+            column.Name = "nameDestination";
+            column.Caption = "Proveedor / Grupo";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "byProvider";
+            column.Name = "byProvider";
+            column.Caption = "Es Proveedor?";
+            column.EditorProperties().CheckBox(p =>
+            {
+
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "byGroup";
+            column.Name = "byGroup";
+            column.Caption = "Es Grupo?";
+            column.EditorProperties().CheckBox(p =>
+            {
+
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_provider";
+            column.Name = "id_provider";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_groupPersonByRol";
+            column.Name = "id_groupPersonByRol";
+            column.Visible = false;
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = false,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 3,
+            Caption = "Acción",
+            Width = Unit.Percentage(8)
+        };
+
+        commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+        {
+            ID = "btnShowRow",
+            Text = "Mostrar"
+        });
+
+        settings.ClientSideEvents.CustomButtonClick = "GridViewPenalityShow_Click";
+        settings.ClientSideEvents.RowDblClick = "GridViewPenalityShow_Click";
+        settings.Columns.Add(commandColumn);
+    });
+}
+@grid.Bind(Model).GetHtml()

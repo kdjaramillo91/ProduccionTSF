@@ -1,0 +1,58 @@
+﻿@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model LiquidationCartOnCartController.ComboBoxMachinesProdOpeningModel
+
+@Html.DevExpress().ComboBoxFor(
+    m => m.id_MachineProdOpening,
+    comboBox =>
+    {
+        comboBox.Name = "id_MachineProdOpeningDetail";
+        comboBox.Width = Unit.Percentage(110);
+        comboBox.ReadOnly = (this.Model.documentStateCode != "01") || this.Model.itemsReceivedTunnels;
+        comboBox.ShowModelErrors = true;
+
+        comboBox.CallbackRouteValues = new { Controller = "LiquidationCartOnCart", Action = "GetMachinesForProdOpening" };
+
+        var p = comboBox.Properties;
+        p.ClientInstanceName = "id_MachineProdOpeningDetail";
+        //p.ValueField = "MachineForProd.id"; 
+        p.ValueField = "MachineProdOpening.id";
+        p.TextField = "name";
+        p.TextFormatString = "{0}";
+        p.ValueType = typeof(int);
+
+        p.Columns.Add("MachineForProd.name", "Máquina", 140);
+        p.Columns.Add("MachineProdOpening.Turn.name", "Turno", 70);
+        p.Columns.Add("MachineProdOpening.id", "idMachineProdOpeningT", 0);
+        p.Columns.Add("MachineForProd.id", "idMachineForProdT", 0);
+
+        var events = comboBox.Properties.ClientSideEvents;
+        events.Init = "MachineForProd_Init";
+        events.SelectedIndexChanged = "MachineForProd_SelectedIndexChanged";
+        events.Validation = "MachineForProd_Validation";
+        events.BeginCallback = "MachineForProd_BeginCallback";
+
+        comboBox.CustomJSProperties = (s, e) =>
+        {
+            e.Properties.Add("cpMachineForProd", this.Model.id_MachineForProd);
+            e.Properties.Add("cpMachineProdOpening", this.Model.id_MachineProdOpening);
+            e.Properties.Add("cpDocumentStateCode", this.Model.documentStateCode);
+            e.Properties.Add("cpPersonProcessPlant", this.Model.id_PersonProcessPlant);
+        };
+
+    }).BindList(this.GetMachinesForProd()).Bind(this.Model.id_MachineForProd).GetHtml()
+
+@functions{
+	private System.Collections.IEnumerable GetMachinesForProd()
+	{
+		return DataProviderMachineForProd.GetMachineForProdOpening(
+			this.Model.id_MachineForProd,
+			this.Model.id_MachineProdOpening,
+			this.Model.emissionDate,
+			this.Model.id_PersonProcessPlant,
+            null,
+			(EntityObjectPermissions)ViewData["entityObjectPermissions"]);
+	}
+}

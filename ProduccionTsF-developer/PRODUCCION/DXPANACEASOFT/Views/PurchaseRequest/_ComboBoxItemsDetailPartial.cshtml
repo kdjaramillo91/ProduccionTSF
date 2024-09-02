@@ -1,0 +1,33 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.CallbackRouteValues = new { Controller = "PurchaseRequest", Action = "ComboBoxItemsDetailPartial" };
+    settings.Name = "id_item";
+    settings.Properties.ClientInstanceName = "id_item";
+
+    //settings.Properties.TextField = "name";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.TextFormatString = "{1}";
+    settings.Properties.CallbackPageSize = 30;
+    settings.Properties.Columns.Add("masterCode", "Código", Unit.Percentage(30));
+    settings.Properties.Columns.Add("name", "Nombre del Producto", Unit.Percentage(50));
+    //p.Columns.Add("barCode", "Cód. Barra", Unit.Percentage(20));
+    settings.Properties.Columns.Add("ItemPurchaseInformation.MetricUnit.code", "UM", Unit.Percentage(20));
+    
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.ShowModelErrors = true;
+
+    settings.Properties.ClientSideEvents.Init = "itemCombo_OnInit";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemsCombo_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.BeginCallback = "ItemsCombo_BeginCallback";
+    settings.Properties.ClientSideEvents.Validation = "OnItemValidation";
+
+}).BindList(Model).Bind(ViewData["id_item"]).GetHtml()

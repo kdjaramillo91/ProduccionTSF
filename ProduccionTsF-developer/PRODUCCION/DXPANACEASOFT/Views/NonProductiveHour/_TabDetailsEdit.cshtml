@@ -1,0 +1,154 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.NonProductiveHourDTO
+
+<div>
+    <div class="Etiqueta"><b>Informaci&oacute;n General</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Fecha: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.dateTimeEmisionStr,
+settings =>
+{
+    settings.Name = "dateTimeEmisionStr";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = true;
+}).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Máquina: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.machineForProd,
+settings =>
+{
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = true;
+}).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Proceso: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.personProcessPlant,
+settings =>
+{
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = true;
+}).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Turno: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.turn,
+                settings =>
+                {
+                    settings.Name = "turn";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+        </div>
+        <div class="Etiqueta"><b>Totales</b></div>
+        <hr style="width: 100%; margin: 10px;">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Horas Parada: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.hoursStop,
+                settings =>
+                {
+                    settings.Name = "hoursStop";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Horas Producción: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.hoursProduction,
+                settings =>
+                {
+                    settings.Name = "hoursProduction";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Total Horas: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.totalHours,
+                settings =>
+                {
+                    settings.Name = "totalHours";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-4">
+            </div>
+        </div>
+    </div>
+
+    <div class="Etiqueta"><b>Detalles</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer" id="divGridViewDetails">
+
+        @Html.Partial("_GridMessageErrorDetail")
+        @{
+            if (ViewBag.enabled == null || (bool)ViewBag.enabled)
+            {
+                @Html.Partial("PanelButtonsDetailEdit")
+            }
+        }
+        @Html.Partial("_GridViewDetails", Model.NonProductiveHourDetails.OrderBy(ob => ob.startDate).ThenBy(tb => tb.startTime))
+    </div>
+</div>

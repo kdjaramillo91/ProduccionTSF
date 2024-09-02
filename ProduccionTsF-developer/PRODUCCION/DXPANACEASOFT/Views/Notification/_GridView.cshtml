@@ -1,0 +1,92 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvNotification";
+        settings.KeyFieldName = "id";
+        settings.CallbackRouteValues = new { Controller = "Notification", Action = "GridViewNotification" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.AllPages;
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+        settings.ClientSideEvents.SelectionChanged = "On_GridView_SelectionChanged";
+        settings.ClientSideEvents.RowDblClick = "On_GridView_DobleClick";
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Columns.Add(c => {
+            c.FieldName = "title";
+            c.Caption = "Titulo";
+            c.Visible = false;
+            c.ReadOnly = true;
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "description";
+            c.Caption = "Descripción";
+            c.Visible = false;
+            c.ReadOnly = true;
+            c.EditorProperties().Memo(p => {
+            });
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "noDocument";
+            c.Caption = "Documento";
+            c.ReadOnly = true;
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "documentType";
+            c.Caption = "Tipo de Documento";
+            c.ReadOnly = true;
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "documentState";
+            c.Caption = "Modificado A";
+            c.ReadOnly = true;
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "dateTime";
+            c.Caption = "Fecha y Hora ";
+            c.ReadOnly = true;
+        });
+
+        settings.Columns.Add(c => {
+            c.FieldName = "reading";
+            c.Caption = "Visto";
+            c.EditorProperties().CheckBox(p => {
+            });
+        });
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+            var notification = DataProviderNotification.Notification(id);
+            Html.RenderPartial("_FormEdit", notification);
+        });
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

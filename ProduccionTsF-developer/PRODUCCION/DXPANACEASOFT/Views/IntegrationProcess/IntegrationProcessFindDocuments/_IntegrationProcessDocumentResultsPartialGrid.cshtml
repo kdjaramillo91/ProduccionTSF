@@ -1,0 +1,198 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.IntegrationProcessDetail>
+
+@{
+    IntegrationProcess integraProcess = TempData["IntegrationProcess"] as IntegrationProcess;
+    string codeTypeDocument = (integraProcess != null && integraProcess.DocumentType.code != null) ? integraProcess.DocumentType.code : "";
+}
+
+@{
+
+
+    var grid = Html.DevExpress().GridView<IntegrationProcessDetail>(settings =>
+    {
+
+        settings.Name = "gvIntegrationProcessDetailResult";
+        settings.CallbackRouteValues = new { Controller = "IntegrationProcess", Action = "CallBackDocument" };
+        settings.Width = Unit.Pixel(1000);
+
+        //settings.SettingsSearchPanel.Visible = true;
+        //settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id_Document";
+        // settings.KeyFieldName = "id_Document";
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 7;
+        settings.Settings.ShowGroupPanel = false;
+
+        //settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        //settings.Settings.ShowFooter = true;
+        //settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = false;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        // settings.ClientSideEvents.SelectionChanged = "SelectionChanged";
+
+        /* Funcion Javascript*/
+
+
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Resultado Documentos </span>");
+        });
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpidRow"] = 0;
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+        };
+
+
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+
+        //DETALLES EN GRID LLAMADA A OTRA
+        settings.SetDetailRowTemplateContent(column =>
+        {
+
+            // TODO: RECODE
+
+            //int? id_invoice = (int?)DataBinder.Eval(column.DataItem, "id");
+            //Invoice invoice = DataProviderInvoiceExterior.InvoiceExteriorById(id_invoice);
+            //Html.RenderPartial("_IntegrationProcessDetailViewPartialDocument", invoice);
+        });
+
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        settings.Columns.Add(m => m.id_Document, column =>
+        {
+            column.Name = "id_Document";
+            column.PropertiesEdit.ClientInstanceName = "id_Document";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(0);
+            column.Visible = false;
+
+        });
+
+        //Document
+        settings.Columns.Add(m => m.Document.number, column =>
+        {
+            column.Name = "number";
+            column.PropertiesEdit.ClientInstanceName = "number";
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(11);
+
+        });
+
+        settings.Columns.Add(m => m.Document.emissionDate, column =>
+        {
+            column.Name = "emissionDate";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(12);
+        });
+
+        settings.Columns.Add(m => m.Document.Lot.ProductionLot.sequentialLiquidation, column =>
+        {
+            column.Name = "sequentialLiquidation";
+            column.Caption = "Número Liquidación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(11);
+            if (codeTypeDocument == "36")
+            {
+                column.Visible = true;
+            }
+            else
+            {
+                column.Visible = false;
+            }
+        });
+
+
+        settings.Columns.Add(m => m.glossData, column =>
+        {
+            column.Name = "glossData";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.Width = Unit.Percentage(70);
+
+            column.PropertiesEdit.EncodeHtml = false;
+
+        });
+
+
+        settings.Columns.Add(m => m.totalValueDocument, column =>
+        {
+            column.Name = "totalValueDocument";
+            column.PropertiesEdit.ClientInstanceName = "totalValueDocument";
+            column.Caption = "Valor Documento";
+
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(35);
+
+            column.PropertiesEdit.EncodeHtml = false;
+
+            var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+            SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+            SpinEdit.DisplayFormatString = "C0";
+            SpinEdit.DecimalPlaces = 0;
+
+        });
+
+
+
+    }
+
+
+);
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+
+}@grid.Bind(Model).GetHtml()
+
+@functions {
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id_Document"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

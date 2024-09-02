@@ -1,0 +1,276 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.FrameworkContractItem>
+@{
+    //var metricUnitUMTPAux = DataProviderSetting.ValueSetting("UMTP");
+    //var id_metricUnitUMTPValueAux = int.Parse(metricUnitUMTPAux != null ? metricUnitUMTPAux : "0");
+    //var metricUnitUMTP = DataProviderMetricUnit.MetricUnitById(id_metricUnitUMTPValueAux);
+    var code_typeContractFramework = (string)ViewData["code_typeContractFramework"];
+    var code_documentState = (string)ViewData["code_documentState"];
+
+}
+@{
+    var grid = Html.DevExpress().GridView<FrameworkContractItem>(settings => {
+        settings.Name = "PersonFrameworkContractItems";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "PersonFrameworkContractItem" };
+
+        settings.ClientSideEvents.BeginCallback = "FrameworkContractItem_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "FrameworkContractItemAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "FrameworkContractItemUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "FrameworkContractItemDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm; //GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = (code_typeContractFramework != null && code_typeContractFramework != "") &&
+                                                  (code_documentState != "03" && code_documentState != "05");
+        settings.CommandColumn.ShowEditButton = (code_typeContractFramework != null && code_typeContractFramework != "");
+        settings.CommandColumn.ShowNewButtonInHeader = (code_typeContractFramework != null && code_typeContractFramework != "") &&
+                                                  (code_documentState != "03" && code_documentState != "05");
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.BeforeGetCallbackResult += (s, e) =>
+        {
+            var gv = s as MVCxGridView;
+            gv.DataColumns["id_metricUnitFrameworkContractItem"].Visible = (code_typeContractFramework == "VA31" || code_typeContractFramework == "VA41C");
+            gv.DataColumns["amoutFrameworkContractItem"].Visible = (code_typeContractFramework == "VA31" || code_typeContractFramework == "VA41C");
+            gv.DataColumns["valueFrameworkContractItem"].Visible = (code_typeContractFramework == "VA31" || code_typeContractFramework == "VA41V");
+
+        };
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            //int id_item = (int)DataBinder.Eval(c.DataItem, "id");
+            FrameworkContractItem detail = (FrameworkContractItem)Model[c.ItemIndex];
+
+            //Item detail = DataProviderItem.Item(id_item);
+            if (detail != null && detail.FrameworkContractDeliveryPlan != null && detail.FrameworkContractDeliveryPlan.Count > 0)
+            {
+                //Html.RenderAction("_BusinessOportunityPhasesDetailPartial", new { item = detail });
+                Html.RenderPartial("_FrameworkContractDeliveryPlanDetailViewPartial", detail);
+            }
+
+            if (detail != null && detail.FrameworkContractExtension != null && detail.FrameworkContractExtension.Count > 0)
+            {
+                //Html.RenderAction("_BusinessOportunityPhasesDetailPartial", new { item = detail });
+                Html.RenderPartial("_FrameworkContractExtensionDetailViewPartial", detail.FrameworkContractExtension.FirstOrDefault());
+            }
+        });
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpRowsCount"] = 0;
+            }
+            else
+            {
+                List<FrameworkContractItem> rows = (Model as List<FrameworkContractItem>);
+                rows = (rows != null) ? rows.ToList() : new List<FrameworkContractItem>();
+
+                e.Properties["cpRowsCount"] = rows.Count;
+            }
+
+        };
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        //starDate
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "startDate";
+            column.Name = "startDate";
+            column.Width = Unit.Percentage(10);
+            column.Caption = "Fecha de Inicio";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                DateTime? startDate = (DateTime?)DataBinder.Eval(c.DataItem, "startDate");
+
+                ViewContext.Writer.Write(startDate == null ? "" : startDate.Value.ToString("dd/MM/yyyy"));
+            });
+
+        });
+
+        //endDate
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "endDate";
+            column.Name = "endDate";
+            column.Width = Unit.Percentage(10);
+            column.Caption = "Fecha de Fin";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                DateTime? endDate = (DateTime?)DataBinder.Eval(c.DataItem, "endDate");
+
+                ViewContext.Writer.Write(endDate == null ? "" : endDate.Value.ToString("dd/MM/yyyy"));
+            });
+
+        });
+
+        //id_item
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Caption = "Producto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                FrameworkContractItem detail = (FrameworkContractItem)Model[c.ItemIndex];
+
+                string item = (detail != null && detail.Item != null) ? detail.Item.name : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                ViewContext.Writer.Write(item);
+
+            });
+
+        });
+
+        //id_metricUnit
+        settings.Columns.Add(column =>
+        {
+
+            column.FieldName = "id_metricUnit";
+            column.Name = "id_metricUnitFrameworkContractItem";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "id_metricUnit";
+            column.Visible = (code_typeContractFramework == "VA31" || code_typeContractFramework == "VA41C");
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_metricUnit = (int?)DataBinder.Eval(c.DataItem, "id_metricUnit");
+                var metricUnit = DataProviderMetricUnit.MetricUnit(id_metricUnit);
+                string strMetricUnit = (metricUnit != null) ? metricUnit.code : "";
+                ViewContext.Writer.Write(strMetricUnit);
+                //FrameworkContractItem detail = (FrameworkContractItem)Model[c.ItemIndex];
+
+                //string metricUnitPurchase = (detail != null && detail.Item != null && detail.Item.ItemPurchaseInformation != null && detail.Item.ItemPurchaseInformation.MetricUnit != null) ? detail.Item.ItemPurchaseInformation.MetricUnit.code : "";
+                //string metricUnitSale = (detail != null && detail.Item != null && detail.Item.ItemSaleInformation != null && detail.Item.ItemSaleInformation.MetricUnit != null) ? detail.Item.ItemSaleInformation.MetricUnit.code : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                ////15: Oportunidad de Venta y 16: Oportunidad de Compra
+                //string metricUnit = (codeBusinessOportunityDocumentType == "15") ? metricUnitSale : ((codeBusinessOportunityDocumentType == "16") ? metricUnitPurchase : "");
+                //ViewContext.Writer.Write(metricUnit);
+                //string text = metricUnitUMTP != null ? metricUnitUMTP.code : "";
+                //ViewContext.Writer.Write(text);//metricUnitUMTP != null ? metricUnitUMTP.code : ""/*"Lbs"*/);
+
+            });
+
+        });
+
+        //amout
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "amout";
+            column.Name = "amoutFrameworkContractItem";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+            column.Visible = (code_typeContractFramework == "VA31" || code_typeContractFramework == "VA41C");
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? amout = (decimal?)DataBinder.Eval(c.DataItem, "amout");
+                ViewContext.Writer.Write(amout == null ? "" : amout.Value.ToString("N2"));
+            });
+
+        });
+
+        //value
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "value";
+            column.Name = "valueFrameworkContractItem";
+            column.Caption = "Valor";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "totalItemDetail";
+            column.Visible = (code_typeContractFramework == "VA31" || code_typeContractFramework == "VA41V");
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                decimal? value = (decimal?)DataBinder.Eval(c.DataItem, "value");
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                string strValue = value == null ? "" : value.Value.ToString("$#,###.00");
+                ViewContext.Writer.Write(strValue);
+
+            });
+
+        });
+
+        #region EditorLayout
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            FrameworkContractItem detail = new FrameworkContractItem();
+            if (c.ItemIndex >= 0)
+            {
+                detail = Model[c.ItemIndex];
+            }
+            //detail = (detail == null) ? new BusinessOportunityPhase() : detail;
+            ////Item detail = DataProviderItem.Item(id_item);
+            ////if (detail != null)
+            ////{
+            ////Html.RenderAction("_BusinessOportunityPhasesEditPartial", new { item = detail });
+            ////}
+            Html.RenderPartial("_FrameworkContractItemsEditPartial", detail);
+
+            //int? id_businessOportunityPhase = (int?)DataBinder.Eval(c.DataItem, "id");
+            //BusinessOportunityPhase businessOportunityPhase = (id_businessOportunityPhase != null) ? DataProviderBusinessOportunity.BusinessOportunityPhase(id_businessOportunityPhase) : new BusinessOportunityPhase();
+            //Html.RenderPartial("_BusinessOportunityPhasesEditPartial", businessOportunityPhase);
+
+            //int? id_item = (int?)DataBinder.Eval(content.DataItem, "id");
+            //Item item = (id_item != null) ? DataProviderItem.Item((int)id_item) : new Item { isActive = true };
+            //Html.RenderPartial("_ItemFormEdit", item);
+        });
+
+        #endregion
+
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

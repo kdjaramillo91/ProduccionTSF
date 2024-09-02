@@ -1,0 +1,45 @@
+﻿
+@using DXPANACEASOFT.Models
+
+@model InventoryMoveDetail
+
+@{
+}
+@{
+	var name = String.Concat("ItemDetail", this.Model.id);
+	var idItem = this.Model.id_item;
+}
+@Html.DevExpress().ComboBox(
+    settings =>
+    {
+        settings.Name = name;
+
+
+        var p = settings.Properties;
+        p.ClientInstanceName = name;
+        p.ValueField = "id";
+
+        p.ValueType = typeof(int);
+        p.TextFormatString = "{0},{1}";
+        p.CallbackPageSize = 30;
+        p.DropDownStyle = DropDownStyle.DropDownList;
+        p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+        p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+        p.IncrementalFilteringDelay = 250;
+
+        p.Columns.Add("masterCode", "Código Auxiliar", Unit.Percentage(120));
+        p.Columns.Add("name", "Nombre del Producto", Unit.Percentage(400));
+
+        p.ClientSideEvents.Init = "ItemCombo_OnInit";
+        p.ClientSideEvents.BeginCallback = "OnItemDetailBeginCallback";
+        p.ClientSideEvents.EndCallback = "OnItemDetailEndCallback";
+        p.ClientSideEvents.SelectedIndexChanged = "DetailsItemsCombo_SelectedIndexChanged";
+        settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "GetItems" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.ItemTextCellPrepared = (sender, e) =>
+        {
+            e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+        };
+    }).BindList(ViewData["_ItemsDetailEditIM"]).Bind(idItem).GetHtml()

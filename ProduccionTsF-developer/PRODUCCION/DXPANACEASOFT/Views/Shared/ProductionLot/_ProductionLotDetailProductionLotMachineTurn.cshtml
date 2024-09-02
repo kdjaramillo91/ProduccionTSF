@@ -1,0 +1,128 @@
+﻿@using DXPANACEASOFT.Controllers
+
+@model DXPANACEASOFT.Models.ProductionLotMachineTurn
+@{
+    string codeState = (string)ViewBag.codeStateLiqNoval;
+    int? id_MachineForProd = (Model != null) ? Model.idMachineForProd : (int?)null;
+    int? id_MachineProdOpening = (Model != null) ? Model.idMachineProdOpening : (int?)null;
+    int? id_Turn = (Model != null) ? Model.idTurn : (int?)null;
+
+    DateTime? receptionDate = (DateTime?)ViewBag.receptionDateLiqNoVal;
+    int? id_PersonProcessPlant = (int?)ViewBag.id_personProcessPlantLiqNoVal;
+
+    @Html.Hidden("id_MachineProdOpeningDetailInitLiqNoVal", (int?)ViewBag.id_MachineProdOpeningDetailInitLiqNoVal) //=> ? de donde sale
+    @Html.Hidden("timeInitMachineProdOpeningDetailLiqNoVal", (TimeSpan?)ViewBag.timeInitMachineProdOpeningDetailLiqNoVal)
+    @Html.HiddenFor(m => m.idMachineForProd, new { @id = "id_MachineForProdLiqNoVal" })
+    @Html.HiddenFor(m => m.idMachineProdOpening, new { @id = "id_MachineProdOpeningLiqNoVal" })
+    @Html.Hidden("id_MachineForProdT2LiqNoVal", id_MachineForProd)
+    @Html.Hidden("id_MachineProdOpeningT2LiqNoVal", id_MachineProdOpening)
+     
+}
+
+<table id="documentProductionLot" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="8">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Liquidación No Valorizada</span>
+        </td>
+    </tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.idMachineProdOpeningDetail, settings =>
+	   {
+		   //CAMBIO FEO
+		   settings.Text = "Máquina";
+		   settings.AssociatedControlName = "idMachineProdOpeningDetail";
+	   }).GetHtml()
+		</td>
+		<td width="25%">
+			@{
+				var machinesForProdModel = new ProductionLotProcessController.ComboBoxMachinesProdOpeningModel()
+				{
+					id_MachineForProd = id_MachineForProd,
+					id_MachineProdOpening = id_MachineProdOpening,
+					documentStateCode = codeState,
+					emissionDate = receptionDate,
+					id_PersonProcessPlant = id_PersonProcessPlant,
+					id_Turn = id_Turn,
+				};
+
+				Html.RenderPartial("ProducionComboBox/_ComboBoxMachinesProdOpeningLiqNoVal", machinesForProdModel);
+			}
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+		   {
+			   settings.Text = "Turno:";
+			   settings.AssociatedControlName = "TurnNameLiqNoVal";
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBoxFor(m => m.TurnNameLiqNoVal, settings =>
+		   {
+			   settings.Properties.ClientInstanceName = "TurnNameLiqNoVal";
+			   settings.Name = "TurnNameLiqNoVal";
+			   settings.Width = Unit.Percentage(100);
+			   settings.ReadOnly = true;
+			   settings.ShowModelErrors = true;
+
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.timeInit, settings =>
+		   {
+			   settings.Text = "Hora Inicio:";
+			   settings.AssociatedControlName = "timeInitLiqNoVal";
+		   }).GetHtml()
+		</td>
+		@{
+			TimeSpan? timeInit = (Model != null) ? (TimeSpan?)Model.timeInit : null;
+		}
+		<td>
+			@Html.DevExpress().TimeEdit(timeEdit =>
+	   {
+		   timeEdit.Name = "timeInitLiqNoVal";
+		   timeEdit.Properties.ClientInstanceName = "timeInitLiqNoVal";
+		   timeEdit.Width = Unit.Percentage(100);
+		   timeEdit.ReadOnly = (codeState == "04" || codeState == "05" || codeState == "06");
+		   timeEdit.Properties.DisplayFormatInEditMode = true;
+		   timeEdit.Properties.EditFormatString = "HH:mm";
+		   timeEdit.Properties.DisplayFormatString = "HH:mm";
+		   timeEdit.Properties.EditFormat = EditFormat.Time;
+		   if (timeInit != null)
+		   {
+			   timeEdit.DateTime = new DateTime(2014, 1, 1, timeInit.Value.Hours, timeInit.Value.Minutes, 0);
+		   }
+		   timeEdit.ShowModelErrors = false;
+	   }).GetHtml()
+		</td>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.timeEnd, settings =>
+		   {
+			   settings.Text = "Hora Fin:";
+			   settings.AssociatedControlName = "timeEndLiqNoVal";
+		   }).GetHtml()
+		</td>
+		@{
+			TimeSpan? timeEnd = (Model != null) ? (TimeSpan?)Model.timeEnd : null;
+		}
+		<td>
+			@Html.DevExpress().TimeEdit(timeEdit =>
+	   {
+		   timeEdit.Name = "timeEndLiqNoVal";
+		   timeEdit.Properties.ClientInstanceName = "timeEndLiqNoVal";
+		   timeEdit.Width = Unit.Percentage(100);
+		   timeEdit.ReadOnly = ((codeState == "04" || codeState == "05" || codeState == "06"));
+		   timeEdit.Properties.DisplayFormatInEditMode = true;
+		   timeEdit.Properties.EditFormatString = "HH:mm";
+		   timeEdit.Properties.DisplayFormatString = "HH:mm";
+		   timeEdit.Properties.EditFormat = EditFormat.Time;
+		   if (timeEnd != null)
+		   {
+			   timeEdit.DateTime = new DateTime(2014, 1, 1, timeEnd.Value.Hours, timeEnd.Value.Minutes, 0);
+		   }
+		   timeEdit.ShowModelErrors = false;
+	   }).GetHtml()
+		</td>
+	</tr>
+</table>

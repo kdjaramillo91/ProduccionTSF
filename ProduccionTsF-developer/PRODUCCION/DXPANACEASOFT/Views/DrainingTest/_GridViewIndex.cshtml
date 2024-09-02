@@ -1,0 +1,171 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+	var grid = Html.DevExpress().GridView<DrainingTestResultConsultDTO>(settings =>
+	{
+		settings.Name = "GridViewDrainingTest";
+		settings.CallbackRouteValues = new {Controller = "DrainingTest", Action = "GridViewDrainingTest"};
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SettingsExport.EnableClientSideExportAPI = true;
+		settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+		settings.SettingsExport.FileName = "Prueba_Escurrido_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+		settings.Toolbars.Add(t =>
+		{
+			t.EnableAdaptivity = true;
+			t.Items.Add(GridViewToolbarCommand.ExportToXls);
+			t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+			t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+		});
+
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.ClientSideEvents.RowClick = "OnGridFocusedRowChanged";
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id";
+			column.Name = "id";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canEdit";
+			column.Name = "canEdit";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canAproved";
+			column.Name = "canAproved";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canReverse";
+			column.Name = "canReverse";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "canAnnul";
+			column.Name = "canAnnul";
+			column.Visible = false;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "number";
+			column.Caption = "No. Prueba";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "emissionDate";
+			column.Caption = "Fecha de Emisión";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "numberLot";
+			column.Caption = "No. Lote";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "secTransaction";
+			column.Caption = "Sec.Transaccional";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "numberRemissionGuide";
+			column.Caption = "No. de Guía";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "personProcessPlant";
+			column.Caption = "Proceso";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "provider";
+			column.Caption = "Proveedor";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "poundsRemitted";
+			column.Caption = "Lbs. Remitidas";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			var prop = column.PropertiesEdit as SpinEditProperties;
+			prop.DisplayFormatString = "n";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "poundsProjected";
+			column.Caption = "Lbs. Proyectadas";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "analist";
+			column.Caption = "Analista";
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "state";
+			column.Caption = "Estado";
+		});
+
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = false,
+			ShowDeleteButton = false,
+			Visible = true,
+			VisibleIndex = 11,
+			Caption = "Acción",
+			Width = Unit.Percentage(8)
+		};
+
+		commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+		{
+			ID = "btnShowRow",
+			Text = "Mostrar"
+		});
+
+		settings.ClientSideEvents.CustomButtonClick = "GridViewBtnShow_Click";
+		settings.ClientSideEvents.RowDblClick = "GridViewBtnShow_Click";
+		settings.Columns.Add(commandColumn);
+
+	});
+}
+@grid.Bind(Model).GetHtml()

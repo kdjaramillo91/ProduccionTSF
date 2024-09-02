@@ -1,0 +1,210 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@*@using DXPANACEASOFT.Models.InventoryMoveDTO*@
+
+@{
+    string code = (ViewData["code"] != null) ? (string)ViewData["code"] : "";
+
+    string codeNatureMove = ViewData["_natureMove"] != null ? (string)ViewData["_natureMove"] : "";
+
+    codeNatureMove = codeNatureMove.Trim();
+}
+
+@{
+	var grid = Html.DevExpress().GridView<DXPANACEASOFT.Models.InventoryMoveDTO.InventoryMoveDTO>(settings =>
+	{
+		settings.Name = "gvInventoryMoves";
+		settings.CallbackRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesPartial" };
+
+		settings.Width = Unit.Percentage(100);
+
+		#region SearchPanel
+
+		//Panel de Busqueda
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		#endregion
+
+		settings.CommandColumn.Visible = true;
+		settings.SettingsBehavior.ConfirmDelete = true;
+
+		//settings.CommandColumn.ShowSelectCheckbox = true;
+		//settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		//settings.SettingsBehavior.ConfirmDelete = false;
+		settings.CommandColumn.Width = Unit.Percentage(3);
+
+		settings.CommandColumn.ShowNewButton = false;
+		settings.CommandColumn.ShowDeleteButton = false;
+		settings.CommandColumn.ShowEditButton = false;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Movimientos</span>");
+		});
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView detailsGrid = s as MVCxGridView;
+			if (detailsGrid == null) return;
+
+			e.Properties["cpVisibleRowCount"] = detailsGrid.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(detailsGrid);
+		};
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+				@"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""SelectAllRows();"">Seleccionar Todos</a>
+				<a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""UnSelectRows();"">Anular Selección.</a>"
+				);
+			}
+		});
+
+		//MASTER DETAILS
+		settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+		settings.SettingsDetail.ShowDetailRow = true;
+
+		//DETALLES EN GRID LLAMADA A OTRA TABLA
+		settings.SetDetailRowTemplateContent(column =>
+		{
+			int? id_inventoryMove = (int?)DataBinder.Eval(column.DataItem, "id");
+
+			InventoryMove inventoryMove = DataProviderInventoryMove.InventoryMove(id_inventoryMove);
+
+			Html.RenderPartial("_InventoryMoveDetailPartial", inventoryMove);
+		});
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(m => m.natureSequential, column =>
+		{
+			column.Name = "number";
+			column.Caption = "No. Movimiento";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(3);
+		});
+
+		settings.Columns.Add(m => m.nameWarehouse, column =>
+		{
+			column.Name = "warehouse";
+			column.Caption = "Bodega";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+		});
+
+		settings.Columns.Add(m => m.emissionDate, column =>
+		{
+			column.Name = "emissionDate";
+			column.Caption = "Fecha de Emisión";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+			column.Width = Unit.Percentage(4);
+		});
+
+		settings.Columns.Add(m => m.nameInventoryReason, column =>
+		{
+			column.Name = "InventoryReason";
+			column.Caption = "Motivo";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(15);
+		});
+
+
+		settings.Columns.Add(m => m.nameReceiver, column =>
+		{
+			column.Name = "reciever";
+			column.Caption = "Recibido por";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(8);
+			column.Visible = codeNatureMove.Equals("I");
+		});
+
+		settings.Columns.Add(m => m.nameDispatcher, column =>
+		{
+			column.Name = "dispacher";
+			column.Caption = "Despachado Por:";
+			column.Width = Unit.Percentage(8);
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Visible = codeNatureMove.Equals("E");
+		});
+
+
+
+		settings.Columns.Add(m => m.nameDocumentState, column =>
+		{
+			column.Name = "documentState";
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(10);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		});
+
+		//Botones de comandos para registros de la tabla
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+		commandColumn.ShowEditButton = false;
+		commandColumn.ShowDeleteButton = false;
+		commandColumn.ShowCancelButton = false;
+		commandColumn.ShowUpdateButton = false;
+		commandColumn.Visible = true;
+		commandColumn.VisibleIndex = 14;
+		commandColumn.Caption = "Acciones";
+		commandColumn.Width = Unit.Percentage(8);
+
+		commandColumn.CustomButtons.Add(
+			new GridViewCommandColumnCustomButton
+			{
+				ID = "btnEditMove",
+				Text = "Editar"
+			}
+		);
+		settings.ClientSideEvents.CustomButtonClick = "OnClickEditInventoryMove";
+		settings.Columns.Add(commandColumn);
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

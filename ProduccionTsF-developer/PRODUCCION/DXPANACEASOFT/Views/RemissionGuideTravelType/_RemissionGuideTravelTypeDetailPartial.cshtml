@@ -1,0 +1,91 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    RemissionGuideTravelType RemissionGuideTravelType = Model ?? new RemissionGuideTravelType();
+}
+
+@Html.Hidden("id_RemissionGuideTravelType", RemissionGuideTravelType.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(RemissionGuideTravelType.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(RemissionGuideTravelType.code)
+        </td>
+    </tr>     
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(RemissionGuideTravelType.description)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(RemissionGuideTravelType.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(RemissionGuideTravelType.dateCreate)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(RemissionGuideTravelType.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(RemissionGuideTravelType.dateUpdate)
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@*@Html.Partial("_RemissionGuideTravelTypeDetailFishingSitePartial", RemissionGuideTravelType.FishingSite.ToList())*@
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

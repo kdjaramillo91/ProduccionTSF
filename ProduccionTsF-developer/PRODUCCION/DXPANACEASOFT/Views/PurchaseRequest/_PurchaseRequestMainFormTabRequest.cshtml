@@ -1,0 +1,88 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.PurchaseRequest
+
+<table id="mainTabRequest" class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.Employee.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "fullname_businessNameLabel";
+                settings.Text = "Solicitante:";
+                settings.AssociatedControlName = "personRequesting";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_personRequesting = (Model != null && Model.id_personRequesting != 0) ? (int?)Model.id_personRequesting : null;
+                List<string> rols = new List<string> { "Empleado", "Solicitante" };
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_personRequesting, settings =>
+           {
+               settings.Name = "id_personRequesting";
+               settings.Properties.ClientInstanceName = "id_personRequesting";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "fullname_businessName";
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               //settings.ReadOnly = @Model.totalQuantityOrdered > 0;
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Init = "OnPersonRequesting_Init";
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnPersonRequesting_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Validation = "OnPersonRequestingValidation";
+
+           }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], id_personRequesting, rols)).Bind(id_personRequesting).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.Employee.Department.name, settings =>
+                {
+                    settings.Name = "employeeDepartamentLabel";
+                    settings.Text = "Departamento:";
+                    settings.AssociatedControlName = "employeeDepartament";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Department.name, settings =>
+                {
+                    settings.Name = "employeeDepartament";
+                    settings.Properties.ClientInstanceName = "employeeDepartament";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ReadOnly = true;
+                }).GetHtml()
+        </td>
+        @*<td>
+            @Html.HiddenFor(m => m.id_personRequesting, new {@id = "id_personRequesting"})
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "personRequesting";
+                settings.Properties.ClientInstanceName = "personRequesting";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>*@
+    </tr>
+    @*<tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.Employee.Department.name, settings =>
+                {
+                    settings.Name = "employeeDepartamentLabel";
+                    settings.Text = "Departamento:";
+                    settings.AssociatedControlName = "employeeDepartament";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Department.name, settings =>
+                {
+                    settings.Name = "employeeDepartament";
+                    settings.Properties.ClientInstanceName = "employeeDepartament";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ReadOnly = true;
+                }).GetHtml()
+        </td>
+    </tr>*@
+</table>

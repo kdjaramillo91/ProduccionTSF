@@ -1,0 +1,52 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Invoice
+
+
+@{
+    int id_invoice = (Model != null) ? Model.id : 0;
+    Document document = (Model != null) ? Model.Document : new Document();
+}
+
+@Html.Hidden("id_invoice", id_invoice)
+
+<table style="width: 100%">
+    <tr>
+        <td>Referencia:</td>
+        <td>@Html.Raw(document.reference)</td>
+        <td>Descripción:</td>
+        <td>@Html.Raw(document.description)</td>
+    </tr>
+    <tr>
+        <td>Creado por:</td>
+        <td>@Html.Raw(GetUserName(document.id_userCreate))</td>
+        <td>Fecha de Creación:</td>
+        <td>@Html.Raw(document.dateCreate)</td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>@Html.Raw(GetUserName(document.id_userUpdate))</td>
+        <td>Fecha de Modificación:</td>
+        <td>@Html.Raw(document.dateUpdate)</td>
+    </tr>
+</table>
+
+<br />
+
+@{
+    var invoicedetail = (Model != null && Model.InvoiceDetail != null) ? Model.InvoiceDetail.ToList() : new List<InvoiceDetail>();
+    Html.RenderPartial("_ResultsDetailViewGridView", invoicedetail);
+}
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+
+        if (user == null)
+            return string.Empty;
+
+        return user.username;
+    }
+}

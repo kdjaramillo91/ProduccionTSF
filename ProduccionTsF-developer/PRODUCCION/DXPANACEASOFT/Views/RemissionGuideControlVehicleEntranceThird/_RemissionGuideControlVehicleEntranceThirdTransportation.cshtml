@@ -1,0 +1,61 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuideTransportation
+
+@{
+    string codeState = (Model != null && Model.RemissionGuide != null && Model.RemissionGuide.Document.DocumentState.code != "") ? Model.RemissionGuide.Document.DocumentState.code : "01";
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Placa Tercero:";
+                settings.AssociatedControlName = "Placa";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.carRegistration, settings =>
+            {
+                settings.Properties.ClientInstanceName = "carRegistration";
+                settings.Name = "carRegistration";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 50;
+                settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                settings.CustomJSProperties = (s, e) =>
+                {
+                    e.Properties["cpTabContainer"] = "tabRemissionGuide";
+                    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                    e.Properties["cpIsRequired"] = "true";
+                    e.Properties["cpTabControl"] = "tabControl";
+                };
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Conductor Tercero:";
+                settings.AssociatedControlName = "model";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.driverName, settings =>
+            {
+                settings.Properties.ClientInstanceName = "driverName";
+                settings.Name = "driverName";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 250;
+                settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                settings.CustomJSProperties = (s, e) =>
+                {
+                    e.Properties["cpTabContainer"] = "tabRemissionGuide";
+                    e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                    e.Properties["cpIsRequired"] = "true";
+                    e.Properties["cpTabControl"] = "tabControl";
+                };
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+

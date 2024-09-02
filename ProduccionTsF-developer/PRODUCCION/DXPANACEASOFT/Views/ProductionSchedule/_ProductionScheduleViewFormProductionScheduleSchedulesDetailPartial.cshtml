@@ -1,0 +1,303 @@
+﻿@using System.Globalization;
+@using System.Drawing
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProductionScheduleScheduleDetail>
+@{
+    //var dataSourceProductionSchedulePurchaseRequestDetail = ViewData["dataSourceProductionSchedulePurchaseRequestDetail"];
+
+    var metricUnitUMTPAux = DataProviderSetting.ValueSetting("UMTP");
+    var id_metricUnitUMTPValueAux = int.Parse(metricUnitUMTPAux != null ? metricUnitUMTPAux : "0");
+    var metricUnitUMTP = DataProviderMetricUnit.MetricUnitById(id_metricUnitUMTPValueAux);
+}
+
+@{
+    var grid = Html.DevExpress().GridView<ProductionScheduleScheduleDetail>(settings =>
+    {
+        settings.Name = "gvProductionScheduleScheduleDetail" + ViewData["id_productionSchedule"];
+        settings.CallbackRouteValues = new { Controller = "ProductionSchedule", Action = "ProductionScheduleViewFormSchedulesDetailPartial" };
+
+        //Eventos
+        settings.ClientSideEvents.BeginCallback = "ProductionScheduleDetail_OnBeginCallback";
+
+        settings.CommandColumn.Visible = false;
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdProductionSchedule"] = 0;
+            }
+            e.Properties["cpIdProductionSchedule"] = ViewData["id_productionSchedule"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        #region ColumnsAdd
+
+        //datePlanning
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "datePlanning";
+            column.Name = "datePlanning";
+            column.Caption = "Fecha Planificada";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                ProductionScheduleScheduleDetail productionScheduleScheduleDetail = (ProductionScheduleScheduleDetail)Model[c.ItemIndex];
+                //var provider = DataProviderPerson.GetProviderFromRemissionGuide(remission.id);
+                var text = productionScheduleScheduleDetail.datePlanning.ToString("ddd", CultureInfo.CreateSpecificCulture("es-US")).ToUpper() +
+                           productionScheduleScheduleDetail.datePlanning.ToString("_dd");
+                ViewContext.Writer.Write(text);
+                //var text = purchasePlanningDetail.datePlanning.ToString("dd/MM/yyyy");
+                //ViewContext.Writer.Write(text);
+                //ViewContext.Writer.Write(remission?.RemissionGuideDetail?.FirstOrDefault().RemissionGuideDetailPurchaseOrderDetail?.FirstOrDefault().PurchaseOrderDetail?.PurchaseOrder.Provider.Person.fullname_businessName ?? "");
+            });
+            column.Width = Unit.Percentage(12);
+
+        });
+
+        //id_provider
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_provider";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_provider = (int?)DataBinder.Eval(c.DataItem, "id_provider");
+                Provider provider = DataProviderPerson.Provider(id_provider);
+
+                string text = (provider != null) ? provider.Person.fullname_businessName : "";
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        //id_buyer
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_buyer";
+            column.Caption = "Comprador";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_buyer = (int?)DataBinder.Eval(c.DataItem, "id_buyer");
+                Person person = DataProviderPerson.Person(id_buyer);
+
+                string text = (person != null) ? person.fullname_businessName : "";
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        //salesPurchaseRequest
+        settings.Columns.Add(column =>
+        {
+            column.Name = "salesPurchaseRequest";
+            column.Caption = "No. Requerimiento de Pedido";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var productionSchedulePurchaseRequestDetail = (ProductionSchedulePurchaseRequestDetail)DataBinder.Eval(c.DataItem, "ProductionSchedulePurchaseRequestDetail");
+                var productionScheduleProductionOrderDetail = (productionSchedulePurchaseRequestDetail != null) ? productionSchedulePurchaseRequestDetail.ProductionScheduleProductionOrderDetail : null;
+                var productionScheduleRequestDetail = (productionScheduleProductionOrderDetail != null) ? productionScheduleProductionOrderDetail.ProductionScheduleRequestDetail : null;
+
+                string text = "Stock";
+
+                if (productionScheduleRequestDetail != null && productionScheduleRequestDetail.SalesRequestOrQuotationDetailProductionScheduleRequestDetail != null &&
+                    productionScheduleRequestDetail.SalesRequestOrQuotationDetailProductionScheduleRequestDetail.Count > 0)
+                {
+                    int? id_salesRequest = productionScheduleRequestDetail.SalesRequestOrQuotationDetailProductionScheduleRequestDetail.FirstOrDefault().id_salesRequest;
+                    SalesRequest salesRequest = DataProviderSalesRequest.SalesRequest(id_salesRequest);
+
+                    text = salesRequest.Document.number;
+
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        //id_productionSchedulePurchaseRequestDetail With Item
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_productionSchedulePurchaseRequestDetail";
+            column.Name = "id_productionSchedulePurchaseRequestDetail";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(15);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+                string text = string.Empty;
+
+                Item item = DataProviderItem.Item(id_item);
+
+                if (item != null)
+                {
+                    text = item.name;
+                }
+
+
+                ViewContext.Writer.Write(text);
+
+            });
+        });
+
+        //outstandingAmountRequired
+        settings.Columns.Add(column =>
+        {
+            column.Name = "outstandingAmountRequired";
+            column.Caption = "Cant. Pend. Requerido";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                ProductionScheduleScheduleDetail productionScheduleScheduleDetail = (ProductionScheduleScheduleDetail)Model[c.ItemIndex];
+                var productionSchedulePurchaseRequestDetail = productionScheduleScheduleDetail.ProductionSchedulePurchaseRequestDetail;
+                //var id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+                var productionSchedule = productionScheduleScheduleDetail.ProductionSchedule;
+                if (productionSchedulePurchaseRequestDetail != null)
+                {
+                    decimal quantityAux = productionSchedulePurchaseRequestDetail.ProductionScheduleScheduleDetail.Sum(s => s.quantity);
+                    //productionSchedule.ProductionScheduleScheduleDetail.Where(w=> w.id_item == id_item).Sum(s => s.quantity);
+                    decimal outstandingAmountRequired = productionSchedulePurchaseRequestDetail.quantity - quantityAux;
+                    ViewContext.Writer.Write(outstandingAmountRequired > 0 ? outstandingAmountRequired.ToString("N2") : "0.00");
+                }
+                else
+                {
+                    ViewContext.Writer.Write("0.00");
+                }
+
+            });
+        });
+
+        //metricUnitPurchaseRequest
+        settings.Columns.Add(column =>
+        {
+            column.Name = "metricUnitPurchaseRequest";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.UnboundType = UnboundColumnType.String;
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+
+                var id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+                string text = string.Empty;
+
+                Item item = DataProviderItem.Item(id_item);
+
+                if (item != null && item.ItemPurchaseInformation != null && item.ItemPurchaseInformation.MetricUnit != null)
+                {
+                    text = item.ItemPurchaseInformation.MetricUnit.code;
+                }
+                else
+                {
+                    text = metricUnitUMTP != null ? metricUnitUMTP.code : "";
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        //quantityScheduleRequest Is quantity
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantity";
+            column.Name = "quantityScheduleRequest";
+            column.Caption = "Cantidad Planificada";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantity = (decimal)DataBinder.Eval(c.DataItem, "quantity");
+                ViewContext.Writer.Write(quantity.ToString("N2"));
+            });
+        });
+
+        //metricUnitScheduleRequest
+        settings.Columns.Add(column =>
+        {
+            column.Name = "metricUnitScheduleRequest";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.UnboundType = UnboundColumnType.String;
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+
+                var id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+                string text = string.Empty;
+
+                Item item = DataProviderItem.Item(id_item);
+
+                if (item != null && item.ItemPurchaseInformation != null && item.ItemPurchaseInformation.MetricUnit != null)
+                {
+                    text = item.ItemPurchaseInformation.MetricUnit.code;
+                }
+                else
+                {
+                    text = metricUnitUMTP != null ? metricUnitUMTP.code : "";
+                }
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

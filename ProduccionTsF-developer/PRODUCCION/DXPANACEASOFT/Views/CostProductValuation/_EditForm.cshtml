@@ -1,0 +1,124 @@
+﻿@model ProductionCostProductValuation
+<h2>Valorización de Costos por Productos</h2>
+@Html.Partial("_ProductValuationEditButtons")
+
+<div id="messageAlert"></div>
+<div id="download-area"></div>
+@using (Html.BeginForm())
+{
+	<div class="row">
+		@Html.Hidden("id_productValuation", this.Model.id)
+		@Html.DevExpress().PageControl(
+			pageControl =>
+			{
+				pageControl.Name = "tpProductValuationEdit";
+				pageControl.Width = Unit.Percentage(100);
+				pageControl.Height = Unit.Pixel(450);
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "DatosGeneralesTabPage";
+					tabPage.Text = "Generales";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_DatosGeneralesEditTabPage", this.Model);
+					});
+				});
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "ResumenTabPage";
+					tabPage.Text = "Resumen";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_ResumenEditTabPage");
+					});
+				});
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "MovimientosTabPage";
+					tabPage.Text = "Movimientos";
+
+					tabPage.SetContent(() =>
+					{
+						var modelo = this.Model.ProductionCostProductValuationInventoryMove.ToList();
+						Html.RenderPartial("_MovimientosEditTabPage", modelo);
+					});
+				});
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "NovedadesTabPage";
+					tabPage.Text = "Novedades";
+
+					tabPage.SetContent(() =>
+					{
+						var modelo = this.Model.ProductionCostProductValuationWarning.ToArray();
+						Html.RenderPartial("_NovedadesEditTabPage", modelo);
+					});
+				});
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "SaldosTabPage";
+					tabPage.Text = "Saldos";
+
+					tabPage.SetContent(() =>
+					{
+						var modelo = this.Model.ProductionCostProductValuationBalance.ToArray();
+						Html.RenderPartial("_SaldosEditTabPage", modelo);
+					});
+				});
+
+				pageControl.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpEditMessage"] = this.ViewBag.EditMessage;
+				};
+
+				pageControl.ClientSideEvents.Init = "OnTabPageControlInit";
+			}).GetHtml()
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<table class="table table-condensed">
+				<tr style="border-top: 1px solid #c0c0c0;">
+					<td style="text-align: right; margin-top: 5px;">
+						@Html.DevExpress().Button(
+							button =>
+							{
+								button.Name = "btnUpdate";
+								button.Text = "Guardar";
+								button.RenderMode = ButtonRenderMode.Button;
+								button.ImagePosition = ImagePosition.Left;
+								button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+								button.UseSubmitBehavior = false;
+								button.ValidateInvisibleEditors = true;
+								button.ClientSideEvents.Click = "OnUpdateButtonClick";
+
+								button.ClientVisible = (bool)this.ViewBag.PuedeEditarDocumento;
+							}).GetHtml()
+
+						@Html.DevExpress().Button(
+							button =>
+							{
+								button.Name = "btnCancel";
+								button.Text = "Cancelar";
+								button.RenderMode = ButtonRenderMode.Button;
+								button.ImagePosition = ImagePosition.Left;
+								button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+								button.UseSubmitBehavior = false;
+								button.ValidateInvisibleEditors = true;
+								button.ClientSideEvents.Click = "OnCancelButtonClick";
+								button.Style.Add("margin-left", "10px");
+							}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+}
+
+<script src="~/Scripts/costProductValuation/edit.js"></script>

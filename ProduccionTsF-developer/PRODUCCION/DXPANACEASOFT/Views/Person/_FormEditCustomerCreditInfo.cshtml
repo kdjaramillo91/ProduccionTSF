@@ -1,0 +1,144 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.CustomerCreditInfo
+
+<table class="table table-condensed">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_paymentMethodCusm, settings =>
+        {
+            settings.Name = "id_paymentMethodCusmLabel";
+            settings.Text = "Forma de Pago: ";
+            settings.AssociatedControlName = "id_paymentMethodCusm";
+        }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_paymentMethodCusm = (Model != null && Model.id_paymentMethodCusm != 0) ? (int?)Model.id_paymentMethodCusm : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_paymentMethodCusm, settings =>
+           {
+               settings.Name = "id_paymentMethodCusm";
+               settings.Properties.ClientInstanceName = "id_paymentMethodCusm";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextFormatString = "{1}";
+               settings.Properties.ValueType = typeof(int);
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.Properties.Columns.Add("code", "Código.", 20);
+               settings.Properties.Columns.Add("name", "Nombre", 100);
+               settings.ShowModelErrors = true;
+           }).BindList(DataProviderPaymentMethod.PaymentsMethods((int)ViewData["id_company"])).Bind(id_paymentMethodCusm).GetHtml()
+
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.discountRate, settings =>
+           {
+               settings.Name = "discountRateLabel";
+               settings.Text = "% Descuento:";
+               settings.AssociatedControlName = "discountRate";
+           }).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.discountRate, settings =>
+            {
+                settings.Name = "discountRate";
+                settings.Properties.ClientInstanceName = "discountRate";
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.DisplayFormatString = "N2";
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                
+                //settings.ClientEnabled = false;
+              //  settings.Properties.ClientSideEvents.Validation = "OnTotalQuantityRecivedValidation";
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+
+        <td width=30%></td>
+    </tr>
+    <tr >
+        <td >
+            @Html.DevExpress().LabelFor(m => m.creditDays, settings =>
+           {
+               settings.Name = "creditDaysLabel";
+               settings.Text = "Días Adicionales de Crédito:";
+               settings.AssociatedControlName = "creditDays";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.creditDays, settings =>
+            {
+                settings.Name = "creditDays";
+                settings.Properties.ClientInstanceName = "creditDays";
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.DisplayFormatString = "N2";
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+
+                //settings.ClientEnabled = false;
+                //  settings.Properties.ClientSideEvents.Validation = "OnTotalQuantityRecivedValidation";
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_paymentTerm, settings =>
+           {
+               settings.Name = "id_paymentTermLabel";
+               settings.Text = "Plazo de Pago:";
+               settings.AssociatedControlName = "id_paymentTerm";
+           }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_paymentTerm = (Model != null && Model.id_paymentTerm != 0) ? (int?)Model.id_paymentTerm : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_paymentTerm, settings =>
+           {
+               settings.Name = "id_paymentTerm";
+               settings.Properties.ClientInstanceName = "id_paymentTerm";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextFormatString = "{1}";
+               settings.Properties.ValueType = typeof(int);
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.Properties.Columns.Add("code", "Código.", 20);
+               settings.Properties.Columns.Add("name", "Nombre", 100);
+               settings.ShowModelErrors = true;
+           }).BindList(DataProviderPaymentTerm.PaymentsTerms((int)ViewData["id_company"])).Bind(id_paymentTerm).GetHtml()
+
+        </td>
+
+        <tr>
+        <td >
+            @Html.DevExpress().LabelFor(m => m.creditQuota, settings =>
+           {
+               settings.Name = "creditQuotaLabel";
+               settings.Text = "Cupo de Crédito:";
+               settings.AssociatedControlName = "creditQuota";
+           }).GetHtml()
+        </td>
+        <td >
+            @Html.DevExpress().SpinEditFor(m => m.creditQuota, settings =>
+            {
+                settings.Name = "creditQuota";
+                settings.Properties.ClientInstanceName = "creditQuota";
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.DisplayFormatString = "N2";
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+ 
+                // settings.ClientEnabled = false;
+                // settings.Properties.ClientSideEvents.Validation = "OnTotalQuantityRecivedValidation";
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td width=30% colspan="4"></td>
+    </tr>
+   
+</table>

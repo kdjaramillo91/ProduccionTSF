@@ -1,0 +1,169 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.PriceList
+@{
+    string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+
+@Html.Hidden("id_priceList", Model.id)
+<table class="table table-condenced">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+            {
+                settings.Name = "priceListNameLabel";
+                settings.Text = "Nombre:";
+                settings.AssociatedControlName = "name";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+            {
+                //settings.Name = "name";
+                //settings.Properties.ClientInstanceName = "name";
+                settings.Width = Unit.Percentage(100);
+
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+
+            }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.CalendarPriceList.name, settings =>
+            {
+                settings.Name = "calendarPriceListLabel";
+                settings.Text = "Calendario:";
+                settings.AssociatedControlName = "id_calendarPriceList";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_calendarPriceList = (Model != null && Model.id_calendarPriceList != 0) ? (int?) Model.id_calendarPriceList : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_calendarPriceList, settings =>
+           {
+               settings.Name = "id_calendarPriceList";
+               settings.Properties.ClientInstanceName = "id_calendarPriceList";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               //settings.Enabled = codeState == "01";
+               settings.ReadOnly = codeState != "01"; //(@Model.id != 0);
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnPriceListCalendarPriceListValidation";
+
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxCalendarPriceList_SelectedIndexChanged";
+               settings.Properties.ClientSideEvents.Init = "ComboBoxCalendarPriceList_Init";
+
+           }).BindList(DataProviderCalendarPriceList.CalendarPriceListCurrentsAndCurrent((int) ViewData["id_company"], id_calendarPriceList)).Bind(id_calendarPriceList).GetHtml()
+        </td>
+    </tr>
+    @*<tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.startDate, settings =>
+            {
+                settings.Name = "startDateLabel";
+                settings.Text = "Fecha de Incio:";
+                settings.AssociatedControlName = "startDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.startDate, settings =>
+           {
+               settings.Name = "startDate";
+               settings.Properties.ClientInstanceName = "startDate";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullDisplayText = "Desde";
+               settings.Properties.NullText = "Desde";
+
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+               settings.Properties.CalendarProperties.Columns = 2;
+               settings.Properties.DateRangeSettings.MinDayCount = 1;
+               settings.Properties.DateRangeSettings.MaxDayCount = 90;
+               //settings.Enabled = codeState == "01";
+               settings.ReadOnly = true; //(@Model.id != 0);
+               settings.ShowModelErrors = true;
+
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.endDate, settings =>
+            {
+                settings.Name = "endDateLabel";
+                settings.Text = "Fecha de Fin:";
+                settings.AssociatedControlName = "endDate";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().DateEditFor(m => m.endDate, settings =>
+           {
+               settings.Name = "endDate";
+               settings.Properties.ClientInstanceName = "endDate";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullDisplayText = "Hasta";
+               settings.Properties.NullText = "Hasta";
+
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+               settings.Properties.CalendarProperties.Columns = 2;
+               settings.Properties.DateRangeSettings.StartDateEditID = "startDate";
+               settings.Properties.DateRangeSettings.MinDayCount = 0;
+               settings.Properties.DateRangeSettings.MaxDayCount = 90;
+               //settings.Enabled = codeState == "01";
+               settings.ReadOnly = true; //(@Model.id != 0);
+               settings.ShowModelErrors = true;
+
+           }).GetHtml()
+        </td>
+    </tr>*@
+    @*<tr>
+        <td></td>
+        <td>
+            <table style="width: 50%;">
+                <tr>
+                    <td>
+                        @Html.DevExpress().CheckBoxFor(m => m.isForPurchase, settings =>
+                        {
+                            settings.Name = "isForPurchase";
+                            settings.Text = "Compra";
+                            //settings.Width = Unit.Percentage(100);
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().CheckBoxFor(m => m.isForSold, settings =>
+                        {
+                            settings.Name = "isForSold";
+                            settings.Text = "Venta:";
+                            //settings.Width = Unit.Percentage(100);
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                        {
+                            settings.Name = "isActive";
+                            settings.Text = "¿Activo?:";
+                            //settings.Width = Unit.Percentage(100);
+                        }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>*@
+</table>
+
+<script src="~/Scripts/pricelist/_priceListTabHeaderEditForm.js"></script>

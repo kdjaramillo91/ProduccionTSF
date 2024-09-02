@@ -1,0 +1,459 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="DAPANACEAPROD.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Document">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="number" Type="varchar(max)" Nullable="false" />
+          <Property Name="sequential" Type="int" Nullable="false" />
+          <Property Name="emissionDate" Type="datetime" Nullable="false" />
+          <Property Name="authorizationDate" Type="datetime" />
+          <Property Name="authorizationNumber" Type="varchar(max)" />
+          <Property Name="accessKey" Type="varchar(max)" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="reference" Type="varchar(max)" />
+          <Property Name="id_emissionPoint" Type="int" Nullable="false" />
+          <Property Name="id_documentType" Type="int" Nullable="false" />
+          <Property Name="id_documentState" Type="int" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+          <Property Name="isOpen" Type="bit" />
+        </EntityType>
+        <EntityType Name="DocumentState">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="code" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="name" Type="varchar(max)" Nullable="false" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="id_company" Type="int" Nullable="false" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DocumentType">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="code" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="name" Type="varchar(max)" Nullable="false" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="currentNumber" Type="int" Nullable="false" />
+          <Property Name="daysToExpiration" Type="int" Nullable="false" />
+          <Property Name="isElectronic" Type="bit" Nullable="false" />
+          <Property Name="codeSRI" Type="varchar" MaxLength="2" />
+          <Property Name="id_company" Type="int" Nullable="false" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="id_userCreate" Type="int" Nullable="false" />
+          <Property Name="dateCreate" Type="datetime" Nullable="false" />
+          <Property Name="id_userUpdate" Type="int" Nullable="false" />
+          <Property Name="dateUpdate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PurchaseOrder">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id_buyer" Type="int" Nullable="false" />
+          <Property Name="id_provider" Type="int" Nullable="false" />
+          <Property Name="id_productionUnitProvider" Type="int" />
+          <Property Name="id_priceList" Type="int" />
+          <Property Name="pricePerList" Type="bit" Nullable="false" />
+          <Property Name="id_paymentTerm" Type="int" Nullable="false" />
+          <Property Name="id_paymentMethod" Type="int" Nullable="false" />
+          <Property Name="requiredLogistic" Type="bit" Nullable="false" />
+          <Property Name="deliveryDate" Type="datetime" Nullable="false" />
+          <Property Name="sendTo" Type="varchar(max)" Nullable="false" />
+          <Property Name="deliveryTo" Type="varchar(max)" Nullable="false" />
+          <Property Name="id_shippingType" Type="int" Nullable="false" />
+          <Property Name="id_personRequesting" Type="int" Nullable="false" />
+          <Property Name="id_purchaseReason" Type="int" Nullable="false" />
+          <Property Name="isImportation" Type="bit" Nullable="false" />
+          <Property Name="deliveryhour" Type="time" Precision="7" />
+          <Property Name="id_providerapparent" Type="int" />
+          <Property Name="id_FishingSite" Type="int" />
+          <Property Name="id_productionUnitProviderProtective" Type="int" />
+        </EntityType>
+        <EntityType Name="RegisterInfReplicationSource">
+          <Key>
+            <PropertyRef Name="idRegisterDestination" />
+            <PropertyRef Name="idRegisterSource" />
+          </Key>
+          <Property Name="idRegisterDestination" Type="int" Nullable="false" />
+          <Property Name="idRegisterSource" Type="int" Nullable="false" />
+          <Property Name="schemaRegister" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="idGeneral" Type="int" />
+          <Property Name="nameGeneral" Type="varchar" MaxLength="100" />
+          <Property Name="idUserCreateSource" Type="int" />
+          <Property Name="nameUserCreateSource" Type="varchar" MaxLength="100" />
+          <Property Name="dateCreateSource" Type="datetime" />
+          <Property Name="idUserUpdateSource" Type="int" />
+          <Property Name="nameUserUpdateSource" Type="varchar" MaxLength="100" />
+          <Property Name="dateUpdateSource" Type="datetime" />
+          <Property Name="dateUpdate" Type="datetime" />
+        </EntityType>
+        <Association Name="FK__Document__id_doc__339FAB6E">
+          <End Role="DocumentType" Type="Self.DocumentType" Multiplicity="1" />
+          <End Role="Document" Type="Self.Document" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DocumentType">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Document">
+              <PropertyRef Name="id_documentType" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Document_DocumentState">
+          <End Role="DocumentState" Type="Self.DocumentState" Multiplicity="1" />
+          <End Role="Document" Type="Self.Document" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DocumentState">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Document">
+              <PropertyRef Name="id_documentState" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PurchaseOrder_Document">
+          <End Role="Document" Type="Self.Document" Multiplicity="1" />
+          <End Role="PurchaseOrder" Type="Self.PurchaseOrder" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Document">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="PurchaseOrder">
+              <PropertyRef Name="id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DAPANACEAPRODStoreContainer">
+          <EntitySet Name="Document" EntityType="Self.Document" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DocumentState" EntityType="Self.DocumentState" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DocumentType" EntityType="Self.DocumentType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PurchaseOrder" EntityType="Self.PurchaseOrder" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RegisterInfReplicationSource" EntityType="Self.RegisterInfReplicationSource" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Document__id_doc__339FAB6E" Association="Self.FK__Document__id_doc__339FAB6E">
+            <End Role="DocumentType" EntitySet="DocumentType" />
+            <End Role="Document" EntitySet="Document" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Document_DocumentState" Association="Self.FK_Document_DocumentState">
+            <End Role="DocumentState" EntitySet="DocumentState" />
+            <End Role="Document" EntitySet="Document" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PurchaseOrder_Document" Association="Self.FK_PurchaseOrder_Document">
+            <End Role="Document" EntitySet="Document" />
+            <End Role="PurchaseOrder" EntitySet="PurchaseOrder" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DAPANACEAPROD" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Document">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="number" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="sequential" Type="Int32" Nullable="false" />
+          <Property Name="emissionDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="authorizationDate" Type="DateTime" Precision="3" />
+          <Property Name="authorizationNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="accessKey" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="reference" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="id_emissionPoint" Type="Int32" Nullable="false" />
+          <Property Name="id_documentType" Type="Int32" Nullable="false" />
+          <Property Name="id_documentState" Type="Int32" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="isOpen" Type="Boolean" />
+          <NavigationProperty Name="DocumentType" Relationship="Self.FK__Document__id_doc__339FAB6E" FromRole="Document" ToRole="DocumentType" />
+          <NavigationProperty Name="DocumentState" Relationship="Self.FK_Document_DocumentState" FromRole="Document" ToRole="DocumentState" />
+          <NavigationProperty Name="PurchaseOrder" Relationship="Self.FK_PurchaseOrder_Document" FromRole="Document" ToRole="PurchaseOrder" />
+        </EntityType>
+        <EntityType Name="DocumentState">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="code" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="id_company" Type="Int32" Nullable="false" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Document" Relationship="Self.FK_Document_DocumentState" FromRole="DocumentState" ToRole="Document" />
+        </EntityType>
+        <EntityType Name="DocumentType">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="code" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="currentNumber" Type="Int32" Nullable="false" />
+          <Property Name="daysToExpiration" Type="Int32" Nullable="false" />
+          <Property Name="isElectronic" Type="Boolean" Nullable="false" />
+          <Property Name="codeSRI" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="id_company" Type="Int32" Nullable="false" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <Property Name="id_userCreate" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_userUpdate" Type="Int32" Nullable="false" />
+          <Property Name="dateUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Document" Relationship="Self.FK__Document__id_doc__339FAB6E" FromRole="DocumentType" ToRole="Document" />
+        </EntityType>
+        <EntityType Name="PurchaseOrder">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="id_buyer" Type="Int32" Nullable="false" />
+          <Property Name="id_provider" Type="Int32" Nullable="false" />
+          <Property Name="id_productionUnitProvider" Type="Int32" />
+          <Property Name="id_priceList" Type="Int32" />
+          <Property Name="pricePerList" Type="Boolean" Nullable="false" />
+          <Property Name="id_paymentTerm" Type="Int32" Nullable="false" />
+          <Property Name="id_paymentMethod" Type="Int32" Nullable="false" />
+          <Property Name="requiredLogistic" Type="Boolean" Nullable="false" />
+          <Property Name="deliveryDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="sendTo" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="deliveryTo" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="id_shippingType" Type="Int32" Nullable="false" />
+          <Property Name="id_personRequesting" Type="Int32" Nullable="false" />
+          <Property Name="id_purchaseReason" Type="Int32" Nullable="false" />
+          <Property Name="isImportation" Type="Boolean" Nullable="false" />
+          <Property Name="deliveryhour" Type="Time" Precision="7" />
+          <Property Name="id_providerapparent" Type="Int32" />
+          <Property Name="id_FishingSite" Type="Int32" />
+          <Property Name="id_productionUnitProviderProtective" Type="Int32" />
+          <NavigationProperty Name="Document" Relationship="Self.FK_PurchaseOrder_Document" FromRole="PurchaseOrder" ToRole="Document" />
+        </EntityType>
+        <EntityType Name="RegisterInfReplicationSource">
+          <Key>
+            <PropertyRef Name="idRegisterDestination" />
+            <PropertyRef Name="idRegisterSource" />
+          </Key>
+          <Property Name="idRegisterDestination" Type="Int32" Nullable="false" />
+          <Property Name="idRegisterSource" Type="Int32" Nullable="false" />
+          <Property Name="schemaRegister" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="idGeneral" Type="Int32" />
+          <Property Name="nameGeneral" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="idUserCreateSource" Type="Int32" />
+          <Property Name="nameUserCreateSource" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="dateCreateSource" Type="DateTime" Precision="3" />
+          <Property Name="idUserUpdateSource" Type="Int32" />
+          <Property Name="nameUserUpdateSource" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="dateUpdateSource" Type="DateTime" Precision="3" />
+          <Property Name="dateUpdate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <Association Name="FK__Document__id_doc__339FAB6E">
+          <End Role="DocumentType" Type="Self.DocumentType" Multiplicity="1" />
+          <End Role="Document" Type="Self.Document" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DocumentType">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Document">
+              <PropertyRef Name="id_documentType" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Document_DocumentState">
+          <End Role="DocumentState" Type="Self.DocumentState" Multiplicity="1" />
+          <End Role="Document" Type="Self.Document" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DocumentState">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Document">
+              <PropertyRef Name="id_documentState" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PurchaseOrder_Document">
+          <End Role="Document" Type="Self.Document" Multiplicity="1" />
+          <End Role="PurchaseOrder" Type="Self.PurchaseOrder" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Document">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="PurchaseOrder">
+              <PropertyRef Name="id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DBContextProduction" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Document" EntityType="Self.Document" />
+          <EntitySet Name="DocumentState" EntityType="Self.DocumentState" />
+          <EntitySet Name="DocumentType" EntityType="Self.DocumentType" />
+          <EntitySet Name="PurchaseOrder" EntityType="Self.PurchaseOrder" />
+          <EntitySet Name="RegisterInfReplicationSource" EntityType="Self.RegisterInfReplicationSource" />
+          <AssociationSet Name="FK__Document__id_doc__339FAB6E" Association="Self.FK__Document__id_doc__339FAB6E">
+            <End Role="DocumentType" EntitySet="DocumentType" />
+            <End Role="Document" EntitySet="Document" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Document_DocumentState" Association="Self.FK_Document_DocumentState">
+            <End Role="DocumentState" EntitySet="DocumentState" />
+            <End Role="Document" EntitySet="Document" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PurchaseOrder_Document" Association="Self.FK_PurchaseOrder_Document">
+            <End Role="Document" EntitySet="Document" />
+            <End Role="PurchaseOrder" EntitySet="PurchaseOrder" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DAPANACEAPRODStoreContainer" CdmEntityContainer="DBContextProduction">
+          <EntitySetMapping Name="Document">
+            <EntityTypeMapping TypeName="DAPANACEAPROD.Document">
+              <MappingFragment StoreEntitySet="Document">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="number" ColumnName="number" />
+                <ScalarProperty Name="sequential" ColumnName="sequential" />
+                <ScalarProperty Name="emissionDate" ColumnName="emissionDate" />
+                <ScalarProperty Name="authorizationDate" ColumnName="authorizationDate" />
+                <ScalarProperty Name="authorizationNumber" ColumnName="authorizationNumber" />
+                <ScalarProperty Name="accessKey" ColumnName="accessKey" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="reference" ColumnName="reference" />
+                <ScalarProperty Name="id_emissionPoint" ColumnName="id_emissionPoint" />
+                <ScalarProperty Name="id_documentType" ColumnName="id_documentType" />
+                <ScalarProperty Name="id_documentState" ColumnName="id_documentState" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+                <ScalarProperty Name="isOpen" ColumnName="isOpen" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DocumentState">
+            <EntityTypeMapping TypeName="DAPANACEAPROD.DocumentState">
+              <MappingFragment StoreEntitySet="DocumentState">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="id_company" ColumnName="id_company" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DocumentType">
+            <EntityTypeMapping TypeName="DAPANACEAPROD.DocumentType">
+              <MappingFragment StoreEntitySet="DocumentType">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="currentNumber" ColumnName="currentNumber" />
+                <ScalarProperty Name="daysToExpiration" ColumnName="daysToExpiration" />
+                <ScalarProperty Name="isElectronic" ColumnName="isElectronic" />
+                <ScalarProperty Name="codeSRI" ColumnName="codeSRI" />
+                <ScalarProperty Name="id_company" ColumnName="id_company" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="id_userCreate" ColumnName="id_userCreate" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="id_userUpdate" ColumnName="id_userUpdate" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PurchaseOrder">
+            <EntityTypeMapping TypeName="DAPANACEAPROD.PurchaseOrder">
+              <MappingFragment StoreEntitySet="PurchaseOrder">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="id_buyer" ColumnName="id_buyer" />
+                <ScalarProperty Name="id_provider" ColumnName="id_provider" />
+                <ScalarProperty Name="id_productionUnitProvider" ColumnName="id_productionUnitProvider" />
+                <ScalarProperty Name="id_priceList" ColumnName="id_priceList" />
+                <ScalarProperty Name="pricePerList" ColumnName="pricePerList" />
+                <ScalarProperty Name="id_paymentTerm" ColumnName="id_paymentTerm" />
+                <ScalarProperty Name="id_paymentMethod" ColumnName="id_paymentMethod" />
+                <ScalarProperty Name="requiredLogistic" ColumnName="requiredLogistic" />
+                <ScalarProperty Name="deliveryDate" ColumnName="deliveryDate" />
+                <ScalarProperty Name="sendTo" ColumnName="sendTo" />
+                <ScalarProperty Name="deliveryTo" ColumnName="deliveryTo" />
+                <ScalarProperty Name="id_shippingType" ColumnName="id_shippingType" />
+                <ScalarProperty Name="id_personRequesting" ColumnName="id_personRequesting" />
+                <ScalarProperty Name="id_purchaseReason" ColumnName="id_purchaseReason" />
+                <ScalarProperty Name="isImportation" ColumnName="isImportation" />
+                <ScalarProperty Name="deliveryhour" ColumnName="deliveryhour" />
+                <ScalarProperty Name="id_providerapparent" ColumnName="id_providerapparent" />
+                <ScalarProperty Name="id_FishingSite" ColumnName="id_FishingSite" />
+                <ScalarProperty Name="id_productionUnitProviderProtective" ColumnName="id_productionUnitProviderProtective" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RegisterInfReplicationSource">
+            <EntityTypeMapping TypeName="DAPANACEAPROD.RegisterInfReplicationSource">
+              <MappingFragment StoreEntitySet="RegisterInfReplicationSource">
+                <ScalarProperty Name="idRegisterDestination" ColumnName="idRegisterDestination" />
+                <ScalarProperty Name="idRegisterSource" ColumnName="idRegisterSource" />
+                <ScalarProperty Name="schemaRegister" ColumnName="schemaRegister" />
+                <ScalarProperty Name="idGeneral" ColumnName="idGeneral" />
+                <ScalarProperty Name="nameGeneral" ColumnName="nameGeneral" />
+                <ScalarProperty Name="idUserCreateSource" ColumnName="idUserCreateSource" />
+                <ScalarProperty Name="nameUserCreateSource" ColumnName="nameUserCreateSource" />
+                <ScalarProperty Name="dateCreateSource" ColumnName="dateCreateSource" />
+                <ScalarProperty Name="idUserUpdateSource" ColumnName="idUserUpdateSource" />
+                <ScalarProperty Name="nameUserUpdateSource" ColumnName="nameUserUpdateSource" />
+                <ScalarProperty Name="dateUpdateSource" ColumnName="dateUpdateSource" />
+                <ScalarProperty Name="dateUpdate" ColumnName="dateUpdate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,17 @@
+﻿@model DXPANACEASOFT.Models.User
+@{
+	var id_user = (Model != null) ? Model.id : 0;
+	var modelUserObjectPermissions = Model.ObjectPermissionUser.Where(e => e.id_user == id_user).ToList();
+}
+<div>
+	<table class="table table-condensed">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			@Html.Partial("_UserObjectEditToolBarPartial")
+		</tr>
+	</table>
+	@{ 
+		Html.RenderPartial("_UserObjectEditGridViewPartial", modelUserObjectPermissions);
+	}	
+</div>
+
+<script src="~/Scripts/user/editform.js"></script>

@@ -1,0 +1,197 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<OpeningClosingPlateLyingDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewDetails";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "OpeningClosingPlateLying",
+            Action = "GridViewDetails",
+            enabled = ViewBag.enabled
+        };
+
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+        settings.Enabled = ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        //settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsPager.Visible = false;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        //settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        //Checkbox de registros de tabla
+        settings.ClientSideEvents.BeginCallback = "OnGridViewDetailBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewDetailEndCallback";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewDetailSelectionChanged";
+        settings.SettingsBehavior.ProcessSelectionChangedOnServer = false;
+        settings.ClientSideEvents.Init = "OnGridViewDetailInit";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            e.Properties["cpEnabled"] = ViewBag.enabled;
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+            var list = (Model as List<LiquidationTurnDetailDTO>) ?? new List<LiquidationTurnDetailDTO>();
+            e.Properties["cpDetailCount"] = list.Count;
+            //e.Properties["cpRowId"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+        };
+
+        //noSecTransLote - 9
+        settings.Columns.Add(m => m.noSecTransLote, column =>
+        {
+            column.Name = "noSecTransLote";
+            column.Caption = "Sec. Transaccional";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(7) : Unit.Percentage(9);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //noLote - 9
+        settings.Columns.Add(m => m.noLote, column =>
+        {
+            column.Name = "noLote";
+            column.Caption = "Lote";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(7) : Unit.Percentage(9);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //name_item - 14
+        settings.Columns.Add(m => m.name_item, column =>
+        {
+            column.Name = "name_item";
+            column.Caption = "Producto";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(11) : Unit.Percentage(14);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //name_item - 13
+        settings.Columns.Add(m => m.cliente, column =>
+        {
+            column.Name = "client";
+            column.Caption = "Cliente";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(10) : Unit.Percentage(13);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //warehouse - 9
+        settings.Columns.Add(m => m.warehouse, column =>
+        {
+            column.Name = "warehouse";
+            column.Caption = "Bodega Congelación";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(8) : Unit.Percentage(9);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //warehouseLocation - 9
+        settings.Columns.Add(m => m.warehouseLocation, column =>
+        {
+            column.Name = "warehouseLocation";
+            column.Caption = "Ubicación Congelación";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(8) : Unit.Percentage(9);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //productionCart - 5
+        settings.Columns.Add(m => m.productionCart, column =>
+        {
+            column.Name = "productionCart";
+            column.Caption = "Coche";
+            column.Width = Unit.Percentage(5);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //amount - 9
+        settings.Columns.Add(m => m.amount, column =>
+        {
+            column.Name = "amount";
+            column.Caption = "Cantidad";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(7) : Unit.Percentage(9);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal amount = (decimal)DataBinder.Eval(c.DataItem, "amount");
+
+                ViewContext.Writer.Write(amount.ToString("N2"));
+            });
+
+        });
+
+        //metricUnit - 5
+        settings.Columns.Add(m => m.metricUnit, column =>
+        {
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //boxedWarehouse - 9
+        settings.Columns.Add(m => m.boxedWarehouse, column =>
+        {
+            column.Name = "boxedWarehouse";
+            column.Caption = "Bodega Destino";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(8) : Unit.Percentage(9);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //boxedWarehouseLocation - 9
+        settings.Columns.Add(m => m.boxedWarehouseLocation, column =>
+        {
+            column.Name = "boxedWarehouseLocation";
+            column.Caption = "Ubicación Destino";
+            column.Width = (ViewBag.showInventory != null && (bool)ViewBag.showInventory) ? Unit.Percentage(8) : Unit.Percentage(9);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        //numberInventoryExit - 8
+        settings.Columns.Add(m => m.numberInventoryExit, column =>
+        {
+            column.Name = "numberInventoryExit";
+            column.Caption = "Egreso Tr.";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Visible = ViewBag.showInventory != null && (bool)ViewBag.showInventory;
+        });
+
+        //numberInventoryEntry - 8
+        settings.Columns.Add(m => m.numberInventoryEntry, column =>
+        {
+            column.Name = "numberInventoryEntry";
+            column.Caption = "Ingreso Tr.";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Visible = ViewBag.showInventory != null && (bool)ViewBag.showInventory;
+        });
+
+    });
+}
+@grid.Bind(Model).GetHtml()

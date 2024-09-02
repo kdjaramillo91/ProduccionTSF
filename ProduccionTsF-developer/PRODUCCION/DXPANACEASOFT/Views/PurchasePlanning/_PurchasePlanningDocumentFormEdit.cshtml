@@ -1,0 +1,116 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.Document
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.DocumentType.name, settings =>
+            {
+                settings.Name = "documentTypeLabel";
+                settings.Text = "Tipo de Documento:";
+                settings.AssociatedControlName = "documentType";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.HiddenFor(m => m.id_documentType, new { @id = "id_documentType" })
+            @Html.DevExpress().TextBoxFor(m => m.DocumentType.name, settings =>
+            {
+                settings.Name = "documentTypeName";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.number, settings =>
+            {
+                settings.Name = "numberLabel";
+                settings.Text = "No. Documento:";
+                settings.AssociatedControlName = "number";
+
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.number, settings =>
+            {
+                settings.Name = "number";
+                settings.Properties.ClientInstanceName = "number";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.DocumentState.name, settings =>
+            {
+                settings.Name = "documentStateLabel";
+                settings.Text = "Estado:";
+                settings.AssociatedControlName = "documentState";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.HiddenFor(m => m.id_documentState, new { @id = "id_documentState" })
+            @Html.DevExpress().TextBoxFor(m => m.DocumentState.name, settings =>
+            {
+                settings.Name = "documentStateName";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emissionDate, settings =>
+            {
+                settings.Name = "emissionDateLabel";
+                settings.Text = "Fecha de Emisión:";
+                settings.AssociatedControlName = "emissionDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.emissionDate, settings =>
+           {
+               settings.Name = "emissionDate";
+               settings.Properties.ClientInstanceName = "emissionDate";
+               settings.Width = Unit.Percentage(100);
+               settings.ReadOnly = false; //(@Model.id != 0);
+                //settings.Properties.DropDownButton.Visible = false;
+               settings.Properties.ClientSideEvents.Validation = "OnPurchasePlanningEmissionDateValidation";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label( settings =>
+            {
+                settings.Name = "accessKeyLabel";
+                settings.Text = "";
+                settings.AssociatedControlName = "accessKey";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "accessKeyLabel2";
+               settings.Text = "";
+               settings.AssociatedControlName = "accessKey2";
+           }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Name = "descriptionLabel";
+                settings.Text = "Descripción:";
+                settings.AssociatedControlName = "description";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().MemoFor(m => m.description, settings =>
+            {
+                settings.Name = "description";
+                settings.Properties.ClientInstanceName = "description";
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

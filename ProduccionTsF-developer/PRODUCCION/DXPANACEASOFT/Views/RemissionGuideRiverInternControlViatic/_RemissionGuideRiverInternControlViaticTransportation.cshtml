@@ -1,0 +1,193 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuideRiverTransportation
+
+@{
+    string codeState = (Model != null && Model.RemissionGuideRiver != null && Model.RemissionGuideRiver.Document.DocumentState.code != "") ? Model.RemissionGuideRiver.Document.DocumentState.code : "01";
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    @*<tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "¿Transporte Propio?: ";
+           settings.AssociatedControlName = "isOwn";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isOwn, settings =>
+       {
+           settings.Properties.ClientInstanceName = "isOwn";
+           settings.Name = "isOwn";
+           settings.ReadOnly = true;
+           settings.Width = Unit.Percentage(100);
+       }).GetHtml()
+        </td>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "providerLabel";
+                settings.Properties.ClientInstanceName = "providerLabel";
+                settings.Text = "Empresa de Transporte: ";
+                settings.ClientVisible = Model.isOwn;
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                var id_provider = (Model != null && Model.id_provider != 0) ? Model.id_provider : null;
+            }
+            @Html.DevExpress().TextBoxFor(m => m.Provider.Person.fullname_businessName, settings =>
+       {
+           settings.Properties.ClientInstanceName = "id_provider";
+           settings.Name = "id_provider";
+           settings.Width = Unit.Percentage(100);
+           
+           settings.ClientVisible = Model.isOwn;
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = false;
+
+       }).GetHtml()
+        </td>
+    </tr>*@
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Transporte: ";
+                settings.AssociatedControlName = "id_vehicle";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Vehicle.carRegistration, settings =>
+       {
+           settings.Name = "id_vehicle";
+           settings.Properties.ClientInstanceName = "id_vehicle";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+         
+       }).GetHtml()
+        </td>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Marca:";
+                settings.AssociatedControlName = "mark";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Vehicle.mark, settings =>
+            {
+                settings.Properties.ClientInstanceName = "mark";
+                settings.Name = "mark";
+                settings.Width = Unit.Percentage(100);
+
+                settings.ReadOnly = true;
+
+            }).GetHtml()
+        </td>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Modelo:";
+                settings.AssociatedControlName = "model";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Vehicle.model, settings =>
+            {
+                settings.Properties.ClientInstanceName = "model";
+                settings.Name = "model";
+                settings.Width = Unit.Percentage(100);
+
+                settings.ReadOnly = true;
+
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Chofer: ";
+                settings.AssociatedControlName = "id_driver";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                var id_driver = (Model != null && Model.id_driver != 0) ? Model.id_driver : null;
+                var driverName = (Model != null) ? Model.driverName : "";
+            }
+            @Html.DevExpress().TextBoxFor(m => m.driverName, settings =>
+       {
+           settings.Properties.ClientInstanceName = "id_driver";
+           settings.Name = "id_driver";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+       }).GetHtml()
+        </td>
+        @*<td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Valor Flete:";
+                settings.AssociatedControlName = "valuePrice";
+            }).GetHtml()
+        </td>
+        <td>
+
+
+
+            @Html.DevExpress().SpinEditFor(m => m.valuePrice, settings =>
+       {
+           settings.Name = "valuePrice";
+           settings.Properties.ClientInstanceName = "valuePrice";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+           settings.ShowModelErrors = true;
+
+
+       }).GetHtml()
+        </td>*@
+
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Anticipo:";
+                settings.AssociatedControlName = "advancePrice";
+            }).GetHtml()
+        </td>
+        <td>
+
+            @Html.DevExpress().SpinEditFor(m => m.advancePrice, settings =>
+       {
+           settings.Name = "advancePrice";
+           settings.Properties.ClientInstanceName = "advancePrice";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+
+       }).GetHtml()
+
+
+        </td>
+    </tr>
+</table>
+

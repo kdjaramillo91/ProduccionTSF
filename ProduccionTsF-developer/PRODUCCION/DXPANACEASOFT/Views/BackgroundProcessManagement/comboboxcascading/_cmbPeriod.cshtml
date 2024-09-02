@@ -1,0 +1,38 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@{
+
+    //string codePeriod = (Model != null && Model.codePeriod != null) ? Model.codePeriod : null;
+}
+
+
+@Html.DevExpress().ComboBox(
+comboBox =>
+{
+    comboBox.Name = "idPeriod";
+    comboBox.Properties.ClientInstanceName = "idPeriod";
+    comboBox.Width = Unit.Percentage(100);
+
+    comboBox.Properties.ValueField = "code";
+    comboBox.Properties.TextField = "description";
+    comboBox.Properties.ValueType = typeof(string);
+
+    comboBox.Properties.NullDisplayText = "Todos";
+    comboBox.Properties.NullText = "Todos";
+
+    comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+
+    comboBox.ShowModelErrors = true;
+    comboBox.CallbackRouteValues = new { Controller = "BackgroundProcessManagement", Action = "PeriodOfWarehouse" };
+    
+    comboBox.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['idWarehouse'] = idWarehouse.GetValue();  }";
+    comboBox.Properties.CallbackPageSize = 20;
+
+
+
+
+}).BindList(TempData["BackgroundProcessManagementPeriods"]).GetHtml()
+

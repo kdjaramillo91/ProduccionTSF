@@ -1,0 +1,19 @@
+﻿@model PersonRolComboBoxModel
+@Html.DevExpress().ComboBox(
+	comboBox =>
+	{
+		this.Model.SetPersonRolComboBoxSettings(comboBox);
+
+	}).BindList(this.GetPersonRolsRange, this.GetPersonRolPorId).Bind(this.Model.IdPerson).GetHtml()
+
+@functions {
+	private IEnumerable<Person> GetPersonRolsRange(ListEditItemsRequestedByFilterConditionEventArgs args)
+	{
+		return this.Model.GetPersonRolsRange(args);
+	}
+
+	private Person GetPersonRolPorId(ListEditItemRequestedByValueEventArgs args)
+	{
+		return this.Model.GetPersonRolPorId(args);
+	}
+}

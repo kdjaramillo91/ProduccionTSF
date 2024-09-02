@@ -1,0 +1,54 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ProductionSchedule
+@{
+    int id_productionSchedule = (Model != null) ? Model.id : 0;
+    //string codeState = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+}
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Requerimiento</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+           @{
+               var productionScheduleRequestsDetail = (Model != null && Model.ProductionScheduleRequestDetail != null) ? Model.ProductionScheduleRequestDetail.OrderByDescending(od => od.id).ToList() : new List<ProductionScheduleRequestDetail>();
+               ViewData["id_productionSchedule"] = id_productionSchedule;
+               Html.RenderPartial("_ProductionScheduleViewFormProductionScheduleRequestsDetailPartial", productionScheduleRequestsDetail);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Reservación en Inventario</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @{
+                ViewData["id_productionSchedule"] = id_productionSchedule;
+                var productionScheduleInventoryReservationsDetail = (Model != null && Model.ProductionScheduleInventoryReservationDetail != null) ? Model.ProductionScheduleInventoryReservationDetail.OrderByDescending(od => od.id).ToList() : new List<ProductionScheduleInventoryReservationDetail>();
+                Html.RenderPartial("_ProductionScheduleViewFormProductionScheduleInventoryReservationsDetailPartial", productionScheduleInventoryReservationsDetail);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Orden de Producción</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @{
+                ViewData["id_productionSchedule"] = id_productionSchedule;
+                var productionScheduleProductionOrdersDetail = (Model != null && Model.ProductionScheduleProductionOrderDetail != null) ? Model.ProductionScheduleProductionOrderDetail.OrderByDescending(od => od.id).ToList() : new List<ProductionScheduleProductionOrderDetail>();
+                Html.RenderPartial("_ProductionScheduleViewFormProductionScheduleProductionOrderDetailsDetailPartial", productionScheduleProductionOrdersDetail);
+            }
+        </td>
+    </tr>
+</table>
+

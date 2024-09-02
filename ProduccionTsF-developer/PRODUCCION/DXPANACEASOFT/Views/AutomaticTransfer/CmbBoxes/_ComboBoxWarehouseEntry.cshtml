@@ -1,0 +1,18 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxWarehouseEntry";
+	settings.Properties.ClientInstanceName = "ComboBoxWarehouseEntry";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxWarehouseEntry",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxWarehouseEntry_SelIndexChanged";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}).BindList(ViewData["CmbBoxWarehouseEntry"]).GetHtml()

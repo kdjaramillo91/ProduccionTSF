@@ -1,0 +1,21 @@
+﻿@model List<DXPANACEASOFT.Models.DTOModel.PriceListDTO>
+
+@{
+    Layout = null;
+}
+
+<h3>Listas de Precios Pendientes de Aprobar</h3>
+
+@Html.Partial("PanelButtonsAproval")
+
+
+@Html.Hidden("id_crateState", (int)ViewBag.id_crateState)
+@Html.Hidden("id_aprovedState", (int)ViewBag.id_aprovedState)
+@Html.Hidden("id_reversedState", (int)ViewBag.id_reversedState)
+
+
+@Html.Partial("_GridViewPriceListPendingAproval", Model)
+
+<div id="gridPendingApprove"></div>
+
+<script src="~/Scripts/price_list_responsive/pending_approve.js"></script>

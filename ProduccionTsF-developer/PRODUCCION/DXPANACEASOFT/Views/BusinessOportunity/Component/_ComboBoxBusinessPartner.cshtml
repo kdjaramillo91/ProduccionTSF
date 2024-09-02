@@ -1,0 +1,27 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.BusinessOportunity
+@{
+    int? id_businessPartner = (Model != null && Model.id_businessPartner != 0) ? (int?)Model.id_businessPartner : null;
+    string codeDocumentType = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+}
+@Html.DevExpress().ComboBoxFor(m => m.id_businessPartner, settings =>
+{
+    settings.Properties.ClientInstanceName = "id_businessPartner";
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "GetBusinessPartner"/*, TextField = "CityName"*/ };
+    settings.Properties.CallbackPageSize = 5;
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "fullname_businessName";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.ShowModelErrors = true;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "BusinessOportunityBusinessPartner_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.Validation = "OnPersonValidation";
+}).BindList(DataProviderPerson.PersonByCompanyDocumentTypeOportunityAndCurrent((int)ViewData["id_company"], codeDocumentType, id_businessPartner)).Bind(id_businessPartner).GetHtml()

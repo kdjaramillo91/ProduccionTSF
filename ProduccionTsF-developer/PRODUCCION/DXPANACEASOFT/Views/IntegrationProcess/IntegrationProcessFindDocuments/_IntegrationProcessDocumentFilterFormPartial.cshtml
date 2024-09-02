@@ -1,0 +1,170 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.IntegrationProcessDetail
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterIntegrationProcessDocument", name = "formFilterIntegrationProcessDocument" }))
+{
+
+    <div class="row">
+        <div class="col-lg-12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información Documentos</span>
+        </div>
+    </div>
+    <div style="border-bottom: 1px Solid #C0C0C0;"></div>
+    <div class="row" style="padding-top: 5px;">
+        <div class="col-lg-10">
+            <div class="row" style="padding: 1px;">
+                <div class="col-lg-3">
+                    @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Name = "dateInitEmissionLabel";
+                        settings.Text = "Fecha Emision Documento:";
+
+                        settings.AssociatedControlName = "dateInitEmission";
+                    }).GetHtml()
+                </div>
+                <div class="col-lg-4">
+                    @Html.DevExpress().DateEdit(settings =>
+                    {
+                        settings.Name = "dateInitEmission";
+                        settings.Properties.ClientInstanceName = "dateInitEmission";
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Properties.NullDisplayText = "Desde";
+                        settings.Properties.NullText = "Desde";
+
+                        settings.Properties.DisplayFormatInEditMode = true;
+                        settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                        settings.Properties.EditFormat = EditFormat.Custom;
+                        settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                        settings.Properties.CalendarProperties.Columns = 1;
+
+                        settings.Properties.DateRangeSettings.MinDayCount = 1;
+                        settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                    }).GetHtml()
+                </div>
+                <div class="col-lg-4">
+                    @Html.DevExpress().DateEdit(settings =>
+                    {
+                        settings.Name = "dateEndEmission";
+                        settings.Properties.ClientInstanceName = "dateEndEmission";
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Properties.NullDisplayText = "Hasta";
+                        settings.Properties.NullText = "Hasta";
+
+                        settings.Properties.DisplayFormatInEditMode = true;
+                        settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                        settings.Properties.EditFormat = EditFormat.Custom;
+                        settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                        settings.Properties.CalendarProperties.Columns = 1;
+                        settings.Properties.DateRangeSettings.StartDateEditID = "dateInitEmission";
+                        settings.Properties.DateRangeSettings.MinDayCount = 1;
+                        settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                    }).GetHtml()
+                </div>
+            </div>
+            <div class="row" style="padding: 1px;">
+                <div class="col-lg-3">
+                    @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Name = "numberDocumentLabel";
+                        settings.Text = "Número Documento:";
+                        settings.AssociatedControlName = "numberDocument";
+                    }).GetHtml()
+                </div>
+                <div class="col-lg-8">
+                    @Html.DevExpress().TextBox(settings =>
+                    {
+                        settings.Name = "numberDocument";
+                        settings.Properties.ClientInstanceName = "numberDocument";
+                        settings.Width = Unit.Percentage(100);
+                        settings.ShowModelErrors = true;
+                        settings.Properties.NullDisplayText = "Todos";
+                        settings.Properties.NullText = "Todos";
+                    }).GetHtml()
+                </div>
+            </div>
+            <div class="row" style="padding: 1px;">
+                <div class="col-lg-3">
+                    @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Name = "id_emissionPointsLabel";
+                        settings.Text = "Punto de Emisión: ";
+                        settings.AssociatedControlName = "id_EmissionPoint";
+                    }).GetHtml()
+                </div>
+                <div class="col-lg-8">
+                    @Html.DevExpress().TokenBox(settings =>
+                    {
+                        settings.Name = "id_EmissionPoint";
+                        settings.Properties.ClientInstanceName = "id_EmissionPoint";
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.TextField = "name";
+
+                        settings.Properties.AllowCustomTokens = false;
+                        settings.Properties.NullDisplayText = "Todos";
+                        settings.Properties.NullText = "Todos";
+
+                        //settings.Properties.Tokens.AddRange( roles.Select(r => r.name).ToList());
+
+                        settings.ShowModelErrors = true;
+
+                        //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                        //settings.Properties.ClientSideEvents.TokensChanged = "RolTokenBox_TokensChanged";
+                        /*if (id_provider != 0 || id_Customer != 0)
+                           {
+                               settings.Properties.TokenRemoveButtonStyle.Height = 0;
+                               settings.Properties.TokenRemoveButtonStyle.Width = 0;
+                           }*/
+                    }).BindList(DataProviderEmissionPoint.EmissionPoints((int?)ViewData["id_company"])).GetHtml()
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <div class="row" style="padding: 1px;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnSearch";
+                    settings.UseSubmitBehavior = false;
+                    settings.Text = "Buscar";
+                    settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                    settings.Width = Unit.Percentage(75);
+                    settings.ClientSideEvents.Click = "btnSearchDocumento_click";
+                }).GetHtml()
+            </div>
+            <div class="row" style="padding: 1px;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnClear";
+                    settings.UseSubmitBehavior = false;
+                    settings.Text = "Limpiar";
+                    settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                    settings.Width = Unit.Percentage(75);
+                    settings.ClientSideEvents.Click = "btnClearDocumento_click";
+                }).GetHtml()
+            </div>
+            <div class="row" style="padding: 1px;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCerrar";
+                    settings.UseSubmitBehavior = false;
+                    settings.Text = "Cerrar";
+                    settings.Images.Image.IconID = IconID.ActionsCancel16x16;
+                    settings.Width = Unit.Percentage(75);
+                    settings.ClientSideEvents.Click = "btnCloseFilter_click";
+                }).GetHtml()
+            </div>
+        </div>
+
+    </div>
+
+
+}

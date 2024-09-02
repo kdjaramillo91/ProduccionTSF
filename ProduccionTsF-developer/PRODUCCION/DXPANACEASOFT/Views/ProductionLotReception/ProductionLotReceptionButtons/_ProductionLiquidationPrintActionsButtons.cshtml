@@ -1,0 +1,125 @@
+﻿
+
+<div style="width: 100%;">
+
+	<div class="vertical-divider"></div>
+
+	@Html.DevExpress().Button(settings =>
+	{
+
+		settings.Name = "btnPrintLiquidation";
+		settings.ToolTip = "Imprimir Liquidación";
+		//settings.Width = 90;
+		settings.Text = "";
+		//settings.RenderMode = ButtonRenderMode.Link;
+		settings.Images.Image.IconID = IconID.ProgrammingShowtestreport16x16;
+		settings.ClientEnabled = true;
+		settings.UseSubmitBehavior = false;
+		settings.EnableClientSideAPI = true;
+		settings.ClientSideEvents.Click = "PrintLiquidation";
+
+	}).GetHtml()
+
+	<div class="vertical-divider"></div>
+
+	@Html.DevExpress().Button(settings =>
+	{
+
+		settings.Name = "btnGenerateAccounting";
+		settings.ToolTip = "Generar Contabilidad";
+		settings.Text = "";
+		settings.Images.Image.IconID = IconID.ActionsExport16x16devav;
+		settings.ClientEnabled = true;
+		settings.UseSubmitBehavior = false;
+		settings.EnableClientSideAPI = true;
+		settings.ClientVisible = false;
+		settings.ClientSideEvents.Click = "GenerateAccounting";
+
+	}).GetHtml()
+
+	<div class="vertical-divider"></div>
+
+	@Html.DevExpress().Button(settings =>
+	{
+
+		settings.Name = "btnGenerateElectronicInvoice";
+		settings.ToolTip = "Generar Factura Electrónica";
+		settings.Text = "";
+		settings.Images.Image.IconID = IconID.ActionsFill16x16;
+		settings.ClientEnabled = true;
+		settings.UseSubmitBehavior = false;
+		settings.EnableClientSideAPI = true;
+		settings.ClientVisible = false;
+		settings.ClientSideEvents.Click = "GenerateElectronicInvoice";
+
+	}).GetHtml()
+
+	<div class="vertical-divider"></div>
+	@model DXPANACEASOFT.Models.ProductionLot
+
+	@Html.DevExpress().Button(settings =>
+	{
+
+		settings.Name = "btnPrintLiquidationEnd";
+		settings.ToolTip = "Imprimir Comprobante/Pago";
+		settings.Text = "";
+		settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+		settings.ClientEnabled = true;
+		settings.UseSubmitBehavior = false;
+		settings.EnableClientSideAPI = true;
+		settings.ClientSideEvents.Click = "PrintLiquidationEnd";
+
+	}).GetHtml()
+
+	<div class="vertical-divider"></div>
+
+	@Html.DevExpress().Button(settings =>
+	{
+
+		settings.Name = "btnPrintLiquidationDistribuida";
+		settings.ToolTip = "Imprimir Distribución de Pago";
+		settings.Text = "";
+		settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+		settings.ClientEnabled = true;
+		settings.UseSubmitBehavior = false;
+		settings.EnableClientSideAPI = true;
+		settings.ClientSideEvents.Click = "PrintLiquidationDistribucion";
+
+	}).GetHtml()
+	<!-- Nuevo Boton -->
+	<div class="vertical-divider"></div>
+
+	@Html.DevExpress().Button(settings =>
+	{
+
+		settings.Name = "btnPrintLiquidationDistribuidaImprimirPE";
+		settings.ToolTip = "Imprimir Liquidación Inventario Lote";
+		settings.Text = "";
+		settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+		settings.ClientEnabled = true;
+		settings.UseSubmitBehavior = false;
+		settings.EnableClientSideAPI = true;
+		settings.ClientSideEvents.Click = "PrintLiquidationDistribucionImprimirPE";
+
+	}).GetHtml()
+
+	<div class="vertical-divider"></div>
+	@Html.DevExpress().Label(settings =>
+   {
+	   settings.Text = "Liquidación No: ";
+	   settings.ControlStyle.Font.Size = FontUnit.Large;
+	   settings.ControlStyle.Font.Bold = true;
+   }).GetHtml()
+	@{
+		var labelLiquidationPago = Model.sequentialLiquidation;
+	}
+	@Html.DevExpress().Label(settings =>
+	{
+		settings.Name = "labelLiquidationPago";
+		settings.ControlStyle.Font.Size = FontUnit.Large;
+		settings.ControlStyle.Font.Bold = true;
+	}).Bind(labelLiquidationPago).GetHtml()
+</div>
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+

@@ -1,0 +1,139 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<MachineAvailabilityDTO>(settings =>
+    {
+        settings.Name = "GridViewDetails";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "MachineAvailability",
+            Action = "GridViewDetails",
+            enabled = ViewBag.enabled
+        };
+
+        settings.KeyFieldName = "id";
+
+        //settings.SettingsBehavior.AllowFixedGroups = true;
+        //settings.SettingsBehavior.AllowSort = false;
+
+        //settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        //settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        //settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        //settings.SettingsPager.Visible = true;
+        //settings.Settings.ShowGroupPanel = true;
+        //settings.Settings.ShowFilterRow = true;
+        //settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Cell;
+        settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+        settings.SettingsEditing.BatchEditSettings.ShowConfirmOnLosingChanges = false;
+
+        settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            var list = (Model as List<ClosingMachinesTurnDetailDTO>) ?? new List<ClosingMachinesTurnDetailDTO>();
+            e.Properties["cpDetailCount"] = list.Count;
+        };
+
+        //#region SearchPanel
+
+        ////Panel de Busqueda
+        //settings.SettingsSearchPanel.Visible = true;
+        //settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        //#endregion
+
+        //settings.Settings.ShowFooter = true;
+
+        settings.Columns.Add(m => m.id, column =>
+        {
+            column.Name = "id";
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(m => m.code, column =>
+        {
+            column.Name = "code";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(m => m.nameMachineForProd, column =>
+        {
+            column.Name = "nameMachineForProd";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(m => m.nameTbsysTypeMachineForProd, column =>
+        {
+            column.Name = "nameTbsysTypeMachineForProd";
+            column.Caption = "Tipo de Máquina";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(m => m.namePersonProcessPlant, column =>
+        {
+            column.Name = "namePersonProcessPlant";
+            column.Caption = "Planta Proceso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(m => m.isActive, column =>
+        {
+            column.Name = "isActive";
+            column.Caption = "¿Activo?";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(5);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(m => m.available, column =>
+        {
+            column.Name = "available";
+            column.Caption = "¿Disponible?";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(5);
+        });
+
+        settings.Columns.Add(m => m.reason, column =>
+        {
+            column.Name = "reason";
+            column.Caption = "Motivo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+        });
+    });
+}
+@grid.Bind(Model).GetHtml()

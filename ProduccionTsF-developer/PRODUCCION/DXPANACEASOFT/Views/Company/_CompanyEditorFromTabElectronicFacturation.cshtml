@@ -1,0 +1,151 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.CompanyElectronicFacturation
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_enviromentType, settings =>
+            {
+                settings.Text = "Ambiente:";
+                settings.AssociatedControlName = "id_enviromentType";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_enviromentType = (Model != null && Model.id_enviromentType != 0) ? (int?) Model.id_enviromentType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_enviromentType, settings =>
+            {
+                settings.Properties.ClientInstanceName = "id_enviromentType";
+
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Ambiente de Emisión";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnEnvironmentTypeValidation";
+
+            }).BindList(DataProviderEnvironmentType.EnvironmentsTypes((int) ViewData["id_company"])).Bind(id_enviromentType).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_emissionType, settings =>
+            {
+                settings.Text = "Tipo Emisión:";
+                settings.AssociatedControlName = "id_emissionType";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_emissionType = (Model != null && Model.id_emissionType != 0) ? (int?) Model.id_emissionType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_emissionType, settings =>
+            {
+                settings.Properties.ClientInstanceName = "id_emissionType";
+
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+
+                settings.Width = Unit.Percentage(100);
+
+                settings.Properties.NullText = "Tipo de Emisión";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnEmissionTypeValidation";
+
+            }).BindList(DataProviderEmissionType.EmissionsTypes((int) ViewData["id_company"])).Bind(id_emissionType).GetHtml()
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.resolutionNumber, settings =>
+            {
+                settings.Text = "No. Resolucion:";
+                settings.AssociatedControlName = "resolutionNumber";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.resolutionNumber, settings =>
+            {
+                settings.Properties.ClientInstanceName = "resolutionNumber";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "Número de Resolución";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnResolutionNumberValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.rise, settings =>
+            {
+                settings.Text = "No. RIMPE:";
+                settings.AssociatedControlName = "rise";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.rise, settings =>
+            {
+                settings.Properties.ClientInstanceName = "rise";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.NullText = "RISE";
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnRiseValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.requireAccounting, settings =>
+            {
+                settings.Text = "Obligado a Contabilidad:";
+                settings.AssociatedControlName = "requireAccounting";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.requireAccounting, settings =>
+            {
+                settings.Properties.ClientInstanceName = "requireAccounting";
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.certificate, settings =>
+            {
+                settings.Text = "Certificado Digital:";
+                settings.AssociatedControlName = "certificate";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                Html.RenderPartial("_File");
+            }
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.password, settings =>
+            {
+                settings.Text = "Contraseña del Certificado:";
+                settings.AssociatedControlName = "password";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.password, settings =>
+            {
+                settings.Properties.ClientInstanceName = "password";
+                settings.Properties.NullText = "Contraseña del Certificado";
+                settings.Properties.Password = true;
+                settings.Properties.ClientSideEvents.Validation = "OnPasswordValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

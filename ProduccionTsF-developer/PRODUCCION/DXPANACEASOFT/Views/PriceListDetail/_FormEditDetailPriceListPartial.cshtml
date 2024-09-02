@@ -1,0 +1,181 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.PriceListDet
+@using DevExpress.Web.DemoUtils
+
+@model List<PriceListDetItemSize>
+
+@{
+	var grid = Html.DevExpress().GridView<PriceListDetItemSize>(settings =>
+	{
+		settings.Name = "gvPriceListDetail";
+		settings.CallbackRouteValues = new { Controller = "PriceListDetail", Action = "FormEditDetailDetailPriceListItemSizePartial" };
+
+		//settings.ClientSideEvents.BeginCallback = "RemissionGuideDetailViewAssignedStaff_BeginCallback";
+
+		settings.Width = Unit.Percentage(90);
+		settings.CommandColumn.Visible = false;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+
+		settings.SettingsPager.PageSize = 20;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = false;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.SettingsExport.EnableClientSideExportAPI = true;
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Toolbars.Add(t =>
+		{
+			t.EnableAdaptivity = true;
+			t.Items.Add(GridViewToolbarCommand.ExportToXls).Text ="Exportar a Excel (2003)";
+		});
+
+		settings.PreRender = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv != null)
+				gv.ExpandAll();
+		};
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+		};
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "sProcessType";
+			column.Name = "sProcessType";
+			column.Caption = "Proceso";
+			column.GroupIndex = 0;
+			column.Width = 50;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "nameClass";
+			column.Name = "nameClass";
+			column.Caption = "Categoría";
+			column.Width = 50;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.GroupIndex = 1;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(m => m.sItemSize, column =>
+		{
+			column.FieldName = "sItemSize";
+			column.Name = "sItemSize";
+			column.Caption = "Talla";
+			column.Width = 50;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+		});
+		
+		settings.Columns.Add(m => m.Libras, column =>
+		{
+			column.FieldName = "Libras";
+			column.Name = "Libras";
+			column.Caption = "Libras";
+			column.Width = 50;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.PropertiesEdit.DisplayFormatString = "N2";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(m => m.Price, column =>
+		{
+			column.FieldName = "Price";
+			column.Name = "Price";
+			column.Caption = "Precio";
+			column.Width = 50;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.PropertiesEdit.DisplayFormatString = "C2";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.ReadOnly = true;
+		});
+		settings.Columns.Add(m => m.Total, column =>
+		{
+			column.FieldName = "Total";
+			column.Name = "Total";
+			column.Caption = "Total";
+			column.Width = 50;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.PropertiesEdit.DisplayFormatString = "C2";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.ReadOnly = true;
+		});
+		//settings.Columns.Add(m => m.PriceA, column =>
+		//{
+		//    column.FieldName = "PriceA";
+		//    column.Name = "PriceA";
+		//    column.Caption = "Precio A";
+		//    column.Width = 50;
+		//    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//    column.PropertiesEdit.DisplayFormatString = "C2";
+		//    column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		//    column.ReadOnly = true;
+		//});
+		//settings.Columns.Add(m => m.PriceB, column =>
+		//{
+		//    column.FieldName = "PriceB";
+		//    column.Name = "PriceB";
+		//    column.Caption = "Precio B";
+		//    column.Width = 50;
+		//    column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		//    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//    column.PropertiesEdit.DisplayFormatString = "C2";
+		//    column.ReadOnly = true;
+		//});
+		DXPANACEASOFT.Helper.GridViewFeaturesHelper.SetupGlobalGridViewBehavior(settings);
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}

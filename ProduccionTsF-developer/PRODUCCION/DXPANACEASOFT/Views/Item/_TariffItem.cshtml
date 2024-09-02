@@ -1,0 +1,54 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.TariffItem
+
+
+<table id="tabTariffItemTable" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Partida arancelaria</span>
+        </td>
+    </tr>
+
+    <tr>
+        <td >
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+           {
+               settings.Name = "codeTariffItemLabel";
+               settings.Text = "Código*:";
+               settings.AssociatedControlName = "codeTariffItemLabel";
+           }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+       {
+           settings.Name = "codeTariffItem";
+           settings.Properties.ClientInstanceName = "codeTariffItem";
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnCodeTariffItemValidation";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+           {
+               settings.Name = "nameTariffItemLabel";
+               settings.Text = "Descripción*:";
+               settings.AssociatedControlName = "nameTariffItemLabel";
+           }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "nameTariffItem";
+           settings.Properties.ClientInstanceName = "nameTariffItem";
+           settings.Width = Unit.Percentage(100);
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnNameTariffItemValidation";
+       }).GetHtml()
+        </td>
+    </tr>
+</table>
+<br />

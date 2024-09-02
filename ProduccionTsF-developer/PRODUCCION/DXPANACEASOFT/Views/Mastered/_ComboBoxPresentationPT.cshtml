@@ -1,0 +1,19 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComboBoxPresentationPT";
+    settings.Width = Unit.Percentage(100);
+    //settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Mastered",
+        Action = "ComboBoxPresentationPT",
+    };
+    //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxPresentationPT_SelectedIndexChanged";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["PresentationPT"]).GetHtml()

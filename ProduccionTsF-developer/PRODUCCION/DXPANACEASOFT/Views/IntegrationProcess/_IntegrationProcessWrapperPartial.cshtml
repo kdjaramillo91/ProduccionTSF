@@ -1,0 +1,165 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@*using ValidationSettings = System.Web.UI.ValidationSettings*@
+@model DXPANACEASOFT.Models.IntegrationProcess
+
+@{
+
+    int id_IntegrationProcess = (Model != null) ? Model.id : 0;
+    string code_IntegrationState = "";
+    if ((Model.id_StatusLote != 0))
+    {
+        IntegrationState _integrationState = DataProviderIntegrationProcess.StatesById(Model.id_StatusLote);
+        if(_integrationState!= null)
+        {
+            code_IntegrationState = DataProviderIntegrationProcess.StatesById(Model.id_StatusLote).code;
+        }
+        else
+        {
+            code_IntegrationState = "01";
+        }
+
+
+    }else
+    {
+        code_IntegrationState = "01";
+    }
+     
+}
+
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditIntegrationProcess", name = "formEditIntegrationProcess" }))
+{
+
+    // presenta mensajes del codeBehind
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw("<div id='integrationprocessmsg'>"+ ViewData["EditMessage"]+ "</div>");
+    }
+    else if (ViewData["EditError"] != null)
+    {
+        @Html.Raw("<div id='integrationprocessmsg'>" + ViewData["EditError"] + "</div>");
+    }
+    else
+    {
+        @Html.Raw("<div id='integrationprocessmsg'></div>");
+    }
+
+
+
+
+    @Html.Hidden("id_IntegrationProcess", id_IntegrationProcess)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+
+
+    // Cabecera Lote Integracion
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabIntegrationProcess";
+        tab.Text = "Lote Proceso de Integración    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_IntegrationProcessHeadFormPartial");
+        });
+    });
+
+    // Detalle Lotes de Integracion
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabIntegrationProcessDetails";
+        tab.Text = "Documentos    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+        tab.ClientEnabled = (id_IntegrationProcess !=0);
+
+
+        tab.SetContent(() =>
+        {
+
+            Html.RenderPartial("_IntegrationProcessDetailFormPartial");
+        });
+    });
+
+    // Log 
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabIntegrationProcessLog";
+        tab.Text = "Log Lote    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+        tab.ClientEnabled = (id_IntegrationProcess != 0);
+
+        tab.SetContent(() =>
+        {
+
+            List<IntegrationProcessLogView> _integrationProcessLogViewList = (Model != null && Model.IntegrationProcessLogViewList != null) ? Model.IntegrationProcessLogViewList.OrderBy(r=> r.FechaHora).ToList() : new List<IntegrationProcessLogView>();
+
+            Html.RenderPartial("_IntegrationProcessLogFormPartial", _integrationProcessLogViewList);
+        });
+    });
+
+}).GetHtml()
+
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                   /* Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdateFoot";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ClientVisible = true;
+                        button.ClientSideEvents.Click = "OIntegrationProcess.SaveLote";
+                        button.ClientEnabled = (code_IntegrationState == "01");
+                    }).Render();*/
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnCancelFoot";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "OIntegrationProcess.CancelEditLote";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+                    }

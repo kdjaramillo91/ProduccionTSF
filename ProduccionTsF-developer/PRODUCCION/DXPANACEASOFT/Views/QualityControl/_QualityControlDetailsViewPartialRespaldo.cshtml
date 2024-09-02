@@ -1,0 +1,124 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.QualityControlDetail>
+@*@Html.Hidden("id_qualityControl_Detail", ViewData["id_qualityControl"])*@
+
+@{
+    var grid = Html.DevExpress().GridView<QualityControlDetail>(settings =>
+    {
+        settings.Name = "gvQualityControlDetails";//+ ViewData["id_qualityControl"];
+
+
+        settings.CallbackRouteValues = new { Controller = "QualityControl", Action = "QualityControlDetailsViewPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "QualityControlDetailView_OnBeginCallback";
+
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            QualityControlDetail detail = (QualityControlDetail)Model[c.ItemIndex];
+            
+            if (detail != null && detail.QualityCorrectiveAction != null)
+            {
+                Html.RenderPartial("_QualityControlDetailsDetailPartial", detail.QualityCorrectiveAction);
+            }
+        });
+        
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdQualityControl"] = 0;
+            }
+            e.Properties["cpIdQualityControl"] = ViewData["id_qualityControl"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //id_qualityAnalysis
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_qualityAnalysis";
+            column.Name = "id_qualityAnalysis";
+            column.Width = Unit.Percentage(10);
+            column.Caption = "Análisis";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_qualityAnalysis = (int)DataBinder.Eval(c.DataItem, "id_qualityAnalysis");
+                var qualityAnalysis = DataProviderQualityAnalysis.QualityAnalysis(id_qualityAnalysis);
+                ViewContext.Writer.Write(qualityAnalysis != null ? qualityAnalysis.name : "");
+
+            });
+
+        });
+
+        //result
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "result";
+            column.Name = "result";
+            column.Width = Unit.Percentage(10);
+            column.Caption = "Resultado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var resultValue = (string)DataBinder.Eval(c.DataItem, "resultValue");
+                ViewContext.Writer.Write(resultValue);
+
+            });
+
+        });
+
+        //isConformsQualityControlDetail
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isConforms";
+            column.Name = "isConformsQualityControlDetail";
+            column.Caption = "Conforme";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var isConforms = (bool)DataBinder.Eval(c.DataItem, "isConforms");
+                string text = (isConforms ? "<font color='green'>" + "Conforme" + "</font>" : "<font color='red'>" + "No Conforme" + "</font>");
+                ViewContext.Writer.Write(text);
+
+            });
+        });
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,121 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.Provider
+
+@{
+//var code_identification = (Model != null && Model.Provider != null && Model.Provider.Person != null && Model.Provider.Person.id_identificationType != 0) ? Model.Provider.Person.IdentificationType.codeSRI : "";
+//string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+
+<table class="table table-condensed" style="margin: 0px;">
+    @*@Html.Hidden("code_purchaseReason", code_purchaseReason)*@
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="5" class="ps-bar-collapse" dtx="ps-emr-comrel">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Compañias Relacionadas</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="ps-emr-comrel">
+        <td colspan="5">
+           @{
+               var providerRelatedCompany = Model.ProviderRelatedCompany.ToList() ?? new List<ProviderRelatedCompany>();
+               Html.RenderPartial("_FormEditProviderRelatedCompany", providerRelatedCompany);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="5" class="ps-bar-collapse" dtx="ps-emr-ctacont">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Cuentas Contables</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="ps-emr-ctacont">
+        <td>
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "auxiliaryAbbreviationLabel";
+                    settings.Text = "Abreviatura Auxiliar:";
+                    settings.AssociatedControlName = "auxiliaryAbbreviation";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Properties.ClientInstanceName = "auxiliaryAbbreviation";
+                settings.Name = "auxiliaryAbbreviation";
+                settings.Text = "";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "numberFormatLabel";
+                    settings.Text = "Formato de Número:";
+                    settings.AssociatedControlName = "numberFormat";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Properties.ClientInstanceName = "numberFormat";
+                settings.Name = "numberFormat";
+                settings.Text = "";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td style="text-align: right;">
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnAssignAccount";
+                settings.Text = "Asignar Cuenta";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.UseSubmitBehavior = false;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsResetchanges16x16devav;
+                settings.ValidateInvisibleEditors = true;
+                //settings.ClientSideEvents.Click = "ButtonAssignAccount_Click";
+                settings.ClientEnabled = false;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr class="ps-emr-ctacont">
+        <td colspan="5">
+            @{
+                var providerAccountingAccounts = Model.ProviderAccountingAccounts.ToList() ?? new List<ProviderAccountingAccounts>();
+                Html.RenderPartial("_FormEditProviderAccountingAccounts", providerAccountingAccounts);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="5"  class="ps-bar-collapse" dtx="ps-emr-productos">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Productos</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+         </td>
+    </tr>
+    <tr class="ps-emr-productos">
+        <td colspan="5">
+            @{
+                var providerItem = Model.ProviderItem.ToList() ?? new List<ProviderItem>();
+                Html.RenderPartial("_FormEditProviderItem", providerItem);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;" class="ps-emr-productos">
+        <td colspan="5">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>            
+        </td>
+    </tr>
+    <tr class="ps-emr-productos">
+        <td colspan="5">
+            @{
+                var providerMailByComDivBra = Model.ProviderMailByComDivBra.ToList() ?? new List<ProviderMailByComDivBra>();
+                Html.RenderPartial("_FormEditProviderMailByComDivBra", providerMailByComDivBra);
+            }
+        </td>
+    </tr>
+</table>
+

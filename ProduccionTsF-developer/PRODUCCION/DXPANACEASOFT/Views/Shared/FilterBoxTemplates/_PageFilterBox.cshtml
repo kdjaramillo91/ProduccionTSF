@@ -1,0 +1,45 @@
+﻿@using DXPANACEASOFT.Models.Filter
+
+@model List<FilterType>
+@{
+    var listFilterTypeDate = Model.Where(w => w.type == "Date").ToList();
+    if (listFilterTypeDate.Count() > 0)
+    {
+        Html.RenderPartial("FilterBoxTemplates/_FilterBoxDate", listFilterTypeDate);
+    }
+    var listFilterTypeText = Model.Where(w => w.type == "Text").ToList();
+    if (listFilterTypeText.Count() > 0)
+    {
+        Html.RenderPartial("FilterBoxTemplates/_FilterBoxText", listFilterTypeText);
+    }
+    var listFilterTypeNumber = Model.Where(w => w.type == "Number").ToList();
+    if (listFilterTypeNumber.Count() > 0)
+    {
+        Html.RenderPartial("FilterBoxTemplates/_FilterBoxNumber", listFilterTypeNumber);
+    }
+    var listFilterTypeSelect = Model.Where(w => w.type == "Select").ToList();
+    if (listFilterTypeSelect.Count() > 0)
+    {
+        Html.RenderPartial("FilterBoxTemplates/_FilterBoxSelect", listFilterTypeSelect);
+    }
+    var listFilterTypeCheck = Model.Where(w => w.type == "Check").ToList();
+    if (listFilterTypeCheck.Count() > 0)
+    {
+        Html.RenderPartial("FilterBoxTemplates/_FilterBoxCheck", listFilterTypeCheck);
+    }
+}
+@*<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="3">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Fechas</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100%">
+            @{
+
+                Html.RenderPartial("FilterBoxTemplates/_FilterBoxDateGridViewLeft", Model);
+            }
+        </td>
+    </tr>
+</table>*@

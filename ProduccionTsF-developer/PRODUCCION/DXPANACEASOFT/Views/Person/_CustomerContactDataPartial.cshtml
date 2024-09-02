@@ -1,0 +1,32 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.Customer
+
+
+
+<table class="table table-condensed" style="margin: 0px;">
+    
+    <tr >
+        <td>
+            @{
+                CustomerContact customerContact = Model.CustomerContact ?? new CustomerContact();
+                Html.RenderPartial("_FormEditCustomerContact", customerContact);
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%" class="ps-bar-collapse" dtx="psep-edirecciones">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Direcciones</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr class="psep-edirecciones">
+        <td>
+            @{
+                List<CustomerAddress>  customerAddress = Model.CustomerAddress.ToList() ?? new List<CustomerAddress>();
+                Html.RenderPartial("_FormEditCustomerAddress", customerAddress);
+            }
+        </td>
+    </tr>     
+</table>

@@ -1,0 +1,564 @@
+﻿@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProviderRawMaterial
+@{
+	int? idSubCostCenter = this.Model.id_SubCostCenter;
+}
+
+@Html.Hidden("idWarehouse", idSubCostCenter)
+@Html.Hidden("idCostCenterCarton", this.Model.id_SubCostCenterCarton)
+@Html.Hidden("idCostCenterFreeze", this.Model.id_SubCostCenterFreeze)
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditProviderCopacking", name = "formEditProviderCopacking" }))
+{
+	<table id="ProviderCopackingTable" class="table table-condensed" style="margin: 0; padding: 0">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="4">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Ingreso de Materias Primas</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_Warehouse, settings =>
+			   {
+				   settings.Name = "warehouseLabel";
+				   settings.Text = "Bodega: ";
+				   settings.AssociatedControlName = "id_Warehouse";
+			   }).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_Warehouse, settings =>
+			   {
+				   settings.Name = "id_Warehouse";
+				   settings.Properties.ClientInstanceName = "id_Warehouse";
+
+				   settings.Properties.ValueField = "id";
+				   settings.Properties.TextField = "name";
+				   settings.Properties.ValueType = typeof(int);
+				   settings.Width = Unit.Percentage(100);
+				   settings.Height = Unit.Percentage(100);
+
+				   settings.Properties.NullDisplayText = "Todas";
+				   settings.Properties.NullText = "Todas";
+
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   //settings.Properties.ClientSideEvents.Init = "OnWarehouseEntryInit";
+				   settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseCombo_SelectedIndexChanged";
+				   //settings.Properties.ClientSideEvents.Validation = "OnWarehouseValidation";
+			   }).BindList(DataProviderWarehouse.WarehousesByCodeType((int)ViewData["id_company"], "BMP01")).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_WarehouseLocation, settings =>
+			   {
+				   settings.Name = "warehouseLocationLabel";
+				   settings.Text = "Ubicación de Bodega: ";
+				   settings.AssociatedControlName = "id_WarehouseLocation";
+			   }).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_WarehouseLocation, settings =>
+			   {
+				   settings.Name = "id_WarehouseLocation";
+				   settings.Properties.ClientInstanceName = "id_WarehouseLocation";
+				   settings.Properties.ValueField = "id";
+				   settings.Properties.TextField = "name";
+				   settings.Properties.ValueType = typeof(int);
+				   settings.Width = Unit.Percentage(100);
+				   settings.Height = Unit.Percentage(100);
+
+				   settings.Properties.NullDisplayText = "Todas";
+				   settings.Properties.NullText = "Todas";
+
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   settings.Properties.ClientSideEvents.Init = "OnWarehouseLocationEntryInit";
+				   settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationValidation";
+			   }).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_CostCenter, settings =>
+			   {
+				   settings.Name = "costCenterLabel";
+				   settings.Text = "Centro de Costo: ";
+				   settings.AssociatedControlName = "id_CostCenter";
+			   }).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_CostCenter, settings =>
+			   {
+					settings.Name = "id_CostCenter";
+					settings.Properties.ClientInstanceName = "id_CostCenter";
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   settings.Properties.ClientSideEvents.SelectedIndexChanged = "SubCostCenterCombo_SelectedIndexChanged";
+			   }).BindList(DataProviderCostCenter.AllCostCenters()).GetHtml()
+			</td>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_SubCostCenter, settings =>
+			   {
+				   settings.Name = "subCostCenterLabel";
+				   settings.Text = "Subcentro de Costo: ";
+				   settings.AssociatedControlName = "id_SubCostCenter";
+			   }).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_SubCostCenter, settings =>
+			   {
+					settings.Name = "id_SubCostCenter";
+					settings.Properties.ClientInstanceName = "id_SubCostCenter";
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.Init = "OnSubCostCenterEntryInit";
+					settings.Properties.ClientSideEvents.Validation = "OnSubCostCenterValidation";
+
+			   }).BindList(DataProviderCostCenter.SubCostCenters()).GetHtml()
+			</td>
+		</tr>
+
+		<tr>
+			<td></td>
+		</tr>
+
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="4">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Ingreso de Encartonado</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_WarehouseCarton, settings =>
+				{
+					settings.Name = "warehouseCartonLabel";
+					settings.Text = "Bodega: ";
+					settings.AssociatedControlName = "id_WarehouseCarton";
+				}).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_WarehouseCarton, settings =>
+				{
+					settings.Name = "id_WarehouseCarton";
+					settings.Properties.ClientInstanceName = "id_WarehouseCarton";
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					//settings.Properties.ClientSideEvents.Init = "OnWarehouseEntryInit";
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseCartonCombo_SelectedIndexChanged";
+				}).BindList(DataProviderWarehouse.WarehousesByCodeType((int)ViewData["id_company"], "BE01")).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_warehouseLocationCarton, settings =>
+				{
+					settings.Name = "warehouseLocationCartonLabel";
+					settings.Text = "Ubicación de Bodega: ";
+					settings.AssociatedControlName = "id_warehouseLocationCarton";
+				}).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_warehouseLocationCarton, settings =>
+				{
+					settings.Name = "id_warehouseLocationCarton";
+					settings.Properties.ClientInstanceName = "id_warehouseLocationCarton";
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.Init = "OnWarehouseLocationCartonEntryInit";
+					settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationCartonValidation";
+				}).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_CostCenterCarton, settings =>
+				{
+					settings.Name = "costCenterCartonLabel";
+					settings.Text = "Centro de Costo: ";
+					settings.AssociatedControlName = "id_CostCenterCarton";
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_CostCenterCarton, settings =>
+				{
+					settings.Name = "id_CostCenterCarton";
+					settings.Properties.ClientInstanceName = "id_CostCenterCarton";
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "SubCostCenterCartonCombo_SelectedIndexChanged";
+				}).BindList(DataProviderCostCenter.AllCostCenters()).GetHtml()
+			</td>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_SubCostCenterCarton, settings =>
+				{
+					settings.Name = "subCostCenterCartonLabel";
+					settings.Text = "Subcentro de Costo: ";
+					settings.AssociatedControlName = "id_CostCenterCarton";
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_SubCostCenterCarton, settings =>
+			{
+				settings.Name = "id_SubCostCenterCarton";
+				settings.Properties.ClientInstanceName = "id_SubCostCenterCarton";
+				settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Properties.NullDisplayText = "Todas";
+				settings.Properties.NullText = "Todas";
+
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.Init = "OnSubCostCenterCartonEntryInit";
+				settings.Properties.ClientSideEvents.Validation = "OnSubCostCenterCartonValidation";
+			}).BindList(DataProviderCostCenter.SubCostCenters()).GetHtml()
+			</td>
+		</tr>
+
+		<tr>
+			<td></td>
+		</tr>
+
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="4">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Ingreso de Cámara de Congelamiento - Máster</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_WarehouseFreeze, settings =>
+				{
+					settings.Name = "warehouseFreezeLabel";
+					settings.Text = "Bodega: ";
+					settings.AssociatedControlName = "id_WarehouseFreeze";
+				}).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_WarehouseFreeze, settings =>
+				{
+					settings.Name = "id_WarehouseFreeze";
+					settings.Properties.ClientInstanceName = "id_WarehouseFreeze";
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					//settings.Properties.ClientSideEvents.Init = "OnWarehouseEntryInit";
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseFreezeCombo_SelectedIndexChanged";
+				}).BindList(DataProviderWarehouse.WarehousesByCodeType((int)ViewData["id_company"], "BCC01")).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_warehouseLocationFreeze, settings =>
+				{
+					settings.Name = "warehouseLocationFreezeLabel";
+					settings.Text = "Ubicación de Bodega: ";
+					settings.AssociatedControlName = "id_warehouseLocationFreeze";
+				}).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_warehouseLocationFreeze, settings =>
+				{
+					settings.Name = "id_warehouseLocationFreeze";
+					settings.Properties.ClientInstanceName = "id_warehouseLocationFreeze";
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.Init = "OnWarehouseLocationFreezeEntryInit";
+					settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationFreezeValidation";
+				}).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_CostCenterFreeze, settings =>
+				{
+					settings.Name = "costCenterFreezeLabel";
+					settings.Text = "Centro de Costo: ";
+					settings.AssociatedControlName = "id_CostCenterFreeze";
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_CostCenterFreeze, settings =>
+				{
+					settings.Name = "id_CostCenterFreeze";
+					settings.Properties.ClientInstanceName = "id_CostCenterFreeze";
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "SubCostCenterFreezeCombo_SelectedIndexChanged";
+				}).BindList(DataProviderCostCenter.AllCostCenters()).GetHtml()
+			</td>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_SubCostCenterFreeze, settings =>
+				{
+					settings.Name = "subCostCenterFreezeLabel";
+					settings.Text = "Subcentro de Costo: ";
+					settings.AssociatedControlName = "id_SubCostCenterFreeze";
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_SubCostCenterFreeze, settings =>
+			{
+				settings.Name = "id_SubCostCenterFreeze";
+				settings.Properties.ClientInstanceName = "id_SubCostCenterFreeze";
+				settings.Width = Unit.Percentage(100);
+				settings.Height = Unit.Percentage(100);
+
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.ValueType = typeof(int);
+
+				settings.Properties.NullDisplayText = "Todas";
+				settings.Properties.NullText = "Todas";
+
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ClientSideEvents.Init = "OnSubCostCenterFreezeEntryInit";
+				settings.Properties.ClientSideEvents.Validation = "OnSubCostCenterFreezeValidation";
+			}).BindList(DataProviderCostCenter.SubCostCenters()).GetHtml()
+			</td>
+		</tr>
+
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="4">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Ingreso de Cámara de Congelamiento - Cajas Sueltas</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_WarehouseLooseCarton, settings =>
+				{
+					settings.Name = "WarehouseLooseCarton";
+					settings.Text = "Bodega: ";
+					settings.AssociatedControlName = "id_WarehouseLooseCarton";
+				}).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_WarehouseLooseCarton, settings =>
+				{
+					settings.Name = "id_WarehouseLooseCarton";
+					settings.Properties.ClientInstanceName = "id_WarehouseLooseCarton";
+
+					settings.Properties.ValueField = "id";
+					settings.Properties.TextField = "name";
+					settings.Properties.ValueType = typeof(int);
+					settings.Width = Unit.Percentage(100);
+					settings.Height = Unit.Percentage(100);
+
+					settings.Properties.NullDisplayText = "Todas";
+					settings.Properties.NullText = "Todas";
+
+					settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					settings.Properties.ClientSideEvents.SelectedIndexChanged = "WarehouseLooseCartonCombo_SelectedIndexChanged";
+				}).BindList(DataProviderWarehouse.WarehousesByCodeType((int)ViewData["id_company"], "BCC01")).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_WarehouseLocationLooseCarton, settings =>
+				{
+					settings.Name = "WarehouseLocationLooseCarton";
+					settings.Text = "Ubicación de Bodega: ";
+					settings.AssociatedControlName = "id_WarehouseLocationLooseCarton";
+				}).GetHtml()
+			</td>
+			<td>
+
+				@Html.DevExpress().ComboBoxFor(m => m.id_WarehouseLocationLooseCarton, settings =>
+		   {
+			   settings.Name = "id_WarehouseLocationLooseCarton";
+			   settings.Properties.ClientInstanceName = "id_WarehouseLocationLooseCarton";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Height = Unit.Percentage(100);
+
+			   settings.Properties.NullDisplayText = "Todas";
+			   settings.Properties.NullText = "Todas";
+
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.Init = "OnWarehouseLocationLooseCartonInit";
+			   settings.Properties.ClientSideEvents.Validation = "OnWarehouseLocationLooseCartonValidation";
+		   }).BindList(DataProviderWarehouseLocation.WarehouseLocations((int)ViewData["id_company"])).GetHtml()
+			</td>
+		</tr>
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_CostCenterLooseCarton, settings =>
+				{
+					settings.Name = "CostCenterLooseCarton";
+					settings.Text = "Centro de Costo: ";
+					settings.AssociatedControlName = "id_CostCenterLooseCarton";
+				}).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_CostCenterLooseCarton, settings =>
+			   {
+				   settings.Name = "id_CostCenterLooseCarton";
+				   settings.Properties.ClientInstanceName = "id_CostCenterLooseCarton";
+				   settings.Width = Unit.Percentage(100);
+				   settings.Height = Unit.Percentage(100);
+
+				   settings.Properties.ValueField = "id";
+				   settings.Properties.TextField = "name";
+				   settings.Properties.ValueType = typeof(int);
+
+				   settings.Properties.NullDisplayText = "Todas";
+				   settings.Properties.NullText = "Todas";
+
+				   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+				   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				   settings.Properties.ClientSideEvents.SelectedIndexChanged = "SubCostCenterLooseCartonCombo_SelectedIndexChanged";
+			   }).BindList(DataProviderCostCenter.AllCostCenters()).GetHtml()
+			</td>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_SubCostCenterLooseCarton, settings =>
+		   {
+			   settings.Name = "SubCostCenterLooseCarton";
+			   settings.Text = "Subcentro de Costo: ";
+			   settings.AssociatedControlName = "id_SubCostCenterLooseCarton";
+		   }).GetHtml()
+			</td>
+			<td>
+				@Html.DevExpress().ComboBoxFor(m => m.id_SubCostCenterLooseCarton, settings =>
+		   {
+			   settings.Name = "id_SubCostCenterLooseCarton";
+			   settings.Properties.ClientInstanceName = "id_SubCostCenterLooseCarton";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Height = Unit.Percentage(100);
+
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+
+			   settings.Properties.NullDisplayText = "Todas";
+			   settings.Properties.NullText = "Todas";
+
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ClientSideEvents.Init = "OnSubCostCenterLooseCartonEntryInit";
+			   settings.Properties.ClientSideEvents.Validation = "OnSubCostCenterLooseCartonValidation";
+		   }).BindList(DataProviderCostCenter.SubCostCenters()).GetHtml()
+			</td>
+		</tr>
+	</table>
+}

@@ -1,0 +1,40 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ProductionSchedule
+@{
+    int id_productionSchedule = (Model != null) ? Model.id : 0;
+}
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Requerimiento de Compra</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+           @{
+               ViewData["id_productionSchedule"] = id_productionSchedule;
+               var productionSchedulePurchaseRequestsDetail = (Model != null && Model.ProductionSchedulePurchaseRequestDetail != null) ? Model.ProductionSchedulePurchaseRequestDetail.OrderByDescending(od => od.id).ToList() : new List<ProductionSchedulePurchaseRequestDetail>();
+               Html.RenderPartial("_ProductionScheduleViewFormProductionSchedulePurchaseRequestsDetailPartial", productionSchedulePurchaseRequestsDetail);
+        }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td width="100%">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Planificación</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @{
+                var productionScheduleSchedulesDetail = (Model != null && Model.ProductionScheduleScheduleDetail != null) ? Model.ProductionScheduleScheduleDetail.OrderBy(od => od.datePlanning).ToList() : new List<ProductionScheduleScheduleDetail>();
+                ViewData["id_productionSchedule"] = id_productionSchedule;
+                Html.RenderPartial("_ProductionScheduleViewFormProductionScheduleSchedulesDetailPartial", productionScheduleSchedulesDetail);
+            }
+            
+        </td>
+    </tr>
+</table>
+

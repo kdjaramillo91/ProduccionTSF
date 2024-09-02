@@ -1,0 +1,51 @@
+﻿
+<h4>Editar Asignación de Costos</h4>
+<hr style="margin: 10px 0px;" />
+
+@{
+
+    Html.RenderPartial("CostAllocationToolbar/_CostAllocationEditActionsButtons");
+    <div id="mainform">
+        @Html.Partial("_CostAllocationEditFormPartial")
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-condensed">
+                <tr style="border-top: 1px Solid #C0C0C0;">
+                    <td colspan="6" style="text-align: right; margin-top: 5px;">
+                        @{
+                            Html.DevExpress().Button(button =>
+                            {
+                                button.Name = "btnUpdateMain";
+                                button.Text = "Guardar";
+                                button.RenderMode = ButtonRenderMode.Button;
+                                button.ImagePosition = ImagePosition.Left;
+                                button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                                button.UseSubmitBehavior = false;
+                                button.ValidateInvisibleEditors = true;
+                                button.ClientSideEvents.Click = "SaveCostAllocation";
+                            }).Render();
+
+                            ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                            Html.DevExpress().Button(button =>
+                            {
+                                button.Name = "btnCancelMain";
+                                button.Text = "Cancelar";
+                                button.RenderMode = ButtonRenderMode.Button;
+                                button.ImagePosition = ImagePosition.Left;
+                                button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                                button.UseSubmitBehavior = false;
+                                button.ClientSideEvents.Click = "ButtonCancel_Click";
+                            }).Render();
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+}
+<script src="~/Scripts/costallocation/editform.js"></script>
+<script src="~/Scripts/costallocation/validations.js"></script>

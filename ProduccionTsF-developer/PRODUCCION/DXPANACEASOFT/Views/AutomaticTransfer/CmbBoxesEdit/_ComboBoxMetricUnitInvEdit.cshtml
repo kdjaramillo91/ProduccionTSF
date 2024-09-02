@@ -1,0 +1,28 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDetailDTO
+
+@Html.DevExpress().ComboBoxFor(m=>m.id_MetricUnitInv, settings =>
+{
+	settings.Name = "id_MetricUnitInv";
+	settings.Properties.ClientInstanceName = "id_MetricUnitInv";
+	settings.Width = Unit.Percentage(100);
+
+	settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+	settings.CallbackRouteValues = new { Controller = "AutomaticTransfer", Action = "ComboBoxMetricUnitInvEdit" };
+	settings.Properties.CallbackPageSize = 10;
+
+	//settings.Properties.DisplayFormatString = "{0}";
+	settings.Properties.ValueField = "id";
+	settings.Properties.TextField = "name";
+	settings.Properties.ValueType = typeof(int);
+	//settings.Properties.Columns.Add("name", "Descripción", Unit.Percentage(70));
+	settings.ReadOnly = true;
+	settings.ItemTextCellPrepared = (sender, e) =>
+	{
+		e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+	};
+}).BindList(DataProviderAutomaticTransfer.MetricUnit()).Bind(Model.id_MetricUnitInv).GetHtml()

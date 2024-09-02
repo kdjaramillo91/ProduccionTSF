@@ -1,0 +1,46 @@
+﻿@model DXPANACEASOFT.Models.TransportSizeDto
+@{
+   int? id_poundsRange = (Model != null && Model.id_poundsRange != 0) ? (int?)Model.id_poundsRange : null;
+ }
+
+ @Html.DevExpress().ComboBoxFor(m => m.id_poundsRange, settings =>
+{
+    settings.Name = "id_poundsRange";
+    settings.Properties.ClientInstanceName = "id_poundsRange";
+
+    settings.Properties.ValueField = "id";
+    //settings.Properties.TextField = "name";
+    //settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.Columns.Clear();
+    settings.Properties.TextFormatString= "{0} ({1}-{2})";
+    settings.Properties.Columns.Add("name", "Nombre", Unit.Percentage(40));
+    settings.Properties.Columns.Add("range_ini", "R.Inicio", Unit.Percentage(20));
+    settings.Properties.Columns.Add("range_end", "R.Fin", Unit.Percentage(20));
+
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.NullText = "Seleccione Rango de Libras";
+
+    settings.CallbackRouteValues = new
+    {
+        Controller = "TransportSize",
+        Action = "ComboBoxPoundsRangeEdit",
+    };
+    settings.Properties.CallbackPageSize = 15;
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.ShowModelErrors = true;
+
+    //settings.ShowModelErrors = true;
+    settings.Properties.ClientSideEvents.Validation = "OnPoundsRangeValidation";
+    settings.ItemTextCellPrepared = (sender, e) =>
+    {
+        e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+    };
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_poundsRange'] = id_poundsRange.GetValue();  }";
+}).BindList(DataProviderPoundsRange.PoundsRangeByCompanyAndCurrent((int)ViewData["id_company"], id_poundsRange)).Bind(id_poundsRange).GetHtml()

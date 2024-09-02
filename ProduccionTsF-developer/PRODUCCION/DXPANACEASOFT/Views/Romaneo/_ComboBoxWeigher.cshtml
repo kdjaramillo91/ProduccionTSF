@@ -1,0 +1,21 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.RomaneoDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.idWeigher, settings =>
+{
+    settings.Name = "ComboBoxWeigher";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Seleccionar...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Romaneo",
+        Action = "ComboBoxWeigher",
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["Pesadores"]).GetHtml()
+

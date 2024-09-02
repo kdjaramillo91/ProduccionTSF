@@ -1,0 +1,42 @@
+﻿@using DXPANACEASOFT.Auxiliares
+@Html.DevExpress().PopupControl(popup =>
+{
+	popup.Name = "DuplicateConfirmDialog";
+	popup.AllowDragging = true;
+	popup.ShowOnPageLoad = false;
+	popup.CloseOnEscape = true;
+	popup.PopupAction = PopupAction.None;
+	popup.CloseAction = CloseAction.CloseButton;
+	popup.MinWidth = Unit.Pixel(400);
+	popup.MinHeight = Unit.Pixel(100);
+	popup.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+	popup.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+	popup.HeaderText = "Sistema de Producción - Panaceasoft";
+
+	popup.SetContent(() =>
+	{
+		Html.RenderPartial("Dialogs/_DuplicateDialogContentPartial");
+	});
+
+	popup.ShowFooter = true;
+	popup.SetFooterContentTemplateContent(content =>
+	{
+
+		ViewContext.Writer.Write(@"<div style=""float:right;padding-top:10px;padding-bottom:10px;"">");
+
+		Html.DevExpress().Button(button =>
+		{
+			button.Name = "DuplicateConfirmButton";
+			button.Text = "Aceptar";
+			button.Style.Add("margin-right", "4px");
+			button.ClientSideEvents.Click = "onConfirmDuplicateClick";
+		}).Render();
+
+		Html.DevExpress().Button(button =>
+		{
+			button.Name = "DuplicateCancelButton";
+			button.Text = "Cancelar";
+			button.ClientSideEvents.Click = "onConfirmCancelClick";
+		}).Render();
+	});
+}).GetHtml()

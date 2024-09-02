@@ -1,0 +1,96 @@
+﻿
+
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ItemHeadIngredient
+
+@{
+    var code_inventoryLine = (Model != null && Model.Item != null && Model.Item.InventoryLine != null && Model.Item.InventoryLine.id != 0) ? Model.Item.InventoryLine.code : "";
+}
+
+<div style="width: 100%; overflow: auto;">
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr class="no-border">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Cantidad Para Formulación:";
+                    settings.AssociatedControlName = "amount";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    decimal amount = (Model != null && Model.amount != 0) ? (decimal)Model.amount : (decimal)1;
+                }
+                @Html.DevExpress().SpinEditFor(m => m.amount, settings =>
+                {
+                    settings.Name = "amount";
+                    settings.Properties.ClientInstanceName = "amount";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NumberType = SpinEditNumberType.Float;
+                    settings.Properties.DecimalPlaces = 6;
+                    settings.Properties.AllowMouseWheel = true;
+                    settings.Properties.Increment = 0.1M;
+                    settings.Properties.LargeIncrement = 1;
+                    settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+                    //settings.ClientEnabled = code_inventoryLine != "PT";
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnAmountValidation";
+
+                }).Bind(amount).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Unidad de Medida:";
+                    settings.AssociatedControlName = "id_metricUnit";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_metricUnit = (Model != null && Model.id_metricUnit != 0) ? (int?)Model.id_metricUnit : null;
+                    int? id_metricType = (Model != null && Model.Item != null && Model.Item.id_metricType != 0) ? (int?)Model.Item.id_metricType : null;
+                }
+                @{
+                    var comboBox_metricUnit = Html.DevExpress().ComboBoxFor(m => m.id_metricUnit, settings =>
+                    {
+                        settings.Name = "id_metricUnit";
+                        settings.Properties.ClientInstanceName = "id_metricUnit";
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        //settings.ClientEnabled = code_inventoryLine != "PT";
+
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnItemMetricUnitValidation";
+
+                    }).BindList(DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], id_metricType, id_metricUnit)).Bind(id_metricUnit).GetHtml();
+                    //.BindList(DataProviderMetricUnit.MetricUnits((int)ViewData["id_company"]));
+
+                    //if (Model.id_metricUnitPurchase != null && Model.id_metricUnitPurchase != 0)
+                    //{
+                    //    comboBox_metricUnit.Bind(Model.id_metricUnitPurchase).Render();
+                    //}
+                    //else
+                    //{
+                    //    comboBox_metricUnit.Render();
+                    //}
+                }
+            </td>
+        </tr>
+    </table>
+</div>
+

@@ -1,0 +1,112 @@
+﻿
+@model int
+
+<table style="width: 100%; border: none;">
+    <tr>
+        <td>
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnSendToSRI_" + Model.ToString();
+                settings.ToolTip = "Enviar al SRI";
+                settings.RenderMode = ButtonRenderMode.Link;
+                settings.Text = "";
+                //settings.RenderMode = ButtonRenderMode.Link;
+                settings.Images.Image.IconID = IconID.MiscellaneousPublish16x16;
+                settings.ClientEnabled = true;
+                settings.UseSubmitBehavior = false;
+                settings.EnableClientSideAPI = true;
+                settings.CustomJSProperties = (s, e) =>
+                {
+                    MVCxButton b = s as MVCxButton;
+                    if (b == null) return;
+
+                    e.Properties["cpId"] = (int)Model;
+                };
+                settings.ClientSideEvents.Click = "SendToSri";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnCkechSRIAutorization_" + Model.ToString();
+                settings.ToolTip = "Comprobar Autorización";
+                settings.RenderMode = ButtonRenderMode.Link;
+                settings.Text = "";
+                //settings.RenderMode = ButtonRenderMode.Link;
+                settings.Images.Image.IconID = IconID.ToolboxitemsCheckbox216x16;
+                settings.ClientEnabled = true;
+                settings.UseSubmitBehavior = false;
+                settings.EnableClientSideAPI = true;
+                settings.CustomJSProperties = (s, e) =>
+                {
+                    MVCxButton b = s as MVCxButton;
+                    if (b == null) return;
+
+                    e.Properties["cpId"] = (int)Model;
+                };
+                settings.ClientSideEvents.Click = "CkechSriAutorization";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnSendMail_" + Model.ToString();
+                settings.ToolTip = "Enviar por Correo";
+                settings.RenderMode = ButtonRenderMode.Link;
+                settings.Text = "";
+                //settings.RenderMode = ButtonRenderMode.Link;
+                //settings.Images.Image.IconID = IconID.ActionsApply16x16office2013;
+                settings.Images.Image.IconID = IconID.MailAttach16x16; //IconID.ActionsApply16x16;
+                settings.ClientEnabled = true;
+                settings.UseSubmitBehavior = false;
+                settings.EnableClientSideAPI = true;
+                settings.ClientSideEvents.Click = "SendMail";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Button(settings =>
+            {
+
+                settings.Name = "btnShowXml_" + Model.ToString();
+                settings.ToolTip = "Ver XML";
+                settings.RenderMode = ButtonRenderMode.Link;
+                settings.Text = "";
+                //settings.RenderMode = ButtonRenderMode.Link;
+                settings.Images.Image.IconID = IconID.ActionsShow16x16;
+                settings.ClientEnabled = true;
+                settings.UseSubmitBehavior = false;
+                settings.EnableClientSideAPI = true;
+                settings.CustomJSProperties = (s, e) =>
+                {
+                    MVCxButton b = s as MVCxButton;
+                    if (b == null) return;
+
+                    e.Properties["cpId"] = (int)Model;
+                };
+                settings.ClientSideEvents.Click = "ShowXml";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Button(settings =>
+            {
+
+                settings.Name = "btnPrint_" + Model.ToString();
+                settings.ToolTip = "Imprimir";
+                settings.RenderMode = ButtonRenderMode.Link;
+                settings.Text = "";
+                //settings.RenderMode = ButtonRenderMode.Link;
+                settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+                settings.ClientEnabled = true;
+                settings.UseSubmitBehavior = false;
+                settings.EnableClientSideAPI = true;
+                settings.ClientSideEvents.Click = "Print";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+
+    
+
+    
+
+    

@@ -1,0 +1,175 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<IntegrationProcessLogView>(settings =>
+    {
+        settings.Name = "gvIntegrationProcessLogView";
+        settings.CallbackRouteValues = new { Controller = "IntegrationProcess", Action = "CallBackIntegrationProcessLogView" };
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningsAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningsUpdate" };
+        //settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningsDelete" };
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        //Panel de Busqueda
+        settings.SettingsSearchPanel.Visible = false;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = false;  // case 
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        //Eventos
+        // settings.ClientSideEvents.Init = "OIntegrationProcess.InitGridLotes";   --> configurar
+        /*settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";*/
+        settings.Settings.ShowTitlePanel = false;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = false;
+
+        //Panel para cantidad de registros
+       /* settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };*/
+
+
+        /*settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Log Lote de Integración Documentacional</span>");
+        });*/
+        /*
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+        */
+        //Boton de filtro para las columnas de la tabla
+        settings.Settings.ShowFilterRowMenu = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        #region ColumnsAdd
+
+
+        settings.Columns.Add(m => m.FechaHora, column =>
+        {
+            column.Name = "FechaHoraLogView";
+            column.Caption = "Fecha/Hora";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+
+        });
+
+       /* settings.Columns.Add(m => m.Accion, column =>
+        {
+            column.Name = "AccionLogView";
+            column.Caption = "Acción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+
+        });*/
+
+        settings.Columns.Add(m => m.Description, column =>
+        {
+            column.Name = "DescriptionLogView";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(85);
+
+        });
+
+
+        //Botones de comandos para registros de la tabla
+      /*  MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+        commandColumn.ShowEditButton = false;
+        commandColumn.ShowDeleteButton = false;
+        commandColumn.Visible = false;
+        commandColumn.VisibleIndex = 10;
+        commandColumn.Caption = "Acciones";
+        commandColumn.Width = Unit.Percentage(10);
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.AllowDragDrop = DefaultBoolean.False;
+        commandColumn.CustomButtons.Add(
+            new GridViewCommandColumnCustomButton
+            {
+                ID = "btnUpdateIntegrationProcess",
+                Text = "Editar"
+            }
+        );
+        //settings.ClientSideEvents.CustomButtonClick = "OIntegrationProcess.EditLote";
+        settings.Columns.Add(commandColumn);*/
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = false;
+        /*
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            //int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+            //PurchasePlanning productionLot = DataProviderPurchasePlanning.PurchasePlanningById(id);
+            IntegrationProcess integrationProcess = (IntegrationProcess)Model[c.ItemIndex];
+            Html.RenderPartial(" ", integrationProcess);
+        });*/
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+  /*  int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }*/
+    /*String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }*/
+}
+
+
+

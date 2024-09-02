@@ -1,0 +1,91 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.PriceListDTO
+
+@Html.DevExpress().PageControl(settings =>
+{
+    settings.Name = "pcFeatures";
+    settings.Width = Unit.Percentage(100);
+    settings.ClientSideEvents.Init = "PageControl_Init";
+    settings.TabPages.Add(tab =>
+    {
+        tab.Name = "tabPriceWholeSize";
+        tab.Text = "Precio por Talla Entero    ";
+        //tab.Visible = Model.code_processtype == "ENT";
+        tab.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                @Html.Partial("PanelButtonsDetailsENT") +
+                "<div id='divGridViewPriceListDetailsENT'>" +
+                    @Html.Action("GridViewPriceListDetailsENT", new
+                    {
+                        id_processtype = Model.id_processtype,
+                        isQuotation = Model.isQuotation,
+                        id_priceListBase = Model.id_priceListBase,
+                        enabled = ViewBag.enabled,
+                        IsOwner = ViewBag.IsOwner,
+                        code_processtype = "ENT",
+                        isClassB = false
+                    })
+                + "</div>");
+        });
+    });
+    settings.TabPages.Add(tab => {
+        tab.Name = "tabPriceTailSize";
+        tab.Text = "Precio por Talla Cola    ";
+
+        tab.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                @Html.Partial("PanelButtonsDetailsCOL") +
+                "<div id='divGridViewPriceListDetailsCOL'>" +
+                    @Html.Action("GridViewPriceListDetailsCOL", new
+                    {
+                        id_processtype = Model.id_processtype,
+                        isQuotation = Model.isQuotation,
+                        id_priceListBase = Model.id_priceListBase,
+                        enabled = ViewBag.enabled,
+                        IsOwner = ViewBag.IsOwner,
+                        code_processtype = "COL",
+                        isClassB = false
+                    })
+                + "</div>");
+        });
+    });
+    settings.TabPages.Add(tab =>
+    {
+        tab.Name = "tabPriceTailSizeB";
+        tab.Text = "Precio por Talla Cola B    ";
+
+        tab.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                @Html.Partial("PanelButtonsDetailsCOLB") +
+                "<div id='divGridViewPriceListDetailsCOLB'>" +
+                    @Html.Action("GridViewPriceListDetailsCOLB", new
+                    {
+                        id_processtype = Model.id_processtype,
+                        isQuotation = Model.isQuotation,
+                        id_priceListBase = Model.id_priceListBase,
+                        enabled = ViewBag.enabled,
+                        IsOwner = ViewBag.IsOwner,
+                        code_processtype = "COL",
+                        isClassB = true
+                    })
+                + "</div>");
+        });
+    });
+    settings.TabPages.Add("Penalización").SetContent(() =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='divGridViewPriceListPenalty'>" +
+                @Html.Action("GridViewPriceListPenalty", new
+                {
+                    id_provider = Model.id_proveedor,
+                    id_group = Model.id_grupo,
+                    enabled = ViewBag.enabled,
+                    IsOwner = ViewBag.IsOwner,
+                    isQuotation = Model.isQuotation,
+                })
+            + "</div>");
+    });
+}).GetHtml()

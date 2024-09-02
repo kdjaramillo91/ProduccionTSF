@@ -1,0 +1,44 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.LiquidationMaterialDTO
+
+<div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = Unit.Percentage(100);
+               settings.Text = "Proveedor: ";
+           }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.provider,
+         settings =>
+         {
+             settings.Name = "TextBoxProviderDetail";
+             settings.Width = Unit.Percentage(100);
+             settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+             settings.ReadOnly = true;
+         }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().CheckBox(
+         settings =>
+         {
+             settings.Name = "CheckBoxVerCantcero";
+             settings.Checked = false;
+             settings.Text = "Ver Cantidad Cero";
+             settings.Properties.ClientSideEvents.CheckedChanged = "OnCheckedChanged";//"function (s, e){ myButton.SetVisible(!myButton.GetVisible());}";
+         }).GetHtml()
+            </div>
+        </div>
+    </div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        @{
+            ViewData["id_documentState"] = Model.id_documentState;
+        }
+        @Html.Partial("_GridViewDetail", Model.LiquidationMaterialDetailDTO.Where(w => w.quantityOrigin != 0).ToList())
+    </div>
+</div>

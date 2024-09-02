@@ -1,0 +1,207 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.DTOModel
+
+@model List<DXPANACEASOFT.Models.DTOModel.AutomaticTransferDetailDTO>
+
+@{
+	bool canShowButton = ViewBag.canShowButton != null ? (bool)ViewBag.canShowButton : false;
+	var existenRegistros = ((this.Model != null) && (this.Model.Any()));
+}
+
+@{
+	var grid = Html.DevExpress().GridView<AutomaticTransferDetailDTO>(settings =>
+	{
+		settings.Name = "GridviewDetailItem";
+		//settings.clien = "GridviewDetailItem";
+		settings.CallbackRouteValues = new { Controller = "AutomaticTransfer"
+			, Action = "GridviewDetailItem"
+			,   enabled = ViewBag.enabled
+		};
+
+		settings.ClientSideEvents.BeginCallback = "GridviewDetailItem_OnBeginCallback";
+		settings.ClientSideEvents.EndCallback = "GridviewDetailItem_OnEndCallback";
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "AutomaticTransfer", Action = "GridviewDetailItemAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "AutomaticTransfer", Action = "GridviewDetailItemUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "AutomaticTransfer", Action = "GridviewDetailItemDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+		settings.SettingsBehavior.ConfirmDelete = false;
+		settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.CommandColumn.Visible = false;
+		settings.SettingsCommandButton.EditButton.Text = "Editar";
+		settings.SettingsCommandButton.DeleteButton.Text = "Eliminar";
+
+		settings.CommandColumn.Width = Unit.Percentage(8);
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "str_ItemName";
+			column.Caption = "Producto";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "str_MetricUnitInv";
+			column.Caption = "UM Inv.";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "str_MetricUnitMov";
+			column.Caption = "UM Mov.";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "strQuantity";
+			column.Caption = "Cantidad";
+			//			column.PropertiesEdit.DisplayFormatString = "0.####";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "strCost";
+			column.Caption = "Costo";
+			//column.PropertiesEdit.DisplayFormatString = "N";
+
+			column.Visible = IsEnabled("VER_COSTO");
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "numero_lote";
+			column.Caption = "Lote";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "strSaldo";
+			column.Caption = "Saldo";
+			//column.PropertiesEdit.DisplayFormatString = "N";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+		});
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = true,
+			ShowDeleteButton = true,
+			Visible = true,
+			VisibleIndex = 8,
+			Caption = "Acciones",
+			Width = Unit.Percentage(5)
+		};
+
+		if(canShowButton)
+		{
+			settings.Columns.Add(commandColumn);
+		}
+
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			e.Properties["cpEnabled"] = ViewBag.enabled;
+			var _grid = s as MVCxGridView;
+
+			var count = _grid.VisibleRowCount;
+
+			int[] arrItems = new int[count];
+
+			if (count > 0)
+			{
+				for (int i = 0; i < count; i++)
+				{
+					var tmp = (AutomaticTransferDetailDTO)_grid.GetRow(i);
+
+					if (tmp != null)
+					{
+						arrItems[i] = tmp.id_Item ?? 0;
+					}
+				}
+			}
+
+			e.Properties["cpGridVals"] = arrItems;
+			e.Properties["cpEditingRowKey"] = (_grid.IsEditing && _grid.GetRowValues(_grid.EditingRowVisibleIndex, "id") != null) ? _grid.GetRowValues(_grid.EditingRowVisibleIndex, "id") : 0;
+
+			e.Properties["cpExistenRegistros"] = existenRegistros;
+
+		};
+
+		#region EditorLayout
+
+		settings.SetEditFormTemplateContent(c =>
+		{
+			AutomaticTransferDetailDTO detail = new AutomaticTransferDetailDTO();
+			if (c.ItemIndex >= 0)
+			{
+				detail = Model[c.ItemIndex];
+			}
+
+
+			detail.id_warehouse_exit = ViewData["id_warehouse_exit"] != null ? (int)ViewData["id_warehouse_exit"] : 0;
+			detail.id_warehouselocation_exit = ViewData["id_warehouse_location_exit"] != null ? (int)ViewData["id_warehouse_location_exit"] : 0;
+
+			Html.RenderPartial("_DetailItemEditPartial", detail);
+
+		});
+
+		#endregion
+
+
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions{
+	bool IsEnabled(string namePermission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.name.Equals(namePermission));
+
+		return (permission != null);
+	}
+}

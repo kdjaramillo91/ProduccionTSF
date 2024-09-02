@@ -1,0 +1,15 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxItemType";
+	settings.Width = Unit.Percentage(100);
+	settings.CallbackRouteValues = new
+	{
+		Controller = "ProductionLot",
+		Action = "ComboBoxItemType",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.ReadOnly = (ViewBag.codeStateLiqNoval == "04" || ViewBag.codeStateLiqNoval == "05" || ViewBag.codeStateLiqNoval == "06");
+}).BindList(ViewData["ItemType"]).GetHtml()

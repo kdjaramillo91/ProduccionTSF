@@ -1,0 +1,251 @@
+﻿
+@model List<ProductionCostCoefficientExecution>
+
+@{
+	var gridView = Html.DevExpress().GridView(
+		grid =>
+		{
+			grid.Name = "gvCostCoefficientExecutionResult";
+			grid.Width = Unit.Percentage(100);
+			grid.KeyFieldName = "id";
+
+			grid.CallbackRouteValues = new { Controller = "CostCoefficientExecution", Action = "CostCoefficientExecutionPartial" };
+
+			#region GridView Behavior
+
+			grid.SettingsBehavior.AllowSelectByRowClick = true;
+
+			grid.CustomJSProperties = (s, e) =>
+			{
+				var gv = s as MVCxGridView;
+				if (gv == null) { return; }
+
+				e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+				e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+			};
+
+			grid.SettingsExport.EnableClientSideExportAPI = true;
+			grid.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+			grid.SettingsExport.FileName = "EjecucionCoeficientesProduccion_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+			grid.Toolbars.Add(t =>
+			{
+				t.EnableAdaptivity = true;
+				t.Items.Add(GridViewToolbarCommand.ExportToXls);
+				t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+				t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+			});
+
+			#endregion
+
+			#region Pager
+
+			grid.SettingsPager.Visible = true;
+
+			#endregion
+
+			#region Client Side Events
+
+			grid.ClientSideEvents.Init = "OnGridViewInit";
+			grid.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+			grid.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+			grid.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+			#endregion
+
+			#region Search Panel
+
+			grid.SettingsSearchPanel.Visible = true;
+			grid.Styles.SearchPanel.CssClass = "searchPanel";
+
+			#endregion
+
+			#region Title Panel
+
+			grid.Settings.ShowTitlePanel = true;
+			grid.Styles.TitlePanel.CssClass = "titleContainer";
+
+			grid.SetTitlePanelTemplateContent(c =>
+			{
+				ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Ejecuciones de Coeficientes de Producción</span>");
+			});
+
+			#endregion
+
+			#region Group Panel
+
+			grid.Settings.ShowGroupPanel = true;
+
+			#endregion
+
+			#region Filter Row
+
+			grid.Settings.ShowFilterRow = true;
+			grid.Settings.ShowFilterRowMenu = true;
+			grid.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+			#endregion
+
+			#region Footer Row
+
+			grid.Settings.ShowFooter = true;
+
+			grid.SetFooterRowTemplateContent(c =>
+			{
+				ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			});
+
+			#endregion
+
+			#region Command Column
+
+			grid.CommandColumn.Visible = false;
+
+			#endregion
+
+			#region Master-Details View
+
+			grid.SettingsDetail.ShowDetailRow = false;
+
+			#endregion
+
+			#region Adaptivity Settings
+
+			grid.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+			grid.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+
+			grid.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+			grid.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+			grid.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+			#endregion
+
+			#region Columns
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "Document.number";
+				column.Name = "number";
+				column.Caption = "Número";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "startDate";
+				column.Name = "startDate";
+				column.Caption = "Fecha Desde";
+				column.ColumnType = MVCxGridViewColumnType.DateEdit;
+				column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "endDate";
+				column.Name = "endDate";
+				column.Caption = "Fecha Hasta";
+				column.ColumnType = MVCxGridViewColumnType.DateEdit;
+				column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+				column.Width = Unit.Percentage(12);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "anio";
+				column.Name = "anio";
+				column.Caption = "Año";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.PropertiesEdit.DisplayFormatString = "G";
+				column.Width = Unit.Percentage(12);
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "mes";
+				column.Name = "mes";
+				column.Caption = "Mes";
+				column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+				column.PropertiesEdit.DisplayFormatString = "G";
+				column.Width = Unit.Percentage(12);
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "ProductionCostAllocationType.name";
+				column.Name = "id_allocationType";
+				column.Caption = "Tipo de Asignación";
+				column.Width = Unit.Percentage(15);
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "value_processed";
+				column.Name = "value_processed";
+				column.Caption = "¿Valorizado?";
+				column.Width = Unit.Percentage(3);
+				column.ColumnType = MVCxGridViewColumnType.CheckBox;
+			});
+
+			grid.Columns.Add(column =>
+			{
+				column.FieldName = "Document.DocumentState.description";
+				column.Name = "documentState";
+				column.Caption = "Estado";
+				column.ColumnType = MVCxGridViewColumnType.TextBox;
+				column.Width = Unit.Percentage(12);
+			});
+
+
+			// Botón de comando
+			var commandColumn = new MVCxGridViewCommandColumn()
+			{
+				ShowEditButton = false,
+				ShowDeleteButton = false,
+				Visible = true,
+				VisibleIndex = 20,
+				Caption = "Acciones",
+				Width = Unit.Percentage(5),
+				AllowDragDrop = DefaultBoolean.False,
+			};
+
+			commandColumn.CustomButtons.Add(
+				new GridViewCommandColumnCustomButton
+				{
+					ID = "btnEditRow",
+					Text = "Editar",
+				}
+			);
+
+			grid.ClientSideEvents.CustomButtonClick = "OnGridViewCustomButtonClick";
+
+			grid.Columns.Add(commandColumn);
+
+			#endregion
+		});
+
+	if (ViewData["EditError"] != null)
+	{
+		gridView.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+
+@gridView.Bind(this.Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		var selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+			{
+				selectedRowsOnPage++;
+			}
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+}

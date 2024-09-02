@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Dashboard>
+  <Title Visible="false" Text="Dashboard 1" />
+  <DataSources>
+    <SqlDataSource ComponentName="DataSource1">
+      <Name>Compras</Name>
+      <Connection Name="DXPANACEASOFT.Properties.Settings.Dashboard" FromAppConfig="true" />
+      <Query Type="SelectQuery" Name="Compras">
+        <Tables>
+          <Table Name="PurchaseOrderDetail" />
+          <Table Name="Item" />
+          <Relation Type="Inner" Parent="PurchaseOrderDetail" Nested="Item">
+            <KeyColumn Parent="id_item" Nested="id" />
+          </Relation>
+        </Tables>
+        <Columns>
+          <Column Table="Item" Name="name" />
+          <Column Table="PurchaseOrderDetail" Name="quantityRequested" />
+          <Column Table="PurchaseOrderDetail" Name="quantityOrdered" />
+          <Column Table="PurchaseOrderDetail" Name="quantityApproved" />
+          <Column Table="PurchaseOrderDetail" Name="quantityReceived" />
+        </Columns>
+      </Query>
+      <ResultSchema>
+        <DataSet Name="Compras">
+          <View Name="Compras">
+            <Field Name="name" Type="String" />
+            <Field Name="quantityRequested" Type="Decimal" />
+            <Field Name="quantityOrdered" Type="Decimal" />
+            <Field Name="quantityApproved" Type="Decimal" />
+            <Field Name="quantityReceived" Type="Decimal" />
+          </View>
+        </DataSet>
+      </ResultSchema>
+      <ConnectionOptions CloseConnection="true" CommandTimeout="0" />
+    </SqlDataSource>
+    <!--<SqlDataSource ComponentName="DataSource2">
+      <Name>Inventarios</Name>
+      <Connection Name="DXPANACEASOFT.Properties.Settings.Dashboard" FromAppConfig="true" />
+      <Query Type="SelectQuery" Name="Inventarios">
+        <Tables>
+          <Table Name="Item" />
+          <Table Name="ItemInventory" />
+          <Relation Type="Inner" Parent="ItemInventory" Nested="Item">
+            <KeyColumn Parent="id_item" Nested="id" />
+          </Relation>
+        </Tables>
+        <Columns>
+          <Column Table="Item" Name="name" />
+          <Column Table="ItemInventory" Name="minimumStock" />
+          <Column Table="ItemInventory" Name="maximumStock" />
+          <Column Table="ItemInventory" Name="currentStock" />
+        </Columns>
+      </Query>
+      <ResultSchema>
+        <DataSet Name="Inventarios">
+          <View Name="Inventarios">
+            <Field Name="name" Type="String" />
+            <Field Name="minimumStock" Type="Decimal" />
+            <Field Name="maximumStock" Type="Decimal" />
+            <Field Name="currentStock" Type="Decimal" />
+          </View>
+        </DataSet>
+      </ResultSchema>
+      <ConnectionOptions CloseConnection="true" CommandTimeout="0" />
+    </SqlDataSource>-->
+  </DataSources>
+  <Items>
+    <Chart ComponentName="chartDashboardItem1" Name="Compras" DataSource="DataSource1" DataMember="Compras">
+      <DataItems>
+        <Dimension DataMember="name" UniqueName="DataItem0" />
+        <Measure DataMember="quantityRequested" UniqueName="DataItem1">
+          <NumericFormat FormatType="Number" Unit="Ones" />
+        </Measure>
+        <Measure DataMember="quantityOrdered" UniqueName="DataItem2">
+          <NumericFormat FormatType="Number" Unit="Ones" />
+        </Measure>
+        <Measure DataMember="quantityApproved" UniqueName="DataItem3">
+          <NumericFormat FormatType="Number" Unit="Ones" />
+        </Measure>
+        <Measure DataMember="quantityReceived" UniqueName="DataItem4">
+          <NumericFormat FormatType="Number" Unit="Ones" />
+        </Measure>
+      </DataItems>
+      <SeriesDimensions>
+        <SeriesDimension UniqueName="DataItem0" />
+      </SeriesDimensions>
+      <Panes>
+        <Pane Name="Pane 1">
+          <Series>
+            <Simple>
+              <Value UniqueName="DataItem1" />
+              <PointLabelOptions Visible="true" />
+            </Simple>
+            <Simple>
+              <Value UniqueName="DataItem2" />
+              <PointLabelOptions Visible="true" />
+            </Simple>
+            <Simple>
+              <Value UniqueName="DataItem3" />
+              <PointLabelOptions Visible="true" />
+            </Simple>
+            <Simple>
+              <Value UniqueName="DataItem4" />
+              <PointLabelOptions Visible="true" />
+            </Simple>
+          </Series>
+        </Pane>
+      </Panes>
+      <ChartLegend Visible="false" />
+    </Chart>
+    <!--<Chart ComponentName="chartDashboardItem2" Name="Inventarios" DataSource="DataSource2" DataMember="Inventarios">
+      <DataItems>
+        <Dimension DataMember="name" UniqueName="DataItem0" />
+        <Measure DataMember="currentStock" UniqueName="DataItem1">
+          <NumericFormat FormatType="Number" Unit="Ones" />
+        </Measure>
+        <Measure DataMember="minimumStock" UniqueName="DataItem2">
+          <NumericFormat FormatType="Number" Unit="Ones" />
+        </Measure>
+        <Measure DataMember="maximumStock" UniqueName="DataItem3">
+          <NumericFormat FormatType="Number" Unit="Ones" />
+        </Measure>
+      </DataItems>
+      <SeriesDimensions>
+        <SeriesDimension UniqueName="DataItem0" />
+      </SeriesDimensions>
+      <Panes>
+        <Pane Name="Pane 1">
+          <AxisY Logarithmic="true" />
+          <Series>
+            <Simple>
+              <Value UniqueName="DataItem2" />
+            </Simple>
+            <Simple>
+              <Value UniqueName="DataItem3" />
+            </Simple>
+            <Simple>
+              <Value UniqueName="DataItem1" />
+            </Simple>
+          </Series>
+        </Pane>
+      </Panes>
+    </Chart>
+    <Gauge ComponentName="gaugeDashboardItem1" Name="Existencia x Producto" DataSource="DataSource2" DataMember="Inventarios" ContentArrangementMode="FixedRowCount" ContentLineCount="1">
+      <InteractivityOptions IgnoreMasterFilters="true" IsDrillDownEnabled="true" />
+      <DataItems>
+        <Dimension DataMember="name" SortByMeasure="DataItem3" TopNEnabled="true" TopNCount="2" TopNMeasure="DataItem3" UniqueName="DataItem0" />
+        <Measure DataMember="maximumStock" UniqueName="DataItem1" />
+        <Measure DataMember="minimumStock" UniqueName="DataItem2" />
+        <Measure DataMember="currentStock" UniqueName="DataItem3" />
+        <Measure DataMember="maximumStock" UniqueName="DataItem4" />
+        <Measure DataMember="minimumStock" UniqueName="DataItem5" />
+        <Measure DataMember="minimumStock" UniqueName="DataItem6" />
+      </DataItems>
+      <SeriesDimensions>
+        <SeriesDimension UniqueName="DataItem0" />
+      </SeriesDimensions>
+      <GaugeElement>
+        <ActualValue UniqueName="DataItem1" />
+        <TargetValue UniqueName="DataItem4" />
+        <DeltaOptions ResultIndicationMode="WarningIfLess" />
+      </GaugeElement>
+      <GaugeElement>
+        <ActualValue UniqueName="DataItem2" />
+        <TargetValue UniqueName="DataItem5" />
+        <DeltaOptions ResultIndicationMode="WarningIfLess" />
+      </GaugeElement>
+      <GaugeElement>
+        <ActualValue UniqueName="DataItem3" />
+        <TargetValue UniqueName="DataItem6" />
+        <DeltaOptions ResultIndicationMode="WarningIfLess" />
+      </GaugeElement>
+    </Gauge>-->
+  </Items>
+  <LayoutTree>
+    <LayoutGroup>
+      <LayoutGroup Orientation="Vertical">
+        <LayoutItem DashboardItem="chartDashboardItem1" />
+      </LayoutGroup>
+      <!--<LayoutGroup Orientation="Vertical">
+        <LayoutItem DashboardItem="chartDashboardItem2" />
+        <LayoutItem DashboardItem="gaugeDashboardItem1" />
+      </LayoutGroup>-->
+    </LayoutGroup>
+  </LayoutTree>
+</Dashboard>

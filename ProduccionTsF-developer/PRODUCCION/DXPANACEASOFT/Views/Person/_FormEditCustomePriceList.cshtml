@@ -1,0 +1,191 @@
+﻿@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.CustomerPriceList>
+
+@{
+    var grid = Html.DevExpress().GridView<CustomerPriceList>(settings =>
+    {
+        settings.Name = "gridCustomerPriceList";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "CustomerPriceList" };
+
+        settings.ClientSideEvents.BeginCallback = "CustomerPriceList_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "CustomerPriceListAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "CustomerPriceListUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "CustomerPriceListDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+
+
+
+
+
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_priceList";
+            column.Name = "id_priceList";
+            column.Caption = "Lista de Precios ";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_priceList = (int)DataBinder.Eval(c.DataItem, "id_priceList");
+                PriceList priceList = DataProviderPriceList.PriceListById(id_priceList);
+
+                if (priceList != null)
+                {
+                    ViewContext.Writer.Write(priceList.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_priceList";
+                p.DataSource = DataProviderPriceList.PriceListsForSoldOpen((int)ViewData["id_company"]);
+                //p.TextField = "name";
+                p.TextFormatString = "{0}";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("name", "Nombre", 100);
+                p.Columns.Add("startDate", "Fecha Ini.", 70);
+                p.Columns.Add("endDate", "Fecha Fin", 70);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "CustomerPriceList_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+
+            //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+            settings.CustomJSProperties = (s, e) =>
+            {
+                e.Properties["cpTabContainer"] = "tabCustomer";
+                e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                e.Properties["cpIsRequired"] = "true";
+                e.Properties["cpTabControl"] = "tabControl";
+            };
+
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "startDate";
+            column.PropertiesEdit.ClientInstanceName = "startDateCums";
+            column.Name = "startDate";
+            column.Caption = "Fecha Inicial";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_priceList = (int)DataBinder.Eval(c.DataItem, "id_priceList");
+                PriceList priceList = DataProviderPriceList.PriceListById(id_priceList);
+
+                if (priceList != null)
+                {
+                    ViewContext.Writer.Write(priceList.startDate);
+                }
+            });
+
+
+            column.ReadOnly = true;
+
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "endDate";
+            column.Name = "endDate";
+            column.PropertiesEdit.ClientInstanceName = "endDateCums";
+            column.Caption = "Fecha Final";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_priceList = (int)DataBinder.Eval(c.DataItem, "id_priceList");
+                PriceList priceList = DataProviderPriceList.PriceListById(id_priceList);
+
+                if (priceList != null)
+                {
+                    ViewContext.Writer.Write(priceList.endDate);
+                }
+            });
+
+
+            column.ReadOnly = true;
+
+        });
+
+
+         
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Name = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            //column.AutoFilterBy("Sí");
+            //column.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+            column.EditorProperties().CheckBox(p =>
+            {
+                p.ClientInstanceName = "isActive";
+            });
+
+        });
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

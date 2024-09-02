@@ -1,0 +1,160 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.DocumentState
+
+@{
+    String ActionName = (Model.id == 0) ? "DocumentStatesPartialAddNew" : "DocumentStatesPartialUpdate";
+}
+
+@using (Ajax.BeginForm(ActionName, "DocumentStates",
+        new AjaxOptions
+        {
+            HttpMethod = "post",
+            OnBegin = "showLoading();",
+            OnComplete = "hideLoading();",
+            UpdateTargetId = "result",
+            InsertionMode = InsertionMode.ReplaceWith
+        },
+        new
+        {
+            id = "formEditDocumentState",
+            name = "formEditDocumentState"
+        }))
+{
+    @Html.Hidden("id_documentState", Model.id)
+    <table class="table table-condensed">
+        <tr>
+            <td style="width: 10%;">
+                @Html.DevExpress().LabelFor(m => m.name, settings =>
+                {
+                    settings.Text = "Nombre:*";
+                    settings.AssociatedControlName = "documentStateName";
+                }).GetHtml()
+            </td>
+            <td style="width: 40%">
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+                {
+                    settings.Name = "documentStateName";
+                    settings.Properties.ClientInstanceName = "documentStateName";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnDocumentStateNameValidation";
+                    settings.Properties.ValidationSettings.ValidationGroup = "formEditDocumentState";
+                }).GetHtml()
+            </td>
+            @if (ViewData["dialogAddDocumentState"] == null)
+            {
+                <td style="width: 10%;">
+                    @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Text = "Tipos de Documentos:*";
+                        settings.AssociatedControlName = "documentStateDocumentTypes";
+                    }).GetHtml()
+                </td>
+                <td>
+                    @{
+                        var documentTypes = (Model != null && Model.DocumentType != null) ? Model.DocumentType.ToList() : new List<DocumentType>();
+                    }
+                    @Html.DevExpress().TokenBox(settings =>
+                    {
+                        settings.Name = "documentStateDocumentTypes";
+                        settings.Properties.ClientInstanceName = "documentStateDocumentTypes";
+
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.TextField = "name";
+
+                        settings.Properties.AllowCustomTokens = false;
+                        settings.Properties.Tokens.AddRange(documentTypes.Where(t => t.isActive).Select(r => r.name).ToList());
+
+                        settings.ShowModelErrors = true;
+
+                        settings.Properties.ClientSideEvents.Validation = "OnDocumentStateDocumentTypesValidation";
+                        settings.Properties.ValidationSettings.ValidationGroup = "formEditDocumentState";
+                    }).BindList(DataProviderDocumentType.DocumentTypes()).GetHtml()
+
+                    <a href="javascript: void(0);" class="float-action" title="Adicionar Nuevo Tipo de Documento" onclick="BtnAddDocumentType_Click();">
+                        <i class="glyphicon glyphicon-plus" style="color: #ff8800"></i>
+                    </a>
+                </td>
+            }
+        </tr>
+        <tr>
+            <td style="width: 10%;">
+                @Html.DevExpress().LabelFor(m => m.description, settings =>
+                {
+                    settings.Text = "Descripción:";
+                    settings.AssociatedControlName = "documentStateDescription";
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().MemoFor(m => m.description, settings =>
+                {
+                    settings.Name = "documentStateDescription";
+                    settings.Properties.ClientInstanceName = "documentStateDescription";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 10%;">
+                @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+                {
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "documentStateIsActive";
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Name = "documentStateIsActive";
+                    settings.Properties.ClientInstanceName = "documentStateIsActive";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr id="documentStateAlertRow" style="display: none;">
+            <td colspan="4">
+                <div class="alert alert-danger fade in" style="margin-top:18px;">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+                    <span id="documentStateErrorMessage"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdateDocumentState";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;                        
+                    settings.ClientSideEvents.Click = "ButtonUpdateDocumentState_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancelDocumentState";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancelDocumentState_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+}
+
+@if(ViewData["dialogAddDocumentState"] == null)
+{
+    Html.RenderPartial("DialogTemplates/_PopupAddDocumentType");
+}
+
+<script src="~/Scripts/documentstates/editform.js"></script>

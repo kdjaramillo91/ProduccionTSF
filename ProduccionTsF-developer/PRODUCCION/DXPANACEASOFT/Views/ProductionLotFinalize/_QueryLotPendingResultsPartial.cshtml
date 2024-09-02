@@ -1,0 +1,21 @@
+﻿@using DXPANACEASOFT.Models.ProductionLotCloseDTO
+@model IList<LotePendienteCierre>
+<div style="width: 100%;">
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnAddNewCloseToolbar";
+			button.Text = "Generar Cierre de Lote";
+			button.ToolTip = "Generar Cierre de Lote";
+			button.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+			button.UseSubmitBehavior = false;
+			button.ClientSideEvents.Click = "onAddNewCloseEditButtonClick";
+		}).GetHtml()
+</div>
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@using (Html.BeginForm())
+{
+	@Html.Partial("_QueryLotPendingGridViewPartial", this.Model)
+}

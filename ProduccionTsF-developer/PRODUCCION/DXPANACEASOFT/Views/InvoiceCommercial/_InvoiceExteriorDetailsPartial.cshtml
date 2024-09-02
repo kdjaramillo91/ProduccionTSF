@@ -1,0 +1,146 @@
+﻿@using DevExpress.Data
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    string labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+    string lableEnterprise = DataProviderSetting.ValueSetting("EEPRIM");
+}
+@{
+    var grid = Html.DevExpress().GridView<InvoiceExterior>(settings =>
+    {
+        settings.Name = "gvInvoiceExterior";
+        settings.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "InvoiceExteriorDetailsPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "OnGridViewInvoiceCommercialDetailsInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewInvoiceCommercialDetailsSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewInvoiceCommercialDetailsEndCallback";
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""GridViewPurchaseOrderDetailsSelectAllRow();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""GridViewPurchaseOrderDetailsClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(m => m.Invoice.Document.number, column =>
+        {
+            column.Caption = "No. Factura";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+
+        settings.Columns.Add(m => m.Invoice.Document.authorizationDate, column =>
+        {
+            column.Caption = "Fecha Autorización";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            ((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy HH:mm";
+            ((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy HH:mm";
+        });
+
+        /* CLiente del exterior*/
+        settings.Columns.Add(m => m.Invoice.Person.fullname_businessName, column =>
+        {
+            column.Caption = "Cliente Exterior";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+        });
+
+        settings.Columns.Add(m => m.totalBoxes, column =>
+        {
+            column.Caption = "Total Cajas";
+            column.Width = Unit.Percentage(5);
+            column.UnboundType = UnboundColumnType.Decimal;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+
+
+        });
+        
+        settings.Columns.Add(m => m.valueTotalFOB, column =>
+        {
+            column.Caption = "Total FOB";
+            column.Width = Unit.Percentage(5);
+            column.UnboundType = UnboundColumnType.Decimal;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+
+
+        });
+
+        settings.Columns.Add(m => m.valuetotalCIF, column =>
+        {
+            column.Caption = "Total CIF";
+            column.Width = Unit.Percentage(5);
+            column.UnboundType = UnboundColumnType.Decimal;
+            column.PropertiesEdit.DisplayFormatString = "N2";
+
+
+        });
+ 
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        string[] values = new string[] { "id" };
+        foreach (var key in grid.GetCurrentPageRowValues(values))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

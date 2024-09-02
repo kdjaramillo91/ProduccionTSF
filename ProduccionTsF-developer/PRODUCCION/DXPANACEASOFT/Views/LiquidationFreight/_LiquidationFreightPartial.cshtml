@@ -1,0 +1,221 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<LiquidationFreight>(settings =>
+    {
+        settings.Name = "gvLiquidationFreight";
+        settings.CallbackRouteValues = new { Controller = "LiquidationFreight", Action = "LiquidationFreightPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Settings.ShowFooter = true;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Liquidación de Flete</span>");
+        });
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+
+        //DETALLES EN GRID LLAMADA A OTRA TABLA
+        settings.SetDetailRowTemplateContent(columns =>
+        {
+            int? id_LiquidationFreight = (int?)DataBinder.Eval(columns.DataItem, "id");
+            LiquidationFreight liquidationfreight = DataProviderLiquidationFreight.LiquidationFreight(id_LiquidationFreight);
+            Html.RenderPartial("_LiquidationFreightMainDetail", liquidationfreight);
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //Document
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                LiquidationFreight liquidationfreight = (LiquidationFreight)Model[c.ItemIndex];
+                ViewContext.Writer.Write(liquidationfreight.Document.number);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Tipo de Documento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                LiquidationFreight liquidationfreight = (LiquidationFreight)Model[c.ItemIndex];
+                ViewContext.Writer.Write(liquidationfreight.Document.DocumentType.name);
+            });
+        });
+
+
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "proveedor";
+            column.Caption = "Compañía que factura";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.Width = Unit.Percentage(15);
+            column.SetDataItemTemplateContent(c =>
+            {
+                LiquidationFreight liquidationfreight = (LiquidationFreight)Model[c.ItemIndex];
+                //   var provider = DataProviderPerson.GetProviderFromRemissionGuide(remission.id);
+
+                var text = liquidationfreight.Person.fullname_businessName;
+                ViewContext.Writer.Write(text);
+                //ViewContext.Writer.Write(remission?.RemissionGuideDetail?.FirstOrDefault().RemissionGuideDetailPurchaseOrderDetail?.FirstOrDefault().PurchaseOrderDetail?.PurchaseOrder.Provider.Person.fullname_businessName ?? "");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "InvoiceNumber";
+            column.Caption = "N. Factura";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.Width = Unit.Percentage(15);
+            column.SetDataItemTemplateContent(c =>
+            {
+                LiquidationFreight liquidationfreight = (LiquidationFreight)Model[c.ItemIndex];
+                
+                var text = liquidationfreight.InvoiceNumber;
+                ViewContext.Writer.Write(text);
+                
+            });
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Fecha Emisión";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+            column.SetDataItemTemplateContent(c =>
+            {
+                LiquidationFreight liquidationfreight = (LiquidationFreight)Model[c.ItemIndex];
+                ViewContext.Writer.Write(liquidationfreight.Document.emissionDate.ToString("dd/MM/yyyy"));
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "id_documentState";
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(5);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var text = "";
+                LiquidationFreight remission = (LiquidationFreight)Model[c.ItemIndex];
+
+                text = remission.Document.DocumentState.name;
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(c =>
+            {
+                c.DataSource = DataProviderDocumentState.DocumentStates((int)ViewData["id_company"]);
+                c.ValueField = "id";
+                c.TextField = "name";
+                c.ValueType = typeof(int);
+                c.Width = Unit.Percentage(100);
+                c.DropDownStyle = DropDownStyle.DropDownList;
+                c.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                c.EnableSynchronization = DefaultBoolean.False;
+                c.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                //c.ClientSideEvents.SelectedIndexChanged = "DocumentTypesCombo_SelectedIndexChanged";
+            });
+
+            // COMMAND COLUMN
+
+            MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+            commandColumn.ShowEditButton = false;
+            commandColumn.ShowDeleteButton = false;
+            commandColumn.Visible = true;
+            commandColumn.VisibleIndex = 14;
+            commandColumn.Caption = "Acciones";
+            commandColumn.Width = Unit.Percentage(3);
+
+            commandColumn.CustomButtons.Add(
+                new GridViewCommandColumnCustomButton
+                {
+                    ID = "btnEditRow",
+                    Text = "Editar"
+                }
+            );
+            settings.ClientSideEvents.CustomButtonClick = "GridViewliquidationfreightCustomCommandButton_Click";
+            settings.Columns.Add(commandColumn);
+        });
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}

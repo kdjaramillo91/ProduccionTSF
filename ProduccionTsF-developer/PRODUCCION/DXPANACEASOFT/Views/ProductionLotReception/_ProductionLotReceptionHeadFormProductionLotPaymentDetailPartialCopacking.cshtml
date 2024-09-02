@@ -1,0 +1,2541 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.ProductionLot
+
+@{
+    string codeState = (Model != null) ? Model.ProductionLotState.code : "";
+    @Html.Hidden("codeState", codeState);
+    int? id_priceList = (Model != null && Model.id_CopackingTariff != 0) ? (int?)Model.id_CopackingTariff : null;
+    
+    int? id_provider = (Model != null && Model.id_provider > 0) ? Model.id_provider : null;
+    @Html.Hidden("id_priceListAux", id_priceList)
+
+    
+    DateTime dt = Model != null && Model.liquidationPaymentDate != null ? Model.liquidationPaymentDate.Value : DateTime.Now;
+
+    Html.DevExpress<ProductionLot>().FormLayout(settings =>
+    {
+        settings.Name = "formLayoutEditProductionLotPaymentSummary";
+        settings.Width = Unit.Percentage(100);
+        settings.ColCount = 8;
+
+        //GroupItem0
+        #region GroupItem0
+        var groupItem0 = settings.Items.AddGroupItem(i =>
+        {
+            i.Caption = "";
+            i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+            i.ColCount = 8;
+            i.ColSpan = 8;
+        });
+        //Fila 0 
+        #region Fila 0
+
+        //Proveedor
+        groupItem0.Items.Add(m => m.liquidationPaymentDate, item =>
+        {
+            item.Name = "liquidationPaymentDate";
+            item.Caption = "Fecha de Liquidación";
+            item.CaptionStyle.Font.Bold = true;
+            //item.ShowCaption = DefaultBoolean.False;
+            item.ColSpan = 4;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+                                                                         //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+            item.Width = Unit.Percentage(50);
+
+            item.NestedExtension().DateEdit(datetime =>
+            {
+                datetime.Name = "liquidationPaymentDate";
+                datetime.Properties.ClientInstanceName = "liquidationPaymentDate";
+                settings.Width = Unit.Percentage(100);
+                datetime.ReadOnly = !(codeState == "07" || codeState == "06");
+                datetime.Properties.UseMaskBehavior = true;
+                datetime.Properties.EditFormat = EditFormat.Custom;
+                datetime.Properties.EditFormatString = "dd/MM/yyyy";
+                datetime.Properties.ClientSideEvents.ValueChanged = "OnLiquidationPayDateChanged";
+            });
+        });
+
+
+        #endregion
+        #endregion
+
+        //GroupItem1
+        #region GroupItem1
+        var groupItem1 = settings.Items.AddGroupItem(i =>
+        {
+            i.Caption = "";
+            i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+            i.ColCount = 8;
+            i.ColSpan = 8;
+        });
+
+        //Fila 1
+        #region Fila 1
+
+        //Proveedor
+        groupItem1.Items.Add(m => m.Provider.Person.fullname_businessName, item =>
+        {
+            item.Name = "personProviderPayment";
+            item.Caption = "Proveedor";
+            item.CaptionStyle.Font.Bold = true;
+            //item.ShowCaption = DefaultBoolean.False;
+            item.ColSpan = 4;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.Width = Unit.Percentage(50);
+
+            item.NestedExtension().TextBox(textBox =>
+            {
+                textBox.Width = Unit.Percentage(100);
+                textBox.Properties.MaxLength = 255;
+                textBox.ReadOnly = true;
+            });
+        });
+
+        //Lista de Precio/ Cotización
+        groupItem1.Items.Add(m => m.id_CopackingTariff, item =>
+        {
+            item.Name = "id_CopackingTariff";
+            item.Caption = "Lista de Precio/ Cotización";
+            item.CaptionStyle.Font.Bold = true;
+            item.ColSpan = 4;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.Width = Unit.Percentage(50);
+            //
+            item.NestedExtension().ComboBox(comboBox =>
+            {
+                comboBox.Width = Unit.Percentage(100);
+
+                comboBox.Properties.ValueField = "id";
+                comboBox.Properties.TextField = "name";
+                comboBox.Properties.DataSource = DataProviderCopackingTariff.CopackingTariffByCompanyWithCurrentAndProviderForLiquidation((int?)ViewData["id_company"], id_provider, dt);
+                comboBox.Properties.ValueType = typeof(string);
+
+                comboBox.Properties.ClientInstanceName = "id_CopackingTariff";
+                comboBox.ShowModelErrors = true;
+                comboBox.ReadOnly = codeState != "07" && codeState != "06";
+
+                comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+                comboBox.Properties.ValidationSettings.CausesValidation = true;
+                comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+                comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+                comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+                comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+                comboBox.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "GetCopackingTariffListForPayment" };
+
+                comboBox.Properties.ClientSideEvents.BeginCallback = "ProductionLotPriceListPayment_BeginCallback";
+
+                comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+                comboBox.Properties.DropDownStyle = DropDownStyle.DropDown;
+                comboBox.Properties.ClientSideEvents.Init = "OnCopackingTariffInit";
+                comboBox.Properties.ClientSideEvents.Validation = "OnPriceListValidation";
+                comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "ComboCopackingTariff_SelectedIndexChanged";
+
+            });
+        });
+
+        #endregion
+
+        #endregion
+
+        //GroupItem2
+        #region GroupItem2
+        var groupItem2 = settings.Items.AddGroupItem(i =>
+        {
+            i.Caption = "";
+            i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+            i.ColCount = 8;
+            i.ColSpan = 8;
+        });
+        //Fila 2
+        #region Fila 2
+
+        //Titulo: Proceso
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleProcessPaymentSummary";
+            item.Caption = "Proceso";
+            item.RowSpan = 2;
+
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleProcessPaymentSummary";
+                label.Text = "PROCESO";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+        });
+
+        //Titulo: Lbs Procesadas
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleProcessedLbsPaymentSummary";
+            item.Caption = "Lbs Procesadas";
+            item.ShowCaption = DefaultBoolean.False;
+            item.ColSpan = 3;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleProcessedLbsPaymentSummary";
+                label.Text = "LBS PROCESADAS";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+
+        });
+
+        //Titulo: Lbs Recibidas
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleReceivedLbsPaymentSummary";
+            item.Caption = "Lbs Recibidas";
+            item.ShowCaption = DefaultBoolean.False;
+            item.ColSpan = 3;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleReceivedLbsPaymentSummary";
+                label.Text = "LBS RECIBIDAS";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+
+        });
+
+        //Titulo: % Rendimiento
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titlePercentPerformancePaymentSummary";
+            item.Caption = "% Rendimiento";
+            item.RowSpan = 2;
+
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titlePercentPerformancePaymentSummary";
+                label.Text = "% Lbs Procesadas/Recibidas";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+        });
+
+        #endregion
+
+        //Fila 3
+        #region Fila 3
+
+        //Titulo: Rendimiento 1
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titlePerformance1PaymentSummary";
+            item.Caption = "Rendimiento";
+
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titlePerformance1PaymentSummary";
+                label.Text = "Rendimiento";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+        });
+
+        //Titulo: Precio Promedio 1
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleAveragePrice1PaymentSummary";
+            item.Caption = "Precio Promedio";
+
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleAveragePrice1PaymentSummary";
+                label.Text = "Precio Promedio";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+        });
+
+        //Titulo: Porciento 1
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titlePercent1PaymentSummary";
+            item.Caption = "Porciento1";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 3;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titlePercent1PaymentSummary";
+                label.Text = "%";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+
+        });
+
+        //Titulo: Rendimiento 2
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titlePerformance2PaymentSummary";
+            item.Caption = "Rendimiento";
+
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titlePerformance2PaymentSummary";
+                label.Text = "Rendimiento";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+        });
+
+        //Titulo: Precio Promedio 2
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titleAveragePrice2PaymentSummary";
+            item.Caption = "Precio Promedio";
+
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titleAveragePrice2PaymentSummary";
+                label.Text = "Precio Promedio";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+        });
+
+        //Titulo: Porciento 2
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "titlePercent2PaymentSummary";
+            item.Caption = "Porciento2";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 3;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "titlePercent2PaymentSummary";
+                label.Text = "%";
+                label.ControlStyle.Font.Bold = true;
+                label.ControlStyle.VerticalAlign = VerticalAlign.Middle;
+                label.ControlStyle.HorizontalAlign = HorizontalAlign.Center;
+            });
+
+        });
+
+        #endregion
+
+        //Fila 4
+        #region Fila 4
+
+        //Proceso Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeProcessPaymentSummary";
+            item.Caption = "ENTERO";
+            item.CaptionStyle.Font.Bold = true;
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "wholeProcessPaymentSummary";
+                label.Text = "ENTERO";
+            });
+
+        });
+
+        //Lbs Rendimiento Entero
+        groupItem2.Items.Add(m => m.wholeSubtotalAdjust, item =>
+        {
+            item.Name = "wholeSubtotalAdjustPaymentSummary";
+            item.Caption = "Lbs Rendimiento Entero";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeSubtotalAdjustPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Precio Promedio Entero Rendimiento
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeAveragePerformancePricePaymentSummary";
+            item.Caption = "Precio Promedio Entero Rendimiento";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeAveragePerformancePricePaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Rendimiento Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentWholePerformancePaymentSummary";
+            item.Caption = "% Rendimiento Entero";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentWholePerformancePaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Lbs Recibidas Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeTotalQuantityRecivedPaymentSummary";
+            item.Caption = "Lbs Recibidas Entero";
+            item.ShowCaption = DefaultBoolean.False;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeTotalQuantityRecivedPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Precio Promedio Entero Recibido
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeAverageTotalQuantityRecivedPricePaymentSummary";
+            item.Caption = "Precio Promedio Entero Recibido";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeAverageTotalQuantityRecivedPricePaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Recibido Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentWholeTotalQuantityRecivedPaymentSummary";
+            item.Caption = "% Recibido Entero";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentWholeTotalQuantityRecivedPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Lbs Procesadas/Recibidas Entero
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "wholeLbsProcessedReceivedPaymentSummary";
+            item.Caption = "% Lbs Procesadas/Recibidas Entero";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "wholeLbsProcessedReceivedPaymentSummary";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        #endregion
+
+        //Fila 5
+        #region Fila 5
+
+        //Proceso Cola
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "tailProcessPaymentSummary";
+            item.Caption = "COLA";
+            item.CaptionStyle.Font.Bold = true;
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "tailProcessPaymentSummary";
+                label.Text = "COLA";
+            });
+
+        });
+
+        //Lbs Rendimiento Cola
+        groupItem2.Items.Add(m => m.subtotalTailAdjust, item =>
+        {
+            item.Name = "subtotalTailAdjustPaymentSummary";
+            item.Caption = "Lbs Rendimiento Entero";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "subtotalTailAdjustPaymentSummary";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Precio Promedio Cola Rendimiento
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "tailAveragePerformancePricePaymentSummary";
+            item.Caption = "Precio Promedio Cola Rendimiento";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailAveragePerformancePricePaymentSummary";
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Rendimiento Cola
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentTailPerformancePaymentSummary";
+            item.Caption = "% Rendimiento Cola";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentTailPerformancePaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Lbs Recibidas Cola
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "tailTotalQuantityRecivedPaymentSummary";
+            item.Caption = "Lbs Recibidas Cola";
+            item.ShowCaption = DefaultBoolean.False;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailTotalQuantityRecivedPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Precio Promedio Cola Recibido
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "tailAverageTotalQuantityRecivedPricePaymentSummary";
+            item.Caption = "Precio Promedio Cola Recibido";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailAverageTotalQuantityRecivedPricePaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Recibido Cola
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentTailTotalQuantityRecivedPaymentSummary";
+            item.Caption = "% Recibido Cola";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "percentTailTotalQuantityRecivedPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Lbs Procesadas/Recibidas Cola
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "tailLbsProcessedReceivedPaymentSummary";
+            item.Caption = "% Lbs Procesadas/Recibidas Cola";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "tailLbsProcessedReceivedPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        #endregion
+
+        //Fila 6
+        #region Fila 6
+
+        //Proceso Total
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "totalProcessPaymentSummary";
+            item.Caption = "TOTAL";
+            item.CaptionStyle.Font.Bold = true;
+            item.ShowCaption = DefaultBoolean.False;
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "totalProcessPaymentSummary";
+                label.Text = "";
+            });
+
+        });
+
+        //Lbs Rendimiento Total
+        groupItem2.Items.Add(m => m.totalQuantityLiquidationAdjust, item =>
+        {
+            item.Name = "totalQuantityLiquidationAdjustPaymentSummary";
+            item.Caption = "Lbs Rendimiento Total";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalQuantityLiquidationAdjustPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Precio Promedio Total Rendimiento
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "totalAveragePerformancePricePaymentSummary";
+            item.Caption = "Precio Promedio Total Rendimiento";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalAveragePerformancePricePaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Rendimiento Total
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentTotalPerformancePaymentSummary";
+            item.Caption = "% Rendimiento Total";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "percentTotalPerformancePaymentSummary";
+                label.Text = "";
+            });
+        });
+
+        //Lbs Recibidas Total
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "totalTotalQuantityRecivedPaymentSummary";
+            item.Caption = "Lbs Recibidas Total";
+            item.ShowCaption = DefaultBoolean.False;
+            //item.ColSpan = 2;
+            item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalTotalQuantityRecivedPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //Precio Promedio Total Recibido
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "totalAverageTotalQuantityRecivedPricePaymentSummary";
+            item.Caption = "Precio Promedio Total Recibido";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 2;
+                spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalAverageTotalQuantityRecivedPricePaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;
+
+                spinedit.ReadOnly = true;
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        //% Recibido Total
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "percentTotalTotalQuantityRecivedPaymentSummary";
+            item.Caption = "% Recibido Total";
+            item.ShowCaption = DefaultBoolean.False;
+
+
+            item.NestedExtension().Label(label =>
+            {
+                label.Width = Unit.Percentage(100);
+                label.Properties.ClientInstanceName = "percentTotalTotalQuantityRecivedPaymentSummary";
+                label.Text = "";
+            });
+        });
+
+        //% Lbs Procesadas/Recibidas Total
+        groupItem2.Items.Add(item =>
+        {
+            item.Name = "totalLbsProcessedReceivedPaymentSummary";
+            item.Caption = "% Lbs Procesadas/Recibidas Total";
+            item.ShowCaption = DefaultBoolean.False;
+
+            item.NestedExtension().SpinEdit(spinedit =>
+            {
+                spinedit.Width = Unit.Percentage(100);
+                spinedit.Properties.DecimalPlaces = 4;
+                spinedit.Properties.DisplayFormatString = "#,##0.00%";
+                //spinedit.Properties.DisplayFormatString = "N2";
+                spinedit.Properties.NumberType = SpinEditNumberType.Float;
+                spinedit.Properties.ClientInstanceName = "totalLbsProcessedReceivedPaymentSummary";
+
+                spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+                spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+                spinedit.ReadOnly = true;
+
+                spinedit.ShowModelErrors = true;
+            });
+        });
+
+        #endregion
+
+        #endregion
+
+        //formLayoutEditProductionLotSubtotalPaymentSummary
+        //GroupItem3
+        //#region GroupItem3
+        //var groupItem3 = settings.Items.AddGroupItem(i =>
+        //{
+        //    i.Caption = "";
+        //    i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+        //    i.ColCount = 8;
+        //    i.ColSpan = 8;
+        //});
+
+        ////Fila 7 Titulos
+        //#region Fila 7 Titulos
+
+        ////Titulo: SubTotal
+        //// groupItem3.Items.AddEmptyItem();
+        ////Titulo: groupItem3EmptyItem1
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "groupItem3EmptyItem1";
+        //    item.Caption = "groupItem3EmptyItem1";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "groupItem3EmptyItem1";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+
+        //});
+
+        ////groupItem3.Items.AddEmptyItem();
+        ////Titulo: groupItem3EmptyItem2
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "groupItem3EmptyItem2";
+        //    item.Caption = "groupItem3EmptyItem2";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "groupItem3EmptyItem2";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////groupItem3.Items.AddEmptyItem();
+        ////Titulo: groupItem3EmptyItem3
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "groupItem3EmptyItem3";
+        //    item.Caption = "groupItem3EmptyItem3";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "groupItem3EmptyItem3";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////groupItem3.Items.AddEmptyItem();
+        ////Titulo: groupItem3EmptyItem4
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "groupItem3EmptyItem4";
+        //    item.Caption = "groupItem3EmptyItem4";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "groupItem3EmptyItem4";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////var groupItem32 = settings.Items.AddGroupItem(i =>
+        ////{
+        ////    i.Caption = "";
+        ////    i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+        ////    i.ColCount = 4;
+        ////    i.ColSpan = 4;
+        ////});
+        ////Titulo: Rendimiento Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleTotalPerformancePaymentSummary";
+        //    item.Caption = "Rendimiento Total";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(50);
+        //        label.Properties.ClientInstanceName = "titleTotalPerformancePaymentSummary";
+        //        label.Text = "Rendimiento Total";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////groupItem3.Items.AddEmptyItem();
+        ////Titulo: groupItem3EmptyItem5
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "groupItem3EmptyItem5";
+        //    item.Caption = "groupItem3EmptyItem5";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "groupItem3EmptyItem5";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Titulo: Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleTotalPaymentSummary";
+        //    item.Caption = "Total";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(50);
+        //        label.Properties.ClientInstanceName = "titleTotalPaymentSummary";
+        //        label.Text = "Total";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Titulo: Porciento de Rendimiento
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titlePercentPerformancePaymentSummary2";
+        //    item.Caption = "Porciento de Rendimiento";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    //item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(50);
+        //        label.Properties.ClientInstanceName = "titlePercentPerformancePaymentSummary2";
+        //        label.Text = "% Rendimiento";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 8
+        //#region Fila 8
+
+        ////Titulo: SubTotal Entero
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleWholeSubtotalPaymentSummary";
+        //    item.Caption = "SubTotal Entero";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 4;
+        //    //item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleWholeSubtotalPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Rendimiento Total Entero
+        //groupItem3.Items.Add(m => m.wholeSubtotalAdjustProcess, item =>
+        //{
+        //    item.Name = "wholeSubtotalAdjustProcess";
+        //    item.Caption = "Rendimiento Total Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "wholeSubtotalAdjustProcess";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    label.Properties.
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "wholeSubtotalAdjustProcess";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////groupItem3WholeSubtotalAdjustProcess1
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "groupItem3WholeSubtotalAdjustProcess1";
+        //    item.Caption = "Rendimiento Total Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "groupItem3WholeSubtotalAdjustProcess1";
+        //        label.Text = " ";
+        //    });
+        //});
+
+        ////Total Entero
+        //groupItem3.Items.Add(m => m.wholeTotalToPay, item =>
+        //{
+        //    item.Name = "wholeTotalToPay";
+        //    item.Caption = "Total Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "wholeTotalToPay";
+        //    //    //label.Text = "";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "wholeTotalToPay";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Entero
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceWholePaymentSummary";
+        //    item.Caption = "% Rendimiento Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //    //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //    //item.Width = Unit.Percentage(35);
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "percentPerformanceWholePaymentSummary";
+        //    //    //label.Text = "";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        spinedit.Properties.DisplayFormatString = "#,##0.00%";
+        //        spinedit.Properties.DecimalPlaces = 4;
+        //        //spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "percentPerformanceWholePaymentSummary";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+        //        //spinedit.Properties.ClientSideEvents.Init = "PercentPerformanceWholeSubtotalAdjust_Init";
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 9
+        //#region Fila 9
+
+        ////Titulo: SubTotal Cola
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleTailSubtotalPaymentSummary";
+        //    item.Caption = "SubTotal Cola";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 4;
+        //    //item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleTailSubtotalPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Rendimiento Total Cola
+        //groupItem3.Items.Add(m => m.subtotalTailAdjust, item =>
+        //{
+        //    item.Name = "subtotalTailAdjustPaymentSummary2";
+        //    item.Caption = "Rendimiento Total Cola";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "subtotalTailAdjustPaymentSummary2";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "subtotalTailAdjustPaymentSummary2";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////groupItem3SubtotalTailAdjustPaymentSummary21
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "groupItem3SubtotalTailAdjustPaymentSummary21";
+        //    item.Caption = "Rendimiento Total Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "groupItem3SubtotalTailAdjustPaymentSummary21";
+        //        label.Text = " ";
+        //    });
+        //});
+
+        ////Total Cola
+        //groupItem3.Items.Add(m => m.tailTotalToPay, item =>
+        //{
+        //    item.Name = "tailTotalToPay";
+        //    item.Caption = "Total Cola";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "tailTotalToPay";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "tailTotalToPay";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Cola
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceTailPaymentSummary";
+        //    item.Caption = "% Rendimiento Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //    //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //    //item.Width = Unit.Percentage(35);
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "percentPerformanceTailPaymentSummary";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        spinedit.Properties.DisplayFormatString = "#,##0.00%";
+        //        spinedit.Properties.DecimalPlaces = 4;
+        //        //spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "percentPerformanceTailPaymentSummary";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        //spinedit.Properties.ClientSideEvents.Init = "PercentPerformanceWholeSubtotalAdjust_Init";
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 10
+        //#region Fila 10
+
+        ////Titulo: SubTotal Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleTotalSubtotalPaymentSummary";
+        //    item.Caption = "Total";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 4;
+        //    //item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleTotalSubtotalPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Titulo: titleTotalSubtotalPaymentSummaryEmptyItem1
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleTotalSubtotalPaymentSummaryEmptyItem1";
+        //    item.Caption = "groupItem3EmptyItem5";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titleTotalSubtotalPaymentSummaryEmptyItem1";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+        ////Total
+        //groupItem3.Items.Add(m => m.totalToPay, item =>
+        //{
+        //    item.Name = "totalToPay";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "totalToPay";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPay";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceTotalPaymentSummary";
+        //    item.Caption = "% Rendimiento Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //    //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //    //item.Width = Unit.Percentage(35);
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "percentPerformanceTotalPaymentSummary";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        spinedit.Properties.DisplayFormatString = "#,##0.00%";
+        //        spinedit.Properties.DecimalPlaces = 4;
+        //        //spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "percentPerformanceTotalPaymentSummary";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        //spinedit.Properties.ClientSideEvents.Init = "PercentPerformanceWholeSubtotalAdjust_Init";
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 11
+        //#region Fila 11
+
+        ////Titulo: SubTotal IvaRate0
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleIvaRate0PaymentSummary";
+        //    item.Caption = "Iva Tarifa 0%";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 4;
+        //    //item.ShowCaption = DefaultBoolean.False;
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleIvaRate0PaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Titulo: titleTotalSubtotalPaymentSummaryEmptyItem1
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleIvaRate0PaymentSummaryEmptyItem1";
+        //    item.Caption = "titleIvaRate0PaymentSummaryEmptyItem1";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titleIvaRate0PaymentSummaryEmptyItem1";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Total IvaRate0
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayIvaRate0PaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "totalToPayIvaRate0PaymentSummary";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayIvaRate0PaymentSummary";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento IvaRate0
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceIvaRate0PaymentSummary";
+        //    item.Caption = "% Rendimiento IvaRate0";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //    //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //    //item.Width = Unit.Percentage(35);
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceIvaRate0PaymentSummary";
+        //        label.RightToLeft = DefaultBoolean.True;
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 12
+        //#region Fila 12
+
+        ////Titulo: SubTotal TotalLiquidación
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleTotalLiquidationPaymentSummary";
+        //    item.Caption = "Total Liquidación";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.CaptionStyle.Font.Size = 15;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 4;
+        //    //item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleTotalLiquidationPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Titulo: titleTotalLiquidationPaymentSummaryEmptyItem1
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleTotalLiquidationPaymentSummaryEmptyItem1";
+        //    item.Caption = "titleTotalLiquidationPaymentSummaryEmptyItem1";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titleTotalLiquidationPaymentSummaryEmptyItem1";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Total TotalLiquidation
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayTotalLiquidationPaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "totalToPayTotalLiquidationPaymentSummary";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayTotalLiquidationPaymentSummary";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento TotalLiquidation
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceTotalLiquidationPaymentSummary";
+        //    item.Caption = "% Rendimiento IvaRate0";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //    //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //    //item.Width = Unit.Percentage(35);
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceTotalLiquidationPaymentSummary";
+        //        label.RightToLeft = DefaultBoolean.True;
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 13
+        //#region Fila 13
+
+        ////Titulo: SubTotal Advance
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleAdvancePaymentSummary";
+        //    item.Caption = "Anticipo";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.CaptionStyle.Font.Size = 15;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 4;
+        //    //item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleAdvancePaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Titulo: titleAdvancePaymentSummaryEmptyItem1
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleAdvancePaymentSummaryEmptyItem1";
+        //    item.Caption = "titleAdvancePaymentSummaryEmptyItem1";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titleAdvancePaymentSummaryEmptyItem1";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Total Advance
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayAdvancePaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "totalToPayAdvancePaymentSummary";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayAdvancePaymentSummary";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Advance
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceAdvancePaymentSummary";
+        //    item.Caption = "% Rendimiento IvaRate0";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //    //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //    //item.Width = Unit.Percentage(35);
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceAdvancePaymentSummary";
+        //        label.RightToLeft = DefaultBoolean.True;
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 14
+        //#region Fila 14
+
+        ////Titulo: SubTotal To Receive
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleToReceivePaymentSummary";
+        //    item.Caption = "A recibir";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.CaptionStyle.Font.Size = 15;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 4;
+        //    //item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleToReceivePaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Titulo: titleToReceivePaymentSummaryEmptyItem1
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleToReceivePaymentSummaryEmptyItem1";
+        //    item.Caption = "titleToReceivePaymentSummaryEmptyItem1";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    //item.RowSpan = 5;
+        //    item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //settings.Width = Unit.Percentage(20);
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titleToReceivePaymentSummaryEmptyItem1";
+        //        label.Text = "                  ";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Total To Receive
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayToReceivePaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    //item.NestedExtension().Label(label =>
+        //    //{
+        //    //    label.Width = Unit.Percentage(100);
+        //    //    label.Properties.ClientInstanceName = "totalToPayToReceivePaymentSummary";
+        //    //    label.RightToLeft = DefaultBoolean.True;
+        //    //    //label.Text = "";
+        //    //});
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(50);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayToReceivePaymentSummary";
+        //        //spinedit.Properties.MaxLength = 17;
+        //        //spinedit.Properties.MinValue = 0.01M;
+        //        //spinedit.Properties.MaxValue = 99999999999999.99M;
+        //        //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        //spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento To Receive
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceToReceivePaymentSummary";
+        //    item.Caption = "% Rendimiento To Receive";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //    //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //    //item.Width = Unit.Percentage(35);
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceToReceivePaymentSummary";
+        //        label.RightToLeft = DefaultBoolean.True;
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        //#endregion
+        //cambio
+        ////Fila 7 Titulos
+        //#region Fila 7 Titulos
+
+        ////Titulo: SubTotal
+        //groupItem3.Items.AddEmptyItem();
+        //groupItem3.Items.AddEmptyItem();
+        //groupItem3.Items.AddEmptyItem();
+        //groupItem3.Items.AddEmptyItem();
+
+        ////Titulo: Rendimiento Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleTotalPerformancePaymentSummary";
+        //    item.Caption = "Rendimiento Total";
+        //    item.CaptionStyle.Font.Bold = true;
+
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titleTotalPerformancePaymentSummary";
+        //        label.Text = "Rendimiento Total";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Titulo: Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titleTotalPaymentSummary";
+        //    item.Caption = "Total";
+        //    item.CaptionStyle.Font.Bold = true;
+
+        //    item.ColSpan = 2;
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titleTotalPaymentSummary";
+        //        label.Text = "Total";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        ////Titulo: Porciento de Rendimiento
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "titlePercentPerformancePaymentSummary2";
+        //    item.Caption = "Porciento de Rendimiento";
+        //    item.CaptionStyle.Font.Bold = true;
+
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "titlePercentPerformancePaymentSummary2";
+        //        label.Text = "% Rendimiento";
+        //        label.ControlStyle.Font.Bold = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 8
+        //#region Fila 8
+
+        ////Titulo: SubTotal Entero
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleWholeSubtotalPaymentSummary";
+        //    item.Caption = "SubTotal Entero";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.ColSpan = 4;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleWholeSubtotalPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Rendimiento Total Entero
+        //groupItem3.Items.Add(m => m.wholeSubtotalAdjustProcess, item =>
+        //{
+        //    item.Name = "wholeSubtotalAdjustProcess";
+        //    item.Caption = "Rendimiento Total Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "wholeSubtotalAdjustProcess";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Total Entero
+        //groupItem3.Items.Add(m => m.wholeTotalToPay, item =>
+        //{
+        //    item.Name = "wholeTotalToPay";
+        //    item.Caption = "Total Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "wholeTotalToPay";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Entero
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceWholePaymentSummary";
+        //    item.Caption = "% Rendimiento Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DisplayFormatString = "#,##0.00%";
+        //        spinedit.Properties.DecimalPlaces = 4;
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "percentPerformanceWholePaymentSummary";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 9
+        //#region Fila 9
+
+        ////Titulo: SubTotal Cola
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleTailSubtotalPaymentSummary";
+        //    item.Caption = "SubTotal Cola";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.ColSpan = 4;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleTailSubtotalPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Rendimiento Total Cola
+        //groupItem3.Items.Add(m => m.subtotalTailAdjust, item =>
+        //{
+        //    item.Name = "subtotalTailAdjustPaymentSummary2";
+        //    item.Caption = "Rendimiento Total Cola";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    //item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "subtotalTailAdjustPaymentSummary2";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Total Cola
+        //groupItem3.Items.Add(m => m.tailTotalToPay, item =>
+        //{
+        //    item.Name = "tailTotalToPay";
+        //    item.Caption = "Total Cola";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "tailTotalToPay";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Cola
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceTailPaymentSummary";
+        //    item.Caption = "% Rendimiento Entero";
+        //    item.ShowCaption = DefaultBoolean.False;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DisplayFormatString = "#,##0.00%";
+        //        spinedit.Properties.DecimalPlaces = 4;
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "percentPerformanceTailPaymentSummary";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 10
+        //#region Fila 10
+
+        ////Titulo: SubTotal Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleTotalSubtotalPaymentSummary";
+        //    item.Caption = "Total";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.ColSpan = 5;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleTotalSubtotalPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Total
+        //groupItem3.Items.Add(m => m.totalToPay, item =>
+        //{
+        //    item.Name = "totalToPay";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPay";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Total
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceTotalPaymentSummary";
+        //    item.Caption = "% Rendimiento Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DisplayFormatString = "#,##0.00%";
+        //        spinedit.Properties.DecimalPlaces = 4;
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "percentPerformanceTotalPaymentSummary";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 11
+        //#region Fila 11
+
+        ////Titulo: SubTotal IvaRate0
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleIvaRate0PaymentSummary";
+        //    item.Caption = "Iva Tarifa 0%";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.ColSpan = 5;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleIvaRate0PaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Total IvaRate0
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayIvaRate0PaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayIvaRate0PaymentSummary";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento IvaRate0
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceIvaRate0PaymentSummary";
+        //    item.Caption = "% Rendimiento IvaRate0";
+        //    item.ShowCaption = DefaultBoolean.False;
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceIvaRate0PaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 12
+        //#region Fila 12
+
+        ////Titulo: SubTotal TotalLiquidación
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleTotalLiquidationPaymentSummary";
+        //    item.Caption = "Total Liquidación";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.CaptionStyle.Font.Size = 15;
+        //    item.ColSpan = 5;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleTotalLiquidationPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Total TotalLiquidation
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayTotalLiquidationPaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayTotalLiquidationPaymentSummary";
+
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento TotalLiquidation
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceTotalLiquidationPaymentSummary";
+        //    item.Caption = "% Rendimiento IvaRate0";
+        //    item.ShowCaption = DefaultBoolean.False;
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceTotalLiquidationPaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 13
+        //#region Fila 13
+
+        ////Titulo: SubTotal Advance
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleAdvancePaymentSummary";
+        //    item.Caption = "Anticipo";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.CaptionStyle.Font.Size = 15;
+        //    item.ColSpan = 5;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleAdvancePaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Total Advance
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayAdvancePaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayAdvancePaymentSummary";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento Advance
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceAdvancePaymentSummary";
+        //    item.Caption = "% Rendimiento IvaRate0";
+        //    item.ShowCaption = DefaultBoolean.False;
+
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceAdvancePaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        ////Fila 14
+        //#region Fila 14
+
+        ////Titulo: SubTotal To Receive
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "TitleToReceivePaymentSummary";
+        //    item.Caption = "A recibir";
+        //    item.CaptionStyle.Font.Bold = true;
+        //    item.CaptionStyle.Font.Size = 15;
+        //    item.ColSpan = 5;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "TitleToReceivePaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        ////Total To Receive
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "totalToPayToReceivePaymentSummary";
+        //    item.Caption = "Total";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.ColSpan = 2;
+        //    item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+        //    item.NestedExtension().SpinEdit(spinedit =>
+        //    {
+        //        spinedit.Width = Unit.Percentage(100);
+        //        spinedit.Properties.DecimalPlaces = 2;
+        //        spinedit.Properties.DisplayFormatString = "N2";
+        //        spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //        spinedit.Properties.ClientInstanceName = "totalToPayToReceivePaymentSummary";
+        //        spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+        //        spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        //        spinedit.RightToLeft = DefaultBoolean.True;
+
+        //        spinedit.ReadOnly = true;
+
+        //        spinedit.ShowModelErrors = true;
+        //    });
+        //});
+
+        ////Porciento de Rendimiento To Receive
+        //groupItem3.Items.Add(item =>
+        //{
+        //    item.Name = "percentPerformanceToReceivePaymentSummary";
+        //    item.Caption = "% Rendimiento To Receive";
+        //    item.ShowCaption = DefaultBoolean.False;
+        //    item.NestedExtension().Label(label =>
+        //    {
+        //        label.Width = Unit.Percentage(100);
+        //        label.Properties.ClientInstanceName = "percentPerformanceToReceivePaymentSummary";
+        //        label.Text = "";
+        //    });
+        //});
+
+        //#endregion
+
+        //#endregion
+
+    }).Render();
+
+}    
+
+<script src="~/Scripts/productionlotreception/_productionLotReceptionHeadFormProductionLotPayment.js"></script>

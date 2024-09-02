@@ -1,0 +1,66 @@
+﻿
+@Html.DevExpress().Button(
+	button =>
+	{
+		button.Name = "btnNew";
+		button.Text = "";
+		button.ToolTip = "Adicionar Elemento";
+		button.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+		button.ClientEnabled = true;
+		button.UseSubmitBehavior = false;
+		button.EnableClientSideAPI = true;
+		button.ClientSideEvents.Click = "AddNewItem";
+	}).GetHtml()
+
+@Html.DevExpress().Button(
+	button =>
+	{
+		button.Name = "btnRefresh";
+		button.Text = "";
+		button.ToolTip = "Refrescar";
+		button.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+		button.ClientEnabled = true;
+		button.ClientVisible = true;
+		button.UseSubmitBehavior = false;
+		button.EnableClientSideAPI = true;
+		button.ClientSideEvents.Click = "RefreshGrid";
+	}).GetHtml()
+
+@Html.DevExpress().Label(
+	label =>
+	{
+		label.Name = "lblEditMessage";
+		label.Properties.ClientInstanceName = "lblEditMessage";
+		label.Width = Unit.Percentage(100);
+		label.ClientVisible = false;
+	}).GetHtml()
+
+<script type="text/javascript">
+	var ShowEditMessage = function(s, e) {
+		if (s.cpEditMessage) {
+			lblEditMessage.SetText(s.cpEditMessage);
+			lblEditMessage.SetVisible(true);
+
+			delete s.cpEditMessage;
+
+			$(".close").click(function() {
+				$(".alert").alert('close');
+
+				lblEditMessage.SetText("");
+				lblEditMessage.SetVisible(false);
+			});
+
+			var message = document.getElementById("successMessage");
+			if (message !== undefined && message !== null) {
+				setTimeout(function() {
+					$("#successMessage").alert('close');
+
+					lblEditMessage.SetText("");
+					lblEditMessage.SetVisible(false);
+				}, 2000);
+			}
+		}
+	};
+</script>
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />

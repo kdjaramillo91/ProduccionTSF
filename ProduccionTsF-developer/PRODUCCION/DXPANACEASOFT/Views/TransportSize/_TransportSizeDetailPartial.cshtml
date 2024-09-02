@@ -1,0 +1,98 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    TransportSizeDto transportSize = Model ?? new TransportSizeDto();
+}
+
+@Html.Hidden("id_transportSize", transportSize.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(transportSize.code)
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(transportSize.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Rango de Libras:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(transportSize.PoundsRange.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Rango de Fundas de Hielo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(transportSize.IceBagRange.name)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(transportSize.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(transportSize.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(transportSize.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(transportSize.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

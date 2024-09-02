@@ -1,0 +1,145 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.ClosePlateTunnelCoolDTO
+
+<div>
+    <div class="Etiqueta"><b>Informaci&oacute;n Resumida</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Máquina: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.machineForProd,
+                    settings =>
+                    {
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Fecha: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.dateTimeEmisionStr,
+                    settings =>
+                    {
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Turno: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.turn,
+                    settings =>
+                    {
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "No.Personas: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().SpinEditFor(model => model.noOfPerson,
+                    settings =>
+                    {
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                        //settings.Properties.DecimalPlaces = 0;
+                        settings.Properties.NumberType = SpinEditNumberType.Integer;
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Responsable: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.person,
+                    settings =>
+                    {
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Width = Unit.Percentage(100);
+                       settings.Text = "Fecha y Hora de Cierre: ";
+                   }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().DateEditFor(model => model.closeDate,
+                   settings =>
+                   {
+                       settings.Name = "closeDate";
+                       settings.Properties.ClientInstanceName = "closeDate";
+                       settings.Width = Unit.Percentage(100);
+                       settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                       settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                       settings.ReadOnly = !((bool)ViewBag.enabled);
+                       settings.Properties.ClientSideEvents.Validation = "DateEditCloseDate_Validation";
+                   }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().TimeEditFor(model => model.closeDate, timeEdit =>
+                   {
+                       timeEdit.Name = "closeTime";
+                       timeEdit.Properties.ClientInstanceName = "closeTime";
+                       timeEdit.Width = Unit.Percentage(100);
+                       timeEdit.ReadOnly = !((bool)ViewBag.enabled);
+                       timeEdit.Properties.DisplayFormatInEditMode = true;
+                       timeEdit.Properties.EditFormatString = "HH:mm";
+                       timeEdit.Properties.DisplayFormatString = "HH:mm";
+                       timeEdit.Properties.EditFormat = EditFormat.Custom;
+                       timeEdit.ShowModelErrors = false;
+                       timeEdit.Properties.ClientSideEvents.Validation = "TimeEditCloseTime_Validation";
+                       timeEdit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                   }).GetHtml()
+            </div>
+        </div>
+    </div>
+
+    <div class="Etiqueta"><b>Detalles</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer" id="divGridViewDetails">
+        @Html.Partial("_GridViewDetails", Model.ClosePlateTunnelCoolDetails)
+    </div>
+
+    <div class="Etiqueta"><b>Resumen</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer" id="divGridViewTransferSummary">
+        @Html.Partial("_TransferSummaryEdit", Model.TransferSummary)
+    </div>
+</div>

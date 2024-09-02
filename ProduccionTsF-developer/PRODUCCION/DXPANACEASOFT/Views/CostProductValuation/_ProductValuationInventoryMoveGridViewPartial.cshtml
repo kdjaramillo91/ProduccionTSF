@@ -1,0 +1,382 @@
+﻿@model IList<ProductionCostProductValuationInventoryMove>
+@using ProductValuationInventoryMoveDTO = DXPANACEASOFT.Controllers.CostProductValuationController.ProductValuationInventoryMoveDTO;
+@{
+	ProductValuationInventoryMoveDTO[] detalles;
+	if (this.TempData.ContainsKey(DXPANACEASOFT.Controllers.CostProductValuationController.m_inventoryMoveDetailDTO))
+	{
+		detalles =  this.TempData[DXPANACEASOFT.Controllers.CostProductValuationController.m_inventoryMoveDetailDTO] as ProductValuationInventoryMoveDTO[];
+	}
+	else
+	{
+		detalles = new ProductValuationInventoryMoveDTO[] { };
+	}
+}
+@Html.DevExpress().GridView(
+	gridView =>
+	{
+		#region Configuración general
+
+		// Configuración general
+		gridView.Name = "gvMovimientoValorizacion";
+		gridView.KeyFieldName = "Orden";
+		gridView.Width = Unit.Percentage(100);
+		//gridView.Height = Unit.Pixel(750);
+		gridView.SettingsSearchPanel.Visible = false;
+
+		gridView.SettingsSearchPanel.Visible = true;
+		gridView.Styles.SearchPanel.CssClass = "searchPanel";
+
+		var header = gridView.Styles.Header;
+		header.BackColor = System.Drawing.Color.FromArgb(255, 255, 191, 102);
+		header.Font.Bold = true;
+		header.ForeColor = System.Drawing.Color.Black;
+
+		var settings = gridView.Settings;
+		settings.ShowGroupPanel = true;
+		settings.ShowTitlePanel = false;
+		settings.HorizontalScrollBarMode = ScrollBarMode.Auto;
+		settings.VerticalScrollBarMode = ScrollBarMode.Hidden;
+		settings.VerticalScrollableHeight = 600;
+		settings.VerticalScrollBarStyle = GridViewVerticalScrollBarStyle.Virtual;
+
+		settings.ShowFilterRow = false;
+		settings.ShowFilterRowMenu = false;
+		settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+		var behavior = gridView.SettingsBehavior;
+		behavior.AllowSelectByRowClick = true;
+		behavior.AllowEllipsisInText = true;
+		behavior.AllowDragDrop = true;
+		behavior.AllowSort = true;
+		behavior.EnableRowHotTrack = true;
+
+		var pager = gridView.SettingsPager;
+		pager.Visible = true;
+		pager.PageSize = 40;
+		pager.Mode = GridViewPagerMode.EndlessPaging;
+
+		var loading = gridView.SettingsLoadingPanel;
+		loading.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+		loading.Text = "Cargando...";
+
+		var styles = gridView.Styles;
+		styles.AlternatingRow.Enabled = DevExpress.Utils.DefaultBoolean.True;
+		styles.AlternatingRow.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffffff");
+		styles.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#f5f3f4");
+
+		var adaptivity = gridView.SettingsAdaptivity;
+		adaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+
+
+		// Parámetros de Exportación
+		var exportSettings = gridView.SettingsExport;
+
+		exportSettings.EnableClientSideExportAPI = true;
+		exportSettings.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+
+		exportSettings.FileName = String.Format("{0}_{1:yyyyMMdd HHmm}", "MovimientoInventario", DateTime.Now);
+
+		exportSettings.Styles.Header.Font.Name = "Verdana";
+		exportSettings.Styles.Header.Font.Size = FontUnit.Point(10);
+
+		exportSettings.Styles.Default.Font.Name = "Verdana";
+		exportSettings.Styles.Default.Font.Size = FontUnit.Point(8);
+
+		gridView.Toolbars.Add(toolbar =>
+		{
+			toolbar.Items.Add(new MVCxGridViewToolbarItem()
+			{
+				Name = "ExportToXlsx",
+				Text = "Exportar datos a Excel (2003)",
+				Command = GridViewToolbarCommand.ExportToXlsx,
+			});
+		});
+
+
+		// Eventos y callbacks
+		gridView.CallbackRouteValues = new { Controller = "CostProductValuation", Action = "QueryMovimientosValorizacionDetails" };
+
+		var events = gridView.ClientSideEvents;
+		events.BeginCallback = "onQueryMovimientosValorizacionDetailsBeginCallback";
+
+		// Pie de página
+		gridView.Settings.ShowFooter = true;
+		gridView.SetFooterRowTemplateContent(content =>
+		{
+			this.ViewContext.Writer.Write(@"<span id=""lblMovimientosValorizacionGridViewInfo""></span>");
+		});
+
+		gridView.SetClientJSProperties(null, null,
+			new Dictionary<string, object>
+			{
+				{ "Model", detalles },
+			});
+
+		#region Colummnas
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Orden";
+			column.Caption = "Nº";
+			column.Width = Unit.Percentage(8);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "OrdenCosteo";
+			column.Caption = "Orden Asig. Costo";
+			column.Width = Unit.Percentage(8);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "IdInventoryMove";
+			column.Caption = "IdInventoryMove";
+			column.Width = Unit.Percentage(8);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.Visible = !(this.ViewBag.EsCostoReal);
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NombreBodega";
+			column.Caption = "Bodega";
+			column.Width = Unit.Percentage(15);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "CodigoNombreItem";
+			column.Caption = "Ítem";
+			column.Width = Unit.Percentage(10);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+			//column.GroupIndex = 0;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "FechaEmision";
+			column.Caption = "Fecha Emisión";
+			column.Width = Unit.Percentage(12);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.DateFormat;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});		
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "FechaCreacion";
+			column.Caption = "Fecha Creación";
+			column.Width = Unit.Percentage(12);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.DateTimeSecondsFormat;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+			column.Visible = !(this.ViewBag.EsCostoReal);
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NombreMotivoMovimiento";
+			column.Caption = "Motivo";
+			column.Width = Unit.Percentage(20);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NumeroMovimiento";
+			column.Caption = "Nº Movimiento";
+			column.Width = Unit.Percentage(10);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "SecuenciaTransaccional";
+			column.Caption = "Sec. Transac.";
+			column.Width = Unit.Percentage(10);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "NumeroLote";
+			column.Caption = "Nº Lote";
+			column.Width = Unit.Percentage(10);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.HeaderStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "TipoCalculo";
+			column.Caption = "Tipo Cálculo";
+			column.Width = Unit.Percentage(15);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Accion";
+			column.Caption = "Acción";
+			column.Width = Unit.Percentage(15);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+		});
+
+		gridView.Columns.Add(column =>
+		{
+			column.FieldName = "Coeficiente";
+			column.Caption = "Coeficiente";
+			column.Width = Unit.Percentage(12);
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.CellStyle.Wrap = DefaultBoolean.True;
+			column.PropertiesEdit.DisplayFormatString = GlobalUtils.Decimal6Format;
+		});
+
+		gridView.Columns.AddBand(band =>
+		{
+			band.Caption = "Caja / Master";
+			band.Width = Unit.Percentage(15);
+			band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "Cantidad";
+				column.Caption = "Cantidad";
+				column.Width = Unit.Percentage(10);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.IntegerFormat;
+			});
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "PrecioUnitario";
+				column.Caption = "Precio Unitario";
+				column.Width = Unit.Percentage(10);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+				column.HeaderStyle.Wrap = DefaultBoolean.True;
+			});
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "CostoTotal";
+				column.Caption = "Costo Total";
+				column.Width = Unit.Percentage(12);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			});
+		});
+
+		gridView.Columns.AddBand(band =>
+		{
+			band.Caption = "Libras";
+			band.Width = Unit.Percentage(15);
+			band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "CantidadLibras";
+				column.Caption = "Cantidad";
+				column.Width = Unit.Percentage(10);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+			});
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "PrecioUnitarioLibras";
+				column.Caption = "Precio Unitario";
+				column.Width = Unit.Percentage(10);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+				column.HeaderStyle.Wrap = DefaultBoolean.True;
+			});
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "CostoTotalLibras";
+				column.Caption = "Costo Total";
+				column.Width = Unit.Percentage(12);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			});
+		});
+
+		gridView.Columns.AddBand(band =>
+		{
+			band.Caption = "Kilogramos";
+			band.Width = Unit.Percentage(15);
+			band.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "CantidadKilogramos";
+				column.Caption = "Cantidad";
+				column.Width = Unit.Percentage(10);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.DecimalFormat;
+			});
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "PrecioUnitarioKilogramos";
+				column.Caption = "Precio Unitario";
+				column.Width = Unit.Percentage(10);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.Currency6Format;
+				column.HeaderStyle.Wrap = DefaultBoolean.True;
+			});
+
+			band.Columns.Add(column =>
+			{
+				column.FieldName = "CostoTotalKilogramos";
+				column.Caption = "Costo Total";
+				column.Width = Unit.Percentage(12);
+				column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+				column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+				column.PropertiesEdit.DisplayFormatString = GlobalUtils.CurrencyFormat;
+			});
+		});
+
+
+
+		#endregion
+
+		#endregion
+
+	}).Bind(detalles).GetHtml()

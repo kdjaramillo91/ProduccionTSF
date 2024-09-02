@@ -1,0 +1,214 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProviderRetention>
+
+@{
+    var grid = Html.DevExpress().GridView<ProviderRetention>(settings => {
+        settings.Name = "ProviderRetentions";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "ProviderRetention" };
+
+        settings.ClientSideEvents.BeginCallback = "ProviderPaymentTerm_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "ProviderRetentionAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "ProviderRetentionUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "ProviderRetentionDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_retentionType";
+            column.Caption = "FR";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_retentionType = (int)DataBinder.Eval(c.DataItem, "id_retentionType");
+                RetentionType retentionType = DataProviderRetention.RetentionTypeById(id_retentionType);
+
+                if (retentionType != null)
+                {
+                    ViewContext.Writer.Write(retentionType.code);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_retentionType";
+                p.DataSource = DataProviderRetention.AllRetentionTypes();
+                p.ValueField = "id";
+                p.TextFormatString = "{0}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Init = "ProviderRetentionRetentionTypeCombo_Init";
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.SelectedIndexChanged = "ProviderRetentionRetentionTypeCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_retentionGroup";
+            column.Caption = "Grupo";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_retentionGroup = (int)DataBinder.Eval(c.DataItem, "id_retentionGroup");
+                RetentionGroup retentionGroup = DataProviderRetention.RetentionGroupById(id_retentionGroup);
+
+                if (retentionGroup != null)
+                {
+                    ViewContext.Writer.Write(retentionGroup.code);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_retentionGroup";
+                p.DataSource = DataProviderRetention.AllRetentionGroups();
+                p.ValueField = "id";
+                p.TextFormatString = "{0}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                p.ClientSideEvents.SelectedIndexChanged = "ProviderRetentionRetentionGroupCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_retention";
+            column.Caption = "Retención";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_retention = (int)DataBinder.Eval(c.DataItem, "id_retention");
+                Retention retention = DataProviderRetention.RetentionById(id_retention);
+
+                if (retention != null)
+                {
+                    ViewContext.Writer.Write(retention.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_retention";
+                p.DataSource = DataProviderRetention.Retentions();
+                p.ValueField = "id";
+                p.TextFormatString = "{1}";
+                //settings.Properties.TextField = "name";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                p.ClientSideEvents.Validation = "OnProviderRetentionComboValidation";
+                p.ClientSideEvents.SelectedIndexChanged = "ProviderRetentionRetentionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "percentRetencion";
+            column.Caption = "Porc.";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? percentRetencion = (decimal?)DataBinder.Eval(c.DataItem, "percentRetencion");
+                ViewContext.Writer.Write(percentRetencion != null ? percentRetencion.Value.ToString("N2") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "percentRetencion";
+                p.NumberType = SpinEditNumberType.Float;
+                p.DecimalPlaces = 2;
+                p.AllowMouseWheel = true;
+                p.Increment = 0.1M;
+                p.LargeIncrement = 1;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+            });
+        });
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["percentRetencion"] = 0.00;
+        };
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,175 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+	var grid = Html.DevExpress().GridView<UserEntity>(settings =>
+	{
+		settings.Name = "gvPersonTypes";
+		settings.CallbackRouteValues = new { Controller = "WarehouseUserPermit", Action = "WarehouseUserPermitPartial" };
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "WarehouseUserPermit", Action = "WarehouseUserPermitPartialAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "WarehouseUserPermit", Action = "WarehouseUserPermitPartialUpdate" };
+
+		settings.KeyFieldName = "id";
+		settings.Width = Unit.Percentage(100);
+
+		#region GRIDVIEW BEHAIVOR
+
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+			e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+			if (ViewData["EditMessage"] != null)
+			{
+				e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+			}
+		};
+
+		#endregion
+
+		settings.SettingsPager.Visible = true;
+
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Permisos a Bodegas</span>");
+		});
+
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.InitNewRow = (s, e) =>
+		{
+			e.NewValues["isActive"] = true;
+		};
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_user";
+			column.Name = "id_user";
+			column.Caption = "Usuario";
+			column.Width = Unit.Percentage(15);
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_user = (int?)DataBinder.Eval(c.DataItem, "id_user");
+				User productionCostType = DataProviderWarehouseUserPermit.Users(id_user);
+
+				string name = (productionCostType != null) ? productionCostType.username : "";
+				ViewContext.Writer.Write(name);
+			});
+
+			column.EditorProperties().ComboBox(comboBox =>
+			{
+				comboBox.DataSource = DataProviderWarehouseUserPermit.UserFilter((int)ViewData["id_company"]);
+				comboBox.ValueField = "id";
+				comboBox.TextField = "username";
+				comboBox.ValueType = typeof(int);
+
+				comboBox.DropDownStyle = DropDownStyle.DropDown;
+				comboBox.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				comboBox.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			});
+
+		});
+
+		// COMMAND COLUMN
+
+		if (ShowEditButton() || ShowDeleteButton())
+		{
+			MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+			{
+				ShowEditButton = ShowEditButton(),
+				ShowDeleteButton = false,
+				Visible = true,
+				VisibleIndex = 10,
+				Width = Unit.Percentage(5),
+				Caption = "Acciones"
+			};
+
+			settings.ClientSideEvents.CustomButtonClick = "GridViewAccountingTemplateCostCustomCommandButton_Click";
+
+			settings.Columns.Add(commandColumn);
+		}
+
+		/*  ver detalle */
+		settings.SetDetailRowTemplateContent(column =>
+		{
+			int idWarehouseUserPermit = (int)DataBinder.Eval(column.DataItem, "id");
+			UserEntity transportTariffs = DataProviderWarehouseUserPermit.WarehouseUserPermitById(idWarehouseUserPermit);
+		});
+
+		#region EditorLayout
+		/*  UUUUUU */
+		settings.SetEditFormTemplateContent(content =>
+		{
+			int? id_warehouseUserPermit = (int?)DataBinder.Eval(content.DataItem, "id");
+			UserEntity warehouseUserPermit = (id_warehouseUserPermit != null) ? DataProviderWarehouseUserPermit.WarehouseUserPermitById((int)id_warehouseUserPermit) : new UserEntity { };
+			Html.RenderPartial("_WarehouseUserPermitFormEditPartial", warehouseUserPermit);
+		});
+
+		#endregion
+
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+    bool ShowEditButton()
+    {
+        var permissions = (ViewData["permissions"] as List<int>);
+        return (permissions != null && permissions.Contains(10));
+    }
+
+    bool ShowDeleteButton()
+    {
+        var permissions = (ViewData["permissions"] as List<int>);
+        return (permissions != null && permissions.Contains(8));
+    }
+
+}

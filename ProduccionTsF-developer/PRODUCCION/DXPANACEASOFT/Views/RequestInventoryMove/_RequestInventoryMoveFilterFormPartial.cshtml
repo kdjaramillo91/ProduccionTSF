@@ -1,0 +1,228 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.RequestInventoryMoveDTO
+
+@model DXPANACEASOFT.Models.RequestInventoryMoveDTO.FilterQueryRequestInventoryMove
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterRequesInventoryMove", name = "formFilterRequesInventoryMove" }))
+{
+	<table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+		<tr>
+			<td style="width: 40%">
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr>
+						<td style="width: 10%;">
+							@Html.DevExpress().Label(settings =>
+							{
+								settings.Name = "NatureMoveFLabel";
+								settings.Text = "Naturaleza:";
+							}).GetHtml()
+						</td>
+						<td style="width: 80%;" colspan="2">
+							@Html.DevExpress().ComboBoxFor(m => m.idNatureMove, settings =>
+							{
+								settings.Name = "idNatureMoveF";
+								settings.Properties.ClientInstanceName = "idNatureMoveF";
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.ValueField = "idNatureF";
+								settings.Properties.TextField = "descNatureF";
+								settings.Properties.ValueType = typeof(int);
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+								settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+								settings.Properties.EnableSynchronization = DefaultBoolean.False;
+								settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+								settings.Properties.NullDisplayText = "Todos";
+								settings.Properties.NullText = "Todos";
+							}).BindList(ViewData["_NatureMoveFilter"]).Bind(null).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 10%;">
+							@Html.DevExpress().Label(settings =>
+							{
+								settings.Name = "startEmissionDateLabel";
+								settings.Text = "Fecha Emisión:";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().DateEditFor(m => m.startEmissionDate, settings =>
+							{
+								settings.Name = "startEmissionDate";
+								settings.Properties.ClientInstanceName = "startEmissionDate";
+								settings.Width = Unit.Percentage(100);
+
+								settings.Properties.NullDisplayText = "Desde";
+								settings.Properties.NullText = "Desde";
+
+								settings.Properties.DisplayFormatInEditMode = true;
+								settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+								settings.Properties.EditFormat = EditFormat.Custom;
+								settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+								settings.Properties.CalendarProperties.Columns = 2;
+								settings.Properties.DateRangeSettings.MinDayCount = 0;
+								settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().DateEditFor(m => m.endEmissionDate, settings =>
+							{
+								settings.Name = "endEmissionDate";
+								settings.Properties.ClientInstanceName = "endEmissionDate";
+								settings.Width = Unit.Percentage(100);
+
+								settings.Properties.NullDisplayText = "Hasta";
+								settings.Properties.NullText = "Hasta";
+
+								settings.Properties.DisplayFormatInEditMode = true;
+								settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+								settings.Properties.EditFormat = EditFormat.Custom;
+								settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+								settings.Properties.CalendarProperties.Columns = 2;
+								settings.Properties.DateRangeSettings.StartDateEditID = "startEmissionDate";
+								settings.Properties.DateRangeSettings.MinDayCount = 0;
+								settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Label(settings =>
+							{
+								settings.Name = "EstadoQueryLabel";
+								settings.Text = "Estado:";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBox(
+								settings =>
+								{
+									settings.Name = "EstadoQueryComboBox";
+									settings.Width = Unit.Percentage(100);
+									settings.Properties.NullText = "Seleccionar...";
+									settings.Properties.CallbackPageSize = 15;
+									settings.Properties.TextField = "Text";
+									settings.Properties.ValueField = "Value";
+									settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+								}
+							).BindList(ViewData["Estados"]).Bind(ViewData["EstadoPredeterminado"]).GetHtml()
+						</td>
+						<td></td>
+					</tr>
+				</table>
+			</td>
+			<td style="width: 25%">
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr>
+						<td style="width: 10%;">
+							@Html.DevExpress().Label(settings =>
+							{
+								settings.Name = "WarehouseFLabel";
+								settings.Text = "Bodega:";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBoxFor(m => m.idWarehouse, settings =>
+							{
+								settings.Name = "idWarehouseF";
+								settings.Properties.ClientInstanceName = "idWarehouseF";
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.ValueField = "idWarehouseF";
+								settings.Properties.TextField = "descWarehouseF";
+								settings.Properties.ValueType = typeof(int);
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+								settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+								settings.Properties.EnableSynchronization = DefaultBoolean.False;
+								settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+								settings.Properties.NullDisplayText = "Todos";
+								settings.Properties.NullText = "Todos";
+							}).BindList(ViewData["_WarehouseFilter"]).Bind(null).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td style="width: 25%">
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr>
+						<td style="width: 10%;">
+							@Html.DevExpress().Label(settings =>
+							{
+								settings.Name = "PersonRequestFLabel";
+								settings.Text = "Persona Solicita:";
+							}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBoxFor(m => m.idPersonRequest, settings =>
+							{
+								settings.Name = "idPersonRequestF";
+								settings.Properties.ClientInstanceName = "idPersonRequestF";
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.ValueField = "idPersonRequestF";
+								settings.Properties.TextField = "descPersonRequestF";
+								settings.Properties.ValueType = typeof(int);
+								settings.Width = Unit.Percentage(100);
+								settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+								settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+								settings.Properties.EnableSynchronization = DefaultBoolean.False;
+								settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+								settings.Properties.NullDisplayText = "Todos";
+								settings.Properties.NullText = "Todos";
+							}).BindList(ViewData["_PersonRequestFilter"]).Bind(null).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td>
+				<table class="table table-condensed" style="border: 0px solid #ffffff;">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td>
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "btnSearch";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Buscar";
+								settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "btnSearch_click";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(settings =>
+							{
+								settings.Name = "Clear";
+								settings.UseSubmitBehavior = false;
+								settings.Text = "Limpiar";
+								settings.Images.Image.IconID = IconID.ActionsClear16x16;
+								settings.Width = Unit.Percentage(100);
+								settings.ClientSideEvents.Click = "btnClear_click";
+							}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="btn-group" style="width: 100%;">
+								<button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nueva</span><span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right">
+									<li><a href="javascript:;" onclick="AddNewRequestInventoryMoveManual();">Manual</a></li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+}

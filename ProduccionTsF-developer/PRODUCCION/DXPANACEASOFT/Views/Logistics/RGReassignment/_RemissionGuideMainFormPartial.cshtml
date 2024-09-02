@@ -1,0 +1,296 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuide
+
+@{
+    int id_remissionGuide = (Model != null) ? Model.id : 0;
+    int? id_RemisionGuideReassignment = (Model != null) ? Model.id_RemisionGuideReassignment : 0;
+    string codeDocumentState = (Model.Document != null) ? (Model.Document.DocumentState != null ? Model.Document.DocumentState.code : "") : "";
+    bool isOwn = (Model != null && Model.RemissionGuideTransportation != null) ? Model.RemissionGuideTransportation.isOwn : false;
+
+    string messageError = "";
+    if (ViewData["EditMessage"] != null)
+    {
+        messageError = (string)ViewData["EditMessage"];
+    }
+    if (ViewBag.ErrorPriceFreight != null)
+    {
+        messageError += " " + (string)ViewBag.ErrorPriceFreight;
+    }
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditRemissionGuide", name = "formEditRemissionGuide" }))
+{
+    if (messageError.Trim() != "")
+    {
+        @Html.Raw(messageError);
+    }
+
+    //@Html.Hidden("id_remissionGuide", id_remissionGuide)
+
+    @Html.Hidden("id_remissionGuide", id_remissionGuide, new { idremissionGuide = id_remissionGuide })
+
+
+    @Html.Hidden("codeDocumentState", codeDocumentState)
+    @Html.Hidden("id_RemisionGuideReassignment", id_RemisionGuideReassignment)
+    @Html.Hidden("isOwnTransport", (isOwn == true ? "SI" : "NO"))
+
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+    tabs.EnableClientSideAPI = true;
+
+    tabs.ClientSideEvents.Init = "TabControl_Init";
+    tabs.ClientSideEvents.ActiveTabChanged = "TabControl_ActiveTabChanged";
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var document = (Model != null && Model.Document != null) ? Model.Document : new Document();
+            Html.RenderPartial("DocumentTemplates/_DocumentFormEdit", document);
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabRemissionGuide";
+        tab.Text = "Guia de Remisión    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("RGReassignment/_PurchaseOrderMainFormTabRemissionGuide");
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabExport";
+        tab.Text = "Exportación   ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Model.RemissionGuideExportInformation = Model.RemissionGuideExportInformation ?? new RemissionGuideExportInformation();
+            Html.RenderPartial("RGReassignment/_Export", Model.RemissionGuideExportInformation);
+        });
+        tab.ClientVisible = Model.isExport;
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDetails";
+        tab.Text = "Materia Prima    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+        tab.SetContent(() =>
+        {
+            List<RemissionGuideDetail> details = (Model != null && Model.RemissionGuideDetail != null)
+                                                    ? Model.RemissionGuideDetail.Where(d => d.isActive).ToList()
+                                                    : new List<RemissionGuideDetail>();
+            if (codeDocumentState == "01")
+            {
+                Html.RenderPartial("RemissionGuideButtons/_RemissionGuideDetailsActionsButtons");
+                Html.RenderPartial("RGReassignment/_Details", details);
+            }
+            else
+            {
+                Html.RenderPartial("RGReassignment/_RemissionGuideDetailViewDetailsPartial", details);
+            }
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDispatchMaterials";
+        tab.Text = "Materiales de Despacho    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.ClientVisible = (Model != null && Model.RemissionGuideTransportation != null) ? !Model.RemissionGuideTransportation.isOwn : true;
+
+        tab.SetContent(() =>
+        {
+            List<RemissionGuideDispatchMaterial> dispatchMaterials = (Model != null && Model.RemissionGuideDispatchMaterial != null)
+                                                            ? Model.RemissionGuideDispatchMaterial.Where(d => d.isActive ).ToList()
+                                                            : new List<RemissionGuideDispatchMaterial>();
+
+            //if (codeDocumentState == "01")
+            //{
+            //    Html.RenderPartial("RemissionGuideButtons/_RemissionGuideDispatchMaterialsActionsButtons");
+            //    Html.RenderPartial("RemissionGuideButtons/_RemissionGuideDispatchMaterialsPrintIceReport");
+            //    Html.RenderPartial("RGReassignment/_DispatchMaterials", dispatchMaterials);
+            //}
+            //else
+            //{
+            Html.RenderPartial("RemissionGuideButtons/_RemissionGuideDispatchMaterialsPrintIceReport");
+            Html.RenderPartial("RGReassignment/_RemissionGuideDetailViewDispatchMaterialsPartial", dispatchMaterials);
+
+            var receptionDispatchMaterials = (Model != null && Model.ReceptionDispatchMaterials != null)
+                             ? Model.ReceptionDispatchMaterials.FirstOrDefault(p => p.Document.DocumentState.code != "05") : null; ///05 ANULADA
+            ViewData["CodeReceptionDispatchMaterials"] = receptionDispatchMaterials != null ? (receptionDispatchMaterials.Document.DocumentState.code == "01" ? "01" : "03") : "05"; //"01" Pendientes, "03" Aprobado, "05" Anulada
+
+            var receptionDispatchMaterialsDetail = (receptionDispatchMaterials != null && receptionDispatchMaterials.ReceptionDispatchMaterialsDetail != null)
+                                                    ? receptionDispatchMaterials.ReceptionDispatchMaterialsDetail.OrderBy(od => od.id).ToList() : new List<ReceptionDispatchMaterialsDetail>();
+            if ((string)ViewData["CodeReceptionDispatchMaterials"] == "03")
+            {
+                Html.RenderPartial("RGReassignment/_ReceptionDispatchMaterialsViewsDetailPartial", receptionDispatchMaterialsDetail);
+            }
+        //}
+        });
+
+});
+        tabs.TabPages.Add(tab =>
+        {
+            tab.Name = "tabTransportation";
+            tab.Text = "Transporte   ";
+            tab.TabStyle.Width = Unit.Percentage(100);
+
+            tab.TabImage.Width = Unit.Pixel(16);
+            tab.TabImage.Height = Unit.Pixel(16);
+            tab.TabImage.Align = ImageAlign.Right;
+            tab.TabImage.Url = "/Content/image/noimage.png";
+            tab.ActiveTabImage.Align = ImageAlign.Right;
+            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+            tab.SetContent(() =>
+            {
+                RemissionGuideTransportation transportation = (Model != null && Model.RemissionGuideTransportation != null) ? Model.RemissionGuideTransportation : new RemissionGuideTransportation();
+
+                transportation.RemissionGuide = Model ?? new RemissionGuide();
+
+                bool manualItis= false;
+                if (Model.isManual != null)
+                {
+                    manualItis = (bool)Model.isManual;
+                }
+
+                if (manualItis)
+                {
+                    transportation.isOwn = false;
+                }
+                //transportation.isOwn = manualItis ? false : true;
+                Html.RenderPartial("RGReassignment/_Transportation", transportation);
+            });
+        });
+
+
+        tabs.TabPages.Add(tab =>
+        {
+            tab.Name = "tabReassignment";
+            tab.Text = "Información de Reasignación    ";
+            tab.TabStyle.Width = Unit.Percentage(100);
+
+            tab.TabImage.Width = Unit.Pixel(16);
+            tab.TabImage.Height = Unit.Pixel(16);
+            tab.TabImage.Align = ImageAlign.Right;
+            tab.TabImage.Url = "/Content/image/noimage.png";
+            tab.ActiveTabImage.Align = ImageAlign.Right;
+            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+            tab.SetContent(() =>
+            {
+
+                Html.RenderPartial("RGReassignment/_PurchaseOrderMainFormTabRemissionGuideReassignment");
+
+            });
+        });
+
+    }).GetHtml()
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ClientVisible = IsEnabled(11);
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                        button.ClientEnabled = codeDocumentState == "01"; //Pendiente
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/rgreassignment/editform.js"></script>
+
+@functions{
+
+    bool IsEnabled(int id_permission)
+    {
+        int id_user = (int)ViewData["id_user"];
+        int id_menu = (int)ViewData["id_menu"];
+
+        User user = DataProviderUser.UserById(id_user);
+
+        if (user == null)
+            return false;
+
+        UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+        if (userMenu == null)
+            return false;
+
+        Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+        return (permission != null);
+    }
+
+}

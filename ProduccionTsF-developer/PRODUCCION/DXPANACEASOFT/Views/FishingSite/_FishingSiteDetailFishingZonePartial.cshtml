@@ -1,0 +1,64 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.FishingZone>
+
+@{
+    var grid = Html.DevExpress().GridView<FishingZone>(settings =>
+    {
+        settings.Name = "gvFishingSiteDetail";
+        settings.SettingsDetail.MasterGridName = "gvFishingSite";
+        settings.CallbackRouteValues = new { Controller = "FishingSite", Action = "FishingSiteDetailFishingZonePartial" };
+
+        settings.ClientSideEvents.BeginCallback = "GridViewFishingSiteFishingZoneDetails_BeginCallback";
+
+        settings.KeyFieldName = "id";
+        settings.Width = Unit.Percentage(100);
+
+        #region  Panel para titulo
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Categorias</span>");
+        });
+        #endregion
+
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+        #region ADD COLUMN
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(m => m.name , column =>
+        {
+            //column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+
+        settings.Columns.Add(m => m.isActive, column =>
+        {
+            //column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+
+    });
+    #endregion
+}
+
+@grid.Bind(Model).GetHtml()

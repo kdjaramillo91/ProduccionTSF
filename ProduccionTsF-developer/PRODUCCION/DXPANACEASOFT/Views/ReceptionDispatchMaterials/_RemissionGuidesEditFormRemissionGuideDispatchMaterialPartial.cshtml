@@ -1,0 +1,670 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using System.Drawing
+
+@model List<DXPANACEASOFT.Models.RemissionGuideDispatchMaterial>
+
+@{
+    var grid = Html.DevExpress().GridView<RemissionGuideDispatchMaterial>(settings =>
+    {
+        settings.Name = "gvRemissionGuideDispatchMaterialEditForm";
+        settings.CallbackRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "RemissionGuideDispatchMaterialEditFormPartial" };
+
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "RemissionGuideDispatchMaterialEditFormUpdate" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<RemissionGuideDispatchMaterial> rows = (Model as List<RemissionGuideDispatchMaterial>);
+            rows = (rows != null) ? rows.ToList() : new List<RemissionGuideDispatchMaterial>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+
+            Item itemAux = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "Item") != null) ? (Item)gv.GetRowValues(gv.EditingRowVisibleIndex, "Item") : null;
+
+            e.Properties["cpEditingRowItemDetailIsConsumed"] = itemAux == null ? false : itemAux.isConsumed;
+
+        };
+
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+        settings.SettingsPager.PageSize = 15;
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 250;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.Styles.Header.Font.Bold = true;
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+        //Pie de tabla
+
+        #region ColumnsAdd
+
+        //id_warehouseRemissionGuideDispatchMaterial 8
+        settings.Columns.Add(m => m.id_warehouse, column =>
+        {
+            column.FieldName = "id_warehouse";
+            column.Name = "id_warehouseRemissionGuideDispatchMaterial";
+            column.Caption = "Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+
+                Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+                string text = (warehouse != null) ? warehouse.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+
+                Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+                string text = (warehouse != null) ? warehouse.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        //id_warehouselocationRemissionGuideDispatchMaterial 8
+        settings.Columns.Add(m => m.id_warehouselocation, column =>
+        {
+            column.FieldName = "id_warehouselocation";
+            column.Name = "id_warehouselocationRemissionGuideDispatchMaterial";
+            column.Caption = "Ubicación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_warehouselocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouselocation");
+
+                WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouselocation);
+
+                string text = (warehouseLocation != null) ? warehouseLocation.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_warehouselocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouselocation");
+
+                WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouselocation);
+
+                string text = (warehouseLocation != null) ? warehouseLocation.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        //itemRemissionGuideDispatchMaterialMasterCode 8
+        settings.Columns.Add(m => m.Item.masterCode, column =>
+        {
+            column.Name = "itemRemissionGuideDispatchMaterialMasterCode";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(8);
+            column.SetEditItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string masterCode = (item != null) ? item.masterCode : "";
+                ViewContext.Writer.Write(masterCode);
+
+            });
+        });
+
+        //itemRemissionGuideDispatchMaterialName 13
+        settings.Columns.Add(m => m.Item.name, column =>
+        {
+            column.Name = "itemRemissionGuideDispatchMaterialName";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(13);
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string name = (item != null) ? item.name : "";
+                ViewContext.Writer.Write(name);
+
+            });
+        });
+
+        //itemRemissionGuideDispatchMaterialMetricUnit  4
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "id_metricUnit";
+            column.Name = "itemRemissionGuideDispatchMaterialMetricUnit";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(4);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+                ViewContext.Writer.Write(metricUnit);
+
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+                ViewContext.Writer.Write(metricUnit);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "sourceExitQuantity";
+            column.Name = "sourceExitQuantityRemissionGuideDispatchMaterial";
+            column.Caption = "Salida Origen";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sourceExitQuantity = (decimal)DataBinder.Eval(c.DataItem, "sourceExitQuantity");
+                ViewContext.Writer.Write(sourceExitQuantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "sourceExitQuantityRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+
+        });
+
+        //sendedDestinationQuantityRemissionGuideDispatchMaterial 7
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "sendedDestinationQuantity";
+            column.Name = "sendedDestinationQuantityRemissionGuideDispatchMaterial";
+            column.Caption = "Cnt. Enviada";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity");
+                ViewContext.Writer.Write(sendedDestinationQuantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "sendedDestinationQuantityRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+        });
+
+        //sendedAdjustmentQuantityRemissionGuideDispatchMaterial
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "sendedAdjustmentQuantity";
+            column.Name = "sendedAdjustmentQuantityRemissionGuideDispatchMaterial";
+            column.Caption = "Ajuste Enviado (+/-)";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(6);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+                ViewContext.Writer.Write(sendedAdjustmentQuantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "sendedAdjustmentQuantityRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.ClientSideEvents.ValueChanged = "SendedAdjustmentQuantity_ValueChanged";
+                p.ClientSideEvents.Validation = "OnsendedAdjustmentQuantityValidation";
+            });
+        });
+
+
+        //sendedNetQuantity
+        settings.Columns.Add(column =>
+        {
+            column.Name = "sendedNetQuantityRemissionGuideDispatchMaterial";
+            column.Caption = "Neto Enviado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(7);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.CellStyle.BackColor = Color.LightGray;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity"); //cantidad enviada
+                decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+
+                decimal sendedNetQuantity = sendedDestinationQuantity + sendedAdjustmentQuantity;
+                ViewContext.Writer.Write(sendedNetQuantity.ToString("N2"));
+
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+
+                decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity"); //cantidad enviada
+                decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+                decimal sendedNetQuantity = sendedDestinationQuantity + sendedAdjustmentQuantity;
+
+                Html.DevExpress().SpinEdit(p =>
+                {
+                    p.Name = "sendedNetQuantityRemissionGuideDispatchMaterial";
+                    p.Properties.ClientInstanceName = "sendedNetQuantityRemissionGuideDispatchMaterial";
+
+                    p.Width = Unit.Percentage(100);
+                    p.Properties.DisplayFormatString = "N2";
+                    p.Properties.DisplayFormatInEditMode = true;
+                    p.Properties.DecimalPlaces = 2;
+                    p.Properties.MinValue = 0;
+                    p.Properties.NumberType = SpinEditNumberType.Float;
+                    p.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                    p.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                    p.ReadOnly = true;
+                    p.ShowModelErrors = false;
+                }).Bind(sendedNetQuantity).Render();
+
+            });
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "sendedNetQuantityRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                //p.ClientSideEvents.ValueChanged = "OnSendedNetQuantity_ValueChanged";
+                p.ClientSideEvents.Validation = "OnsendedNetQuantityValidation";
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "amountConsumed";
+            column.Name = "amountConsumedRemissionGuideDispatchMaterial";
+            column.Caption = "Cnt. Consumida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(6);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal amountConsumed = (decimal)DataBinder.Eval(c.DataItem, "amountConsumed");
+                ViewContext.Writer.Write(amountConsumed.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                //p.Width = Unit.Percentage(127);
+                p.ClientInstanceName = "amountConsumedRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.ClientSideEvents.Init = "AmountConsumed_Init";
+                p.ClientSideEvents.ValueChanged = "AmountConsumed_ValueChanged";
+                p.ClientSideEvents.Validation = "OnAmountConsumedValidation";
+            });
+        });
+
+
+        //stealQuantityRemissionGuideDispatchMaterial
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "stealQuantity";
+            column.Name = "stealQuantityRemissionGuideDispatchMaterial";
+            column.Caption = "Cnt. Robo";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal stealQuantity = (decimal)DataBinder.Eval(c.DataItem, "stealQuantity");
+                ViewContext.Writer.Write(stealQuantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "stealQuantityRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.ClientSideEvents.ValueChanged = "StealQuantity_ValueChanged";
+                p.ClientSideEvents.Validation = "OnstealQuantityValidation";
+            });
+        });
+
+        //arrivalDestinationQuantityRemissionGuideDispatchMaterial 7
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalDestinationQuantity";
+            column.Name = "arrivalDestinationQuantityRemissionGuideDispatchMaterial";
+            column.Caption = "Cnt. Recibida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(6);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+                ViewContext.Writer.Write(arrivalDestinationQuantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "arrivalDestinationQuantityRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.ClientSideEvents.ValueChanged = "ArrivalDestinationQuantity_ValueChanged";
+                p.ClientSideEvents.Validation = "OnArrivalDestinationQuantityValidation";
+
+            });
+        });
+
+        //arrivalBadConditionRemissionGuideDispatchMaterial 7
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalBadCondition";
+            column.Name = "arrivalBadConditionRemissionGuideDispatchMaterial";
+            column.Caption = "Mal Estado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalBadCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalBadCondition");
+                ViewContext.Writer.Write(arrivalBadCondition.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "arrivalBadConditionRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.ClientSideEvents.ValueChanged = "UpdateArrivalGoodConditionRemissionGuideDispatchMaterial";
+                p.ClientSideEvents.Validation = "OnArrivalBadConditionValidation";
+            });
+        });
+
+        //arrivalGoodConditionRemissionGuideDispatchMaterial 7
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalGoodCondition";
+            column.Name = "arrivalGoodConditionRemissionGuideDispatchMaterial";
+            column.Caption = "Buen Estado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalGoodCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalGoodCondition");
+                ViewContext.Writer.Write(arrivalGoodCondition.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                //p.Width = Unit.Percentage(127);
+                p.ClientInstanceName = "arrivalGoodConditionRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.ClientSideEvents.Validation = "OnArrivalGoodConditionValidation";
+            });
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "transferQuantity";
+            column.Name = "transferQuantityRemissionGuideDispatchMaterial";
+            column.Caption = "Cnt. Transferencia (+/-)";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+            column.ReadOnly = false;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal transferQuantity = (decimal)DataBinder.Eval(c.DataItem, "transferQuantity");
+                ViewContext.Writer.Write(transferQuantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                //p.Width = Unit.Percentage(127);
+                p.ClientInstanceName = "transferQuantityRemissionGuideDispatchMaterial";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.ClientSideEvents.ValueChanged = "TransferQuantity_ValueChanged";
+                p.ClientSideEvents.Validation = "OntransferQuantityValidation";
+            });
+        });
+
+        //notReceivedQuantity 7
+        settings.Columns.Add(column =>
+        {
+            column.Name = "notReceivedQuantity";
+            column.Caption = "Diferencia";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(7);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity"); //cantidad enviada
+                decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+                decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+                decimal amountConsumed = (decimal)DataBinder.Eval(c.DataItem, "amountConsumed");
+                decimal stealQuantity = (decimal)DataBinder.Eval(c.DataItem, "stealQuantity");
+                decimal transferQuantity = (decimal)DataBinder.Eval(c.DataItem, "transferQuantity");
+                decimal sendedNetQuantity = sendedDestinationQuantity + sendedAdjustmentQuantity;
+                decimal notReceivedQuantity = sendedNetQuantity - amountConsumed - arrivalDestinationQuantity - stealQuantity - transferQuantity;
+                ViewContext.Writer.Write(notReceivedQuantity.ToString("N2"));
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+
+                decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity"); //cantidad enviada
+                decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+                decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+                decimal amountConsumed = (decimal)DataBinder.Eval(c.DataItem, "amountConsumed");
+                decimal stealQuantity = (decimal)DataBinder.Eval(c.DataItem, "stealQuantity");
+                decimal transferQuantity = (decimal)DataBinder.Eval(c.DataItem, "transferQuantity");
+                decimal sendedNetQuantity = sendedDestinationQuantity + sendedAdjustmentQuantity;
+                decimal notReceivedQuantity = sendedNetQuantity - amountConsumed - arrivalDestinationQuantity - stealQuantity - transferQuantity;
+
+                Html.DevExpress().SpinEdit(p =>
+                {
+                    p.Name = "notReceivedQuantity";
+                    p.Properties.ClientInstanceName = "notReceivedQuantity";
+
+                    p.Width = Unit.Percentage(100);
+                    p.Properties.DisplayFormatString = "N2";
+                    p.Properties.DisplayFormatInEditMode = true;
+                    p.Properties.DecimalPlaces = 2;
+                    p.Properties.MinValue = 0;
+                    p.Properties.NumberType = SpinEditNumberType.Float;
+                    p.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                    p.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                    p.ReadOnly = true;
+                    p.ShowModelErrors = false;
+                }).Bind(notReceivedQuantity).Render();
+            });
+
+        });
+
+        //Botones de comandos para registros de la tabla
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 17,
+            Caption = "Acciones"
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.Width = Unit.Percentage(10);
+
+        settings.Columns.Add(commandColumn);
+
+        settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

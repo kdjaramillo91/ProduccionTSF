@@ -1,0 +1,16 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxUserDispatcher";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxUserDispatcher",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}).BindList(ViewData["CmbBoxUserDispatcher"]).GetHtml()

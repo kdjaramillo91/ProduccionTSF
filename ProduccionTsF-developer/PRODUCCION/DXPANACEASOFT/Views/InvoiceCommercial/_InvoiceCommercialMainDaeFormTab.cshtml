@@ -1,0 +1,173 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InvoiceCommercial
+
+@{ 
+
+    //int id_invoiceCommercial = (Model != null) ? Model.id : 0;
+    DocumentState documentState = (Model != null && Model.Document != null && Model.Document.id_documentState != 0) ? DataProviderDocumentState.DocumentStateById(Model.Document.id_documentState) : DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+
+}
+
+<table style="width:350px; margin-left:24px">
+   <tr>
+       <td>
+           
+
+           @Html.DevExpress().Label(settings =>
+          {
+              settings.Text = "DAE: ";
+              settings.AssociatedControlName = "daeNumber";
+          }).GetHtml()
+       </td>
+       <td style="padding-left:105px !important;padding-right:5px !important;">
+           @Html.DevExpress().TextBoxFor(m => m.daeNumber, settings =>
+      {
+          settings.Name = "daeNumber";
+          settings.Properties.ClientInstanceName = "daeNumber";
+          settings.Width = Unit.Pixel(50);
+          settings.Properties.MaxLength = 3;
+          settings.Properties.ClientSideEvents.KeyPress = "OnValueChanged";
+          settings.CustomJSProperties = (s, e) =>
+          {
+              e.Properties["cpMaxLength"] = "3";
+              e.Properties["cpNextControl"] = "daeNumber2";
+
+          };
+
+
+          settings.ReadOnly = Model.daeNumber_CSI.isReadOnly;
+          if (Model.daeNumber_CSI.isRequired)
+          {
+              settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+              settings.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+          }
+
+          settings.Properties.ValidationSettings.CausesValidation = true;
+          settings.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+          settings.Properties.ValidationSettings.ValidateOnLeave = true;
+          settings.Properties.ValidationSettings.SetFocusOnError = true;
+          settings.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+          
+
+      }).GetHtml()
+       </td>
+       <td style="padding-right:5px !important">
+           @Html.DevExpress().TextBoxFor(m => m.daeNumber2, settings =>
+      {
+          settings.Name = "daeNumber2";
+          settings.Properties.ClientInstanceName = "daeNumber2";
+          settings.Width = Unit.Pixel(50);
+          settings.Properties.MaxLength = 4;
+          settings.Properties.ClientSideEvents.KeyPress = "OnValueChanged";
+          settings.CustomJSProperties = (s, e) =>
+          {
+              e.Properties["cpMaxLength"] = "4";
+              e.Properties["cpNextControl"] = "daeNumber3";
+
+          };
+
+
+          settings.ReadOnly = Model.daeNumber2_CSI.isReadOnly;
+          if (Model.daeNumber2_CSI.isRequired)
+          {
+              settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+              settings.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+          }
+
+          settings.Properties.ValidationSettings.CausesValidation = true;
+          settings.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+          settings.Properties.ValidationSettings.ValidateOnLeave = true;
+          settings.Properties.ValidationSettings.SetFocusOnError = true;
+          settings.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+
+      }).GetHtml()
+       </td>
+       <td style="padding-right:5px !important">
+           @Html.DevExpress().TextBoxFor(m => m.daeNumber3, settings =>
+      {
+          settings.Name = "daeNumber3";
+          settings.Properties.ClientInstanceName = "daeNumber3";
+          settings.Width = Unit.Pixel(50);
+          settings.Properties.MaxLength = 2;
+          settings.Properties.ClientSideEvents.KeyPress = "OnValueChanged";
+          settings.CustomJSProperties = (s, e) =>
+          {
+              e.Properties["cpMaxLength"] = "2";
+              e.Properties["cpNextControl"] = "daeNumber4";
+
+          };
+
+
+          settings.ReadOnly = Model.daeNumber3_CSI.isReadOnly;
+          if (Model.daeNumber3_CSI.isRequired)
+          {
+              settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+              settings.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+          }
+
+          settings.Properties.ValidationSettings.CausesValidation = true;
+          settings.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+          settings.Properties.ValidationSettings.ValidateOnLeave = true;
+          settings.Properties.ValidationSettings.SetFocusOnError = true;
+          settings.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+
+      }).GetHtml()
+       </td>
+       <td style="padding-right:5px !important">
+           @Html.DevExpress().TextBoxFor(m => m.daeNumber4, settings =>
+      {
+          settings.Name = "daeNumber4";
+          settings.Properties.ClientInstanceName = "daeNumber4";
+          settings.Width = Unit.Pixel(100);
+          settings.Properties.MaxLength = 8;
+          
+
+          settings.ReadOnly = Model.daeNumber4_CSI.isReadOnly;
+          if (Model.daeNumber4_CSI.isRequired)
+          {
+              settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+              settings.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+          }
+
+          settings.Properties.ValidationSettings.CausesValidation = true;
+          settings.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+          settings.Properties.ValidationSettings.ValidateOnLeave = true;
+          settings.Properties.ValidationSettings.SetFocusOnError = true;
+          settings.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+
+      }).GetHtml()
+       </td>
+
+   </tr>
+    <tr>
+        <td colspan="5"></td>
+    </tr>
+    <tr>
+		<td>Contenedores:</td>
+		<td colspan="4" style="padding-left:105px !important;padding-right:5px !important;">
+			@Html.DevExpress().MemoFor(m =>
+				m.containers,
+				settings =>
+				{
+					settings.Name = "containers";
+					settings.Properties.ClientInstanceName = "containers";
+					settings.Width = Unit.Percentage(100);
+					settings.ReadOnly = Model.containers_CSI.isReadOnly;
+
+					if (Model.containers_CSI.isRequired)
+					{
+						settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+						settings.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+					}
+				}).GetHtml()
+		</td>
+
+	</tr>
+</table>
+  

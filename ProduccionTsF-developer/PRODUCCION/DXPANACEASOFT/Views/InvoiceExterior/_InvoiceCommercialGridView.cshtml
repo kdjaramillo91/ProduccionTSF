@@ -1,0 +1,106 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+	var grid = Html.DevExpress().GridView<InvoiceCommercial>(settings =>
+	{
+		settings.Name = "gvInvoiceCommercial";
+		settings.CallbackRouteValues = new { Controller = "InvoiceExterior", Action = "InvoiceCommercialList" };
+		settings.ClientSideEvents.BeginCallback = "gvInvoiceCommercialBeginCallback";
+		settings.Width = Unit.Percentage(100);
+
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+		settings.Settings.ShowFooter = true;
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Facturas Comerciales</span>");
+		});
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Columns.Add(m => m.Document.number, column =>
+		{
+			column.Name = "number";
+			column.Caption = "Número";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		// Numero de referencia
+		settings.Columns.Add(m => m.referenceInvoice, column =>
+		{
+			column.Name = "referenceInvoice";
+			column.Caption = "Referencia";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//emissionDate 15
+		settings.Columns.Add(m => m.Document.emissionDate, column =>
+		{
+			column.Name = "emissionDate";
+			column.Caption = "Fecha de Emisión";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+		});
+
+		settings.Columns.Add(m => m.Document.Document2.number, column =>
+		{
+			column.Name = "proforma";
+			column.Caption = "Proforma";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.PropertiesEdit.NullDisplayText = "0";
+		});
+
+		//id_ForeignCustomer 15
+		settings.Columns.Add(m => m.ForeignCustomer.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_ForeignCustomer";
+			column.Caption = "Cliente";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//id_Consignee 15
+		settings.Columns.Add(m => m.ForeignCustomer1.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_Consignee";
+			column.Caption = "Consignatario";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//id_Notifier 15
+		settings.Columns.Add(m => m.ForeignCustomer2.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_Notifier";
+			column.Caption = "Notificador";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//documentState 15
+		settings.Columns.Add(m => m.Document.DocumentState.name, column =>
+		{
+			column.Name = "documentState";
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		});
+	}
+);
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+
+}@grid.Bind(Model).GetHtml()

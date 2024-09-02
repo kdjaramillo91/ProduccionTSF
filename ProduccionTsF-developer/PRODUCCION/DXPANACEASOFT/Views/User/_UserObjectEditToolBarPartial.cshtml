@@ -1,0 +1,72 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnNewObjectUser";
+	//settings.Width = 90;
+	settings.Text = "";
+	settings.ToolTip = "Adicionar Elemento";
+	settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+	settings.ClientEnabled = true;
+	settings.ClientVisible = true;
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	settings.ClientSideEvents.Click = "AddNewUserObject";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnRemoveObjectUser";
+	//settings.Width = 90;
+	settings.Text = "";
+	settings.ToolTip = "Eliminar Elemento(s)";
+	settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsRemoveitem16x16office2013;
+	settings.ClientEnabled = true;
+	settings.ClientVisible = true;
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	//settings.ClientSideEvents.Click = "EliminarObjeto";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+	settings.Name = "btnRefresh";
+	//settings.Width = 90;
+	settings.Text = "";
+	settings.ToolTip = "Refrescar";
+	settings.RenderMode = ButtonRenderMode.Link;
+	settings.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+	settings.ClientEnabled = true;
+	settings.ClientVisible = true;
+	settings.UseSubmitBehavior = false;
+	settings.EnableClientSideAPI = true;
+	//settings.ClientSideEvents.Click = "RefreshGrid";
+
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@functions{
+
+	bool IsEnabeled(int id_permission)
+	{
+		int id_user = (int)ViewData["id_user"];
+		int id_menu = (int)ViewData["id_menu"];
+
+		User user = DataProviderUser.UserById(id_user);
+
+		if (user == null)
+			return false;
+
+		UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+		if (userMenu == null)
+			return false;
+
+		Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+		return (permission != null);
+	}
+}

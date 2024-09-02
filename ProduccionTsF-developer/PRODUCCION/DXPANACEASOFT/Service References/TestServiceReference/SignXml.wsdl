@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://singxml/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="SignXml" targetNamespace="http://singxml/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://singxml/">
+      <xsd:element name="sign" type="tns:sign" />
+      <xsd:complexType name="sign">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="_xmlPath" type="xsd:string" />
+          <xsd:element minOccurs="0" name="_xmlFileIn" type="xsd:string" />
+          <xsd:element minOccurs="0" name="_outPutPath" type="xsd:string" />
+          <xsd:element minOccurs="0" name="_pathSignature" type="xsd:string" />
+          <xsd:element minOccurs="0" name="_passSignature" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="signResponse" type="tns:signResponse" />
+      <xsd:complexType name="signResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="return" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="signResponse">
+    <wsdl:part name="parameters" element="tns:signResponse" />
+  </wsdl:message>
+  <wsdl:message name="sign">
+    <wsdl:part name="parameters" element="tns:sign" />
+  </wsdl:message>
+  <wsdl:portType name="SignXmlPortType">
+    <wsdl:operation name="sign">
+      <wsdl:input name="sign" message="tns:sign" />
+      <wsdl:output name="signResponse" message="tns:signResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SignXmlSoapBinding" type="tns:SignXmlPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="sign">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="sign">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="signResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SignXml">
+    <wsdl:port name="SignXmlPort" binding="tns:SignXmlSoapBinding">
+      <soap:address location="http://localhost:9000/SignXml" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

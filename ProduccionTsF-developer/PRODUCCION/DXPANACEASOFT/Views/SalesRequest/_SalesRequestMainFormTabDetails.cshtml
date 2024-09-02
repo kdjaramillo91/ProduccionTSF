@@ -1,0 +1,143 @@
+﻿@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.SalesRequest
+
+@{
+    string codeState = (Model != null) ? Model.Document.DocumentState.code : "";
+}
+<div id="GridMessageErrorSalesRequest" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorSalesRequest";
+           settings.Properties.ClientInstanceName = "gridMessageErrorSalesRequest";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td colspan="6">
+            @{
+                var details = (Model != null && Model.SalesRequestDetail != null) ? Model.SalesRequestDetail.Where(d => d.isActive).OrderByDescending(obd=> obd.id).ToList() : new List<SalesRequestDetail>();
+                if (codeState == "01")
+                {
+                    ViewData["OnlyRead"] = false;
+                    Html.RenderPartial("DocumentTemplates/_DocumentDetailsActionsButtons");
+                    Html.RenderPartial("_SalesRequestEditFormDetailPartial", details);
+                }
+                else
+                {
+                    ViewData["OnlyRead"] = true;
+                    Html.RenderPartial("_SalesRequestEditFormDetailPartial", details);
+                }
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Totales</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Subtotal:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.SalesRequestTotal.subtotal, settings =>
+            {
+                settings.Name = "requestSubtotal";
+                settings.Properties.ClientInstanceName = "requestSubtotal";
+                settings.Properties.DisplayFormatString = "C2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Base Imponible IVA 12%:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.SalesRequestTotal.subtotalIVA12Percent, settings =>
+            {
+                settings.Name = "requestSubtotalIVA12Percent";
+                settings.Properties.ClientInstanceName = "requestSubtotalIVA12Percent";
+                settings.Properties.DisplayFormatString = "C2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">IVA 12%:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.SalesRequestTotal.totalIVA12, settings =>
+            {
+                settings.Name = "requestTotalIVA12";
+                settings.Properties.ClientInstanceName = "requestTotalIVA12";
+                settings.Properties.DisplayFormatString = "C2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Descuento:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.SalesRequestTotal.discount, settings =>
+            {
+                settings.Name = "requestDiscount";
+                settings.Properties.ClientInstanceName = "requestDiscount";
+                settings.Properties.DisplayFormatString = "C2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Base Imponible IVA 14%:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.SalesRequestTotal.subtotalIVA14Percent, settings =>
+            {
+                settings.Name = "requestSubtotalIVA14Percent";
+                settings.Properties.ClientInstanceName = "requestSubtotalIVA14Percent";
+                settings.Properties.DisplayFormatString = "C2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">IVA 14%:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.SalesRequestTotal.totalIVA14, settings =>
+            {
+                settings.Name = "requestTotalIVA14";
+                settings.Properties.ClientInstanceName = "requestTotalIVA14";
+                settings.Properties.DisplayFormatString = "C2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Total:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.SalesRequestTotal.total, settings =>
+            {
+                settings.Name = "requestTotal";
+                settings.Properties.ClientInstanceName = "requestTotal";
+                settings.Properties.DisplayFormatString = "C2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

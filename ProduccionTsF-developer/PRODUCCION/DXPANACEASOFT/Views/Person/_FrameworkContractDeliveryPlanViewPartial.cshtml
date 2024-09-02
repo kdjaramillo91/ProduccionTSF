@@ -1,0 +1,134 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.FrameworkContractDeliveryPlan>
+@*@{
+    var metricUnitUMTPAux = DataProviderSetting.ValueSetting("UMTP");
+    var id_metricUnitUMTPValueAux = int.Parse(metricUnitUMTPAux != null ? metricUnitUMTPAux : "0");
+    var metricUnitUMTP = DataProviderMetricUnit.MetricUnitById(id_metricUnitUMTPValueAux);
+}*@
+@*@Html.Hidden("id_qualityControl_Detail", ViewData["id_qualityControl"])*@
+
+@{
+    var grid = Html.DevExpress().GridView<FrameworkContractDeliveryPlan>(settings =>
+    {
+        settings.Name = "PersonFrameworkContractDeliveryPlansView";//+ ViewData["id_qualityControl"];
+
+
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "PersonFrameworkContractDeliveryPlansViewPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "FrameworkContractDeliveryPlanView_OnBeginCallback";
+
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        //settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdFrameworkContractItem"] = 0;
+                e.Properties["cpIdFrameworkContract"] = 0;
+            }
+            else
+            {
+                e.Properties["cpIdFrameworkContractItem"] = ViewData["id_frameworkContractItem"];
+                e.Properties["cpIdFrameworkContract"] = ViewData["id_frameworkContract"];
+            }
+
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        //deliveryPlanDate
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "deliveryPlanDate";
+            column.Name = "deliveryPlanDate";
+            column.Width = Unit.Percentage(10);
+            column.Caption = "Día Planificado";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                DateTime? deliveryPlanDate = (DateTime?)DataBinder.Eval(c.DataItem, "deliveryPlanDate");
+
+                ViewContext.Writer.Write(deliveryPlanDate == null ? "" : deliveryPlanDate.Value.ToString("dd/MM/yyyy"));
+            });
+        });
+
+        //amout
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "amout";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? amout = (decimal?)DataBinder.Eval(c.DataItem, "amout");
+                ViewContext.Writer.Write(amout == null ? "" : amout.Value.ToString("N2"));
+            });
+
+        });
+
+        //metricUnitDeliveryPlan
+        settings.Columns.Add(column =>
+        {
+            column.Name = "metricUnitDeliveryPlan";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "metricUnitDeliveryPlan";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                FrameworkContractDeliveryPlan detail = (FrameworkContractDeliveryPlan)Model[c.ItemIndex];
+
+                //string metricUnitPurchase = (detail != null && detail.Item != null && detail.Item.ItemPurchaseInformation != null && detail.Item.ItemPurchaseInformation.MetricUnit != null) ? detail.Item.ItemPurchaseInformation.MetricUnit.code : "";
+                //string metricUnitSale = (detail != null && detail.Item != null && detail.Item.ItemSaleInformation != null && detail.Item.ItemSaleInformation.MetricUnit != null) ? detail.Item.ItemSaleInformation.MetricUnit.code : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                ////15: Oportunidad de Venta y 16: Oportunidad de Compra
+                //string metricUnit = (codeBusinessOportunityDocumentType == "15") ? metricUnitSale : ((codeBusinessOportunityDocumentType == "16") ? metricUnitPurchase : "");
+                //ViewContext.Writer.Write(metricUnit);
+                string text = detail != null && detail.FrameworkContractItem != null ? detail.FrameworkContractItem.MetricUnit.code : "";
+                ViewContext.Writer.Write(text);//metricUnitUMTP != null ? metricUnitUMTP.code : ""/*"Lbs"*/);
+
+            });
+
+        });
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

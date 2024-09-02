@@ -1,0 +1,60 @@
+﻿@model LiquidationCartOnCartDetail
+
+@{
+	var name = String.Concat("ItemWarehouse", this.Model.id);
+
+	var itemsWarehouseModel = new Item[] { };
+	var itemIndex = -1;
+
+	if (this.Model.id_ItemToWarehouse > 0)
+	{
+		var itemWarehouse = DataProviderItem.Item(this.Model.id_ItemToWarehouse);
+
+		if (itemWarehouse != null)
+		{
+			itemsWarehouseModel = new[] { itemWarehouse };
+			itemIndex = 0;
+		}
+	}
+}
+
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = name;
+		settings.ReadOnly = true;
+		settings.SelectedIndex = itemIndex;
+
+		var p = settings.Properties;
+		p.ClientInstanceName = name;
+		p.ValueField = "id";
+
+		p.ValueType = typeof(int);
+		p.TextFormatString = "{0},{1}";
+		p.CallbackPageSize = 30;
+		p.DropDownStyle = DropDownStyle.DropDownList;
+		p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		p.IncrementalFilteringDelay = 250;
+
+		p.Columns.Add("masterCode", "Código Auxiliar", Unit.Percentage(200));
+		p.Columns.Add("name", "Nombre del Producto", Unit.Percentage(800));
+
+		p.ClientSideEvents.Init = "ItemWarehouseCombo_OnInit";
+		p.ClientSideEvents.BeginCallback = "OnItemWarehouseDetailBeginCallback";
+		p.ClientSideEvents.EndCallback = "OnItemWarehouseDetailEndCallback";
+		p.ClientSideEvents.SelectedIndexChanged = "DetailsItemsWarehouseCombo_SelectedIndexChanged";
+		p.ClientSideEvents.Validation = "OnItemLiquidationCartOnCartWarehouseDetailValidation";
+		settings.CallbackRouteValues = new { Controller = "LiquidationCartOnCart", Action = "GetItemsWarehouse" };
+
+		p.ValidationSettings.RequiredField.IsRequired = true;
+		p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+		settings.Width = Unit.Percentage(106);
+
+		settings.ItemTextCellPrepared = (sender, e) =>
+		{
+			e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+		};
+
+	}).BindList(itemsWarehouseModel).GetHtml()

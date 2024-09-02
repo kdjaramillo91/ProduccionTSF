@@ -1,0 +1,94 @@
+﻿
+@{
+	Layout = null;
+}
+
+<table id="itemSizeUploadFileForm" class="table table-condensed" style="margin: 0px;">
+	<tr>
+		<td>
+			@Html.DevExpress().Button(
+			button =>
+			{
+				button.Name = "ImportarItemSizesButton";
+				button.Text = "Importar";
+				button.ImagePosition = ImagePosition.Left;
+				button.ToolTip = "Importar Tallas de Producto";
+				button.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+				button.ClientEnabled = false;
+				button.ClientSideEvents.Click = "createNewFromFileUploaded";
+			}).GetHtml()
+
+			@Html.DevExpress().Button(
+			button =>
+			{
+				button.Name = "RefreshImportarItemSizesButton";
+				button.Text = "";
+				button.ToolTip = "Refrescar contenido";
+				button.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+				@*//button.ClientSideEvents.Click = "panaceasoftApp.item.refreshImportFile";*@
+			}).GetHtml()
+
+			@Html.DevExpress().Button(
+			button =>
+			{
+				button.Name = "DownloadTemplateImportarItemsButton";
+				button.Name = "btnDownloadTemplate";
+				button.Text = "Descargar Plantilla para Importación";
+				button.ImagePosition = ImagePosition.Left;
+				button.ToolTip = "Descargar la Plantilla para la Importación de Tallas";
+				button.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+				button.Style.Add("float", "right");
+				button.ClientSideEvents.Click = "DownloadTemplateImportItems";
+			}).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<hr style="margin-top: 2px; margin-bottom: 2px;" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().FormLayout(
+				formLayout =>
+				{
+					formLayout.Name = "SizeProductImportFileForm";
+					formLayout.SettingsAdaptivity.SwitchToSingleColumnAtWindowInnerWidth = 1080;
+					formLayout.SettingsAdaptivity.AdaptivityMode = FormLayoutAdaptivityMode.SingleColumnWindowLimit;
+
+					formLayout.UseDefaultPaddings = false;
+
+					formLayout.Items.AddGroupItem(group =>
+					{
+						group.ShowCaption = DevExpress.Utils.DefaultBoolean.False;
+						group.UseDefaultPaddings = true;
+						group.GroupBoxDecoration = GroupBoxDecoration.None;
+						group.ColCount = 2;
+
+						group.Items.Add(item =>
+						{
+							item.Caption = "Archivo de Datos";
+							item.CaptionStyle.CssClass = "mandatory";
+							item.CaptionSettings.VerticalAlign = FormLayoutVerticalAlign.Middle;
+							item.ColSpan = 2;
+							item.SetNestedContent(() =>
+							{
+								Html.RenderPartial("_ItemSizeImportFileUploadPartial");
+							});
+						});
+
+						group.Items.Add(item =>
+						{
+							item.Caption = "";
+							item.ColSpan = 2;
+							item.SetNestedContent(() =>
+							{
+								Html.RenderPartial("_ItemSizeImportFileDragDropPartial");
+							});
+						});
+					});
+				}).GetHtml()
+			@Html.Hidden("GuidArchivoItemSize")
+		</td>
+	</tr>
+</table>

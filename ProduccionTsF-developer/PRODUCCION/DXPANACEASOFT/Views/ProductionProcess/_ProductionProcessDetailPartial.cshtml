@@ -1,0 +1,187 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionProcess
+
+
+@{
+    ProductionProcess productionProcess = Model ?? new ProductionProcess();
+}
+
+@Html.Hidden("id_productionProcess", productionProcess.id)
+
+<table style="width: 100%;">
+	<tr>
+		<td>
+			<strong>
+				C&oacute;digo:
+			</strong>
+		</td>
+		<td colspan="4">
+			@Html.Raw(productionProcess.code)
+		</td>
+	</tr>
+	<tr>
+	<tr>
+		<td>
+			<strong>
+				Nombre:
+			</strong>
+		</td>
+		<td colspan="4">
+			@Html.Raw(productionProcess.name)
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<strong>
+				Sequential:
+			</strong>
+		</td>
+		<td colspan="4">
+			@Html.Raw(productionProcess.sequential)
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<strong>
+				Bodega:
+			</strong>
+		</td>
+		<td colspan="4">
+			@{
+				var warehouse = DataProviderWarehouse.WarehouseById(productionProcess.id_warehouse);
+			}
+			@if (warehouse != null)
+			{
+				@Html.Raw(warehouse.name)
+			}
+			else
+			{
+				@Html.Raw("")
+			}
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<strong>
+				Ubicaci&oacute;n:
+			</strong>
+		</td>
+		<td colspan="4">
+			@{
+				var warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(productionProcess.id_WarehouseLocation);
+			}
+			@if (warehouseLocation != null)
+			{
+				@Html.Raw(warehouseLocation.name)
+			}
+			else
+			{
+				@Html.Raw("")
+			}
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<strong>
+				Centro de Costo:
+			</strong>
+		</td>
+		<td colspan="4">
+			@{
+				var costCenter = DataProviderCostCenter.CostCenterById(productionProcess.id_CostCenter);
+			}
+			@if (costCenter != null)
+			{
+				@Html.Raw(costCenter.name)
+			}
+			else
+			{
+				@Html.Raw("")
+			}
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<strong>
+				SubCentro de Costo:
+			</strong>
+		</td>
+		<td colspan="4">
+			@{
+				var subCostCenter = DataProviderCostCenter.CostCenterById(productionProcess.id_SubCostCenter);
+			}
+			@if (subCostCenter != null)
+			{
+				@Html.Raw(subCostCenter.name)
+			}
+			else
+			{
+				@Html.Raw("")
+			}
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<strong>
+				Descripci&oacute;n:
+			</strong>
+		</td>
+		<td colspan="4">
+			@Html.Raw(productionProcess.description)
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 10%;">
+			<strong>
+				Creado por:
+			</strong>
+		</td>
+		<td style="width: 10%;">
+			@Html.Raw(GetUserName(productionProcess.id_userCreate))
+		</td>
+		<td style="width: 10%;">
+			<strong>
+				Fecha de Creaci&oacute;n:
+			</strong>
+		</td>
+		<td>
+			@Html.Raw(productionProcess.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<strong>
+				Modificado por:
+			</strong>
+		</td>
+		<td>
+			@Html.Raw(GetUserName(productionProcess.id_userUpdate))
+		</td>
+		<td style="width: 15%;">
+			<strong>
+				Fecha de Modificaci&oacute;n:
+			</strong>
+		</td>
+		<td>
+			@Html.Raw(productionProcess.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+		</td>
+	</tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

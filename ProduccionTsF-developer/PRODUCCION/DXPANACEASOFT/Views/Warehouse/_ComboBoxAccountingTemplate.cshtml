@@ -1,0 +1,49 @@
+﻿
+@using DXPANACEASOFT.Models
+
+@model WarehouseExpenseAccountingTemplate
+
+@{
+	int idTemplateAccount;
+	if (this.Model.id_accountingTemplate > 0)
+	{
+		idTemplateAccount = this.Model.id_accountingTemplate;
+	}
+	else
+	{
+		idTemplateAccount = 0;
+	}
+}
+
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = "id_accountingTemplate";
+		settings.Properties.ClientInstanceName = "id_accountingTemplate";
+		settings.Width = Unit.Percentage(92);
+
+		settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		settings.CallbackRouteValues = new { Controller = "Warehouse", Action = "GetAccountingTemplate" };
+		settings.Properties.CallbackPageSize = 10;
+
+		settings.Properties.TextFormatString = "{0} - {1}";
+		settings.Properties.ValueField = "id";
+		//settings.Properties.TextField = "name";
+		settings.Properties.ValueType = typeof(string);
+		settings.Properties.Columns.Clear();
+		settings.Properties.Columns.Add("code", "Código", Unit.Percentage(20));
+		settings.Properties.Columns.Add("description", "Descripción", Unit.Percentage(70));
+		settings.Properties.ClientSideEvents.BeginCallback = "AccountingTemplateCombo_BeginCallback";
+		settings.Properties.ClientSideEvents.Validation = "AccountingTemplateCombo_Validation";
+		settings.Properties.ClientSideEvents.SelectedIndexChanged = "AccountingTemplateCombo_SelectedIndexChanged";
+		settings.Properties.ClientSideEvents.EndCallback = "AccountingTemplateCombo_EndCallback";
+		settings.ItemTextCellPrepared = (sender, e) =>
+		{
+			e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+		};
+
+	}).BindList(DataProviderAccountingTemplate.AccountingTemplateByCompany((int)ViewData["id_company"])).Bind(idTemplateAccount).GetHtml()

@@ -1,0 +1,144 @@
+﻿
+
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ItemPurchaseInformation
+
+<div style="width: 100%; overflow: auto;">
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr class="no-border">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Precio:";
+                    settings.AssociatedControlName = "purchasePrice";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.purchasePrice, settings =>
+                {
+                    settings.Name = "purchasePrice";
+                    settings.Properties.ClientInstanceName = "purchasePrice";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NumberType = SpinEditNumberType.Float;
+                    settings.Properties.DecimalPlaces = 6;
+                    settings.Properties.AllowMouseWheel = true;
+                    settings.Properties.Increment = 0.1M;
+                    settings.Properties.LargeIncrement = 1;
+                    settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnPurchasePriceValidation";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Precio Mayor:";
+                    settings.AssociatedControlName = "largestPurchasePrice";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.largestPurchasePrice, settings =>
+                {
+                    settings.Name = "largestPurchasePrice";
+                    settings.Properties.ClientInstanceName = "largestPurchasePrice";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NumberType = SpinEditNumberType.Float;
+                    settings.Properties.DecimalPlaces = 6;
+                    settings.Properties.AllowMouseWheel = true;
+                    settings.Properties.Increment = 0.1M;
+                    settings.Properties.LargeIncrement = 1;
+                    settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnLargestPurchasePriceValidation";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Unidad de Medida:";
+                    settings.AssociatedControlName = "id_metricUnitPurchase";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_metricUnitPurchase = (Model != null && Model.id_metricUnitPurchase != 0) ? (int?)Model.id_metricUnitPurchase : null;
+                    int? id_metricType = (Model != null && Model.Item != null && Model.Item.id_metricType != 0) ? (int?)Model.Item.id_metricType : null;
+                }
+                @{
+                    var comboBox_metricUnit = Html.DevExpress().ComboBoxFor(m => m.id_metricUnitPurchase, settings =>
+                    {
+                        settings.Name = "id_metricUnitPurchase";
+                        settings.Properties.ClientInstanceName = "id_metricUnitPurchase";
+                        settings.Width = Unit.Percentage(100);
+
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnItemMetricUnitPurchaseValidation";
+
+                    }).BindList(DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], id_metricType, id_metricUnitPurchase)).Bind(id_metricUnitPurchase).GetHtml();
+                    //.BindList(DataProviderMetricUnit.MetricUnits((int)ViewData["id_company"]));
+
+                    //if (Model.id_metricUnitPurchase != null && Model.id_metricUnitPurchase != 0)
+                    //{
+                    //    comboBox_metricUnit.Bind(Model.id_metricUnitPurchase).Render();
+                    //}
+                    //else
+                    //{
+                    //    comboBox_metricUnit.Render();
+                    //}
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Descripción Corta:";
+                    settings.AssociatedControlName = "shortDescriptionPurchase";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.shortDescriptionPurchase, settings =>
+                {
+                    settings.Name = "shortDescriptionPurchase";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Descripción:";
+                    settings.AssociatedControlName = "descriptionPurchase";
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().MemoFor(m => m.descriptionPurchase, settings =>
+                {
+                    settings.Name = "descriptionPurchase";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>
+

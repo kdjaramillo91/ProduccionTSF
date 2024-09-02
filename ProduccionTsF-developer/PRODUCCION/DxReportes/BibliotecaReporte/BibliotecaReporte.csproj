@@ -1,0 +1,3588 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\LijsDev.CrystalReportsRunner.13.0.33.x86.1.4.2\build\LijsDev.CrystalReportsRunner.13.0.33.x86.props" Condition="Exists('..\..\packages\LijsDev.CrystalReportsRunner.13.0.33.x86.1.4.2\build\LijsDev.CrystalReportsRunner.13.0.33.x86.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8AC866F8-E6F3-421A-A64D-B6883788702E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BibliotecaReporte</RootNamespace>
+    <AssemblyName>BibliotecaReporte</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>bibliotecaReporteKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\..\..\Dlls\CrystalDecisions.CrystalReports.Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\..\..\Dlls\CrystalDecisions.ReportSource.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.Shared, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\..\..\Dlls\CrystalDecisions.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper.StrongName, Version=2.0.0.0, Culture=neutral, PublicKeyToken=e3e8412083d25dd3, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dapper.StrongName.2.1.35\lib\net461\Dapper.StrongName.dll</HintPath>
+    </Reference>
+    <Reference Include="LijsDev.CrystalReportsRunner.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LijsDev.CrystalReportsRunner.Core.1.4.2\lib\netstandard2.0\LijsDev.CrystalReportsRunner.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Win32.Registry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Win32.Registry.5.0.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PipeMethodCalls, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PipeMethodCalls.4.0.1\lib\netstandard2.0\PipeMethodCalls.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Security.AccessControl, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.AccessControl.5.0.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Auxiliares\CompaniaInfoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Compras\RequerimientoCompraAuxiliar.cs" />
+    <Compile Include="Auxiliares\Compras\OrdenCompraCamaronAuxiliar.cs" />
+    <Compile Include="Auxiliares\Configuracion\IntegrationProcessAuxiliar.cs" />
+    <Compile Include="Auxiliares\ControlDeCalidad\AnalisisDeCalidadAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturaComercial\FacturacionComercialExcelAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturaComercial\FacturaComercialAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\FactExteriorBLModelAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\FactPesosAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\FacturaElectronicaAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\FacturaElectronicaPropiaExcelAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\FacturaElectronicaPropiaAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\FacturaFiscalAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\ISFAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\NoomWoodAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\FacturaElectronicaPackinListAuxiliar.cs" />
+    <Compile Include="Auxiliares\FacturasExterior\TemperaturafAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\IngresoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\KardexCostoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\KardexProveedorAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\KardexProveedorSaldoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\MovimientoInventarioEgresoTransferenciaAAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\MovimientoInventarioIngresoTransferenciaAAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\MovimientoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\MovimientoInventarioAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\MovimientoInventarioMotivoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\MovimientoLoteAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\SaldoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\SaldoLoteAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\SaldosSinLoteAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\SaldosSinLoteTodoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\LogisticaGuiaExcelAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\RequerimientoInventarioAuxiliar.cs" />
+    <Compile Include="Auxiliares\OrdenesDeProduccion\OrdenesProduccionAuxiliar.cs" />
+    <Compile Include="Auxiliares\OrdenesDeProduccion\OrdenesProduccionVentasAuxiliar.cs" />
+    <Compile Include="Auxiliares\OrdenesDeProduccion\OrdenProduccionMaterialAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\MatrizProcesoInterno2Auxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\MovimientoInventarioEgresoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\MovimientoInventarioIngresoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\ProcesoInternoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\CierrePlacaTunelesFrescoFcam002Auxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\CierrePlacaTunelesFrescoFcam003Auxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\ComprobanteUnicoPagoEquivalenteAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\ConsultaLiquidacionCamaronAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\HorasNoProductivasAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\HorasNoProductivasSubAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\LiquidacionCarroXCarroAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proforma\ProformaContratoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\CierreLiquidacionAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\CierreLiquidacionRendimientoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\ComprobanteUnicoPagoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\DistribucionPagoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LibrasLiquidadasPendientesPagoPAprobadoProveedorAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LibrasLiquidadasSequencialAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LiquidacionCamaronAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LibrasLiquidadasPendientesPagoPAprobacionAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LiquidacionCompraCamaronAuxiliar.cs" />
+    <Compile Include="Auxiliares\SeguridadGarita\GuiaRemisionViaticoTerrestreAuxiliar.cs" />
+    <Compile Include="Auxiliares\SeguridadGarita\PagoAnticiposFluvialAuxiliar.cs" />
+    <Compile Include="Dataset\CompaniaInfoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CompaniaInfoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Compras\RequerimientoCompraDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RequerimientoCompraDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\ControldeCalidad\AnalisisCalidadDefectosDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalisisCalidadDefectosDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\ControldeCalidad\AnalisisCalidadOtrasEspeciesDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalisisCalidadOtrasEspeciesDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\ControldeCalidad\AnalisisDeCalidadDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalisisDeCalidadDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasComercial\FacturacionComercialExcelDataSet.cs">
+      <DependentUpon>FacturacionComercialExcelDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasComercial\FacturacionComercialExcelDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FacturacionComercialExcelDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FactpesosDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FactpesosDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FacturaElectronicaPropiaExcelDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FacturaElectronicaPropiaExcelDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\ISFDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ISFDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\NoomWoodDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NoomWoodDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\TemperaturaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TemperaturaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\KardexCostoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KardexCostoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\MovimientoInventarioDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoInventarioDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\MovimientoInventarioMotivoDatSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoInventarioMotivoDatSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\SaldoLoteDataSet.Designer.cs">
+      <DependentUpon>SaldoLoteDataSet.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Dataset\Inventario\SaldoSinLoteTodoDataSet.Designer.cs">
+      <DependentUpon>SaldoSinLoteTodoDataSet.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Dataset\Inventario\SaldoSinLoteDataSet.Designer.cs">
+      <DependentUpon>SaldoSinLoteDataSet.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Dataset\Inventario\SaldoDataSet.Designer.cs">
+      <DependentUpon>SaldoDataSet.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Dataset\Inventario\MovimientoLoteDataSet.Designer.cs">
+      <DependentUpon>MovimientoLoteDataSet.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Dataset\Inventario\MovimientoDataSet.Designer.cs">
+      <DependentUpon>MovimientoDataSet.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Dataset\Inventario\KardexProveedorDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KardexProveedorDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\KardexProveedorSaldoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KardexProveedorSaldoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\GuiaRemisionDetalleRIDEDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GuiaRemisionDetalleRIDEDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\MaterialDespachoDataSet.cs">
+      <DependentUpon>MaterialDespachoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\MaterialDespachoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MaterialDespachoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\LogisticaGuiaExcelDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LogisticaGuiaExcelDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\RequerimientoInventarioDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RequerimientoInventarioDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\OrdenesDeProduccion\OrdenProduccionDataSet.cs">
+      <DependentUpon>OrdenProduccionDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\OrdenesDeProduccion\OrdenProduccionDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrdenProduccionDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialDataSet.cs">
+      <DependentUpon>OrdenProduccionMaterialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrdenProduccionMaterialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialResumenDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrdenProduccionMaterialResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\OrdenesDeProduccion\OrdenProduccionVentasDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrdenProduccionVentasDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\MatrizProcesoInterno2DataSet.cs">
+      <DependentUpon>MatrizProcesoInterno2DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\MatrizProcesoInterno2DataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MatrizProcesoInterno2DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\MovimientoInventarioEgresoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoInventarioEgresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\MovimientoInventarioIngresoDataSet.cs">
+      <DependentUpon>MovimientoInventarioIngresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\MovimientoInventarioIngresoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoInventarioIngresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\ProcesoInternoDataSet.cs">
+      <DependentUpon>ProcesoInternoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\ProcesoInternoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProcesoInternoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\CierrePlacatunelesFrescoFcam002DataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CierrePlacatunelesFrescoFcam002DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\CierrePlacaTunelesFrescoFcam003DataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CierrePlacaTunelesFrescoFcam003DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\ComprobanteUnicoPagoEquivalenteDataSet.Designer.cs">
+      <DependentUpon>ComprobanteUnicoPagoEquivalenteDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\ConsultaLiquidacionCamaronDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConsultaLiquidacionCamaronDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\HorasNoProductivasDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HorasNoProductivasDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\HorasNoProductivasSubDataSet.cs">
+      <DependentUpon>HorasNoProductivasSubDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\HorasNoProductivasSubDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HorasNoProductivasSubDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\LiquidacionCarroXCarroDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiquidacionCarroXCarroDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\LiquidacionCarroXCarroResumenDataSet.cs">
+      <DependentUpon>LiquidacionCarroXCarroResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\LiquidacionCarroXCarroResumenDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiquidacionCarroXCarroResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MasterizadoMovInventarioDataSet.cs">
+      <DependentUpon>MasterizadoMovInventarioDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MasterizadoMovInventarioDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MasterizadoMovInventarioDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Proforma\ProformaContratoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProformaContratoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\CierreLiquidacionDataSet.cs">
+      <DependentUpon>CierreLiquidacionDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\CierreLiquidacionDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CierreLiquidacionDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\CierreLiquidacionRendimientoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CierreLiquidacionRendimientoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\CierreLiquidacionRendimientoResumenDataSet.Designer.cs">
+      <DependentUpon>CierreLiquidacionRendimientoResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\ComprobanteUnicoPagoDataSet.cs">
+      <DependentUpon>ComprobanteUnicoPagoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\ComprobanteUnicoPagoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ComprobanteUnicoPagoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\DistribucionPagoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DistribucionPagoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\DistribucionPagoResumenDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DistribucionPagoResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobacionDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibrasLiquidadasPendientesPagoPAprobacionDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasSequencialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibrasLiquidadasSequencialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LiquidacionCamaronDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiquidacionCamaronDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LiquidacionCarroXCarroLoteDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiquidacionCarroXCarroLoteDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LiquidacionCompraCamaronDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiquidacionCompraCamaronDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\ResumenLiquidacionProveedorResumenDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResumenLiquidacionProveedorResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\SeguridadGarita\GuiaRemisionViaticoTerrestreDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GuiaRemisionViaticoTerrestreDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\SeguridadGarita\PagosAnticiposFluvialDataSet.cs">
+      <DependentUpon>PagosAnticiposFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\SeguridadGarita\PagosAnticiposFluvialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PagosAnticiposFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Model\CompaniaInfoModel.cs" />
+    <Compile Include="Model\Compras\RequerimientoCompraModel.cs" />
+    <Compile Include="Model\ControlDeCalidad\AnalisisDeCalidadDefectosModel.cs" />
+    <Compile Include="Model\ControlDeCalidad\AnalisisDeCalidadModel.cs" />
+    <Compile Include="Model\ControlDeCalidad\AnalisisDeCalidadOtrasEspeciesModel.cs" />
+    <Compile Include="Model\facturasComercial\FacturacionComercialExcelModel.cs" />
+    <Compile Include="Model\FacturasExterior\FactpesosModel.cs" />
+    <Compile Include="Model\FacturasExterior\FacturaElectronicaPropiaExcelModel.cs" />
+    <Compile Include="Model\FacturasExterior\TemperaturaModel.cs" />
+    <Compile Include="Model\Inventario\KardexCostoModel.cs" />
+    <Compile Include="Model\Inventario\KardexLoteModel.cs" />
+    <Compile Include="Model\Inventario\KardexModel.cs" />
+    <Compile Include="Model\Inventario\KardexProveedorModel.cs" />
+    <Compile Include="Model\Inventario\KardexProveedorSaldoModel.cs" />
+    <Compile Include="Model\Inventario\MovimientoInventarioIngresoTransferenciaAModel.cs" />
+    <Compile Include="Auxiliares\Inventario\TransferEgresoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Inventario\TransferIngresoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\FleteFluvialAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\FleteTerrestreAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\GuiaRemisionPersAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\GuiaRemisionPersFluvialAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\GuiaRemisionViaticoFluvialAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\GuiaRideAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\LiquidacionMaterialesAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\LiquidacionMaterialesGeneralAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\LogisticaGuiaAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\MovimientoInventarioTodosAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\RemisionBodegaAuxiliar.cs" />
+    <Compile Include="Auxiliares\Logistica\RotacionTransAuxiliares.cs" />
+    <Compile Include="Auxiliares\Logistica\RotacionTransFluvialAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\DetalleDeReprocesoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\ProcesoInternoDetalladoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\ProcesoInternoResumenAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proceso\ResumenReprocesoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\AnticipoAProveedoresAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\AnticipoComprarCamaronAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\CierreMaquinaAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\CierreTurnoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\CierreTurnoTemporalAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\DescabezadoAuxiliares.cs" />
+    <Compile Include="Auxiliares\Produccion\MasterizadoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\MasterizadoPersAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\MovimientoEgresoMasterizadoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\MovimientoIngresoMasterizadoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\PruebaDeEscurridoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\TransferenciaPlantaFCam001Auxiliar.cs" />
+    <Compile Include="Auxiliares\Produccion\TumbadoPlacaIngresoTransferenciaAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proforma\ProformaAuxiliar.cs" />
+    <Compile Include="Auxiliares\Proforma\TemperaturaAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\IngresoCamaronStatusAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LibrasLiquidadasAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LibrasLiquidadasPendientePagoAprobadoProveedorAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\LibrasLiquidadasPendientePagoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\MargenPorTallasAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\RecepcionAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\MateriaPrimaPendienteAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\ResumenComprasPorPeriodoGlaseoAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\ResumenLiquidacionProveedorAuxiliar.cs" />
+    <Compile Include="Auxiliares\Recepcion\VitacoraProduccionAuxiliar.cs" />
+    <Compile Include="Auxiliares\ReportAuxiliar.cs" />
+    <Compile Include="Auxiliares\RptPilotoAuxiliar.cs" />
+    <Compile Include="Auxiliares\SeguridadGarita\PagosAnticiposTerrestreAuxiliar.cs" />
+    <Compile Include="Biblioteca.cs" />
+    <Compile Include="Dataset\Compras\OrdenCompraCamaronDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrdenCompraCamaronDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Configuraciones\IntegrationProcessDataSet.cs">
+      <DependentUpon>IntegrationProcessDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Configuraciones\IntegrationProcessDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IntegrationProcessDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasComercial\FacturaComercialDataSet.cs">
+      <DependentUpon>FacturaComercialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasComercial\FacturaComercialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FacturaComercialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FactExteriorBLDataSet.cs">
+      <DependentUpon>FactExteriorBLDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FactExteriorBLDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FactExteriorBLDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FacturaElectronicaDataSet.cs">
+      <DependentUpon>FacturaElectronicaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FacturaElectronicaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FacturaElectronicaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FacturaElectronicaPackinListDataSet.cs">
+      <DependentUpon>FacturaElectronicaPackinListDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FacturaElectronicaPackinListDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FacturaElectronicaPackinListDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FacturaElectronicaPropiaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FacturaElectronicaPropiaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\FacturasExterior\FacturasFiscalDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FacturasFiscalDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\IngresoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IngresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\MovimientoInventarioEgresoTransferenciaADataSet.cs">
+      <DependentUpon>MovimientoInventarioEgresoTransferenciaADataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\MovimientoInventarioEgresoTransferenciaADataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoInventarioEgresoTransferenciaADataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\MovimientoInventarioIngresoTransferenciaADataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoInventarioIngresoTransferenciaADataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\TransferEgresoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TransferEgresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\TransferIngresoDataSet.cs">
+      <DependentUpon>TransferIngresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Inventario\TransferIngresoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TransferIngresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\RotacionTransDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RotacionTransDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\FleteFluvialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FleteFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\FleteTerrestreDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FleteTerrestreDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\GuiaRemisionPersDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GuiaRemisionPersDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\GuiaRemisionPersFluvialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GuiaRemisionPersFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\GuiaRemisionViaticoFluvialDataSet.cs">
+      <DependentUpon>GuiaRemisionViaticoFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\GuiaRemisionViaticoFluvialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GuiaRemisionViaticoFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\GuiaRideDataSet.cs">
+      <DependentUpon>GuiaRideDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\GuiaRideDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GuiaRideDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\LiquidacionMaterialesDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiquidacionMaterialesDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\LiquidacionMaterialesGeneralDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiquidacionMaterialesGeneralDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\LogisticaGuiaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LogisticaGuiaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\MovimientoInventarioTodosDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoInventarioTodosDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\RequisicionBodegaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RequisicionBodegaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\RotacionTransFluvialDataSet.cs">
+      <DependentUpon>RotacionTransFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Logistica\RotacionTransFluvialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RotacionTransFluvialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\DetalleDeReprocesoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DetalleDeReprocesoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\ProcesoInternoDetalladoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProcesoInternoDetalladoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\ProcesoInternoResumenDataSet.cs">
+      <DependentUpon>ProcesoInternoResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\ProcesoInternoResumenDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProcesoInternoResumenDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Procesos\ResumenReprocesoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResumenReprocesoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\AnticipoAProveedoresDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnticipoAProveedoresDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\AnticipoCompraCamaronDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnticipoCompraCamaronDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\CierreMaquinaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CierreMaquinaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\CierreTurnoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CierreTurnoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\CierreTurnoTemporalDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CierreTurnoTemporalDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\DescabezadoDataSet.cs">
+      <DependentUpon>DescabezadoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\DescabezadoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DescabezadoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MasterizadoDataSet.cs">
+      <DependentUpon>MasterizadoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MasterizadoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MasterizadoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MasterizadoPersDataSet.cs">
+      <DependentUpon>MasterizadoPersDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MasterizadoPersDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MasterizadoPersDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MovimientoEgresoMasterizadoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoEgresoMasterizadoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\MovimientoMasterizadoIngresoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MovimientoMasterizadoIngresoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\PruebaDeEscurridoDataSet.cs">
+      <DependentUpon>PruebaDeEscurridoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\PruebaDeEscurridoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PruebaDeEscurridoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\TransferenciaPlantaFCam001DataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TransferenciaPlantaFCam001DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Produccion\TumbadoPlacaIngresoTransferenciaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TumbadoPlacaIngresoTransferenciaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\IngresoCamaronStatusDataSet.cs">
+      <DependentUpon>IngresoCamaronStatusDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\IngresoCamaronStatusDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IngresoCamaronStatusDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.cs">
+      <DependentUpon>LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Proformas\ProformaDataset.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProformaDataset.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Proforma\ProformaDataSet.cs">
+      <DependentUpon>ProformaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Proforma\ProformaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProformaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Proforma\TemperaturaDataSet.cs">
+      <DependentUpon>TemperaturaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Proforma\TemperaturaDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TemperaturaDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibrasLiquidadasDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoDataSet.cs">
+      <DependentUpon>LibrasLiquidadasPendientePagoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibrasLiquidadasPendientePagoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\LibrasLiquidadasSequentialDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibrasLiquidadasSequentialDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\MargenPorTallasDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MargenPorTallasDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\RecepcionDataset.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RecepcionDataset.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\MateriaPrimaPendienteDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MateriaPrimaPendienteDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\ResumenComprasPorPeriodoGlaseoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResumenComprasPorPeriodoGlaseoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\ResumenLiquidacionProveedorDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResumenLiquidacionProveedorDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\Recepcion\VitacotaProduccionDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VitacotaProduccionDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\rptPilotoDataSet.cs">
+      <DependentUpon>rptPilotoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\rptPilotoDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rptPilotoDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Dataset\SeguridadGarita\PagosAnticiposTerrestreDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PagosAnticiposTerrestreDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Model\Compras\OrdenCompraCamaronModel.cs" />
+    <Compile Include="Model\Configuracion\IntegrationProcessModel.cs" />
+    <Compile Include="Model\facturasComercial\FacturaComercialModel.cs" />
+    <Compile Include="Model\FacturasExterior\FactExteriorBLModel.cs" />
+    <Compile Include="Model\FacturasExterior\FacturaElectronicaModel.cs" />
+    <Compile Include="Model\FacturasExterior\FacturaElectronicaPackinListModel.cs" />
+    <Compile Include="Model\FacturasExterior\FacturaElectronicaPropiaModel.cs" />
+    <Compile Include="Model\FacturasExterior\FacturaFiscalModel.cs" />
+    <Compile Include="Model\FacturasExterior\ISFModel.cs" />
+    <Compile Include="Model\FacturasExterior\NoomWoodModel.cs" />
+    <Compile Include="Model\Inventario\IngresoModel.cs" />
+    <Compile Include="Model\Inventario\MovimientoInventarioEgresoTransferenciaAModel.cs" />
+    <Compile Include="Model\Inventario\MovimientoInventarioModel.cs" />
+    <Compile Include="Model\Inventario\MovimientoInventarioMotivoModel.cs" />
+    <Compile Include="Model\Inventario\MovimientoModel.cs" />
+    <Compile Include="Model\Inventario\MovimientoLoteModel.cs" />
+    <Compile Include="Model\Inventario\SaldoLoteModel.cs" />
+    <Compile Include="Model\Inventario\SaldoModel.cs" />
+    <Compile Include="Model\Inventario\SaldoSinLoteModel.cs" />
+    <Compile Include="Model\Inventario\SaldoSinLoteTodoModel.cs" />
+    <Compile Include="Model\Inventario\TransferEgresoModel.cs" />
+    <Compile Include="Model\Inventario\TransferIngresoModel .cs" />
+    <Compile Include="Model\Logistica\FleteFluvialModel.cs" />
+    <Compile Include="Model\Logistica\FleteTerrestreModel.cs" />
+    <Compile Include="Model\Logistica\GuiaRemisionPersFluvialModel.cs" />
+    <Compile Include="Model\Logistica\GuiaRemisionPersModel.cs" />
+    <Compile Include="Model\Logistica\GuiaRemisionViaticoFluvialModel.cs" />
+    <Compile Include="Model\Logistica\GuiaRideModel.cs" />
+    <Compile Include="Model\Logistica\LiquidacionMaterialesGeneralModel.cs" />
+    <Compile Include="Model\Logistica\LiquidacionMaterialesModel.cs" />
+    <Compile Include="Model\Logistica\LogisticaGuiaExcelModel.cs" />
+    <Compile Include="Model\Logistica\LogisticaGuiaModel.cs" />
+    <Compile Include="Model\Logistica\GuiaRemisionDetalleRIDEModel.cs" />
+    <Compile Include="Model\Logistica\MaterialDespachoModel.cs" />
+    <Compile Include="Model\Logistica\MovimientoInventarioTodosModel.cs" />
+    <Compile Include="Model\Logistica\RequerimientoInventarioModel.cs" />
+    <Compile Include="Model\Logistica\RequisicionBodegaModel.cs" />
+    <Compile Include="Model\Logistica\RotacionTransFluvialModel.cs" />
+    <Compile Include="Model\Logistica\RotacionTransModel.cs" />
+    <Compile Include="Model\Logo\LogoModel.cs" />
+    <Compile Include="Model\OrdenesDeProduccion\OrdenesProduccionModel.cs" />
+    <Compile Include="Model\OrdenesDeProduccion\OrdenProduccionMaterialModel.cs" />
+    <Compile Include="Model\OrdenesDeProduccion\OrdenProduccionMaterialResumenModel.cs" />
+    <Compile Include="Model\OrdenesDeProduccion\OrdenProduccionVentasModel.cs" />
+    <Compile Include="Model\Parametro.cs" />
+    <Compile Include="Model\Procesos\DetalleDeReprocesoModel.cs" />
+    <Compile Include="Model\Procesos\MatrizProcesoInterno2Model.cs" />
+    <Compile Include="Model\Procesos\MovimientoInventarioEgresoModel.cs" />
+    <Compile Include="Model\Procesos\MovimientoInventarioIngresoModel.cs" />
+    <Compile Include="Model\Procesos\ProcesoInternoModel.cs" />
+    <Compile Include="Model\Procesos\ProcesoInternoResumenModel.cs" />
+    <Compile Include="Model\Procesos\ProcesoInternoDetalladoModel.cs" />
+    <Compile Include="Model\Procesos\ResumenReprocesoModel.cs" />
+    <Compile Include="Model\Produccion\AnticipoAProveedoresModel.cs" />
+    <Compile Include="Model\Produccion\AnticipoCompraCamaronModel.cs" />
+    <Compile Include="Model\Produccion\CierreMaquinaModel.cs" />
+    <Compile Include="Model\Produccion\CierrePlacaTunelesFrescoFcam002Model.cs" />
+    <Compile Include="Model\Produccion\CierrePlacaTunelesFrescoFcam003Model.cs" />
+    <Compile Include="Model\Produccion\CierreturnoModel.cs" />
+    <Compile Include="Model\Produccion\CierreTurnoTemporalModel.cs" />
+    <Compile Include="Model\Produccion\ComprobanteUnicoPagoEquivalenteModel.cs" />
+    <Compile Include="Model\Produccion\HorasNoProductivasSubModel.cs" />
+    <Compile Include="Model\Produccion\ConsultaLiquidacionCamaronModel.cs" />
+    <Compile Include="Model\Produccion\DescabezadoModel.cs" />
+    <Compile Include="Model\Produccion\HorasNoProductivasModel.cs" />
+    <Compile Include="Model\Produccion\LiquidacionCarroXCarroResumenModel.cs" />
+    <Compile Include="Model\Produccion\LiquidacionCarroXCarroModel.cs" />
+    <Compile Include="Model\Produccion\MasterizadoModel.cs" />
+    <Compile Include="Model\Produccion\MasterizadoMovInventarioModel.cs" />
+    <Compile Include="Model\Produccion\MasterizadoPersModel.cs" />
+    <Compile Include="Model\Produccion\MovimientoEgresoMasterizadoModel.cs" />
+    <Compile Include="Model\Produccion\MovimientoIngresoMasterizadoModel.cs" />
+    <Compile Include="Model\Produccion\PruebaDeEscurridoModel.cs" />
+    <Compile Include="Model\Produccion\TransferenciaPlantaFCam001Model.cs" />
+    <Compile Include="Model\Produccion\TumbadoPlacaIngresoTransferenciaModel.cs" />
+    <Compile Include="Model\Proforma\ProformaContratoModel.cs" />
+    <Compile Include="Model\Recepcion\CierreLiquidacionModel.cs" />
+    <Compile Include="Model\Recepcion\CierreLiquidacionRendimientoModel.cs" />
+    <Compile Include="Model\Recepcion\CierreLiquidacionRendimientoResumenModel.cs" />
+    <Compile Include="Model\Recepcion\ComprobanteUnicoPagoModel.cs" />
+    <Compile Include="Model\Recepcion\DistribucionPagoResumenModel.cs" />
+    <Compile Include="Model\Recepcion\DistribucionPagoModel.cs" />
+    <Compile Include="Model\Recepcion\IngresoCamaronStatusModel.cs" />
+    <Compile Include="Model\Recepcion\LibraLiquidadasPendientePagoAprobadoProveedorModel.cs" />
+    <Compile Include="Model\Proforma\ProformaModel.cs" />
+    <Compile Include="Model\Proforma\TemperaturaModel.cs" />
+    <Compile Include="Model\Recepcion\LibrasLiquidadasPendientesPagoPAprobadoProveedorModel.cs" />
+    <Compile Include="Model\Recepcion\LibrasLiquidadasSequencialModel.cs" />
+    <Compile Include="Model\Recepcion\LibrasLiquidadasModel.cs" />
+    <Compile Include="Model\Recepcion\LibrasLiquidadasPendientePagoModel.cs" />
+    <Compile Include="Model\Recepcion\LibrasLiquidadasPenPagoPAprobacion.cs" />
+    <Compile Include="Model\Recepcion\LiquidacionCamaronModel.cs" />
+    <Compile Include="Model\Recepcion\LiquidacionCarroXCarroLoteModel.cs" />
+    <Compile Include="Model\Recepcion\LiquidacionCompraCamaronModel.cs" />
+    <Compile Include="Model\Recepcion\MargenPorTallasModel.cs" />
+    <Compile Include="Model\Recepcion\RecepcionModel.cs" />
+    <Compile Include="Model\Recepcion\MateriaPrimaPendienteModel.cs" />
+    <Compile Include="Model\Recepcion\ResumenComprasPorPeriodoGlaseoModel.cs" />
+    <Compile Include="Model\Recepcion\ResumenLiquidacionProveedorResumenModel.cs" />
+    <Compile Include="Model\Recepcion\ResumenLiquidacionProveedorModel.cs" />
+    <Compile Include="Model\Recepcion\VitacoraProducionModel.cs" />
+    <Compile Include="Model\SeguridadGarita\GuiaRemisionViaticoTerrestreModel.cs" />
+    <Compile Include="Model\SeguridadGarita\PagosAnticiposFluvialModel.cs" />
+    <Compile Include="Model\SeguridadGarita\PagosAnticiposTerrestreModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reportes\Compras\RptOrdenCompraCamaron.cs">
+      <SubType>Component</SubType>
+      <DependentUpon>RptOrdenCompraCamaron.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reportes\Compras\RptRequerimientoCompra.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptRequerimientoCompra.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Configuracion\RptIntegrationProcess.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptIntegrationProcess.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\ControlDeCalidad\RptAnalisisDeCalidad.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptAnalisisDeCalidad.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturaComercial\RptFacturacionComercialExcel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFacturacionComercialExcel.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturaComercial\RptFacturaComercial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFacturaComercial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptFactExteriorBL.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFactExteriorBL.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptFactPesos.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFactPesos.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptFacturaElectronica.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFacturaElectronica.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptFacturaElectronicaPackinList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFacturaElectronicaPackinList.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptFacturaElectronicaPropiaExcel.cs">
+      <DependentUpon>RptFacturaElectronicaPropiaExcel.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptFacturaElectronicaPropia.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFacturaElectronicaPropia.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptFacturaFiscal.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFacturaFiscal.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptISF.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptISF.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptNoomWood.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptNoomWood.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\FacturasExterior\RptTemperatura.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptTemperatura.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptIngreso.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptIngreso.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptKardexCosto.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptKardexCosto.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptKardexlote.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptKardexlote.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptKardexProveedor.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptKardexProveedor.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptKardexProveedorSaldo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptKardexProveedorSaldo.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptMovimientoInventarioEgresoTransferenciaA.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoInventarioEgresoTransferenciaA.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptMovimientoInventarioIngresoTransferenciaA.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoInventarioIngresoTransferenciaA.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptMovimiento.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimiento.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptMovimientoInventario.cs">
+      <DependentUpon>RptMovimientoInventario.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptMovimientoInventarioMotivo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoInventarioMotivo.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptMovimientoLote.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoLote.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptSaldo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptSaldo.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptSaldoLote.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptSaldoLote.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptSaldoSinLote.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptSaldoSinLote.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptSaldoSinLoteTodo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptSaldoSinLoteTodo.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptTransferEgreso.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptTransferEgreso.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Inventario\RptTransferIngreso.cs">
+      <DependentUpon>RptTransferIngreso.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptGuiaRemisionDetalleRIDE.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptGuiaRemisionDetalleRIDE.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptMatDespacho.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMatDespacho.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptFleteFluvial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFleteFluvial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptFleteTerrestre.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptFleteTerrestre.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptGuiaRemisionPers.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptGuiaRemisionPers.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptGuiaRemisionPersFluvial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptGuiaRemisionPersFluvial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptGuiaRemisionViaticoFluvial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptGuiaRemisionViaticoFluvial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptGuiaRide.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptGuiaRide.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptLiquidacionMateriales.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLiquidacionMateriales.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptLiquidacionMaterialesGeneral.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLiquidacionMaterialesGeneral.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptLogisticaGuiaExcel.cs">
+      <DependentUpon>RptLogisticaGuiaExcel.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptLogisticaGuia.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLogisticaGuia.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptMovimientoInventarioTodos.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoInventarioTodos.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptRequerimientoInventario.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptRequerimientoInventario.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptRequisionBodega.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptRequisionBodega.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptRotacionTrans.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptRotacionTrans.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logistica\RptRotacionTransFluvial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptRotacionTransFluvial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Logo\RptLogo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLogo.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\OrdenesDeProduccion\RptOrdenProduccion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptOrdenProduccion.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\OrdenesDeProduccion\RptOrdenProduccionMaterial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptOrdenProduccionMaterial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\OrdenesDeProduccion\RptOrdenProduccionMaterialResumen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptOrdenProduccionMaterialResumen.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\OrdenesDeProduccion\RptOrdenProduccionVentas.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptOrdenProduccionVentas.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\PilotoCrytalReport.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PilotoCrytalReport.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Model\RptPiloto.cs" />
+    <Compile Include="Reportes\Procesos\RptDetalleDeReproceso.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptDetalleDeReproceso.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Procesos\RptMatrizProcesoInterno2.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMatrizProcesoInterno2.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Procesos\RptMovimientoInventarioEgreso.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoInventarioEgreso.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Procesos\RptMovimientoInventarioIngreso.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoInventarioIngreso.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Procesos\RptProcesoInterno.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptProcesoInterno.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Procesos\RptProcesoInternoDetallado.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptProcesoInternoDetallado.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Procesos\RptProcesoInternoResumen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptProcesoInternoResumen.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Procesos\RptResumenReproceso.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptResumenReproceso.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptCierrePlacaTunelesFrescoFcam002.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptCierrePlacaTunelesFrescoFcam002.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptCierrePlacaTunelesFrescoFcam003.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptCierrePlacaTunelesFrescoFcam003.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptComprobanteUnicoPagoEquivalente.cs">
+      <SubType>Component</SubType>
+      <DependentUpon>RptComprobanteUnicoPagoEquivalente.rpt</DependentUpon>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptLiquidacionCarroXCarroResumen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLiquidacionCarroXCarroResumen.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptMasterizadoCajasSueltas.cs">
+      <DependentUpon>RptMasterizadoCajasSueltas.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptMasterizadoTerminado.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMasterizadoTerminado.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptSubHorasNoProductivas.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptSubHorasNoProductivas.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptAnticipoAProveedores.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptAnticipoAProveedores.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptAnticipoCompraCamaron.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptAnticipoCompraCamaron.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptCierreMaquina.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptCierreMaquina.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptCierreTurno.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptCierreTurno.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptCierreTurnoTemporal.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptCierreTurnoTemporal.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptConsultaLiquidacionCamaron.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptConsultaLiquidacionCamaron.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptDescabezado.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptDescabezado.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptHorasNoProductivas.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptHorasNoProductivas.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptLiquidacionCarroXCarro.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLiquidacionCarroXCarro.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptMasterizado.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMasterizado.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptMasterizadoPers.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMasterizadoPers.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptMovimientoEgresoMasterizado.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoEgresoMasterizado.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptMovimientoIngresoMasterizado.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMovimientoIngresoMasterizado.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptPruebaDeEscurrido.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptPruebaDeEscurrido.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptTmbadoPlacaIngresoTransferencia.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptTmbadoPlacaIngresoTransferencia.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Produccion\RptTransferenciaPlantaFCam001.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptTransferenciaPlantaFCam001.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Proforma\RptProforma.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptProforma.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Proforma\RptProformaContrato.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptProformaContrato.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Proforma\RptTemperatura.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptTemperatura.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptCierreLiquidacion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptCierreLiquidacion.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptCierreLiquidacionRendimiento.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptCierreLiquidacionRendimiento.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptCierreLiquidacionRendimientoResumen.cs">
+      <SubType>Component</SubType>
+      <DependentUpon>RptCierreLiquidacionRendimientoResumen.rpt</DependentUpon>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptComprobanteUnicoPago.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptComprobanteUnicoPago.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptDistribucionPago.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptDistribucionPago.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptIngresoCamaronStatus.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptIngresoCamaronStatus.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLibrasLiquidadas.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLibrasLiquidadas.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLibrasliquidadasPendientePago.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLibrasliquidadasPendientePago.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLibrasLiquidadasPendientePagoAprobadoProveedor.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLibrasLiquidadasPendientePagoAprobadoProveedor.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLibrasLiquidadasPendientesPagoPAprobacion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLibrasLiquidadasPendientesPagoPAprobacion.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLibrasLiquidadasPendientesPagoPAprobadoProveedor.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLibrasLiquidadasPendientesPagoPAprobadoProveedor.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLibrasLiquidadasSequencial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLibrasLiquidadasSequencial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLiquidacionCamaron.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLiquidacionCamaron.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLiquidacionCarroXCarro.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLiquidacionCarroXCarro.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptLiquidacionCompraCamaron.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptLiquidacionCompraCamaron.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptMargenPorTallas.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMargenPorTallas.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptMateriaPrimaPendiente.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptMateriaPrimaPendiente.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptRecepcion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptRecepcion.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptResumenComprasPorPeriodoGlaseo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptResumenComprasPorPeriodoGlaseo.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptResumenLiquidacionProveedor.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptResumenLiquidacionProveedor.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptResumenLiquidacionProveedorResumen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptResumenLiquidacionProveedorResumen.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\Recepcion\RptVitacoraProduccion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptVitacoraProduccion.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\SeguridadGarita\RptGuiaRemisionViaticoTerrestre.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptGuiaRemisionViaticoTerrestre.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\SeguridadGarita\RptPagosAnticiposFluvial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptPagosAnticiposFluvial.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reportes\SeguridadGarita\RptPagosAnticiposTerrestre.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RptPagosAnticiposTerrestre.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Release\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Reportes\Compras\RptOrdenCompraCamaron.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptOrdenCompraCamaron.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Compras\RptRequerimientoCompra.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptRequerimientoCompra.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Configuracion\RptIntegrationProcess.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptIntegrationProcess.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\ControlDeCalidad\RptAnalisisDeCalidad.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptAnalisisDeCalidad.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturaComercial\RptFacturacionComercialExcel.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFacturacionComercialExcel.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturaComercial\RptFacturaComercial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFacturaComercial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptFactExteriorBL.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFactExteriorBL.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptFactPesos.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFactPesos.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptFacturaElectronica.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFacturaElectronica.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptFacturaElectronicaPackinList.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFacturaElectronicaPackinList.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptFacturaElectronicaPropiaExcel.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFacturaElectronicaPropiaExcel.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptFacturaElectronicaPropia.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFacturaElectronicaPropia.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptFacturaFiscal.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFacturaFiscal.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptISF.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptISF.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptNoomWood.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptNoomWood.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FacturasExterior\RptTemperatura.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptTemperatura.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptIngreso.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptIngreso.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptKardexCosto.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptKardexCosto.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptKardexlote.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptKardexlote.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptKardexProveedor.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptKardexProveedor.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptKardexProveedorSaldo.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptKardexProveedorSaldo.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptMovimientoInventarioEgresoTransferenciaA.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoInventarioEgresoTransferenciaA.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptMovimientoInventarioIngresoTransferenciaA.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoInventarioIngresoTransferenciaA.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptMovimiento.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimiento.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptMovimientoInventario.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoInventario.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptMovimientoInventarioMotivo.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoInventarioMotivo.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptMovimientoLote.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoLote.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptSaldo.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptSaldo.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptSaldoLote.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptSaldoLote.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptSaldoSinLote.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptSaldoSinLote.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptSaldoSinLoteTodo.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptSaldoSinLoteTodo.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptTransferEgreso.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptTransferEgreso.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Inventario\RptTransferIngreso.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptTransferIngreso.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptGuiaRemisionDetalleRIDE.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptGuiaRemisionDetalleRIDE.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptMatDespacho.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMatDespacho.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptFleteFluvial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFleteFluvial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptFleteTerrestre.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptFleteTerrestre.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptGuiaRemisionPers.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptGuiaRemisionPers.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptGuiaRemisionPersFluvial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptGuiaRemisionPersFluvial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptGuiaRemisionViaticoFluvial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptGuiaRemisionViaticoFluvial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptGuiaRide.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptGuiaRide.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptLiquidacionMateriales.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLiquidacionMateriales.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptLiquidacionMaterialesGeneral.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLiquidacionMaterialesGeneral.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptLogisticaGuiaExcel.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLogisticaGuiaExcel.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptLogisticaGuia.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLogisticaGuia.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptMovimientoInventarioTodos.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoInventarioTodos.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptRequerimientoInventario.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptRequerimientoInventario.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptRequisionBodega.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptRequisionBodega.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptRotacionTrans.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptRotacionTrans.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logistica\RptRotacionTransFluvial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptRotacionTransFluvial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Logo\RptLogo.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLogo.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\OrdenesDeProduccion\RptOrdenProduccion.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptOrdenProduccion.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\OrdenesDeProduccion\RptOrdenProduccionMaterial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptOrdenProduccionMaterial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\OrdenesDeProduccion\RptOrdenProduccionMaterialResumen.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptOrdenProduccionMaterialResumen.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\OrdenesDeProduccion\RptOrdenProduccionVentas.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptOrdenProduccionVentas.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\PilotoCrytalReport.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>PilotoCrytalReport.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptDetalleDeReproceso.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptDetalleDeReproceso.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptMatrizProcesoInterno2.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMatrizProcesoInterno2.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptMovimientoInventarioEgreso.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoInventarioEgreso.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptMovimientoInventarioIngreso.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoInventarioIngreso.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptProcesoInterno.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptProcesoInterno.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptProcesoInternoDetallado.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptProcesoInternoDetallado.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptProcesoInternoResumen.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptProcesoInternoResumen.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Procesos\RptResumenReproceso.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptResumenReproceso.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptCierrePlacaTunelesFrescoFcam002.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptCierrePlacaTunelesFrescoFcam002.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptCierrePlacaTunelesFrescoFcam003.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptCierrePlacaTunelesFrescoFcam003.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptComprobanteUnicoPagoEquivalente.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptComprobanteUnicoPagoEquivalente1.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptLiquidacionCarroXCarroResumen.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLiquidacionCarroXCarroResumen.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptMasterizadoCajasSueltas.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMasterizadoCajasSueltas.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptMasterizadoTerminado.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMasterizadoTerminado.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptSubHorasNoProductivas.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptSubHorasNoProductivas.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptAnticipoAProveedores.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptAnticipoAProveedores.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptAnticipoCompraCamaron.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptAnticipoCompraCamaron.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptCierreMaquina.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptCierreMaquina.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptCierreTurno.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptCierreTurno.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptCierreTurnoTemporal.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptCierreTurnoTemporal.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptConsultaLiquidacionCamaron.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptConsultaLiquidacionCamaron.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptDescabezado.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptDescabezado.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptHorasNoProductivas.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptHorasNoProductivas.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptLiquidacionCarroXCarro.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLiquidacionCarroXCarro.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptMasterizado.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMasterizado.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptMasterizadoPers.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMasterizadoPers.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptMovimientoEgresoMasterizado.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoEgresoMasterizado.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptMovimientoIngresoMasterizado.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMovimientoIngresoMasterizado.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptPruebaDeEscurrido.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptPruebaDeEscurrido.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptTmbadoPlacaIngresoTransferencia.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptTmbadoPlacaIngresoTransferencia.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Produccion\RptTransferenciaPlantaFCam001.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptTransferenciaPlantaFCam001.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Proforma\RptProforma.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptProforma.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Proforma\RptProformaContrato.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptProformaContrato.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Proforma\RptTemperatura.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptTemperatura.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptCierreLiquidacion.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptCierreLiquidacion.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptCierreLiquidacionRendimiento.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptCierreLiquidacionRendimiento.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptCierreLiquidacionRendimientoResumen.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptComprobanteUnicoPago.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptComprobanteUnicoPago.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptDistribucionPago.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptDistribucionPago.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptIngresoCamaronStatus.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptIngresoCamaronStatus.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLibrasLiquidadas.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLibrasLiquidadas.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLibrasliquidadasPendientePago.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLibrasliquidadasPendientePago.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLibrasLiquidadasPendientePagoAprobadoProveedor.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLibrasLiquidadasPendientePagoAprobadoProveedor.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLibrasLiquidadasPendientesPagoPAprobacion.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLibrasLiquidadasPendientesPagoPAprobacion.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLibrasLiquidadasPendientesPagoPAprobadoProveedor.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLibrasLiquidadasPendientesPagoPAprobadoProveedor.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLibrasLiquidadasSequencial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLibrasLiquidadasSequencial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLiquidacionCamaron.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLiquidacionCamaron.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLiquidacionCarroXCarro.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLiquidacionCarroXCarro.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptLiquidacionCompraCamaron.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptLiquidacionCompraCamaron.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptMargenPorTallas.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMargenPorTallas.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptMateriaPrimaPendiente.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptMateriaPrimaPendiente.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptRecepcion.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptRecepcion.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptResumenComprasPorPeriodoGlaseo.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptResumenComprasPorPeriodoGlaseo.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptResumenLiquidacionProveedor.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptResumenLiquidacionProveedor.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptResumenLiquidacionProveedorResumen.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptResumenLiquidacionProveedorResumen.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\Recepcion\RptVitacoraProduccion.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptVitacoraProduccion.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\SeguridadGarita\RptGuiaRemisionViaticoTerrestre.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptGuiaRemisionViaticoTerrestre.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\SeguridadGarita\RptPagosAnticiposFluvial.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptPagosAnticiposFluvial.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\SeguridadGarita\RptPagosAnticiposTerrestre.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RptPagosAnticiposTerrestre.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bibliotecaReporteKey.snk" />
+    <None Include="Dataset\CompaniaInfoDataSet.xsc">
+      <DependentUpon>CompaniaInfoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\CompaniaInfoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CompaniaInfoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\CompaniaInfoDataSet.xss">
+      <DependentUpon>CompaniaInfoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Compras\OrdenCompraCamaronDataSet.xsc">
+      <DependentUpon>OrdenCompraCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Compras\OrdenCompraCamaronDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrdenCompraCamaronDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Compras\OrdenCompraCamaronDataSet.xss">
+      <DependentUpon>OrdenCompraCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Compras\RequerimientoCompraDataSet.xsc">
+      <DependentUpon>RequerimientoCompraDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Compras\RequerimientoCompraDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RequerimientoCompraDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Compras\RequerimientoCompraDataSet.xss">
+      <DependentUpon>RequerimientoCompraDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Configuraciones\IntegrationProcessDataSet.xsc">
+      <DependentUpon>IntegrationProcessDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Configuraciones\IntegrationProcessDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>IntegrationProcessDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Configuraciones\IntegrationProcessDataSet.xss">
+      <DependentUpon>IntegrationProcessDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisCalidadDefectosDataSet.xsc">
+      <DependentUpon>AnalisisCalidadDefectosDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisCalidadDefectosDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalisisCalidadDefectosDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisCalidadDefectosDataSet.xss">
+      <DependentUpon>AnalisisCalidadDefectosDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisCalidadOtrasEspeciesDataSet.xsc">
+      <DependentUpon>AnalisisCalidadOtrasEspeciesDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisCalidadOtrasEspeciesDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalisisCalidadOtrasEspeciesDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisCalidadOtrasEspeciesDataSet.xss">
+      <DependentUpon>AnalisisCalidadOtrasEspeciesDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisDeCalidadDataSet.xsc">
+      <DependentUpon>AnalisisDeCalidadDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisDeCalidadDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalisisDeCalidadDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\ControldeCalidad\AnalisisDeCalidadDataSet.xss">
+      <DependentUpon>AnalisisDeCalidadDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasComercial\FacturacionComercialExcelDataSet.xsc">
+      <DependentUpon>FacturacionComercialExcelDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasComercial\FacturacionComercialExcelDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FacturacionComercialExcelDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasComercial\FacturacionComercialExcelDataSet.xss">
+      <DependentUpon>FacturacionComercialExcelDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasComercial\FacturaComercialDataSet.xsc">
+      <DependentUpon>FacturaComercialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasComercial\FacturaComercialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FacturaComercialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasComercial\FacturaComercialDataSet.xss">
+      <DependentUpon>FacturaComercialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FactExteriorBLDataSet.xsc">
+      <DependentUpon>FactExteriorBLDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FactExteriorBLDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FactExteriorBLDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\FactExteriorBLDataSet.xss">
+      <DependentUpon>FactExteriorBLDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FactpesosDataSet.xsc">
+      <DependentUpon>FactpesosDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FactpesosDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FactpesosDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\FactpesosDataSet.xss">
+      <DependentUpon>FactpesosDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaDataSet.xsc">
+      <DependentUpon>FacturaElectronicaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FacturaElectronicaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaDataSet.xss">
+      <DependentUpon>FacturaElectronicaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPackinListDataSet.xsc">
+      <DependentUpon>FacturaElectronicaPackinListDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPackinListDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FacturaElectronicaPackinListDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPackinListDataSet.xss">
+      <DependentUpon>FacturaElectronicaPackinListDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPropiaDataSet.xsc">
+      <DependentUpon>FacturaElectronicaPropiaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPropiaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FacturaElectronicaPropiaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPropiaDataSet.xss">
+      <DependentUpon>FacturaElectronicaPropiaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPropiaExcelDataSet.xsc">
+      <DependentUpon>FacturaElectronicaPropiaExcelDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPropiaExcelDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FacturaElectronicaPropiaExcelDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturaElectronicaPropiaExcelDataSet.xss">
+      <DependentUpon>FacturaElectronicaPropiaExcelDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturasFiscalDataSet.xsc">
+      <DependentUpon>FacturasFiscalDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturasFiscalDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FacturasFiscalDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\FacturasFiscalDataSet.xss">
+      <DependentUpon>FacturasFiscalDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\ISFDataSet.xsc">
+      <DependentUpon>ISFDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\ISFDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ISFDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\ISFDataSet.xss">
+      <DependentUpon>ISFDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\NoomWoodDataSet.xsc">
+      <DependentUpon>NoomWoodDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\NoomWoodDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>NoomWoodDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\NoomWoodDataSet.xss">
+      <DependentUpon>NoomWoodDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\TemperaturaDataSet.xsc">
+      <DependentUpon>TemperaturaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\FacturasExterior\TemperaturaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TemperaturaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\FacturasExterior\TemperaturaDataSet.xss">
+      <DependentUpon>TemperaturaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\IngresoDataSet.xsc">
+      <DependentUpon>IngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\IngresoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>IngresoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\IngresoDataSet.xss">
+      <DependentUpon>IngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\KardexCostoDataSet.xsc">
+      <DependentUpon>KardexCostoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\KardexCostoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>KardexCostoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\KardexCostoDataSet.xss">
+      <DependentUpon>KardexCostoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioDataSet.xsc">
+      <DependentUpon>MovimientoInventarioDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoInventarioDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioDataSet.xss">
+      <DependentUpon>MovimientoInventarioDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioMotivoDatSet.xsc">
+      <DependentUpon>MovimientoInventarioMotivoDatSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioMotivoDatSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoInventarioMotivoDatSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioMotivoDatSet.xss">
+      <DependentUpon>MovimientoInventarioMotivoDatSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoLoteDataSet.xsc">
+      <DependentUpon>SaldoLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoLoteDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SaldoLoteDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\SaldoLoteDataSet.xss">
+      <DependentUpon>SaldoLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoSinLoteTodoDataSet.xsc">
+      <DependentUpon>SaldoSinLoteTodoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoSinLoteTodoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SaldoSinLoteTodoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\SaldoSinLoteTodoDataSet.xss">
+      <DependentUpon>SaldoSinLoteTodoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoSinLoteDataSet.xsc">
+      <DependentUpon>SaldoSinLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoSinLoteDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SaldoSinLoteDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\SaldoSinLoteDataSet.xss">
+      <DependentUpon>SaldoSinLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoDataSet.xsc">
+      <DependentUpon>SaldoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\SaldoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SaldoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\SaldoDataSet.xss">
+      <DependentUpon>SaldoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoLoteDataSet.xsc">
+      <DependentUpon>MovimientoLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoLoteDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoLoteDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoLoteDataSet.xss">
+      <DependentUpon>MovimientoLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoDataSet.xsc">
+      <DependentUpon>MovimientoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoDataSet.xss">
+      <DependentUpon>MovimientoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\KardexProveedorDataSet.xsc">
+      <DependentUpon>KardexProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\KardexProveedorDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>KardexProveedorDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\KardexProveedorDataSet.xss">
+      <DependentUpon>KardexProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\KardexProveedorSaldoDataSet.xsc">
+      <DependentUpon>KardexProveedorSaldoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\KardexProveedorSaldoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>KardexProveedorSaldoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\KardexProveedorSaldoDataSet.xss">
+      <DependentUpon>KardexProveedorSaldoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioEgresoTransferenciaADataSet.xsc">
+      <DependentUpon>MovimientoInventarioEgresoTransferenciaADataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioEgresoTransferenciaADataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoInventarioEgresoTransferenciaADataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioEgresoTransferenciaADataSet.xss">
+      <DependentUpon>MovimientoInventarioEgresoTransferenciaADataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioIngresoTransferenciaADataSet.xsc">
+      <DependentUpon>MovimientoInventarioIngresoTransferenciaADataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioIngresoTransferenciaADataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoInventarioIngresoTransferenciaADataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Inventario\MovimientoInventarioIngresoTransferenciaADataSet.xss">
+      <DependentUpon>MovimientoInventarioIngresoTransferenciaADataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\TransferEgresoDataSet.xsc">
+      <DependentUpon>TransferEgresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\TransferEgresoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TransferEgresoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Inventario\TransferEgresoDataSet.xss">
+      <DependentUpon>TransferEgresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\TransferIngresoDataSet.xsc">
+      <DependentUpon>TransferIngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Inventario\TransferIngresoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TransferIngresoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Inventario\TransferIngresoDataSet.xss">
+      <DependentUpon>TransferIngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionDetalleRIDEDataSet.xsc">
+      <DependentUpon>GuiaRemisionDetalleRIDEDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionDetalleRIDEDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GuiaRemisionDetalleRIDEDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionDetalleRIDEDataSet.xss">
+      <DependentUpon>GuiaRemisionDetalleRIDEDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\MaterialDespachoDataSet.xsc">
+      <DependentUpon>MaterialDespachoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\MaterialDespachoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MaterialDespachoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\MaterialDespachoDataSet.xss">
+      <DependentUpon>MaterialDespachoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LogisticaGuiaExcelDataSet.xsc">
+      <DependentUpon>LogisticaGuiaExcelDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LogisticaGuiaExcelDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LogisticaGuiaExcelDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\LogisticaGuiaExcelDataSet.xss">
+      <DependentUpon>LogisticaGuiaExcelDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RequerimientoInventarioDataSet.xsc">
+      <DependentUpon>RequerimientoInventarioDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RequerimientoInventarioDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RequerimientoInventarioDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\RequerimientoInventarioDataSet.xss">
+      <DependentUpon>RequerimientoInventarioDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RotacionTransDataSet.xsc">
+      <DependentUpon>RotacionTransDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RotacionTransDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RotacionTransDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\RotacionTransDataSet.xss">
+      <DependentUpon>RotacionTransDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\FleteFluvialDataSet.xsc">
+      <DependentUpon>FleteFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\FleteFluvialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FleteFluvialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\FleteFluvialDataSet.xss">
+      <DependentUpon>FleteFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\FleteTerrestreDataSet.xsc">
+      <DependentUpon>FleteTerrestreDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\FleteTerrestreDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FleteTerrestreDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\FleteTerrestreDataSet.xss">
+      <DependentUpon>FleteTerrestreDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionPersDataSet.xsc">
+      <DependentUpon>GuiaRemisionPersDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionPersDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GuiaRemisionPersDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionPersDataSet.xss">
+      <DependentUpon>GuiaRemisionPersDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionPersFluvialDataSet.xsc">
+      <DependentUpon>GuiaRemisionPersFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionPersFluvialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GuiaRemisionPersFluvialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionPersFluvialDataSet.xss">
+      <DependentUpon>GuiaRemisionPersFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionViaticoFluvialDataSet.xsc">
+      <DependentUpon>GuiaRemisionViaticoFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionViaticoFluvialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GuiaRemisionViaticoFluvialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRemisionViaticoFluvialDataSet.xss">
+      <DependentUpon>GuiaRemisionViaticoFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRideDataSet.xsc">
+      <DependentUpon>GuiaRideDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRideDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GuiaRideDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\GuiaRideDataSet.xss">
+      <DependentUpon>GuiaRideDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LiquidacionMaterialesDataSet.xsc">
+      <DependentUpon>LiquidacionMaterialesDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LiquidacionMaterialesDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LiquidacionMaterialesDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\LiquidacionMaterialesDataSet.xss">
+      <DependentUpon>LiquidacionMaterialesDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LiquidacionMaterialesGeneralDataSet.xsc">
+      <DependentUpon>LiquidacionMaterialesGeneralDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LiquidacionMaterialesGeneralDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LiquidacionMaterialesGeneralDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\LiquidacionMaterialesGeneralDataSet.xss">
+      <DependentUpon>LiquidacionMaterialesGeneralDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LogisticaGuiaDataSet.xsc">
+      <DependentUpon>LogisticaGuiaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\LogisticaGuiaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LogisticaGuiaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\LogisticaGuiaDataSet.xss">
+      <DependentUpon>LogisticaGuiaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\MovimientoInventarioTodosDataSet.xsc">
+      <DependentUpon>MovimientoInventarioTodosDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\MovimientoInventarioTodosDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoInventarioTodosDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\MovimientoInventarioTodosDataSet.xss">
+      <DependentUpon>MovimientoInventarioTodosDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RequisicionBodegaDataSet.xsc">
+      <DependentUpon>RequisicionBodegaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RequisicionBodegaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RequisicionBodegaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\RequisicionBodegaDataSet.xss">
+      <DependentUpon>RequisicionBodegaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RotacionTransFluvialDataSet.xsc">
+      <DependentUpon>RotacionTransFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Logistica\RotacionTransFluvialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RotacionTransFluvialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Logistica\RotacionTransFluvialDataSet.xss">
+      <DependentUpon>RotacionTransFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionDataSet.xsc">
+      <DependentUpon>OrdenProduccionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrdenProduccionDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionDataSet.xss">
+      <DependentUpon>OrdenProduccionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialDataSet.xsc">
+      <DependentUpon>OrdenProduccionMaterialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrdenProduccionMaterialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialDataSet.xss">
+      <DependentUpon>OrdenProduccionMaterialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialResumenDataSet.xsc">
+      <DependentUpon>OrdenProduccionMaterialResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialResumenDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrdenProduccionMaterialResumenDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionMaterialResumenDataSet.xss">
+      <DependentUpon>OrdenProduccionMaterialResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionVentasDataSet.xsc">
+      <DependentUpon>OrdenProduccionVentasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionVentasDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrdenProduccionVentasDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\OrdenesDeProduccion\OrdenProduccionVentasDataSet.xss">
+      <DependentUpon>OrdenProduccionVentasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\DetalleDeReprocesoDataSet.xsc">
+      <DependentUpon>DetalleDeReprocesoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\DetalleDeReprocesoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DetalleDeReprocesoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\DetalleDeReprocesoDataSet.xss">
+      <DependentUpon>DetalleDeReprocesoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\MatrizProcesoInterno2DataSet.xsc">
+      <DependentUpon>MatrizProcesoInterno2DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\MatrizProcesoInterno2DataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MatrizProcesoInterno2DataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\MatrizProcesoInterno2DataSet.xss">
+      <DependentUpon>MatrizProcesoInterno2DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\MovimientoInventarioEgresoDataSet.xsc">
+      <DependentUpon>MovimientoInventarioEgresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\MovimientoInventarioEgresoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoInventarioEgresoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\MovimientoInventarioEgresoDataSet.xss">
+      <DependentUpon>MovimientoInventarioEgresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\MovimientoInventarioIngresoDataSet.xsc">
+      <DependentUpon>MovimientoInventarioIngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\MovimientoInventarioIngresoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoInventarioIngresoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\MovimientoInventarioIngresoDataSet.xss">
+      <DependentUpon>MovimientoInventarioIngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoDataSet.xsc">
+      <DependentUpon>ProcesoInternoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ProcesoInternoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoDataSet.xss">
+      <DependentUpon>ProcesoInternoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoDetalladoDataSet.xsc">
+      <DependentUpon>ProcesoInternoDetalladoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoDetalladoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ProcesoInternoDetalladoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoDetalladoDataSet.xss">
+      <DependentUpon>ProcesoInternoDetalladoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoResumenDataSet.xsc">
+      <DependentUpon>ProcesoInternoResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoResumenDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ProcesoInternoResumenDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\ProcesoInternoResumenDataSet.xss">
+      <DependentUpon>ProcesoInternoResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ResumenReprocesoDataSet.xsc">
+      <DependentUpon>ResumenReprocesoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Procesos\ResumenReprocesoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ResumenReprocesoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Procesos\ResumenReprocesoDataSet.xss">
+      <DependentUpon>ResumenReprocesoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\AnticipoAProveedoresDataSet.xsc">
+      <DependentUpon>AnticipoAProveedoresDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\AnticipoAProveedoresDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnticipoAProveedoresDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\AnticipoAProveedoresDataSet.xss">
+      <DependentUpon>AnticipoAProveedoresDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\AnticipoCompraCamaronDataSet.xsc">
+      <DependentUpon>AnticipoCompraCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\AnticipoCompraCamaronDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnticipoCompraCamaronDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Produccion\AnticipoCompraCamaronDataSet.xss">
+      <DependentUpon>AnticipoCompraCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierreMaquinaDataSet.xsc">
+      <DependentUpon>CierreMaquinaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierreMaquinaDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CierreMaquinaDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Produccion\CierreMaquinaDataSet.xss">
+      <DependentUpon>CierreMaquinaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierrePlacatunelesFrescoFcam002DataSet.xsc">
+      <DependentUpon>CierrePlacatunelesFrescoFcam002DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierrePlacatunelesFrescoFcam002DataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CierrePlacatunelesFrescoFcam002DataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\CierrePlacatunelesFrescoFcam002DataSet.xss">
+      <DependentUpon>CierrePlacatunelesFrescoFcam002DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierrePlacaTunelesFrescoFcam003DataSet.xsc">
+      <DependentUpon>CierrePlacaTunelesFrescoFcam003DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierrePlacaTunelesFrescoFcam003DataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CierrePlacaTunelesFrescoFcam003DataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\CierrePlacaTunelesFrescoFcam003DataSet.xss">
+      <DependentUpon>CierrePlacaTunelesFrescoFcam003DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierreTurnoDataSet.xsc">
+      <DependentUpon>CierreTurnoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierreTurnoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CierreTurnoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Produccion\CierreTurnoDataSet.xss">
+      <DependentUpon>CierreTurnoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierreTurnoTemporalDataSet.xsc">
+      <DependentUpon>CierreTurnoTemporalDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\CierreTurnoTemporalDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CierreTurnoTemporalDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\CierreTurnoTemporalDataSet.xss">
+      <DependentUpon>CierreTurnoTemporalDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\ComprobanteUnicoPagoEquivalenteDataSet.xsc">
+      <DependentUpon>ComprobanteUnicoPagoEquivalenteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\ComprobanteUnicoPagoEquivalenteDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ComprobanteUnicoPagoEquivalenteDataSet1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Produccion\ComprobanteUnicoPagoEquivalenteDataSet.xss">
+      <DependentUpon>ComprobanteUnicoPagoEquivalenteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\ConsultaLiquidacionCamaronDataSet.xsc">
+      <DependentUpon>ConsultaLiquidacionCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\ConsultaLiquidacionCamaronDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ConsultaLiquidacionCamaronDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\ConsultaLiquidacionCamaronDataSet.xss">
+      <DependentUpon>ConsultaLiquidacionCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\DescabezadoDataSet.xsc">
+      <DependentUpon>DescabezadoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\DescabezadoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DescabezadoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\DescabezadoDataSet.xss">
+      <DependentUpon>DescabezadoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\HorasNoProductivasDataSet.xsc">
+      <DependentUpon>HorasNoProductivasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\HorasNoProductivasDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HorasNoProductivasDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\HorasNoProductivasDataSet.xss">
+      <DependentUpon>HorasNoProductivasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\HorasNoProductivasSubDataSet.xsc">
+      <DependentUpon>HorasNoProductivasSubDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\HorasNoProductivasSubDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HorasNoProductivasSubDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\HorasNoProductivasSubDataSet.xss">
+      <DependentUpon>HorasNoProductivasSubDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\LiquidacionCarroXCarroDataSet.xsc">
+      <DependentUpon>LiquidacionCarroXCarroDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\LiquidacionCarroXCarroDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LiquidacionCarroXCarroDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\LiquidacionCarroXCarroDataSet.xss">
+      <DependentUpon>LiquidacionCarroXCarroDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\LiquidacionCarroXCarroResumenDataSet.xsc">
+      <DependentUpon>LiquidacionCarroXCarroResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\LiquidacionCarroXCarroResumenDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LiquidacionCarroXCarroResumenDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\LiquidacionCarroXCarroResumenDataSet.xss">
+      <DependentUpon>LiquidacionCarroXCarroResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoDataSet.xsc">
+      <DependentUpon>MasterizadoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MasterizadoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoDataSet.xss">
+      <DependentUpon>MasterizadoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoMovInventarioDataSet.xsc">
+      <DependentUpon>MasterizadoMovInventarioDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoMovInventarioDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MasterizadoMovInventarioDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoMovInventarioDataSet.xss">
+      <DependentUpon>MasterizadoMovInventarioDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoPersDataSet.xsc">
+      <DependentUpon>MasterizadoPersDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoPersDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MasterizadoPersDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\MasterizadoPersDataSet.xss">
+      <DependentUpon>MasterizadoPersDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MovimientoEgresoMasterizadoDataSet.xsc">
+      <DependentUpon>MovimientoEgresoMasterizadoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MovimientoEgresoMasterizadoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoEgresoMasterizadoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Produccion\MovimientoEgresoMasterizadoDataSet.xss">
+      <DependentUpon>MovimientoEgresoMasterizadoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MovimientoMasterizadoIngresoDataSet.xsc">
+      <DependentUpon>MovimientoMasterizadoIngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\MovimientoMasterizadoIngresoDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MovimientoMasterizadoIngresoDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Produccion\MovimientoMasterizadoIngresoDataSet.xss">
+      <DependentUpon>MovimientoMasterizadoIngresoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\PruebaDeEscurridoDataSet.xsc">
+      <DependentUpon>PruebaDeEscurridoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\PruebaDeEscurridoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PruebaDeEscurridoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\PruebaDeEscurridoDataSet.xss">
+      <DependentUpon>PruebaDeEscurridoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\TransferenciaPlantaFCam001DataSet.xsc">
+      <DependentUpon>TransferenciaPlantaFCam001DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\TransferenciaPlantaFCam001DataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TransferenciaPlantaFCam001DataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\TransferenciaPlantaFCam001DataSet.xss">
+      <DependentUpon>TransferenciaPlantaFCam001DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\TumbadoPlacaIngresoTransferenciaDataSet.xsc">
+      <DependentUpon>TumbadoPlacaIngresoTransferenciaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Produccion\TumbadoPlacaIngresoTransferenciaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TumbadoPlacaIngresoTransferenciaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Produccion\TumbadoPlacaIngresoTransferenciaDataSet.xss">
+      <DependentUpon>TumbadoPlacaIngresoTransferenciaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proforma\ProformaContratoDataSet.xsc">
+      <DependentUpon>ProformaContratoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proforma\ProformaContratoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ProformaContratoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Proforma\ProformaContratoDataSet.xss">
+      <DependentUpon>ProformaContratoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionDataSet.xsc">
+      <DependentUpon>CierreLiquidacionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CierreLiquidacionDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionDataSet.xss">
+      <DependentUpon>CierreLiquidacionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionRendimientoDataSet.xsc">
+      <DependentUpon>CierreLiquidacionRendimientoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionRendimientoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CierreLiquidacionRendimientoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionRendimientoDataSet.xss">
+      <DependentUpon>CierreLiquidacionRendimientoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionRendimientoResumenDataSet.xsc">
+      <DependentUpon>CierreLiquidacionRendimientoResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\CierreLiquidacionRendimientoResumenDataSet.xsd" />
+    <None Include="Dataset\Recepcion\CierreLiquidacionRendimientoResumenDataSet.xss">
+      <DependentUpon>CierreLiquidacionRendimientoResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ComprobanteUnicoPagoDataSet.xsc">
+      <DependentUpon>ComprobanteUnicoPagoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ComprobanteUnicoPagoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ComprobanteUnicoPagoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\ComprobanteUnicoPagoDataSet.xss">
+      <DependentUpon>ComprobanteUnicoPagoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\DistribucionPagoDataSet.xsc">
+      <DependentUpon>DistribucionPagoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\DistribucionPagoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DistribucionPagoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\DistribucionPagoDataSet.xss">
+      <DependentUpon>DistribucionPagoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\DistribucionPagoResumenDataSet.xsc">
+      <DependentUpon>DistribucionPagoResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\DistribucionPagoResumenDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DistribucionPagoResumenDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\DistribucionPagoResumenDataSet.xss">
+      <DependentUpon>DistribucionPagoResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\IngresoCamaronStatusDataSet.xsc">
+      <DependentUpon>IngresoCamaronStatusDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\IngresoCamaronStatusDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>IngresoCamaronStatusDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\IngresoCamaronStatusDataSet.xss">
+      <DependentUpon>IngresoCamaronStatusDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.xsc">
+      <DependentUpon>LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.xss">
+      <DependentUpon>LibrasLiquidadasPendientePagoAprovadoProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proformas\ProformaDataset.xsc">
+      <DependentUpon>ProformaDataset.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proformas\ProformaDataset.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ProformaDataset.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Proformas\ProformaDataset.xss">
+      <DependentUpon>ProformaDataset.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proforma\ProformaDataSet.xsc">
+      <DependentUpon>ProformaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proforma\ProformaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ProformaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Proforma\ProformaDataSet.xss">
+      <DependentUpon>ProformaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proforma\TemperaturaDataSet.xsc">
+      <DependentUpon>TemperaturaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Proforma\TemperaturaDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TemperaturaDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Proforma\TemperaturaDataSet.xss">
+      <DependentUpon>TemperaturaDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasDataSet.xsc">
+      <DependentUpon>LibrasLiquidadasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LibrasLiquidadasDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasDataSet.xss">
+      <DependentUpon>LibrasLiquidadasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoDataSet.xsc">
+      <DependentUpon>LibrasLiquidadasPendientePagoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LibrasLiquidadasPendientePagoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientePagoDataSet.xss">
+      <DependentUpon>LibrasLiquidadasPendientePagoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobacionDataSet.xsc">
+      <DependentUpon>LibrasLiquidadasPendientesPagoPAprobacionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobacionDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LibrasLiquidadasPendientesPagoPAprobacionDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobacionDataSet.xss">
+      <DependentUpon>LibrasLiquidadasPendientesPagoPAprobacionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.xsc">
+      <DependentUpon>LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.xss">
+      <DependentUpon>LibrasLiquidadasPendientesPagoPAprobadoProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasSequencialDataSet.xsc">
+      <DependentUpon>LibrasLiquidadasSequencialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasSequencialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LibrasLiquidadasSequencialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasSequencialDataSet.xss">
+      <DependentUpon>LibrasLiquidadasSequencialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasSequentialDataSet.xsc">
+      <DependentUpon>LibrasLiquidadasSequentialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasSequentialDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LibrasLiquidadasSequentialDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Recepcion\LibrasLiquidadasSequentialDataSet.xss">
+      <DependentUpon>LibrasLiquidadasSequentialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCamaronDataSet.xsc">
+      <DependentUpon>LiquidacionCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCamaronDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LiquidacionCamaronDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCamaronDataSet.xss">
+      <DependentUpon>LiquidacionCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCarroXCarroLoteDataSet.xsc">
+      <DependentUpon>LiquidacionCarroXCarroLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCarroXCarroLoteDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LiquidacionCarroXCarroLoteDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCarroXCarroLoteDataSet.xss">
+      <DependentUpon>LiquidacionCarroXCarroLoteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCompraCamaronDataSet.xsc">
+      <DependentUpon>LiquidacionCompraCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCompraCamaronDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LiquidacionCompraCamaronDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\LiquidacionCompraCamaronDataSet.xss">
+      <DependentUpon>LiquidacionCompraCamaronDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\MargenPorTallasDataSet.xsc">
+      <DependentUpon>MargenPorTallasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\MargenPorTallasDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MargenPorTallasDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\MargenPorTallasDataSet.xss">
+      <DependentUpon>MargenPorTallasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\RecepcionDataset.xsc">
+      <DependentUpon>RecepcionDataset.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\RecepcionDataset.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RecepcionDataset.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dataset\Recepcion\RecepcionDataset.xss">
+      <DependentUpon>RecepcionDataset.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\MateriaPrimaPendienteDataSet.xsc">
+      <DependentUpon>MateriaPrimaPendienteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\MateriaPrimaPendienteDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MateriaPrimaPendienteDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\MateriaPrimaPendienteDataSet.xss">
+      <DependentUpon>MateriaPrimaPendienteDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenComprasPorPeriodoGlaseoDataSet.xsc">
+      <DependentUpon>ResumenComprasPorPeriodoGlaseoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenComprasPorPeriodoGlaseoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ResumenComprasPorPeriodoGlaseoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenComprasPorPeriodoGlaseoDataSet.xss">
+      <DependentUpon>ResumenComprasPorPeriodoGlaseoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenLiquidacionProveedorDataSet.xsc">
+      <DependentUpon>ResumenLiquidacionProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenLiquidacionProveedorDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ResumenLiquidacionProveedorDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenLiquidacionProveedorDataSet.xss">
+      <DependentUpon>ResumenLiquidacionProveedorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenLiquidacionProveedorResumenDataSet.xsc">
+      <DependentUpon>ResumenLiquidacionProveedorResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenLiquidacionProveedorResumenDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ResumenLiquidacionProveedorResumenDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\ResumenLiquidacionProveedorResumenDataSet.xss">
+      <DependentUpon>ResumenLiquidacionProveedorResumenDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\VitacotaProduccionDataSet.xsc">
+      <DependentUpon>VitacotaProduccionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\Recepcion\VitacotaProduccionDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>VitacotaProduccionDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\Recepcion\VitacotaProduccionDataSet.xss">
+      <DependentUpon>VitacotaProduccionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\rptPilotoDataSet.xsc">
+      <DependentUpon>rptPilotoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\rptPilotoDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>rptPilotoDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\rptPilotoDataSet.xss">
+      <DependentUpon>rptPilotoDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\SeguridadGarita\GuiaRemisionViaticoTerrestreDataSet.xsc">
+      <DependentUpon>GuiaRemisionViaticoTerrestreDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\SeguridadGarita\GuiaRemisionViaticoTerrestreDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GuiaRemisionViaticoTerrestreDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\SeguridadGarita\GuiaRemisionViaticoTerrestreDataSet.xss">
+      <DependentUpon>GuiaRemisionViaticoTerrestreDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\SeguridadGarita\PagosAnticiposFluvialDataSet.xsc">
+      <DependentUpon>PagosAnticiposFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\SeguridadGarita\PagosAnticiposFluvialDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PagosAnticiposFluvialDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\SeguridadGarita\PagosAnticiposFluvialDataSet.xss">
+      <DependentUpon>PagosAnticiposFluvialDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\SeguridadGarita\PagosAnticiposTerrestreDataSet.xsc">
+      <DependentUpon>PagosAnticiposTerrestreDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Dataset\SeguridadGarita\PagosAnticiposTerrestreDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PagosAnticiposTerrestreDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Dataset\SeguridadGarita\PagosAnticiposTerrestreDataSet.xss">
+      <DependentUpon>PagosAnticiposTerrestreDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\BibliotecaReporte.dll" />
+    <Content Include="bin\Debug\BibliotecaReporte.pdb" />
+    <Content Include="Procedimientos\Compras\spPar_OrdenCompraCamaron.sql" />
+    <Content Include="Procedimientos\Configuracion\spPar_IntegrationProcess.sql" />
+    <Content Include="Procedimientos\ControlDeCalidad\spParRpt_AnalisisCalidad.sql" />
+    <Content Include="Procedimientos\ControlDeCalidad\spRpt_AnalisisCalidadDefectos.sql" />
+    <Content Include="Procedimientos\ControlDeCalidad\spRpt_AnalisisCalidadOtrasEspecies.sql" />
+    <Content Include="Procedimientos\FacturaComercial\spPar_FacturacionComercialExcel.sql" />
+    <Content Include="Procedimientos\FacturaComercial\spPar_FacturaComercial.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_FactPesos.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_FactExteriorBL.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_FacturaElectronicaPropiaExcel.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_Temperatura.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_FacturaElectronicaPropia.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_FacturaFiscal.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_FacturaElectronicaAuxiliar.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_FacturaElectronicaPackinList.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_NomWoodCR.sql" />
+    <Content Include="Procedimientos\FacturasExterior\spPar_ISF.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_Ingreso.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_KardexCosto.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_KardexLote.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_KardexProveedor.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_KardexProveedorSaldo.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_MovimientoInventario.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_MovimientoInventarioMotivo.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_MovimientoInventarioIngresoTransferenciaA.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_MovimientoInventarioEgresoTransferenciaA.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_Movimiento.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_MovimientoLote.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_Saldo.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_SaldoLote.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_SaldoSinLote.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_SaldoSinLoteTodo.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_TransferEgreso.sql" />
+    <Content Include="Procedimientos\Inventario\spPar_TransferIngreso.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_RequerimientoInventario.sql" />
+    <Content Include="Procedimientos\Logistica\spParGuiaRIDE.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_GuiaRemisionDetalleRIDE.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_GuiaRemisionMatDespFluvial.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_GuiaRemisionMatDesp.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_LogisticaGuiaExcel.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_MovimientoInventarioTodos.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_LiquidacionMateriales.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_LiquidacionMaterialesGeneral.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_FleteTerrestre.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_FleteFluvial.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_GuiaRemisionViaticoFluvial.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_GuiaRemisionPersFluvial.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_RequisicionBodega.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_RotacionTransFluvial.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_RotacionTrans.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_GuiaRemisionPers.sql" />
+    <Content Include="Procedimientos\Logistica\spPar_LogisticaGuia.sql" />
+    <Content Include="Procedimientos\Logo\spPar_Logo.sql" />
+    <Content Include="Procedimientos\OrdenesDeProduccion\spPar_OrdenProduccionMaterialResumen.sql" />
+    <Content Include="Procedimientos\OrdenesDeProduccion\spPar_OrdenProduccionInstrucciones.sql" />
+    <Content Include="Procedimientos\OrdenesDeProduccion\spPar_OrdenProduccionVenta.sql" />
+    <Content Include="Procedimientos\OrdenesDeProduccion\sp_ParOrdenProduccionMaterial.sql" />
+    <Content Include="Procedimientos\OrdenesDeProduccion\spPar_OrdenProduccionReport.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_MatrizProcesosInterno2.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_ProcesosInternos.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_Movimiento_InventarioEgreso.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_Movimiento_InventarioIngreso.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_ProcesoInternoDetallado.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_DetalleDeReproceso.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_ProcesosInternoResumen.sql" />
+    <Content Include="Procedimientos\Procesos\spPar_ResumenReproceso.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_ComprobanteUnicoPagoEquivalente.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_LiquidacionCarroXCarroResumen.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_MasterizadoMovInventario.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_ReportFCam003.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_ReportFCam002.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_ConsultaLiquidacionCamaron.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_RptHorasNoTrabajadasDetalleReport.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_RptHorasNoTrabajadasReport.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_LiquidacionCarroXCarro.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_AnticipoAProveedores.sql" />
+    <Content Include="Procedimientos\Produccion\spAnticipoCompraCamaron.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_Masterizado.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_MovimientoEgresoMasterizado.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_MovimientoIngresoMasterizado.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_TransferenciaPlantaFCam001.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_RptDescabezado.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_TmbadoPlacaIngresoTransferencia.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_PruebaDeEscurrido.sql" />
+    <Content Include="Procedimientos\Produccion\spPar_MasterizadoPers.sql" />
+    <Content Include="Procedimientos\Produccion\spRptCierreTurnoTemporal.sql" />
+    <Content Include="Procedimientos\Produccion\spRptCierreTurno.sql" />
+    <Content Include="Procedimientos\Produccion\spRptCierreMaquina.sql" />
+    <Content Include="Procedimientos\Proforma\spPar_ProformasReportContract.sql" />
+    <Content Include="Procedimientos\Proforma\spPar_Temperatura.sql" />
+    <Content Include="Procedimientos\Proforma\spPar_Proforma.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_CierreLiquidacionRendimientoResumen.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_DistribucionPagoConDistribucion.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_DistribucionPagoSinDistribucion.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_DistribucionPago.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LiquidacionCarroXCarroLote.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LiquidacionCompraCamaron.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LibrasLiquidadasPendientesPagoPAprobadoProveedor.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LibrasLiquidadasSequencial.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_CierreLiquidacionRendimiento.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_ComprobanteUnicoPago.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_CierreLiquidacion.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LiquidacionCamaron.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LibrasLiquidadasPendientePagoPAprobacion.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_IngresoCamaronStatus.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_ResumenLiquidacionesProveedorResumen.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_ResumenLiquidacionProveedor.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_ResumenComprasPorPeriodoGlaseo.sql" />
+    <Content Include="Procedimientos\Recepcion\SP_MargenPorTallas.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_VitacoraProduccion.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_MateriaPrimaPendiente.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LibrasLiquidadas.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LibrasLiquidadaspendientePagoAprobadoProveedor.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_LibrasLiquidadasPendientePago.sql" />
+    <Content Include="Procedimientos\Recepcion\spPar_Recepcion.sql" />
+    <Content Include="Procedimientos\SeguridadGarita\spPar_PagosAnticiposFluvial.sql" />
+    <Content Include="Procedimientos\SeguridadGarita\spPar_GuideRemisionViaticoTerrestre.sql" />
+    <Content Include="Procedimientos\SeguridadGarita\spPar_PagosAnticiposTerrestre.sql" />
+    <Content Include="Procedimientos\spQuerys.sql" />
+    <Content Include="Procedimientos\spPilotoCrytalReport.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\LijsDev.CrystalReportsRunner.13.0.33.x86.1.4.2\build\LijsDev.CrystalReportsRunner.13.0.33.x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LijsDev.CrystalReportsRunner.13.0.33.x86.1.4.2\build\LijsDev.CrystalReportsRunner.13.0.33.x86.props'))" />
+  </Target>
+</Project>

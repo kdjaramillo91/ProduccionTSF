@@ -1,0 +1,52 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.FrameworkContractExtension
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="3">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Extensi&oacute;n del Contrato</span>
+        </td>
+    </tr>
+    <tr>
+        @{
+            if (Model.value != null)
+            {
+                <td>
+                    @Html.DevExpress().LabelFor(m => m.value, settings =>
+               {
+                   settings.Name = "valueLabel";
+                   settings.Text = "Valor:";
+                   settings.AssociatedControlName = "value";
+               }).GetHtml()
+                </td>
+                <td>
+                    @Html.Raw(Model.value.Value.ToString("$#,###.00"))
+                </td>
+                <td>
+                    
+                </td>
+            }
+            if (Model.amout != null)
+            {
+                var metricUnitUMTPAux = DataProviderSetting.ValueSetting("UMTP");
+                var id_metricUnitUMTPValueAux = int.Parse(metricUnitUMTPAux != null ? metricUnitUMTPAux : "0");
+                var metricUnitUMTP = DataProviderMetricUnit.MetricUnitById(id_metricUnitUMTPValueAux);
+                <td>
+                    @Html.DevExpress().LabelFor(m => m.amout, settings =>
+               {
+                   settings.Name = "amoutLabel";
+                   settings.Text = "Cantidad:";
+                   settings.AssociatedControlName = "amout";
+               }).GetHtml()
+                </td>
+                <td>
+                    @Html.Raw(Model.amout.Value.ToString("N2"))
+                </td>
+                <td>
+                    @Html.Raw(metricUnitUMTP != null ? metricUnitUMTP.code : "")
+                </td>
+            }
+        }
+    </tr>
+</table>
+

@@ -1,0 +1,64 @@
+﻿ 
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuide
+
+
+
+<table class="table table-condenced" style="margin: 0px;">
+    <!--FILA 1  Información de Liquidación-->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="12">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Liquidaci&oacute;n</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Número Liquidación: ";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.liquidationDocument, settings =>
+       {
+           settings.Properties.ClientInstanceName = "liquidationDocument";
+           settings.Name = "liquidationDocument";
+           settings.Width = Unit.Percentage(50);
+           settings.Properties.MaxLength = 50;
+       }).GetHtml()
+        </td>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Número Factura: ";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.invoiceNumber, settings =>
+       {
+           settings.Properties.ClientInstanceName = "invoiceNumber";
+           settings.Name = "invoiceNumber";
+           settings.Width = Unit.Percentage(50);
+           settings.Properties.MaxLength = 50;
+       }).GetHtml()
+        </td>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Valor Liquidado: ";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalLiquidation, settings =>
+            {
+            settings.Properties.ClientInstanceName = "totalLiquidation";
+            settings.Name = "totalLiquidation";
+            settings.Width = Unit.Percentage(50);
+            settings.Properties.MaxLength = 50;
+                settings.Properties.DisplayFormatString = "N2";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+

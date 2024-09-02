@@ -1,0 +1,29 @@
+﻿@using DXPANACEASOFT.DataProviders
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "id_rate";
+    settings.Properties.ClientInstanceName = "id_rate";
+    settings.Width = Unit.Percentage(100);
+
+    settings.CallbackRouteValues = new { Controller = "Item", Action = "ComboBoxTaxationRatePartial" };
+
+    settings.Properties.ClientSideEvents.BeginCallback = "ItemTaxationRateCombo_BeginCallback";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemTaxationRateCombo_SelectedIndexChanged";
+
+    settings.ControlStyle.CssClass = "editor";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.TextFormatString = "{0}";
+
+    settings.Properties.Columns.Add("name").Caption = "Tarifa";
+    settings.Properties.Columns.Add("percentage").Caption = "Porcentaje";
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+}).BindList(Model).Bind(ViewData["id_rate"]).GetHtml()

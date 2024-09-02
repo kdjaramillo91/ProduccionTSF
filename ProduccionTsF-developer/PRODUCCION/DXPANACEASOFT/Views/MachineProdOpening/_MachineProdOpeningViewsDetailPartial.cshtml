@@ -1,0 +1,213 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.MachineProdOpeningDetail>
+
+@{
+    var grid = Html.DevExpress().GridView<MachineProdOpeningDetail>(settings =>
+    {
+        settings.Name = "gvMachineProdOpeningDetailEditForm" + ViewData["id_machineProdOpening"];
+        settings.CallbackRouteValues = new { Controller = "MachineProdOpening", Action = "MachineProdOpeningDetailPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "MachineProdOpeningDetails_BeginCallback";
+
+
+        settings.CommandColumn.Visible = false;
+//settings.CommandColumn.ShowSelectCheckbox = true;
+//settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+//settings.SettingsBehavior.ConfirmDelete = false;
+
+settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId";
+
+settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+//settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+//Checkbox de registros de tabla
+//settings.CommandColumn.ShowSelectCheckbox = true;
+//settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+////Eventos
+//settings.ClientSideEvents.Init = "OnGridViewInitDetail";
+//settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedDetail";
+//settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackDetail";
+//settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackDetail";
+
+//Pie de tabla
+//settings.Settings.ShowFooter = true;
+
+//Panel para cantidad de registros
+settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<MachineProdOpeningDetail> rows = (Model as List<MachineProdOpeningDetail>);
+            rows = (rows != null) ? rows.ToList() : new List<MachineProdOpeningDetail>();
+
+            e.Properties["cpIdMachineProdOpening"] = ViewData["id_machineProdOpening"];
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+//settings.SetFooterRowTemplateContent(c =>
+//{
+//    ViewContext.Writer.Write(@"<span id=""lblInfoDetails""></span>");
+//    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+//    {
+//        ViewContext.Writer.Write(
+//            @"<a id=""lnkSelectAllRowsDetails"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRowsDetail()"">Seleccionar Todos</a>
+//              <a id=""lnkClearSelectionDetails"" style=""cursor: pointer;"" onclick=""gvEditClearSelectionDetail()"">Anular Selección</a>"
+//        );
+//    }
+//});
+
+settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+//settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+//settings.InitNewRow = (s, e) =>
+//{
+//    e.NewValues["quantity"] = 0.00M;
+//};
+
+settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+//Pie de tabla
+//settings.Settings.ShowFooter = true;
+
+//settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "numBoxes").DisplayFormat = "<b>{0:#,##0}</b>";
+//settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountInvoice").DisplayFormat = "<b>{0:n2}</b>";
+//settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>{0:c2}</b>";
+
+#region ColumnsAdd
+
+//code 14
+settings.Columns.Add(m => m.MachineForProd.code, column =>
+        {
+            column.Name = "codeMachineForProd";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(14);
+
+        });
+
+//name 30
+settings.Columns.Add(m => m.MachineForProd.name, column =>
+        {
+            column.Name = "nameMachineForProd";
+    //column.FieldName = "id_MachineForProd";
+    column.Caption = "Máquina";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(30);
+
+        });
+
+//person 30
+settings.Columns.Add(m => m.Person.fullname_businessName, column =>
+        {
+            column.Name = "responsable";
+            column.Caption = "Responsable";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(30);
+        });
+
+        settings.Columns.Add(m => m.MachineForProd.Person.processPlant, column =>
+        {
+            column.Name = "processPlant";
+            column.Caption = "Proceso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+        });
+
+//timeInit 13
+settings.Columns.Add(m => m.timeInit, column =>
+        {
+            column.Name = "timeInitDetail";
+            column.Caption = "Hora Inicio";
+    //column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+    column.Width = Unit.Percentage(13);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                TimeSpan? timeInit = (TimeSpan?)DataBinder.Eval(c.DataItem, "timeInit");
+
+                string code = (timeInit != null) ? timeInit.ToString() : "00:00:00";
+
+                ViewContext.Writer.Write(code);
+            });
+
+        });
+
+//timeEnd 13
+settings.Columns.Add(m => m.timeEnd, column =>
+        {
+            column.Name = "timeEndDetail";
+            column.Caption = "Hora Fin";
+            column.ColumnType = MVCxGridViewColumnType.TimeEdit;
+            column.ReadOnly = true;
+            column.Width = Unit.Percentage(13);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                TimeSpan? timeEnd = (TimeSpan?)DataBinder.Eval(c.DataItem, "timeEnd");
+
+                string code = (timeEnd != null) ? timeEnd.ToString() : "00:00:00";
+
+                ViewContext.Writer.Write(code);
+            });
+
+        });
+
+        settings.Columns.Add(m => m.numPerson, column =>
+        {
+            column.Name = "numPerson";
+            column.Caption = "No. Personas";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(30);
+
+        });
+
+#endregion
+
+});
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}
+
+@*<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingDetailsEditForm.js"></script>*@

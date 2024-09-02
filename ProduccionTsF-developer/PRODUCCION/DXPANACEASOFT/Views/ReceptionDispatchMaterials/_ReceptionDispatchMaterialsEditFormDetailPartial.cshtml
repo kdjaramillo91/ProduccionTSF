@@ -1,0 +1,513 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ReceptionDispatchMaterialsDetail>
+
+@{
+    var grid = Html.DevExpress().GridView<ReceptionDispatchMaterialsDetail>(settings =>
+    {
+        settings.Name = "gvReceptionDispatchMaterialsDetailEditForm";
+        settings.CallbackRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "ReceptionDispatchMaterialsEditFormDetailPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "InvoiceCommercialsDetail_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "ReceptionDispatchMaterialsEditFormDetailAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "ReceptionDispatchMaterialsEditFormDetailUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "ReceptionDispatchMaterialsEditFormDetailDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+        //settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        //settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        //settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+        //settings.SettingsEditing.BatchEditSettings.HighlightDeletedRows = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId"; 
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        ////Eventos
+        //settings.ClientSideEvents.Init = "OnGridViewInitDetail";
+        //settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedDetail";
+        //settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackDetail";
+        //settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackDetail";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<ReceptionDispatchMaterialsDetail> rows = (Model as List<ReceptionDispatchMaterialsDetail>);
+            rows = (rows != null) ? rows.ToList() : new List<ReceptionDispatchMaterialsDetail>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+
+            WarehouseLocation warehouseLocationAux = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "WarehouseLocation") != null) ? (WarehouseLocation)gv.GetRowValues(gv.EditingRowVisibleIndex, "WarehouseLocation") : null;
+
+            e.Properties["cpEditingRowWarehouseLocationName"] = warehouseLocationAux == null ? "" : warehouseLocationAux.name;
+        };
+
+        //settings.SetFooterRowTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblInfoDetails""></span>");
+        //    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+        //    {
+        //        ViewContext.Writer.Write(
+        //            @"<a id=""lnkSelectAllRowsDetails"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRowsDetail()"">Seleccionar Todos</a>
+        //              <a id=""lnkClearSelectionDetails"" style=""cursor: pointer;"" onclick=""gvEditClearSelectionDetail()"">Anular Selección</a>"
+        //        );
+        //    }
+        //});
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["arrivalDestinationQuantity"] = 0.00M;
+            e.NewValues["arrivalBadCondition"] = 0.00M;
+            e.NewValues["arrivalGoodCondition"] = 0.00M;
+        };
+
+        settings.Styles.Header.Font.Bold = true;
+
+        //Pie de tabla
+        //settings.Settings.ShowFooter = true;
+
+        //settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "numBoxes").DisplayFormat = "<b>{0:#,##0}</b>";
+        //settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountInvoice").DisplayFormat = "<b>{0:n2}</b>";
+        //settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>{0:c2}</b>";
+
+        #region ColumnsAdd
+
+        //id_warehouseReceptionDispatchMaterialsDetail 15
+        settings.Columns.Add(m => m.id_warehouse, column =>
+        {
+            column.FieldName = "id_warehouse";
+            //column.Name = "id_warehouseReceptionDispatchMaterialsDetail";
+            column.Caption = "Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+
+                Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+                string text = (warehouse != null) ? warehouse.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_warehouseReceptionDispatchMaterialsDetail";
+                p.DataSource = DataProviderWarehouse.AllWarehousesWithVIRPROByCompany((int?)ViewData["id_company"], (EntityObjectPermissions)ViewData["entityObjectPermissions"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                //p.TextFormatString = "{1}";
+                p.ValueType = typeof(int);
+                //p.CallbackPageSize = 30;
+                p.Width = Unit.Percentage(100);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                //p.Columns.Add("masterCode", "Código", 70);//, Unit.Percentage(50));
+                //p.Columns.Add("name", "Nombre del Producto", 200);//, Unit.Percentage(70));
+                //p.Columns.Add("barCode", "EAN", Unit.Percentage(50));
+                //p.Columns.Add("ItemInventory.MetricUnit.code", "UM", 50);//, Unit.Percentage(20));
+                //p.ClientSideEvents.Init = "WarehouseReceptionDispatchMaterialsDetailCombo_OnInit";
+                //p.ClientSideEvents.DropDown = "ItemCombo_DropDown";
+                p.ValidationSettings.RequiredField.IsRequired = false;
+                p.ValidationSettings.EnableCustomValidation = true;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ClientSideEvents.SelectedIndexChanged = "WarehouseReceptionDispatchMaterialsDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnWarehouseReceptionDispatchMaterialsDetailValidation";
+                //p.ClientSideEvents.ValueChanged = "ItemsCombo_ValueChanged";}
+            });
+
+        });
+
+        //id_warehouseLocationReceptionDispatchMaterialsDetail 15
+        settings.Columns.Add(m => m.id_warehouseLocation, column =>
+        {
+            column.FieldName = "id_warehouseLocation";
+            //column.Name = "id_warehouseLocationReceptionDispatchMaterialsDetail";
+            column.Caption = "Ubicación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(15);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_warehouselocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouselocation");
+
+                WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouselocation);
+
+                string text = (warehouseLocation != null) ? warehouseLocation.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_warehouseLocationReceptionDispatchMaterialsDetail";
+                p.DataSource = null;// DataProviderWarehouse.AllWarehousesVIRPROByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "name";
+                //p.TextFormatString = "{1}";
+                p.ValueType = typeof(int);
+                //p.CallbackPageSize = 30;
+                p.Width = Unit.Percentage(100);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                //p.Columns.Add("masterCode", "Código", 70);//, Unit.Percentage(50));
+                //p.Columns.Add("name", "Nombre del Producto", 200);//, Unit.Percentage(70));
+                //p.Columns.Add("barCode", "EAN", Unit.Percentage(50));
+                //p.Columns.Add("ItemInventory.MetricUnit.code", "UM", 50);//, Unit.Percentage(20));
+                p.ClientSideEvents.Init = "WarehouseLocationReceptionDispatchMaterialsDetailCombo_OnInit";
+                //p.ClientSideEvents.DropDown = "ItemCombo_DropDown";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                //p.ClientSideEvents.SelectedIndexChanged = "WarehouseLocationReceptionDispatchMaterialsDetailCombo_SelectedIndexChanged";
+                //p.ClientSideEvents.Validation = "OnWarehouseLocationReceptionDispatchMaterialsDetailValidation";
+                //p.ClientSideEvents.ValueChanged = "ItemsCombo_ValueChanged";}
+                p.CallbackRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "GetWarehouseLocationReceptionDispatchMaterialsDetail"/*, TextField = "CityName"*/ };
+                p.ClientSideEvents.BeginCallback = "WarehouseLocationReceptionDispatchMaterialsDetail_BeginCallback";
+                p.ClientSideEvents.EndCallback = "WarehouseLocationReceptionDispatchMaterialsDetail_EndCallback";
+                //p.ClientSideEvents.SelectedIndexChanged = "WarehouseLocationReceptionDispatchMaterialsDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnWarehouseLocationReceptionDispatchMaterialsDetailValidation";
+
+            });
+
+        });
+
+        //itemReceptionDispatchMaterialsDetailMasterCode 6
+        settings.Columns.Add(m => m.Item.masterCode, column =>
+        {
+            column.Name = "itemReceptionDispatchMaterialsDetailMasterCode";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(6);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+
+                string masterCode = (item != null) ? item.masterCode : "";
+
+                ViewContext.Writer.Write(masterCode);
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+
+                string masterCode = (item != null) ? item.masterCode : "";
+
+                Html.DevExpress().TextBox(textBox =>
+                {
+                    textBox.Name = "itemReceptionDispatchMaterialsDetailMasterCode";
+                    textBox.Properties.ClientInstanceName = "itemReceptionDispatchMaterialsDetailMasterCode";
+                    textBox.Width = Unit.Percentage(100);
+                    textBox.ReadOnly = true;
+                    textBox.ShowModelErrors = false;
+
+                }).Bind(masterCode).GetHtml();//.Render();//.Bind(masterCode).Render();
+            });
+        });
+
+        //itemReceptionDispatchMaterialsDetailName 26
+        settings.Columns.Add(m => m.Item.name, column =>
+        {
+            //column.Name = "itemReceptionDispatchMaterialsDetailName";
+            column.FieldName = "id_item";
+            column.Caption = "Nombre del Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(26);
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "itemReceptionDispatchMaterialsDetailName";
+                p.DataSource = DataProviderItem.AllMDDItemsByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                //p.TextField = "name";
+                p.TextFormatString = "{1}";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 30;
+                p.Width = Unit.Percentage(100);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                p.Columns.Add("masterCode", "Código", 70);//, Unit.Percentage(50));
+                p.Columns.Add("name", "Nombre del Producto", 200);//, Unit.Percentage(70));
+                //p.Columns.Add("barCode", "EAN", Unit.Percentage(50));
+                p.Columns.Add("ItemInventory.MetricUnit.code", "UM", 50);//, Unit.Percentage(20));
+                //p.ClientSideEvents.Init = "ItemReceptionDispatchMaterialsDetailCombo_OnInit";
+                //p.ClientSideEvents.DropDown = "ItemCombo_DropDown";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ClientSideEvents.SelectedIndexChanged = "ItemReceptionDispatchMaterialsDetailCombo_SelectedIndexChanged";
+                p.ClientSideEvents.Validation = "OnItemReceptionDispatchMaterialsDetailValidation";
+                //p.ClientSideEvents.ValueChanged = "ItemsCombo_ValueChanged";}
+            });
+        });
+
+        ////itemDetailAuxCode 15
+        //settings.Columns.Add(m => m.Item1.auxCode, column =>
+        //{
+        //    column.Name = "itemDetailAuxCode";
+        //    column.Caption = "Código Aux.";
+        //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        //    column.Width = Unit.Percentage(15);
+        //});
+
+        //itemReceptionDispatchMaterialsDetailMetricUnit  5
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "id_metricUnit";
+            column.Name = "itemReceptionDispatchMaterialsDetailMetricUnit";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+                Item item = DataProviderItem.Item(id);
+                string metricUnit = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+                ViewContext.Writer.Write(metricUnit);
+
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id);
+
+                string metricUnit = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+
+                Html.DevExpress().TextBox(p =>
+                {
+                    p.Name = "itemReceptionDispatchMaterialsDetailMetricUnit";
+                    p.Properties.ClientInstanceName = "itemReceptionDispatchMaterialsDetailMetricUnit";
+
+                    p.Width = Unit.Percentage(100);
+
+                    p.ReadOnly = true;
+                    p.ShowModelErrors = false;
+                }).Bind(metricUnit).GetHtml();//.Render();//.Bind(metricUnit).Render();
+            });
+        });
+
+        //arrivalDestinationQuantityReceptionDispatchMaterialsDetail 8
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalDestinationQuantity";
+            //column.Name = "arrivalDestinationQuantityReceptionDispatchMaterialsDetail";
+            column.Caption = "Cantidad Recibida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+                ViewContext.Writer.Write(arrivalDestinationQuantity.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                //p.Width = Unit.Percentage(127);
+                p.ClientInstanceName = "arrivalDestinationQuantityReceptionDispatchMaterialsDetail";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                //p.SpinButtons.ShowIncrementButtons = true;
+                //p.SpinButtons.ShowLargeIncrementButtons = true;
+                //p.Increment = 0.01M;
+                //p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                //p.NumberFormat = SpinEditNumberFormat.Number;
+
+                p.ClientSideEvents.ValueChanged = "UpdateArrivalGoodConditionReceptionDispatchMaterialsDetail";
+                p.ClientSideEvents.Validation = "OnArrivalDestinationQuantityReceptionDispatchMaterialsDetailValidation";
+            });
+        });
+
+        //arrivalBadConditionReceptionDispatchMaterialsDetail 8
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalBadCondition";
+            //column.Name = "arrivalBadConditionReceptionDispatchMaterialsDetail";
+            column.Caption = "Mal Estado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalBadCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalBadCondition");
+                ViewContext.Writer.Write(arrivalBadCondition.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                //p.Width = Unit.Percentage(127);
+                p.ClientInstanceName = "arrivalBadConditionReceptionDispatchMaterialsDetail";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                //p.SpinButtons.ShowIncrementButtons = true;
+                //p.SpinButtons.ShowLargeIncrementButtons = true;
+                //p.Increment = 0.01M;
+                //p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                //p.NumberFormat = SpinEditNumberFormat.Number;
+
+                p.ClientSideEvents.ValueChanged = "UpdateArrivalGoodConditionReceptionDispatchMaterialsDetail";
+
+                p.ClientSideEvents.Validation = "OnArrivalBadConditionReceptionDispatchMaterialsDetailValidation";
+            });
+        });
+
+        //arrivalGoodConditionReceptionDispatchMaterialsDetail 8
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "arrivalGoodCondition";
+            //column.Name = "arrivalGoodConditionReceptionDispatchMaterialsDetail";
+            column.Caption = "Buen Estado";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+            column.ReadOnly = true;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal arrivalGoodCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalGoodCondition");
+                ViewContext.Writer.Write(arrivalGoodCondition.ToString("N2"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                //p.Width = Unit.Percentage(127);
+                p.ClientInstanceName = "arrivalGoodConditionReceptionDispatchMaterialsDetail";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                //p.SpinButtons.ShowIncrementButtons = true;
+                //p.SpinButtons.ShowLargeIncrementButtons = true;
+                //p.Increment = 0.01M;
+                //p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                //p.MaxValue = 100;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                //p.NumberFormat = SpinEditNumberFormat.Number;
+
+
+                p.ClientSideEvents.Validation = "OnArrivalGoodConditionReceptionDispatchMaterialsDetailValidation";
+            });
+        });
+
+        //Botones de comandos para registros de la tabla
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 15,
+            Caption = "Acciones"
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.Width = Unit.Percentage(10);
+
+        settings.Columns.Add(commandColumn);
+
+        settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+
+        #endregion
+
+        //#region EditorLayout
+
+        //settings.SetEditFormTemplateContent(content =>
+        //{
+        //    int? id_invoiceCommercialDetail = (int?)DataBinder.Eval(content.DataItem, "id");
+        //    List<InvoiceCommercialDetail> rows = (Model as List<InvoiceCommercialDetail>);
+        //    rows = (rows != null) ? rows.ToList() : new List<InvoiceCommercialDetail>();
+        //    InvoiceCommercialDetail invoiceCommercialDetail = rows.FirstOrDefault(fod => fod.id == id_invoiceCommercialDetail);
+        //    invoiceCommercialDetail = ((invoiceCommercialDetail == null) ? new InvoiceCommercialDetail() : invoiceCommercialDetail);
+        //    //Item item = (id_item != null) ? DataProviderItem.Item((int)id_item) : new Item { isActive = true };
+        //    Html.RenderPartial("_InvoiceCommercialDetailFormEdit", invoiceCommercialDetail);
+        //});
+
+        //#endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+
+@*<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingDetailsEditForm.js"></script>*@

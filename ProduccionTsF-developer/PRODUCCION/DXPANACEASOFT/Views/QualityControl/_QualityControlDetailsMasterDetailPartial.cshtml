@@ -1,0 +1,339 @@
+﻿@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+
+@model List<DXPANACEASOFT.Models.QualityControlDetail>
+
+@{
+	Html.EnableClientValidation();
+	Html.EnableUnobtrusiveJavaScript();
+	TempData.Keep("qualityControlDetailsTmp");
+	TempData.Keep("codeVisualizationTypeTemporal");
+	string codeVisualizationType = DataProviderQualityControl.QualityControlVisualizationTypeDataByAnalysis((int)ViewData["id_analysisGroup"]);
+	bool hasWholePerformance = DataProviderQualityControl.QualityControlAnalysisGroupHasWholePerformance((int)ViewData["id_analysisGroup"]);
+	string codeVisualizationColor = DataProviderQualityControl.QualityControlAnalysisGroupHasColor((int)ViewData["id_analysisGroup"]);
+
+	decimal valorTotal = 0m;
+	int hasWholePerformanceInt = 0;
+	hasWholePerformanceInt = hasWholePerformance == true ? 1 : 0;
+	string codeState = "01";
+	if (ViewData["codeState"] != null)
+	{
+		codeState = (string)ViewData["codeState"];
+	}
+	string aValueSettingGRAMCLA = DataProviderSetting.ValueSetting("GRAMCLA");
+	bool aValueSettingGRAMCLASI = aValueSettingGRAMCLA == "SI";
+	bool aCJATXT = false;
+	bool aPieza = false;
+	object validacionesAR = null;
+	if (codeVisualizationType == "SPIEDT")
+	{
+		var qcd = Model.FirstOrDefault();
+		if (qcd != null)
+		{
+			var qualityControlConfiguration = qcd.QualityControl.id_qualityControlConfiguration;
+			validacionesAR = DataProviderQualityControl.GetValidation(Model.ToArray(), qualityControlConfiguration);
+		}
+
+	}
+}
+@{
+	var grid = Html.DevExpress().GridView<QualityControlDetail>(
+settings =>
+{
+	settings.Name = hasWholePerformanceInt == 1 ? (hasWholePerformanceInt + "gvQualityControlDetailsDetail" + ViewData["id_analysisGroup"]) : ("gvQualityControlDetailsDetail" + ViewData["id_analysisGroup"]);
+	settings.KeyFieldName = "id";
+
+	settings.Width = Unit.Percentage(100);
+	settings.CallbackRouteValues = new
+	{
+		Controller = "QualityControl",
+		Action = "QualityControlDetailsDetailPartial",
+		id_analysisGroup = (int)ViewData["id_analysisGroup"]
+	};
+	settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+	settings.ClientSideEvents.BatchEditRowValidating = "OnBatchEditRowValidating";
+
+	if (codeVisualizationType != "CMBBOX")
+	{
+		settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+		settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+		settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "QualityControl", Action = "BatchEditingUpdateModel", id_analysisGroup = (int)ViewData["id_analysisGroup"] };
+
+	}
+	else
+	{
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "QualityControl", Action = "QualityControlDetailsDetailUpdatePartial", id_analysisGroup = (int)ViewData["id_analysisGroup"] };
+	}
+
+	settings.SettingsBehavior.AllowSort = false;
+	settings.CommandColumn.Visible = true;
+	settings.CommandColumn.ShowDeleteButton = false;
+	settings.CommandColumn.ShowNewButtonInHeader = false;
+	settings.CommandColumn.Width = Unit.Point(90);
+
+	settings.Columns.Add(column =>
+	{
+		column.FieldName = "id_qualityAnalysis";
+		column.Name = "id_qualityAnalysisName";
+		column.Width = Unit.Percentage(50);
+		column.Caption = "Análisis";
+		column.ColumnType = MVCxGridViewColumnType.TextBox;
+		if (codeVisualizationType == "CMBBOX")
+		{
+			column.Width = Unit.Percentage(25);
+
+		}
+
+		column.SetDataItemTemplateContent(c =>
+		{
+
+			var id_qualityAnalysis = (int?)DataBinder.Eval(c.DataItem, "id_qualityAnalysis");
+
+			var qualityAnalysis = DataProviderQualityAnalysis.QualityAnalysis(id_qualityAnalysis);
+			ViewContext.Writer.Write(qualityAnalysis != null ? qualityAnalysis.name : "");
+
+		});
+		column.EditFormSettings.Visible = DefaultBoolean.False;
+
+	});
+	if (hasWholePerformance == true && aValueSettingGRAMCLASI)
+	{
+		settings.Columns.Add(column =>
+		{
+			column.Name = "unit";
+			column.Width = Unit.Percentage(50);
+			column.Caption = "Unidades";
+			column.ReadOnly = codeState != "01";
+
+
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+			var spinEditProperties = column.PropertiesEdit as SpinEditProperties;
+			spinEditProperties.MinValue = 0;
+			//spinEditProperties.MaxValue = 100;
+			spinEditProperties.DisplayFormatString = "N2";
+			column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+			spinEditProperties.DisplayFormatInEditMode = true;
+			column.FieldName = "otherResultValue";
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				try
+				{
+					var otherResultValue = (string)DataBinder.Eval(c.DataItem, "otherResultValue");
+					if (!String.IsNullOrEmpty(otherResultValue))
+					{
+						//decimal otherResultValueDecimal = Convert.ToDecimal(otherResultValue);
+						ViewContext.Writer.Write(otherResultValue);
+					}
+				}
+				catch (Exception)
+				{
+				}
+			});
+
+			//settings.SummaryDisplayText = (s, e) =>
+			//{
+			//    e.Text = string.Format("Piezas Totales = {0}", e.Value);
+			//};
+			settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "otherResultValue").DisplayFormat = "N2";
+			settings.Settings.ShowFooter = true;
+		});
+	}
+	settings.Columns.Add(column =>
+	{
+		column.Name = "result";
+		column.Width = Unit.Percentage(50);
+		column.Caption = hasWholePerformance == true && aValueSettingGRAMCLASI ? "%" : "Resultado";
+		column.ReadOnly = codeState != "01";
+
+		if (codeVisualizationType == "CMBBOX")
+		{
+			column.FieldName = "result";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.Width = Unit.Percentage(30);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var resultValue = (string)DataBinder.Eval(c.DataItem, "resultValue");
+				ViewContext.Writer.Write(resultValue);
+			});
+		}
+		else if (codeVisualizationType == "CJATXT")
+		{
+			column.FieldName = "resultValue";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			aCJATXT = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var resultValue = (string)DataBinder.Eval(c.DataItem, "resultValue");
+				ViewContext.Writer.Write(resultValue);
+			});
+		}
+		else if (codeVisualizationType == "SPIEDT")
+		{
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+			var spinEditProperties = column.PropertiesEdit as SpinEditProperties;
+			spinEditProperties.MinValue = 0;
+
+			//spinEditProperties.MaxValue = 100;
+
+
+			spinEditProperties.DisplayFormatString = "N2";
+			column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+			spinEditProperties.DisplayFormatInEditMode = true;
+			column.FieldName = "resultValue";
+			column.ReadOnly = hasWholePerformance == true && aValueSettingGRAMCLASI;
+			column.SetDataItemTemplateContent(c =>
+			{
+
+
+				try
+				{
+					var resultValue = (string)DataBinder.Eval(c.DataItem, "resultValue");
+					if (!String.IsNullOrEmpty(resultValue))
+					{
+						decimal resultValueDecimal = Convert.ToDecimal(resultValue);
+						ViewContext.Writer.Write(resultValueDecimal);
+					}
+				}
+				catch (Exception)
+				{
+				}
+
+
+
+			});
+
+			settings.SummaryDisplayText = (s, e) =>
+			{
+				if (hasWholePerformance == true)
+				{
+					if (e.Item.FieldName == "resultValue")
+					{
+						var aAmoutNADCTD = ViewBag.amoutNADCTD != null ? (decimal)ViewBag.amoutNADCTD : 0.00M;
+						var diffAux = ((e.Value != null ? (decimal)e.Value : 0.00M) - aAmoutNADCTD);
+						decimal decSum = 100 - diffAux;
+
+						if (codeVisualizationColor == "TOTDEF")
+						{
+							e.Text = string.Format("Total Defectos = {0}", diffAux) + "      " + string.Format("Total Rendimiento Entero = {0}", decSum);
+
+						}
+						//else
+						//{
+						//	e.Text = string.Format("Total = {0}", diffAux) + "      " + string.Format("Total Rendimiento Entero = {0}", decSum);
+						//}
+
+					}
+					if (e.Item.FieldName == "otherResultValue")
+					{
+						aPieza = true;
+						e.Text = string.Format("Piezas Totales = {0}", e.Value);
+						if (e.IsTotalSummary)
+						{
+							valorTotal = Convert.ToDecimal(e.Value);
+						}
+					}
+				}
+				else
+				{
+					aPieza = false;
+					e.Text = string.Format("Total = {0}", e.Value);
+				}
+
+			};
+			settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "resultValue").DisplayFormat = "N2";
+			settings.Settings.ShowFooter = true;
+			settings.ClientSideEvents.BatchEditChangesSaving = "onUpdateTotal";
+			settings.ClientSideEvents.Init = "onInitTotal";
+		}
+	});
+	if (codeVisualizationType == "CMBBOX")
+	{
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "otherResultValue";
+			column.Name = "otherResultValue";
+			column.Width = Unit.Percentage(40);
+			column.Caption = "Descripción";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.ReadOnly = codeState != "01";
+
+		});
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = true,
+			ShowDeleteButton = false,
+			Visible = true,
+			VisibleIndex = 5,
+			Caption = "Acciones",
+			Width = Unit.Percentage(5)
+		};
+		settings.Columns.Add(commandColumn);
+
+		settings.SetEditFormTemplateContent(c =>
+		{
+			QualityControlDetail detail = new QualityControlDetail();
+			if (c.ItemIndex >= 0)
+			{
+				detail = Model[c.ItemIndex];
+			}
+			Html.RenderPartial("_QualityControlDetailsEditDetailPartial", detail);
+			TempData["idgvQualityControlDetails"] = settings.Name;
+			TempData.Keep("idgvQualityControlDetails");
+		});
+	}
+	settings.Columns.Add(c =>
+	{
+		c.FieldName = "id_qualityAnalysis";
+		c.CellStyle.CssClass = "hiddenCell";
+		c.HeaderStyle.CssClass = "hiddenCell";
+		c.FooterCellStyle.CssClass = "hiddenCell";
+		c.GroupFooterCellStyle.CssClass = "hiddenCell";
+		c.FilterCellStyle.CssClass = "hiddenCell";
+		c.Visible = false;
+
+	});
+	settings.CellEditorInitialize = (s, e) =>
+	{
+		ASPxEdit editor = (ASPxEdit)e.Editor;
+		editor.ValidationSettings.Display = Display.None;
+	};
+	if (codeVisualizationType != "CMBBOX")
+	{
+		settings.ClientSideEvents.BatchEditStartEditing = "OnBatchStartEditing";
+		settings.ClientSideEvents.EndCallback = "OnBatchEditDetailEndCallback";
+	}
+	if (codeVisualizationType != "CMBBOX")
+	{
+		settings.CustomJSProperties = (sender, e) =>
+		{
+			//e.Properties["cpFRESCOYSANO"] = (int?)ViewBag.keyFRESCOYSANO;
+			//e.Properties["cpBASURAGR"] = (int?)ViewBag.keyBASURAGR;
+			var sum = this.Model.Where(sm => !string.IsNullOrWhiteSpace(sm.otherResultValue))
+							.Sum(str => Convert.ToDecimal(str.otherResultValue));
+
+			e.Properties["cpValorTotal"] = sum;
+			e.Properties["cpValorTotalEditado"] = valorTotal;
+			e.Properties["cpValidaciones"] = validacionesAR;
+			e.Properties["cpQualityAnalysisMayor0"] = ViewBag.keysQualityAnalysisMayor0;
+			e.Properties["cpCJATXT"] = aCJATXT;
+			e.Properties["cpPieza"] = aPieza;
+			e.Properties["cpValueSettingGRAMCLASI"] = aValueSettingGRAMCLASI;
+			e.Properties["cpAmoutNADCTD"] = ViewBag.amoutNADCTD != null ? (decimal)ViewBag.amoutNADCTD : 0.00M;
+			MVCxGridView grid2 = sender as MVCxGridView;
+			Dictionary<object, int>
+			rowHashes = ViewData["RowHashes"] as Dictionary<object, int>;
+
+			for (int i = 0; i < grid2.VisibleRowCount; i++)
+				rowHashes[grid2.GetRowValues(i, grid2.KeyFieldName)] = (int)grid2.GetRowValues(i, "id_qualityAnalysis");
+		};
+	}
+});
+}
+@grid.Bind(Model).GetHtml()

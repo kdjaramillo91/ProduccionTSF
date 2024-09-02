@@ -1,0 +1,146 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.OpeningClosingPlateLying
+@{
+    string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+}
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.id_freezerWarehouse, settings =>
+           {
+               settings.Name = "freezerWarehouseLabel";
+               settings.Text = "Bodega Congelación:";
+               settings.AssociatedControlName = "id_freezerWarehouse";
+           }).GetHtml()
+        </td>
+        <td style="width: 40%;">
+            @{
+                int? id_freezerWarehouse = (Model != null && Model.id_freezerWarehouse != 0) ? (int?)Model.id_freezerWarehouse : null;
+            }
+            @Html.Hidden("id_freezerWarehouseAux", id_freezerWarehouse)
+            @Html.DevExpress().ComboBoxFor(m => m.id_freezerWarehouse, settings =>
+           {
+               settings.Name = "id_freezerWarehouse";
+               settings.Properties.ClientInstanceName = "id_freezerWarehouse";
+               //settings.Properties.DataSource = DataProviderPriceList.PriceLists();
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.ReadOnly = codeState != "01";
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Init = "ComboFreezerWarehouse_Init";
+               settings.Properties.ClientSideEvents.Validation = "OnFreezerWarehouseValidation";
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboFreezerWarehouse_SelectedIndexChanged";
+           }).BindList(DataProviderWarehouse.FreezerWarehousebyCompanyAndCurrent((int?)ViewData["id_company"], id_freezerWarehouse)).Bind(id_freezerWarehouse).GetHtml()
+        </td>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "freezerWarehouseLocationLabel";
+               settings.Text = "Ubicación Congelación:";
+           }).GetHtml()
+        </td>
+        <td style="width: 40%">
+            @Html.DevExpress().TokenBox(settings =>
+           {
+               settings.Name = "ids_freezerWarehouseLocation";
+               settings.Properties.ClientInstanceName = "ids_freezerWarehouseLocation";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NullDisplayText = "Todas";
+               settings.Properties.NullText = "Todas";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.ReadOnly = codeState != "01";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Init = "TokenfreezerWarehouseLocation_Init";
+               //settings.Properties.ClientSideEvents.Validation = "OnPriceListItemTypeValidation";
+               settings.Properties.ClientSideEvents.ValueChanged = "TokenfreezerWarehouseLocation_ValueChanged";
+               //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboPriceList_SelectedIndexChanged";
+           }).BindList(DataProviderWarehouseLocation.FreezerWarehouseLocationbyCompany((int)ViewData["id_company"])).GetHtml()
+        </td>
+
+    </tr>
+
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.id_maintenanceWarehouse, settings =>
+           {
+               settings.Name = "maintenanceWarehouseLabel";
+               settings.Text = "Bodega Cámara:";
+               settings.AssociatedControlName = "id_maintenanceWarehouse";
+           }).GetHtml()
+        </td>
+        <td style="width: 40%;">
+            @{
+                int? id_maintenanceWarehouse = (Model != null && Model.id_maintenanceWarehouse != 0) ? (int?)Model.id_maintenanceWarehouse : null;
+            }
+            @Html.Hidden("id_maintenanceWarehouseAux", id_maintenanceWarehouse)
+            @Html.DevExpress().ComboBoxFor(m => m.id_maintenanceWarehouse, settings =>
+       {
+           settings.Name = "id_maintenanceWarehouse";
+           settings.Properties.ClientInstanceName = "id_maintenanceWarehouse";
+           //settings.Properties.DataSource = DataProviderPriceList.PriceLists();
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Init = "ComboMaintenanceWarehouse_Init";
+           settings.Properties.ClientSideEvents.Validation = "OnMaintenanceWarehouseValidation";
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboMaintenanceWarehouse_SelectedIndexChanged";
+       }).BindList(DataProviderWarehouse.MaintenanceWarehousebyCompany((int?)ViewData["id_company"])).Bind(id_maintenanceWarehouse).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.id_maintenanceWarehouseLocation, settings =>
+           {
+               settings.Name = "maintenanceWarehouseLocationLabel";
+               settings.Text = "Ubicación Cámara:";
+               settings.AssociatedControlName = "id_maintenanceWarehouseLocation";
+           }).GetHtml()
+        </td>
+        <td style="width: 40%;">
+            @{
+                int? id_maintenanceWarehouseLocation = (Model != null && Model.id_maintenanceWarehouseLocation != 0) ? (int?)Model.id_maintenanceWarehouseLocation : null;
+            }
+            @Html.Hidden("id_maintenanceWarehouseLocationAux", id_maintenanceWarehouseLocation)
+            @Html.DevExpress().ComboBoxFor(m => m.id_maintenanceWarehouseLocation, settings =>
+           {
+               settings.Name = "id_maintenanceWarehouseLocation";
+               settings.Properties.ClientInstanceName = "id_maintenanceWarehouseLocation";
+               //settings.Properties.DataSource = DataProviderPriceList.PriceLists();
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Width = Unit.Percentage(100);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.ReadOnly = codeState != "01";
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Init = "ComboMaintenanceWarehouseLocation_Init";
+               settings.Properties.ClientSideEvents.Validation = "OnMaintenanceWarehouseLocationValidation";
+               //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboMaintenanceWarehouseLocation_SelectedIndexChanged";
+           }).BindList(DataProviderWarehouseLocation.MaintenanceWarehouseLocationbyCompany((int?)ViewData["id_company"])).Bind(id_maintenanceWarehouseLocation).GetHtml()
+        </td>
+
+    </tr>
+
+</table>
+
+<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingHeadFormDetailPartial.js"></script>

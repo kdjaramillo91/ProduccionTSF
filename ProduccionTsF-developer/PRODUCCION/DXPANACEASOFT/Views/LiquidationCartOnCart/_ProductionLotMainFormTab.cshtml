@@ -1,0 +1,226 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.LiquidationCartOnCart
+
+
+@{
+    decimal _dqd = Model.ProductionLot.ProductionLotDetail.Sum(s => s.quantitydrained) ?? 0;
+}
+<table id="tableProccess" class="table table-condenced" style="margin: 0px;">
+
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="9">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Proceso</span>
+        </td>
+    </tr>
+    <!--New Version-->
+
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "nameProviderLabel";
+                settings.Text = "Proveedor:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBoxFor(m => m.ProductionLot.Provider.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "nameProvider";
+                settings.Properties.ClientInstanceName = "nameProvider";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "LoteName";
+                settings.Text = "No. Lote:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBoxFor(m => m.ProductionLot.internalNumber, settings =>
+            {
+                settings.Name = "internalNumber";
+                settings.Properties.ClientInstanceName = "internalNumber";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "receptionDateLabel";
+                settings.Text = "Fecha de Recepción:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().DateEditFor(m => m.ProductionLot.receptionDate, settings =>
+            {
+                settings.Name = "receptionDate";
+                settings.Properties.ClientInstanceName = "receptionDate";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                settings.ShowModelErrors = false;
+            }).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "nameProviderShrimpLabel";
+                settings.Text = "Camaronera:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBoxFor(m => m.ProductionLot.ProductionUnitProvider.name, settings =>
+            {
+                settings.Name = "nameProviderShrimp";
+                settings.Properties.ClientInstanceName = "nameProviderShrimp";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "transactionalLabel";
+                settings.Text = "Sec. Transaccional:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBoxFor(m => m.ProductionLot.number, settings =>
+            {
+                settings.Name = "secNumber";
+                settings.Properties.ClientInstanceName = "secNumber";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "receptionTimeLabel";
+           settings.Text = "Hora de Recepción:";
+       }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TimeEdit(settings =>
+            {
+                settings.Name = "receptionTime";
+                settings.Properties.ClientInstanceName = "receptionTime";
+
+                settings.Properties.EditFormat = EditFormat.Time;
+                settings.Properties.EditFormatString = "HH:mm";
+                settings.Properties.DisplayFormatString = "HH:mm";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+
+                settings.DateTime = Model.ProductionLot.receptionDate;
+
+                settings.ShowModelErrors = false;
+            }).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "nameProductionUnitProviderPoolLabel";
+                settings.Text = "Piscina:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBoxFor(m => m.ProductionLot.ProductionUnitProviderPool.name, settings =>
+            {
+                settings.Name = "nameProductionUnitProviderPool";
+                settings.Properties.ClientInstanceName = "nameProductionUnitProviderPool";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Proceso:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBoxFor(m => m.ProductionLot.Person1.processPlant, settings =>
+            {
+                settings.Name = "process";
+                settings.Properties.ClientInstanceName = "process";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "cantidadRecibida";
+                settings.Text = DataProviderSetting.ValueSetting("URE") + ":";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().SpinEditFor(m => m.ProductionLot.totalQuantityRecived, settings =>
+            {
+                settings.Name = "totalQuantityRecived";
+                settings.Properties.ClientInstanceName = "totalQuantityRecived";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.DisplayFormatString = "N2";
+                settings.ReadOnly = true;
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "drainedLabel";
+                settings.Text = "Libras Escurrido:";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().SpinEdit(settings =>
+            {
+                settings.Name = "quantitydrained";
+                settings.Properties.ClientInstanceName = "quantitydrained";
+                settings.Number = _dqd;
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.DisplayFormatString = "N2";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "liquidationLabel";
+                settings.Text = "Libras Procesadas:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.ProductionLot.totalQuantityLiquidation, settings =>
+            {
+                settings.Name = "totalQuantityLiquidation";
+                settings.Properties.ClientInstanceName = "totalQuantityLiquidation";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.DisplayFormatString = "N2";
+                settings.ReadOnly = true;
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </td>
+    </tr>
+
+</table>

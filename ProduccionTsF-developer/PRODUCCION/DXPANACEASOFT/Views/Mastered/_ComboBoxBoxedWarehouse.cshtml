@@ -1,0 +1,24 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.MasteredDTO
+
+@*@Html.Hidden("ConfigBoxedWarehouse", ((bool?)ViewBag.ConfigBoxedWarehouse))*@
+    
+@Html.DevExpress().ComboBoxFor(model => model.id_boxedWarehouse, settings =>
+{
+    settings.Name = "ComboBoxBoxedWarehouse";
+    settings.Width = Unit.Percentage(100);
+    //settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Mastered",
+        Action = "ComboBoxBoxedWarehouse",
+    };
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxBoxedWarehouse_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxBoxedWarehouse_BeginCallback";
+    settings.Properties.ClientSideEvents.EndCallback = "ComboBoxBoxedWarehouse_EndCallback";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    //settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["BoxedWarehouse"]).GetHtml()

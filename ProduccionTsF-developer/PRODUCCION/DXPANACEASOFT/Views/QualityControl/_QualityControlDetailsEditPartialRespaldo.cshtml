@@ -1,0 +1,97 @@
+﻿
+@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.QualityControlDetail
+@{
+    var code_state = (Model != null && Model.QualityControl != null && Model.QualityControl.Document != null && Model.QualityControl.Document.DocumentState != null) ? Model.QualityControl.Document.DocumentState.code : "";   
+    var isCorrected = (Model != null && Model.QualityCorrectiveAction != null) ? Model.QualityCorrectiveAction.isCorrected : (bool?)null;
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditQualityControlDetail", name = "formEditQualityControlDetail" }))
+{
+    @Html.Hidden("id_qualityControlDetail", Model.id)
+
+    <table id="qualityControlDetailTable" class="table table-condensed" style="margin: 0; padding: 0">
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.QualityAnalysis.name, settings =>
+           {
+               settings.Name = "qualityAnalysisLabel";
+               settings.Text = "Análisis:";
+               settings.AssociatedControlName = "qualityAnalysis";
+           }).GetHtml()
+            </td>
+            <td>
+
+                @Html.DevExpress().TextBoxFor(m => m.QualityAnalysis.name, settings =>
+           {
+               settings.Name = "qualityAnalysisName";
+               settings.Properties.ClientInstanceName = "qualityAnalysisName";
+               settings.ReadOnly = true;
+
+               settings.ShowModelErrors = true;
+               settings.Width = Unit.Percentage(100);
+               settings.ReadOnly = true;
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var qualityControlConfigurationAnalysisDataTypeValidate = Model.QualityControl.QualityControlConfiguration.QualityControlConfigurationAnalysisDataTypeValidate.FirstOrDefault(fod => fod.id_qualityAnalysis == Model.id_qualityAnalysis);
+                    var codeDataType = qualityControlConfigurationAnalysisDataTypeValidate.QualityDataType.code;
+
+                        var result = (Model.result != null && Model.result != "") ? Convert.ToInt32(Model.result) : (int?)null;
+                        var listValue = qualityControlConfigurationAnalysisDataTypeValidate.QualityControlConfigurationAnalysisDataTypeValidateDetailValue.Where(w => w.isActive || w.id == result).Select(s => new { id = s.id, value = s.value });
+                        Html.DevExpress().ComboBox(settings =>
+                        {
+                            settings.Name = "result";
+                            settings.Properties.ClientInstanceName = "result";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                            settings.Properties.ValueField = "id";
+                            settings.Properties.TextField = "value";
+                            settings.Properties.ValueType = typeof(int);
+                            settings.ReadOnly = (code_state != "01" && Model.isSave);
+                            settings.ShowModelErrors = true;
+                            //settings.Properties.ClientSideEvents.Validation = "OnResultListValidation";
+                        }).BindList(listValue).Bind(result).GetHtml();
+                    
+                }
+            </td>
+        </tr>
+    </table>
+    
+    <table class="table table-condensed" style="margin: 0; padding: 0">    
+        <tr>
+            <td style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+           {
+               settings.Name = "btnUpdateQualityControlDetail";
+               settings.Text = "Actualizar";
+               settings.RenderMode = ButtonRenderMode.Button;
+               settings.UseSubmitBehavior = false;
+               settings.ImagePosition = ImagePosition.Left;
+               settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+               
+               settings.ValidateInvisibleEditors = true;
+               settings.ClientEnabled = (code_state == "01" || (code_state == "03" && Model.isSave && !Model.isConforms && isCorrected != true) || (!Model.isSave)); //01: PENDIENTE y 03: PENDIENTE
+               settings.ClientSideEvents.Click = "ButtonUpdateQualityControlDetail_Click";
+           }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancelQualityControlDetail";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.ClientSideEvents.Click = "BtnCancelQualityControlDetail_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+}

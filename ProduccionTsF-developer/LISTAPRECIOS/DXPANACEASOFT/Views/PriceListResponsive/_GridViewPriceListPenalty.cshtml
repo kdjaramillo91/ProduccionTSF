@@ -1,0 +1,94 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<PriceListPenaltyDTO>(settings =>
+    {
+        settings.Name = "GridViewPriceListPenalty";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "PriceListResponsive",
+            Action = "GridViewPriceListPenalty",
+
+            id_provider = ViewBag.id_provider,
+            id_group = ViewBag.id_group,
+            enabled = ViewBag.enabled,
+            IsOwner = ViewBag.IsOwner,
+            isQuotation = ViewBag.isQuotation,
+        };
+
+        settings.Enabled = ViewBag.enabled;
+
+        settings.KeyFieldName = "id_classShrimp";
+        settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditingPenalty";
+
+        settings.SettingsBehavior.AllowFixedGroups = true;
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Cell;
+        settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+        settings.SettingsEditing.BatchEditSettings.ShowConfirmOnLosingChanges = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            var listPriceListsPenalty = (Model as List<PriceListPenaltyDTO>) ?? new List<PriceListPenaltyDTO>();
+            e.Properties["cpPriceListPenaltyCount"] = listPriceListsPenalty.Count;
+        };
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_classShrimp";
+            column.Name = "id_classShrimp";
+            column.Caption = "id_classShrimp";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "order";
+            column.Name = "order";
+            column.Caption = "order";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "classShrimp";
+            column.Name = "classShrimp";
+            column.Caption = "Penalidad";
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "value";
+            column.Name = "value";
+            column.Caption = "Valor";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+            prop.MinValue = 0;
+            prop.MaxValue = 9999;
+            prop.DisplayFormatString = "n";
+            column.Settings.ShowEditorInBatchEditMode = !ViewBag.isQuotation;
+        });
+    });
+}
+@grid.Bind(Model).GetHtml()

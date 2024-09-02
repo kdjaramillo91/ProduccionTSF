@@ -1,0 +1,20 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.SalesOrderDTO
+
+<div>
+    <div class="MyContainer" id="divGridViewMPMaterialDetails">
+        @{
+            if ((ViewBag.enabled == null || (bool)ViewBag.enabled))
+            {
+                @Html.Partial("_GridMessageErrorMPMaterialDetail")
+                @Html.Partial("PanelButtonsMPMaterialDetailEdit")
+            }
+        }
+        @Html.Partial("_GridViewMPMaterialDetails", Model.SalesOrderMPMaterialDetails.OrderBy(o => o.codProduct).ToList())
+    </div>
+    <div class="Etiqueta"><b>Resumen</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        @Html.Partial("_GridViewMPMaterialSummaryDetails", Model.SalesOrderMPMaterialDetailsSummary.OrderBy(o => o.id_inventoryLine).ThenBy(tb => tb.cod_item).ToList())
+    </div>
+</div>

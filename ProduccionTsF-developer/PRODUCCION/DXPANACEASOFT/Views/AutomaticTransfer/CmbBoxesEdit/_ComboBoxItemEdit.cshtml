@@ -1,0 +1,64 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDetailDTO
+
+
+@{
+	bool requiereLoteSistema = ViewData["requiereUsuarioLote"] != null ? ((string)ViewData["requiereUsuarioLote"] == "S" ? true : false) : false;
+	DateTime? fechaEmision = ViewData["fechaEmision"] != null
+		? ((DateTime?)ViewData["fechaEmision"]) : null;
+
+	//Model.requiereSistemaLote == "S" ? true : false;
+	bool requiereUsuarioSistema = ViewData["requiereSistemaLote"] != null ? ((string)ViewData["requiereSistemaLote"] == "S" ? true : false) : false;
+	//Model.requiereUsuarioLote == "S" ? true : false;
+
+	int? id_warehouse_exit = ViewData["id_warehouse_exit"] != null ? (int)ViewData["id_warehouse_exit"] : 0;
+	int? id_warehouse_location_exit = ViewData["id_warehouse_location_exit"] != null ? (int)ViewData["id_warehouse_location_exit"] : 0;
+}
+@Html.DevExpress().ComboBoxFor(m => m.id_Item, settings =>
+{
+	settings.Name = "id_Item";
+	settings.Properties.ClientInstanceName = "id_Item";
+	settings.Width = Unit.Percentage(100);
+
+	settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.Properties.EnableSynchronization = DefaultBoolean.False;
+	settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+	settings.CallbackRouteValues = new { Controller = "AutomaticTransfer", Action = "ComboBoxItemEdit" };
+	settings.Properties.CallbackPageSize = 8;
+
+	settings.Properties.DisplayFormatString = "{0} - {1}";
+	settings.Properties.ValueField = "id";
+	settings.Properties.ValueType = typeof(int);
+	settings.Properties.Columns.Add("mastercode", "Código", Unit.Percentage(30));
+	settings.Properties.Columns.Add("name", "Descripción", Unit.Percentage(70));
+	settings.Properties.Columns.Add("id_metricUnitInventory", "MetricUnit", Unit.Percentage(1));
+	settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxItemEdit_BeginCallback";
+	//settings.Properties.ClientSideEvents.Init = "ComboBoxItemEdit_Init";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxItemEdit_SelIndexChanged";
+
+	//settings.Properties.ClientSideEvents.EndCallback = "ComboBoxItemEdit_EndCallback";
+	//settings.CustomJSProperties = (s, e) =>
+	//{
+	//	e.Properties["cpValSelected"] = Model.id_Item;
+	//};
+	settings.ItemTextCellPrepared = (sender, e) =>
+	{
+		e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+	};
+}).BindList(DataProviderAutomaticTransfer.ItemsWithLotInventoryCodeDocumentTypeWarehouseWarehouseLocationAndCurrent(
+	(int)ViewData["id_company"],
+	Model.id_Item,
+	requiereLoteSistema,
+	requiereUsuarioSistema,
+	id_warehouse_exit,
+	id_warehouse_location_exit,
+	(int?)ViewData["id_itemType"],
+	(int?)ViewData["id_size"],
+	(int?)ViewData["id_trademark"],
+	(int?)ViewData["id_presentation"],
+	(string)ViewData["codigoProducto"],
+	(int?)ViewData["categoriaProducto"],
+	(int?)ViewData["modeloProducto"],
+	fechaEmision)).Bind(Model.id_Item).GetHtml()

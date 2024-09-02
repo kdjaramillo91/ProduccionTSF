@@ -1,0 +1,25 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    Layout = null;
+}
+
+<h4>Recepci&oacute;n de Materia Prima</h4>
+
+@{
+    @Html.Hidden("codeAdvancedFiltersConfiguration", "RP")
+    ViewData["Model"] = new DXPANACEASOFT.Models.ProductionLot();
+    Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_ProductionLotReceptionFilterFormPartial");
+}
+
+<div id="results">
+
+</div>
+
+<script src="~/Scripts/productionlotreception/index.js"></script>
+<script src="~/Scripts/purchaseorder/index.js"></script>
+@{
+
+    Html.RenderPartial("FilterBoxTemplates/_PopupAdvancedFilter", new AdvancedFilter());
+
+}

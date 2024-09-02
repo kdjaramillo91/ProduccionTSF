@@ -1,0 +1,216 @@
+﻿@using DXPANACEASOFT.Models
+@using System.Drawing
+@model List<DXPANACEASOFT.Models.RemissionGuideRiverDetail>
+
+
+    @{
+        var grid = Html.DevExpress().GridView<RemissionGuideRiverDetail>(settings =>
+        {
+            settings.Name = "gvDetailsRemissionGuide";
+            settings.CallbackRouteValues = new { Controller = "RemissionGuideRiver", Action = "RemissionGuideRiverDetailsPopupPartial" };
+
+
+            settings.Width = Unit.Percentage(100);
+            settings.CommandColumn.Visible = true;
+            settings.CommandColumn.Width = Unit.Percentage(3);
+            settings.CommandColumn.ShowSelectCheckbox = true;
+            settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+
+            settings.KeyFieldName = "id";
+
+            settings.SettingsPager.Visible = true;
+            settings.Settings.ShowGroupPanel = false;
+            settings.Settings.ShowFilterRow = false;
+            settings.SettingsBehavior.AllowSelectByRowClick = true;
+            settings.Settings.ShowFooter = true;
+            settings.Settings.ShowFilterRowMenu = true;
+
+            settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+            settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+            settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+            settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+            settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+            settings.ClientSideEvents.Init = "OnGridViewInitpopup";
+            settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedpopup";
+            settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackpopup";
+
+            //Pie de tabla
+            settings.Settings.ShowFooter = true;
+
+            settings.CustomJSProperties = (s, e) =>
+            {
+                MVCxGridView gv = s as MVCxGridView;
+                if (gv == null) return;
+
+                e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+                e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+                if (gv.IsEditing)
+                {
+
+                }
+
+                List<RemissionGuideRiverDetail> rows = (Model as List<RemissionGuideRiverDetail>);
+                rows = (rows != null) ? rows.Where(d => d.isActive).ToList() : new List<RemissionGuideRiverDetail>();
+
+                e.Properties["cpRowsCount"] = rows.Count;
+            };
+
+            settings.SetFooterRowTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(@"<span id=""lblInfoDetailsRemision""></span>");
+                if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+                {
+                    ViewContext.Writer.Write(
+                        @"<a id=""lnkSelectAllRowsDetailsRemission"" style=""cursor: pointer;"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelectionDetailsRemission"" style=""cursor: pointer;"">Anular Selección.</a>"
+                    );
+                }
+            });
+
+            //settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+            //settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+            //settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+            //settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+            //settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+            //settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+            settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+            settings.Styles.Header.Font.Bold = true;
+
+            #region Columns
+
+            settings.Columns.Add(m => m.RemissionGuide.Document.number, column =>
+            {
+                column.Caption = "Guia de Remisión";
+                column.Width = Unit.Percentage(7);
+                column.ReadOnly = true;
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                column.Settings.AllowSort = DefaultBoolean.False;
+            });
+
+            settings.Columns.Add(m => m.RemissionGuide.Document.DocumentState.name, column =>
+            {
+                column.Caption = "Estado";
+                column.Width = Unit.Percentage(7);
+                column.ReadOnly = true;
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                column.Settings.AllowSort = DefaultBoolean.False;
+            });
+            settings.Columns.Add(m => m.Item.name, column =>
+            {
+                column.Caption = "Producto";
+                column.Width = Unit.Percentage(7);
+                column.ReadOnly = true;
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                column.Settings.AllowSort = DefaultBoolean.False;
+            });
+            settings.Columns.Add(m => m.RemissionGuide.despachureDate, column =>
+            {
+                column.Caption = "Fecha de Despacho ";
+                column.Width = Unit.Percentage(7);
+                column.ReadOnly = true;
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+                column.Settings.AllowSort = DefaultBoolean.False;
+            });
+
+            settings.Columns.Add(m => m.RemissionGuide.despachurehour, column =>
+            {
+                column.Caption = "Hora de Despacho ";
+                column.Width = Unit.Percentage(7);
+                column.ReadOnly = true;
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                column.Settings.AllowSort = DefaultBoolean.False;
+                //    column.PropertiesEdit.DisplayFormatString = "HH\\:mm ";
+            });
+
+            settings.Columns.Add(m => m.quantityOrdered, column =>
+            {
+                column.Caption = "Cantidad Ordenada ";
+                column.Width = Unit.Percentage(7);
+                column.ReadOnly = true;
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                column.PropertiesEdit.DisplayFormatString = "#0.00";
+                column.Settings.AllowSort = DefaultBoolean.False;
+            });
+
+            settings.Columns.Add(m => m.quantityProgrammed, column =>
+            {
+                column.Caption = "Cantidad Programada ";
+                column.Width = Unit.Percentage(7);
+                column.ReadOnly = true;
+                column.ColumnType = MVCxGridViewColumnType.TextBox;
+                column.PropertiesEdit.DisplayFormatString = "#0.00";
+                column.Settings.AllowSort = DefaultBoolean.False;
+            });
+
+            //settings.Columns.Add(m => m.quantityDispatchMaterial, column =>
+            //{
+            //    column.Caption = "Cantidad Materiales ";
+            //    column.Width = Unit.Percentage(7);
+            //    column.ReadOnly = true;
+            //    column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //    column.PropertiesEdit.DisplayFormatString = "#0.00";
+            //    column.Settings.AllowSort = DefaultBoolean.False;
+            //});
+
+            #endregion
+
+
+        });
+    }
+    @grid.Bind(Model).GetHtml()
+
+    @functions {
+        int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+        {
+            int selectedRowsOnPage = 0;
+            string[] values = new string[] { "id" };
+            foreach (var key in grid.GetCurrentPageRowValues(values))
+            {
+                if (grid.Selection.IsRowSelectedByKey(key))
+                    selectedRowsOnPage++;
+            }
+            return grid.Selection.FilteredCount - selectedRowsOnPage;
+        }
+
+        //int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+        //{
+        //    int selectedRowsOnPage = 0;
+        //    foreach (var key in grid.GetCurrentPageRowValues("id"))
+        //    {
+        //        if (grid.Selection.IsRowSelectedByKey(key))
+        //            selectedRowsOnPage++;
+        //    }
+        //    return grid.Selection.FilteredCount - selectedRowsOnPage;
+        //}
+    }
+
+@{
+<div class="row" style="text-align: center; padding: 13px 35px 5px 0px; margin-bottom: 20px;">
+    @Html.DevExpress().Button(settings =>
+    {
+        settings.Name = "btnSavePopup";
+
+        settings.Text = "Adicionar";
+        settings.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+        settings.UseSubmitBehavior = false;
+
+        settings.ClientSideEvents.Click = "AddREmisiondetailpopup";
+    }).GetHtml()
+
+    @Html.DevExpress().Button(settings =>
+    {
+    settings.Name = "btnClosePopup";
+    settings.Text = "Cerrar";
+    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+    settings.UseSubmitBehavior = false;
+    settings.ClientSideEvents.Click = "OnBtnClosePopup_ClickRemissionFilter";
+    }).GetHtml()
+</div>
+}
+
+
+

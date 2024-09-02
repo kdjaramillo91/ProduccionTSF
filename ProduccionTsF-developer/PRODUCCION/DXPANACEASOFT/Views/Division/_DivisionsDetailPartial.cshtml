@@ -1,0 +1,69 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    Division division = Model ?? new Division();
+}
+
+@Html.Hidden("id_division", division.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>Email:</td>
+        <td colspan="4">
+            @Html.Raw(division.email)
+        </td>
+    </tr>
+    <tr>
+        <td>Dirección:</td>
+        <td colspan="4">
+            @Html.Raw(division.address)
+        </td>
+    </tr>
+    <tr>
+        <td>Teléfono:</td>
+        <td colspan="4">
+            @Html.Raw(division.phoneNumber)
+        </td>
+    </tr>
+    <tr>
+        <td>Descripción:</td>
+        <td colspan="4">
+            @Html.Raw(division.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">Creado por:</td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(division.id_userCreate))
+        </td>
+        <td style="width: 10%;">Fecha de Creación:</td>
+        <td>
+            @Html.Raw(division.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>
+            @Html.Raw(UsernameById(division.id_userUpdate))
+        </td>
+        <td>Fecha de Modificaci&oacute;n:</td>
+        <td>
+            @Html.Raw(division.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@Html.Partial("_DivisionDetailBranchOfficesPartial", division.BranchOffice.ToList())
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

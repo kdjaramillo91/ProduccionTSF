@@ -1,0 +1,113 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.BusinessOportunityDocument>
+
+@{
+    var grid = Html.DevExpress().GridView<BusinessOportunityDocument>(settings => {
+        settings.Name = "gvAttachedDocuments" + ViewData["id_businessOportunity"];
+
+
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessOportunityAttachedDocumentsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "BusinessOportunity_OnBeginCallback";
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdBusinessOportunity"] = 0;
+            }
+            e.Properties["cpIdBusinessOportunity"] = ViewData["id_businessOportunity"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "attachment";
+            column.Caption = "Documento Adjunto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string attachment = (string)DataBinder.Eval(c.DataItem, "attachment");
+                int id = (int)DataBinder.Eval(c.DataItem, "id");
+                ViewContext.Writer.Write(Html.ActionLink(attachment, "download-attachment", new { id = id }));
+            });
+
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "referenceDocument";
+            column.Caption = "Referencia";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string referenceDocument = (string)DataBinder.Eval(c.DataItem, "referenceDocument");
+
+                ViewContext.Writer.Write(referenceDocument);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "referenceDocument";
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "descriptionDocument";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string descriptionDocument = (string)DataBinder.Eval(c.DataItem, "descriptionDocument");
+
+                ViewContext.Writer.Write(descriptionDocument);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "descriptionDocument";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

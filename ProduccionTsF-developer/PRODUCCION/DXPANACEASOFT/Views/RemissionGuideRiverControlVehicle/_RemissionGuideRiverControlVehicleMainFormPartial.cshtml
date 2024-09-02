@@ -1,0 +1,131 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuideRiverControlVehicle
+
+@{
+    int id_remissionGuideRiver = (Model != null) ? Model.id_remissionGuideRiver : 0;
+    TempData.Keep("remissionGuideRiverForControlVehicle");
+    string codeDocumentState = (Model.RemissionGuideRiver != null) ? ((Model.RemissionGuideRiver.Document != null) ? (Model.RemissionGuideRiver.Document.DocumentState != null ? Model.RemissionGuideRiver.Document.DocumentState.code : "") : "") : "";
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditRemissionGuideRiverControlVehicle", name = "formEditRemissionGuideRiverControlVehicle" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_remissionGuideRiver", id_remissionGuideRiver, new { idremissionGuideRiver = id_remissionGuideRiver })
+
+    @Html.Hidden("codeDocumentState", codeDocumentState)
+    //@Html.Hidden("id_RemisionGuideReassignment", id_RemisionGuideReassignment)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+    tabs.EnableClientSideAPI = true;
+
+    //tabs.ClientSideEvents.Init = "TabControl_Init";
+    //tabs.ClientSideEvents.ActiveTabChanged = "TabControl_ActiveTabChanged";
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var document = (Model != null && Model.RemissionGuideRiver != null && Model.RemissionGuideRiver.Document != null) ? Model.RemissionGuideRiver.Document : new Document();
+            Html.RenderPartial("DocumentTemplates/_DocumentFormEdit", document);
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabRemissionGuideRiver";
+        tab.Text = "Control Salida de Vehículos    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_RemissionGuideRiverControlVehicleMainFormTab", Model);
+            var securitySealsList = (Model != null & Model.RemissionGuideRiver != null & Model.RemissionGuideRiver.RemissionGuideRiverSecuritySeal != null) ? Model.RemissionGuideRiver.RemissionGuideRiverSecuritySeal.Where(w => w.RemissionGuideTravelType.code == "IDA").ToList() : new List<RemissionGuideRiverSecuritySeal>();
+
+            if (securitySealsList != null && securitySealsList.Count > 0)
+            {
+                TempData["securitySealsList"] = securitySealsList;
+                TempData.Keep("securitySealsList");
+            }
+
+            Html.RenderPartial("_RemissionGuideRiverControlVehicleTableSecuritySeals");
+            Html.RenderPartial("_RemissionGuideRiverControlVehicleSecuritySealsPartial", securitySealsList);
+            //var assignedStaffList = (Model != null & Model.RemissionGuideRiver != null & Model.RemissionGuideRiver.RemissionGuideRiverAssignedStaff != null) ? Model.RemissionGuideRiver.RemissionGuideRiverAssignedStaff.ToList() : new List<RemissionGuideRiverAssignedStaff>();
+            //Html.RenderPartial("_RemissionGuideRiverControlVehicleTableAssignedStaff");
+            //Html.RenderPartial("_RemissionGuideRiverDetailViewAssignedStaffPartial", assignedStaffList);
+            //var remissionGuideRiverTransportation = (Model != null & Model.RemissionGuideRiver != null & Model.RemissionGuideRiver.RemissionGuideRiverTransportation != null) ? Model.RemissionGuideRiver.RemissionGuideRiverTransportation : new RemissionGuideRiverTransportation();
+            //Html.RenderPartial("_RemissionGuideRiverControlVehicleTableAdvance");
+            //Html.RenderPartial("_RemissionGuideRiverControlVehicleTransportation", remissionGuideRiverTransportation);
+        });
+    });
+
+}).GetHtml()
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    if (Model.hasEntrancePlanctProduction != true )
+                    {
+                        Html.DevExpress().Button(button =>
+                        {
+
+                            button.Name = "btnUpdate";
+                            button.Text = "Actualizar";
+                            button.RenderMode = ButtonRenderMode.Button;
+                            button.ImagePosition = ImagePosition.Left;
+                            button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                            button.UseSubmitBehavior = false;
+                            button.ValidateInvisibleEditors = true;
+                            button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                            //button.ClientEnabled = codeDocumentState == "01"; //Pendiente
+                        }).Render();
+                        ViewContext.Writer.Write("&nbsp;&nbsp;");
+                    }
+
+
+
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/remissionGuideRivercontrolvehicle/editform.js"></script>

@@ -1,0 +1,242 @@
+﻿
+@*@using System.Globalization*@
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProviderGeneralDataEP
+@*@{
+    string codeState = (Model != null && Model.PurchaseOrder != null && Model.PurchaseOrder.Document.DocumentState.code != "") ? Model.PurchaseOrder.Document.DocumentState.code : "";
+}*@
+<table class="table table-condensed">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_identificationTypeEP, settings =>
+                {
+                    settings.Name = "id_identificationTypeEPLabel";
+                    settings.Text = "Identificación:";
+                    settings.AssociatedControlName = "id_identificationTypeEP";
+                }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_identificationTypeEP = (Model != null && Model.id_identificationTypeEP != 0) ? (int?)Model.id_identificationTypeEP : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_identificationTypeEP, settings =>
+       {
+           settings.Name = "id_identificationTypeEP";
+           settings.Properties.ClientInstanceName = "id_identificationTypeEP";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnIdentificationTypeEPValidation";
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProvider_SelectedIndexChanged";
+       }).BindList(DataProviderIdentificationType.IdentificationTypeWithCurrent(id_identificationTypeEP)).Bind(id_identificationTypeEP).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_paymentMethodEP, settings =>
+                {
+                    settings.Name = "id_paymentMethodEPLabel";
+                    settings.Text = "Forma de Pago:";
+                    settings.AssociatedControlName = "id_paymentMethodEP";
+                }).GetHtml()
+        </td>
+        <td colspan="2">
+            @{
+                int? id_paymentMethodEP = (Model != null && Model.id_paymentMethodEP != 0) ? (int?)Model.id_paymentMethodEP : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_paymentMethodEP, settings =>
+       {
+           settings.Name = "id_paymentMethodEP";
+           settings.Properties.ClientInstanceName = "id_paymentMethodEP";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.Properties.Columns.Add("name", "Nombre", 100);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPaymentMethodEPValidation";
+       }).BindList(DataProviderPaymentMethod.EPPaymentMethodWithCurrent(id_paymentMethodEP)).Bind(id_paymentMethodEP).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_bankToBelieve, settings =>
+                {
+                    settings.Name = "id_bankToBelieveLabel";
+                    settings.Text = "Banco a Acreditar:";
+                    settings.AssociatedControlName = "id_bankToBelieve";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_bankToBelieve = (Model != null && Model.id_bankToBelieve != 0) ? (int?)Model.id_bankToBelieve : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_bankToBelieve, settings =>
+       {
+           settings.Name = "id_bankToBelieve";
+           settings.Properties.ClientInstanceName = "id_bankToBelieve";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           //settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.Properties.Columns.Add("name", "Nombre", 100);
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnIdentificationTypeEPValidation";
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProvider_SelectedIndexChanged";
+       }).BindList(DataProviderBoxCardAndBank.BankWithCurrent(id_bankToBelieve)).Bind(id_bankToBelieve).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_accountTypeGeneralEP, settings =>
+                {
+                    settings.Name = "id_accountTypeGeneralEPLabel";
+                    settings.Text = "Tipo Cuenta:";
+                    settings.AssociatedControlName = "id_accountTypeGeneralEP";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_accountTypeGeneralEP = (Model != null && Model.id_accountTypeGeneralEP != 0) ? (int?)Model.id_accountTypeGeneralEP : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_accountTypeGeneralEP, settings =>
+       {
+           settings.Name = "id_accountTypeGeneralEP";
+           settings.Properties.ClientInstanceName = "id_accountTypeGeneralEP";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnIdentificationTypeEPValidation";
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProvider_SelectedIndexChanged";
+       }).BindList(DataProviderAccount.AccountTypeGeneralWithCurrent(id_accountTypeGeneralEP)).Bind(id_accountTypeGeneralEP).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.noAccountEP, settings =>
+           {
+               settings.Name = "noAccountEPLabel";
+               settings.Text = "No. Cuenta:";
+               settings.AssociatedControlName = "noAccountEP";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.noAccountEP, settings =>
+       {
+           settings.Name = "noAccountEP";
+           settings.Properties.ClientInstanceName = "noAccountEP";
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnNoAccountEPValidation";
+       }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.noRefTransfer, settings =>
+           {
+               settings.Name = "noRefTransferLabel";
+               settings.Text = "No. Ref. Transf.*:";
+               settings.AssociatedControlName = "noRefTransfer";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.noRefTransfer, settings =>
+       {
+           settings.Name = "noRefTransfer";
+           settings.Properties.ClientInstanceName = "noRefTransfer";
+           settings.Width = Unit.Percentage(100);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnNoRefTransferValidation";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_rtInternational, settings =>
+                {
+                    settings.Name = "id_rtInternationalLabel";
+                    settings.Text = "Rt. Internacional:";
+                    settings.AssociatedControlName = "id_rtInternational";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_rtInternational = (Model != null && Model.id_rtInternational != 0) ? (int?)Model.id_rtInternational : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_rtInternational, settings =>
+       {
+           settings.Name = "id_rtInternational";
+           settings.Properties.ClientInstanceName = "id_rtInternational";
+           settings.Properties.ValueField = "id";
+           //settings.Properties.TextFormatString = "{1}";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           //settings.Properties.Columns.Add("name", "Nombre", 100);
+           //settings.Properties.Columns.Add("code", "Cod.", 50);
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnIdentificationTypeEPValidation";
+           //settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProvider_SelectedIndexChanged";
+       }).BindList(DataProviderRetention.RtInternationalWithCurrent(id_rtInternational)).Bind(id_rtInternational).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.noRoute, settings =>
+           {
+               settings.Name = "noRouteLabel";
+               settings.Text = "No. Ruta:";
+               settings.AssociatedControlName = "noRoute";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.noRoute, settings =>
+       {
+           settings.Name = "noRoute";
+           settings.Properties.ClientInstanceName = "noRoute";
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnNoRouteValidation";
+       }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emailEP, settings =>
+           {
+               settings.Name = "emailEPLabel";
+               settings.Text = "Email Pago Electrónico:";
+               settings.AssociatedControlName = "tradeName";
+           }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.emailEP, settings =>
+       {
+           settings.Name = "emailEP";
+           settings.Properties.ClientInstanceName = "emailEP";
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnEmailEPValidation";
+       }).GetHtml()
+        </td>
+    </tr>
+</table>

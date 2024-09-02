@@ -1,0 +1,486 @@
+﻿ 
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuideTransportation
+
+@{
+    string codeState = (Model != null && Model.RemissionGuide != null && Model.RemissionGuide.Document.DocumentState.code != "") ? Model.RemissionGuide.Document.DocumentState.code : "01";
+    bool controlsEnabled = (!Model.isOwn);
+    //|| ((Model.RemissionGuide.isManual != null ? ((bool)Model.RemissionGuide.isManual) : true) == true));
+    string answerControlsEnabled = (controlsEnabled) ? "NO" : "SI";
+    decimal dValueMaxAdvance = 0;
+    dValueMaxAdvance = Convert.ToDecimal(DataProviderSetting.ValueSettingDetailByCodes("VMDVAL", "ANTRGTRA"));
+    var isOwnTmp = (Model != null) ? Model.isOwn : false;
+}
+
+@Html.Hidden("answerControlsEnabled", answerControlsEnabled)
+@Html.Hidden("isOwnTransport", Model.isOwn ? "NO":"SI")
+<table class="table table-condenced" style="margin: 0px;">
+    <!--FILA 1-->
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "¿Transporte Tercero?: ";
+           settings.AssociatedControlName = "isOwn";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isOwn, settings =>
+       {
+           settings.Properties.ClientInstanceName = "isOwn";
+           settings.Name = "isOwn";
+           settings.ReadOnly = codeState != "01" || (Model.RemissionGuide.isManual != null ? ((bool)Model.RemissionGuide.isManual) : true) == false;
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.CheckedChanged = "OnIsOwn_CheckedChanged";
+           settings.Properties.ClientSideEvents.Init = "OnIsOwnInit";
+       }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "id_FishingZoneLabel";
+                settings.Text = "Zona:";
+                settings.AssociatedControlName = "id_FishingZoneLabel";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_FishingSiteRG = (Model != null && Model.id_FishingSiteRG != null && Model.id_FishingSiteRG > 0) ? (int?)Model.id_FishingSiteRG : null;
+                int? id_FishingZoneRG = null;
+                if (id_FishingSiteRG != null)
+                {
+                    var fsObj = DataProviderFishingSite.FishingSiteById(id_FishingSiteRG);
+                    if (fsObj != null) { id_FishingZoneRG = fsObj.id_FishingZone; }
+                }
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_FishingZoneRGNew, settings =>
+            {
+                settings.Name = "id_FishingZoneRGNew";
+                settings.Properties.ClientInstanceName = "id_FishingZoneRGNew";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.ReadOnly = codeState != "01" || isOwnTmp;
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.BeginCallback = "OnFishingZoneRGBeginCallback";
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = "FishingZoneRG_SelectedIndexChanged";
+
+            }).BindList(DataProviderFishingZone.FishingZone((int?)ViewData["id_company"])).Bind(id_FishingZoneRG).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "id_FishingSiteLabel";
+                settings.Text = "Sitio:";
+                settings.AssociatedControlName = "id_FishingSiteLabel";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                Html.RenderPartial("componentCascading/_ComboBoxFishingSite");
+
+            }
+            @*@Html.DevExpress().ComboBoxFor(m => m.id_FishingSiteRG, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "id_FishingSiteRG";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                    settings.CallbackRouteValues = new { Controller = "Logistics", Action = "GetFishingSiteRG" };
+                    settings.Properties.CallbackPageSize = 10;
+
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueType = typeof(int);
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.SelectedIndexChanged = "FishingSiteRG_SelectedIndexChanged";
+
+                }).BindList(DataProviderFishingSite.FishingSiteByZone(id_FishingZoneRG)).Bind(id_FishingSiteRG).GetHtml()*@
+        </td>
+    </tr>
+    <!--FILA 2-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Tipo de Tarifario: ";
+                settings.AssociatedControlName = "id_TransportTariffType";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                var remisionGuide = Model.RemissionGuide ?? new RemissionGuide(); ;
+
+                Html.RenderPartial("comboboxcascading/_cmbTransportTariffTypePartial", remisionGuide);
+            }
+        </td>
+
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "providerLabel";
+           settings.Properties.ClientInstanceName = "providerLabel";
+           settings.Text = "Compañia de Transporte: ";
+           settings.AssociatedControlName = "id_provider";
+           // settings.ClientVisible = Model.isOwn;
+       }).GetHtml()
+        </td>
+		<td colspan="5">
+			@*@{
+				var id_provider = (Model != null && Model.id_provider != 0) ? Model.id_provider : null;
+			}*@
+			@{
+				var id_DriverVeicleProviderTransport = (Model != null && Model.id_DriverVeicleProviderTransport != null) ? Model.id_DriverVeicleProviderTransport : null;
+				var id_provider = 0;
+				if (id_DriverVeicleProviderTransport != null)
+				{
+					id_provider = DataProviderVehicle.VehicleProviderTransportistIdVehicleProvider(id_DriverVeicleProviderTransport);
+				}
+
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_provider, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "id_provider";
+		   settings.Name = "id_provider";
+
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabTransportation";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnProviderValidation";
+		   settings.ClientEnabled = false;
+
+	   }).BindList(DataProviderPerson.PersonsTransportist((int?)ViewData["id_company"])).Bind(id_provider).GetHtml()
+		</td>
+
+    </tr>
+    <!--FILA 3 vehiculo-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Transporte: ";
+                settings.AssociatedControlName = "id_vehicle";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+
+                Html.RenderPartial("comboboxcascading/_cmbVehiclePartial", Model);
+            }
+        </td>
+        <td >
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Marca:";
+                settings.AssociatedControlName = "mark";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Vehicle.mark, settings =>
+            {
+                settings.Properties.ClientInstanceName = "mark";
+                settings.Name = "mark";
+                settings.Width = Unit.Percentage(100);
+
+                settings.ReadOnly = true;
+
+            }).GetHtml()
+        </td>
+        <td>
+            <!--<td style="width: 10%">-->
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Modelo:";
+                settings.AssociatedControlName = "model";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Vehicle.model, settings =>
+            {
+                settings.Properties.ClientInstanceName = "model";
+                settings.Name = "model";
+                settings.Width = Unit.Percentage(100);
+
+                settings.ReadOnly = true;
+
+            }).GetHtml()
+        </td>
+    </tr>
+    <!--FILA candado hunter-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Candado Hunter:";
+                settings.AssociatedControlName = "hunterLockLabel";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.VehicleHunterLockText, settings =>
+            {
+                settings.Properties.ClientInstanceName = "VehicleHunterLockText";
+                settings.Name = "VehicleHunterLockText";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 250;
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td style="width: 10%">
+			@Html.DevExpress().Label(settings =>
+	   {
+		   settings.Name = "billingcompanyLabel";
+		   settings.Properties.ClientInstanceName = "billingcompanyLabel";
+		   settings.Text = "Compañia que Factura: ";
+		   settings.AssociatedControlName = "id_VehicleProviderTranportistBilling";
+		   // settings.ClientVisible = Model.isOwn;
+	   }).GetHtml()
+		</td>
+		<td colspan="5">
+			@{
+				var id_VehicleProviderTranportistBilling = (Model != null && Model.id_VehicleProviderTranportistBilling != null) ? Model.id_VehicleProviderTranportistBilling : null;
+				var _Person = new Person();
+				if (id_VehicleProviderTranportistBilling != null)
+				{
+					_Person = DataProviderPerson.GetProviderTransportBilling(id_VehicleProviderTranportistBilling);
+				}
+
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_VehicleProviderTranportistBilling, settings =>
+	   {
+		   settings.Properties.ClientInstanceName = "id_VehicleProviderTranportistBilling";
+		   settings.Name = "id_VehicleProviderTranportistBilling";
+
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.ValueType = typeof(int);
+
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Width = Unit.Percentage(100);
+
+		   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValidationSettings.ValidationGroup = "tabTransportation";
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnProviderValidation";
+		   settings.ClientEnabled = false;
+
+	   }).BindList(DataProviderPerson.PersonsTransportist((int?)ViewData["id_company"])).Bind(_Person.id).GetHtml()
+		</td>
+    </tr>
+    <!--FILA 4  Valor Flete Anticipo-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Chofer: ";
+                settings.AssociatedControlName = "id_driver";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                var id_driver = (Model != null && Model.id_driver != 0) ? Model.id_driver : null;
+                var driverName = (Model != null) ? Model.driverName : "";
+                if (Model.isOwn)
+                {
+                    driverName = "";
+                }
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_driver, settings =>
+       {
+           settings.Properties.ClientInstanceName = "id_driver";
+           settings.Name = "id_driver";
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "fullname_businessName";
+           settings.Properties.ValueType = typeof(string);
+
+           settings.Properties.AllowUserInput = true;
+           settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+           settings.Properties.ValidationSettings.ValidationGroup = "tabTransportation";
+           settings.ReadOnly = codeState != "01" || (Model.isOwn);
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnDriverValidation";
+       }).BindList(DataProviderPerson.Driver()).Bind((id_driver != null) ? id_driver.ToString() : driverName).GetHtml()
+
+        </td>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Valor Flete:";
+                settings.AssociatedControlName = "valuePrice";
+            }).GetHtml()
+        </td>
+        <td>
+
+
+
+            @Html.DevExpress().SpinEditFor(m => m.valuePrice, settings =>
+       {
+           settings.Name = "valuePrice";
+           settings.Properties.ClientInstanceName = "valuePrice";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.Properties.ClientSideEvents.Validation = "OnValuePriceValidation";
+           settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+
+       }).GetHtml()
+        </td>
+
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Anticipo:";
+                settings.AssociatedControlName = "advancePrice";
+            }).GetHtml()
+        </td>
+        <td>
+
+            @Html.DevExpress().SpinEditFor(m => m.advancePrice, settings =>
+       {
+           settings.Name = "advancePrice";
+           settings.Properties.ClientInstanceName = "advancePrice";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.Properties.MinValue = 0;
+           if (dValueMaxAdvance > 0) settings.Properties.MaxValue = dValueMaxAdvance;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.ShowModelErrors = true;
+           settings.ReadOnly = codeState != "01" || (Model.isOwn);
+
+           settings.Properties.ClientSideEvents.Validation = "OnAdvancePriceValidation";
+
+       }).GetHtml()
+
+
+        </td>
+    </tr>
+    <!--FILA 5 Placa Nombre Tercero-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Placa Tercero:";
+                settings.AssociatedControlName = "Placa";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.RemissionGuide.RemissionGuideTransportation.carRegistration, settings =>
+            {
+                settings.Properties.ClientInstanceName = "carRegistrationThird";
+                settings.Name = "carRegistrationThird";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 50;
+                settings.Properties.ClientSideEvents.Init = "OnCarRegistrationThirdInit";
+                settings.ReadOnly = true;
+                //settings.ReadOnly = codeState != "01" || ((!Model.isOwn) && ((Model.RemissionGuide.isManual != null ? ((bool)Model.RemissionGuide.isManual) : true) == false));
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Conductor Tercero:";
+                settings.AssociatedControlName = "model";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.RemissionGuide.RemissionGuideTransportation.driverName, settings =>
+            {
+                settings.Properties.ClientInstanceName = "driverNameThird";
+                settings.Name = "driverNameThird";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 50;
+                settings.Properties.ClientSideEvents.Init = "OnDriverNameThirdInit";
+                settings.ReadOnly = true;
+                //settings.ReadOnly = codeState != "01" || ((!Model.isOwn) && ((Model.RemissionGuide.isManual != null ? ((bool)Model.RemissionGuide.isManual) : true) == false));
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Cédula Tercero:";
+                settings.AssociatedControlName = "model";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.RemissionGuide.RemissionGuideTransportation.identificationNumberDriver, settings =>
+            {
+                settings.Properties.ClientInstanceName = "identificationNumberDriverThird";
+                settings.Name = "identificationNumberDriverThird";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 50;
+                settings.Properties.ClientSideEvents.Init = "OnidentificationCard";
+                settings.ReadOnly = true;
+            }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <!--FILA 6 observacion-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Observación:";
+                settings.AssociatedControlName = "ObservationTransLabel";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.descriptionTrans, settings =>
+            {
+                settings.Properties.ClientInstanceName = "descriptionTrans";
+                settings.Name = "descriptionTrans";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 250;
+            }).GetHtml()
+        </td>
+    </tr>
+
+</table>
+

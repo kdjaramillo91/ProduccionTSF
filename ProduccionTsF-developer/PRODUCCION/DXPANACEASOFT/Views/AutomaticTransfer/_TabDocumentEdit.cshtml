@@ -1,0 +1,96 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Tipo de Documento: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().TextBoxFor(model => model.documentType,
+            settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;
+            }).GetHtml()
+    </div>
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "No.Documento: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().TextBoxFor(model => model.number,
+            settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;
+            }).GetHtml()
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Fecha de Emisión: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().DateEditFor(model => model.dateTimeEmision,
+		  settings =>
+		  {
+			  settings.Name = "DateTimeEmision";
+			  settings.Properties.ClientInstanceName = "DateTimeEmision";
+			  settings.Width = Unit.Percentage(100);
+			  settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+			  settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+			  //settings.ReadOnly = true;
+              
+			  settings.ReadOnly = !((bool)ViewBag.enabled);
+
+              settings.Properties.ClientSideEvents.DateChanged = "DateTimeEmision_DateChanged";
+		  }).GetHtml()
+    </div>
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Estado: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-4">
+        @Html.DevExpress().TextBoxFor(model => model.state,
+            settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                settings.ReadOnly = true;//!((bool)ViewBag.enabled);
+            }).GetHtml()
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Width = Unit.Percentage(100);
+            settings.Text = "Descripción: ";
+        }).GetHtml()
+    </div>
+    <div class="col-sm-10">
+        @Html.DevExpress().MemoFor(model => model.description,
+            settings =>
+            {
+                settings.Name = "MemoDescription";
+                settings.Width = Unit.Percentage(97);
+                settings.ReadOnly = !((bool)ViewBag.enabled);
+            }).GetHtml()
+    </div>
+</div>

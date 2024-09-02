@@ -1,0 +1,85 @@
+﻿@using System.Data
+
+@model DataTable
+
+@{
+    string lableEnterprise = DataProviderSetting.ValueSetting("EEPRIM");
+}
+@Html.DevExpress().GridView(
+    gridView =>
+    {
+        gridView.Name = "DataExportUserPermissionGridView";
+        gridView.CallbackRouteValues = new { Controller = "DataExportUserPermission", Action = "GridViewPartial" };
+        gridView.Width = Unit.Percentage(100);
+
+        gridView.SettingsPager.Visible = true;
+        gridView.Settings.ShowGroupPanel = true;
+        gridView.Settings.ShowFilterRow = true;
+        gridView.SettingsBehavior.AllowSelectByRowClick = false;
+        gridView.Settings.HorizontalScrollBarMode = ScrollBarMode.Auto;
+
+        //Panel de Busqueda
+        gridView.SettingsSearchPanel.Visible = true;
+        gridView.Styles.SearchPanel.CssClass = "searchPanel";
+
+        //Eventos
+        gridView.ClientSideEvents.BeginCallback = "onDataExportUserPermissionGridViewBeginCallback";
+
+        gridView.Settings.ShowTitlePanel = false;
+
+        //Pie de tabla
+        gridView.Settings.ShowFooter = true;
+
+        //Boton de filtro para las columnas de la tabla
+        gridView.Settings.ShowFilterRowMenu = true;
+
+        gridView.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        gridView.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        gridView.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        gridView.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        gridView.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        gridView.Styles.Header.BackColor = System.Drawing.Color.FromArgb(255, 255, 191, 102);
+        gridView.Styles.Header.Font.Bold = true;
+
+        // Parámetros de Exportación
+        var exportSettings = gridView.SettingsExport;
+
+        exportSettings.EnableClientSideExportAPI = true;
+        exportSettings.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+
+        exportSettings.FileName = String.Format("{0}_{1:yyyyMMdd HHmm}", this.ViewBag.TipoReporte, DateTime.Now);
+
+        exportSettings.Styles.Header.Font.Name = "Verdana";
+        exportSettings.Styles.Header.Font.Size = FontUnit.Point(10);
+
+        exportSettings.Styles.Default.Font.Name = "Verdana";
+        exportSettings.Styles.Default.Font.Size = FontUnit.Point(8);
+
+        gridView.Toolbars.Add(toolbar =>
+        {
+            toolbar.Items.Add(new MVCxGridViewToolbarItem()
+            {
+                Name = "ExportToXlsx",
+                Text = "Exportar datos a Excel (2003)",
+                Command = GridViewToolbarCommand.ExportToXlsx,
+            });
+        });
+
+        var formatosColumna = (Dictionary<string, string>)this.ViewBag.FormatosColumna;
+
+        foreach(System.Data.DataColumn dataColumn in this.Model.Columns)
+        {
+            var column1 = dataColumn;
+            gridView.Columns.Add(column =>
+            {
+                column.FieldName = column1.ColumnName;
+                column.Caption = column1.ColumnName != "Logística" ? column1.ColumnName : ((lableEnterprise != "") ? "Logística " + lableEnterprise : "Logística Empresa");
+
+                if (formatosColumna.ContainsKey(column1.ColumnName))
+                {
+                    column.PropertiesEdit.DisplayFormatString = formatosColumna[column1.ColumnName];
+                }
+            });
+        }
+    }).Bind(this.Model).GetHtml()

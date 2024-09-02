@@ -1,0 +1,257 @@
+﻿@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.RemissionGuideAssignedStaff>
+@{ 
+    decimal dValueMaxAdvance = 0;
+    dValueMaxAdvance = Convert.ToDecimal(DataProviderSetting.ValueSettingDetailByCodes("VMDVAL", "VALVIA"));
+}
+@{
+    var grid = Html.DevExpress().GridView<RemissionGuideAssignedStaff>(settings =>
+    {
+        settings.Name = "gvAssignedStaff";
+        settings.CallbackRouteValues = new { Controller = "Logistics", Action = "RemissionGuideAssignedStaffPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Logistics", Action = "RemissionGuideAssignedStaffPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Logistics", Action = "RemissionGuideAssignedStaffPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Logistics", Action = "RemissionGuideAssignedStaffPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.KeyFieldName = "id_person";
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<RemissionGuideAssignedStaff> rows = (Model as List<RemissionGuideAssignedStaff>);
+            rows = (rows != null) ? rows.Where(d => d.isActive).ToList() : new List<RemissionGuideAssignedStaff>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+
+            MVCxGridView gridView = (MVCxGridView)s;
+
+
+
+            if (gridView.EditingRowVisibleIndex != -1)
+            {
+                var key = gridView.GetRowValues(gridView.EditingRowVisibleIndex, "id_person");
+
+                e.Properties["cpEditingRowVisibleIndex"] = gv.EditingRowVisibleIndex;
+                //TempData["gvAssignedStaffid_person"] = gridView.GetRowValues(gridView.EditingRowVisibleIndex, "id_person");
+                TempData["gvAssignedStaffid_person"] = key;
+                TempData["gvAssignedStaffID"] = 0;
+            }
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfoAssigendStaff""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRowsAssigendStaff"" style=""cursor: pointer;"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelectionAssigendStaff"" style=""cursor: pointer;"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #region Columns
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_person";
+            column.Name = "id_person";
+            column.Caption = "Persona";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_person";
+                p.DataSource = DataProviderPerson.Persons((int)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextField = "fullname_businessName";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 15;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnAssigendPersonValidation";
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_travelType";
+            column.Caption = "Viaje";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_travelType";
+                p.DataSource = DataProviderTravelType.TravelTypes();
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 30;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                //p.ClientSideEvents.Init = "InitAssignedPersonTravelType";
+                p.ClientSideEvents.Validation = "OnAssigendPersonTravelTypeValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_assignedStaffRol";
+            column.Name = "id_assignedStaffRol";
+            column.Caption = "Rol";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+
+                if (TempData["gvAssignedStaffID"] != null && (int)TempData["gvAssignedStaffID"] == 0 && TempData["gvAssignedStaffid_person"] != "")
+                {
+
+                    RemissionGuide remissionGuide = (TempData["remissionGuide"] as RemissionGuide);
+                    if (remissionGuide != null && remissionGuide.RemissionGuideAssignedStaff != null)
+                    {
+                        var id = (from e in remissionGuide.RemissionGuideAssignedStaff
+                                  where e.id_person == (int)(TempData["gvAssignedStaffid_person"] ??0)
+                                  select e.id).FirstOrDefault();
+                        TempData["gvAssignedStaffID"] = id;/// (int?)DataBinder.Eval(c.DataItem, "ID");
+                        TempData.Keep("gvAssignedStaffID");
+
+                    }
+                }
+
+
+
+                int? id_assignedStaffRol = (int?)DataBinder.Eval(c.DataItem, "id_assignedStaffRol");
+
+                RemissionGuideAssignedStaffRol rol = DataProviderAssignedStaffRol.AssignedStaffRol(id_assignedStaffRol);
+                if (rol != null)
+                {
+                    ViewContext.Writer.Write(rol.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_assignedStaffRol";
+                p.DataSource = DataProviderAssignedStaffRol.AssignedStaffRoles();
+                p.ValueField = "id";
+                p.TextField = "name";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 30;
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnAssigendPersonRolValidation";
+
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "viaticPrice";
+            column.Caption = "Viatico";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? viaticPrice = (decimal?)DataBinder.Eval(c.DataItem, "viaticPrice");
+                ViewContext.Writer.Write(viaticPrice !=null?viaticPrice.Value.ToString("N2"):"0");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "viaticPrice";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.SpinButtons.ShowIncrementButtons = true;
+                p.SpinButtons.ShowLargeIncrementButtons = false;
+                p.Increment = 0.01M;
+                p.LargeIncrement = 1.0M;
+                p.MinValue = 0;
+                if (dValueMaxAdvance > 0) p.MaxValue = dValueMaxAdvance;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Custom;
+                //   p.ClientSideEvents.ValueChanged = "QuantityOrdered_ValueChanged";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                //p.ClientSideEvents.Init = "QuantityOrdered_Init";
+                p.ClientSideEvents.Validation = "OnviaticPriceValidation";
+            });
+        });
+        #endregion
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 13,
+            Caption = "Acciones",
+            Width = Unit.Percentage(5)
+        };
+
+        settings.Columns.Add(commandColumn);
+    });
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id_person"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}

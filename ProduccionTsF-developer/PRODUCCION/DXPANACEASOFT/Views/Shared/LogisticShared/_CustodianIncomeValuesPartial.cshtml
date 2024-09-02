@@ -1,0 +1,199 @@
+﻿@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.Dto
+
+@model DXPANACEASOFT.Models.Dto.CustodianIncomeDto
+
+<!-- TITULO CUSTODIOS  -->
+<tr style="border-bottom: 1px Solid #C0C0C0;">
+    <td colspan="6">
+        <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Custodios</span>
+    </td>
+</tr>
+<!-- VALOR 1 -->
+<tr>
+    <td style="width: 5%;">
+        @Html.DevExpress().LabelFor(m => m.id_PersonCompanyCustodian1, settings =>
+   {
+       settings.Text = "Empresa 1:*";
+       settings.AssociatedControlName = "id_PersonCompanyCustodian1";
+   }).GetHtml()
+
+    </td>
+    <td>
+        @{
+            int? id_PersonCompanyCustodian1 = (Model != null && Model.id_PersonCompanyCustodian1 != 0) ? (int?)Model.id_PersonCompanyCustodian1 : null;
+        }
+        @Html.DevExpress().ComboBoxFor(m => m.id_PersonCompanyCustodian1, settings =>
+   {
+       settings.Properties.ClientInstanceName = "id_PersonCompanyCustodian1";
+
+       settings.Properties.ValueField = "id";
+       settings.Properties.TextField = "name";
+       settings.Properties.ValueType = typeof(int);
+
+       settings.Width = Unit.Percentage(100);
+
+       settings.Properties.NullText = "Seleccione empresa de custodia";
+       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+       settings.ShowModelErrors = true;
+       settings.Properties.ClientSideEvents.Validation = "OnPersonCompanyCustodian1Validation";
+   }).BindList(DataProviderPerson.ProviderByCompanyAndCurrent((int)ViewData["id_company"], id_PersonCompanyCustodian1)).Bind(id_PersonCompanyCustodian1).GetHtml()
+
+    </td>
+
+    <td style="width: 5%;">
+        @Html.DevExpress().LabelFor(m => m.id_FishingCustodian1, settings =>
+   {
+       settings.Text = "Destino:*";
+       settings.AssociatedControlName = "id_FishingCustodian1";
+   }).GetHtml()
+
+    </td>
+    <td>
+        @{
+            int? id_FishingCustodian1 = (Model != null && Model.id_FishingCustodian1 != 0) ? (int?)Model.id_FishingCustodian1 : null;
+        }
+        @Html.DevExpress().ComboBoxFor(m => m.id_FishingCustodian1, settings =>
+   {
+       settings.Name = "id_FishingCustodian1";
+       settings.Properties.ClientInstanceName = "id_FishingCustodian1";
+       settings.Properties.ValueField = "id";
+       settings.Properties.TextField = "name";
+       settings.Properties.ValueType = typeof(int);
+       settings.Width = Unit.Percentage(100);
+       settings.Properties.NullText = "Seleccione destino";
+       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+       settings.Properties.EnableClientSideAPI = true;
+       settings.Properties.ClientSideEvents.SelectedIndexChanged = "id_FishingCustodian1_SelectedIndexChanged";
+       settings.ShowModelErrors = true;
+       settings.Properties.ClientSideEvents.Validation = "OnFishingCustodian1Validation";
+   }).BindList(DataProviderFishingCustodian.FishingCustodianByCompanyAndCurrent((int)ViewData["id_company"], id_FishingCustodian1)).Bind(id_FishingCustodian1).GetHtml()
+
+    </td>
+
+    <td style="width: 5%;">
+        @Html.DevExpress().LabelFor(m => m.fishingCustodianField1, settings =>
+   {
+       settings.Text = "Valor:*";
+       settings.AssociatedControlName = "fishingCustodianField1";
+   }).GetHtml()
+
+    </td>
+    <td>
+
+        @{
+            string fishingCustodianField1 = (Model != null && !string.IsNullOrEmpty(Model.fishingCustodianField1)) ? (string)Model.fishingCustodianField1 : null;
+            int fishingCustodianId = (Model != null) ? Model.id_FishingCustodian1 : 0;
+            FishingCustodianValueDto modelField = new FishingCustodianValueDto
+            {
+                FishingCustodianId = fishingCustodianId,
+                ControlName = "fishingCustodianField1",
+                CodeValue = fishingCustodianField1,
+                ControlDependName = "id_FishingCustodian1"
+            };
+            Html.RenderPartial("LogisticShared/comboboxcascading/_cmbFishingCustodiaValue", modelField);
+        }
+
+    </td>
+</tr>
+<!-- END VALOR 1 -->
+<!-- VALOR 2 -->
+<tr>
+    <td style="width: 5%;">
+        @Html.DevExpress().LabelFor(m => m.id_PersonCompanyCustodian2, settings =>
+   {
+       settings.Text = "Empresa 2:";
+       settings.AssociatedControlName = "id_PersonCompanyCustodian2";
+   }).GetHtml()
+
+    </td>
+    <td>
+        @{
+            int? id_PersonCompanyCustodian2 = (Model != null && Model.id_PersonCompanyCustodian2 != 0) ? (int?)Model.id_PersonCompanyCustodian2 : null;
+        }
+        @Html.DevExpress().ComboBoxFor(m => m.id_PersonCompanyCustodian2, settings =>
+   {
+       settings.Properties.ClientInstanceName = "id_PersonCompanyCustodian2";
+
+       settings.Properties.ValueField = "id";
+       settings.Properties.TextField = "name";
+       settings.Properties.ValueType = typeof(int);
+
+       settings.Width = Unit.Percentage(100);
+
+       settings.Properties.NullText = "Seleccione empresa de custodia";
+       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+       settings.ShowModelErrors = true;
+       settings.Properties.ClientSideEvents.Validation = "OnPersonCompanyCustodian2Validation";
+   }).BindList(DataProviderPerson.ProviderByCompanyAndCurrent((int)ViewData["id_company"], id_PersonCompanyCustodian2)).Bind(id_PersonCompanyCustodian2).GetHtml()
+
+    </td>
+
+    <td style="width: 5%;">
+        @Html.DevExpress().LabelFor(m => m.id_FishingCustodian2, settings =>
+   {
+       settings.Text = "Destino:";
+       settings.AssociatedControlName = "id_FishingCustodian2";
+   }).GetHtml()
+
+    </td>
+    <td>
+        @{
+            int? id_FishingCustodian2 = (Model != null && Model.id_FishingCustodian2 != 0) ? (int?)Model.id_FishingCustodian2 : null;
+        }
+        @Html.DevExpress().ComboBoxFor(m => m.id_FishingCustodian2, settings =>
+   {
+       settings.Name = "id_FishingCustodian2";
+       settings.Properties.ClientInstanceName = "id_FishingCustodian2";
+
+       settings.Properties.ValueField = "id";
+       settings.Properties.TextField = "name";
+       settings.Properties.ValueType = typeof(int);
+
+       settings.Width = Unit.Percentage(100);
+
+       settings.Properties.NullText = "Seleccione destino";
+       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+       settings.Properties.EnableClientSideAPI = true;
+       settings.Properties.ClientSideEvents.SelectedIndexChanged = "id_FishingCustodian2_SelectedIndexChanged";
+       settings.ShowModelErrors = true;
+       settings.Properties.ClientSideEvents.Validation = "OnFishingCustodian2Validation";
+   }).BindList(DataProviderFishingCustodian.FishingCustodianByCompanyAndCurrent((int)ViewData["id_company"], id_FishingCustodian2)).Bind(id_FishingCustodian2).GetHtml()
+
+    </td>
+
+    <td style="width: 5%;">
+        @Html.DevExpress().LabelFor(m => m.fishingCustodianField2, settings =>
+   {
+       settings.Text = "Valor:";
+       settings.AssociatedControlName = "id_FishingCustodianValue2";
+   }).GetHtml()
+
+    </td>
+    <td>
+        @{
+            string fishingCustodianField2 = (Model != null && !string.IsNullOrEmpty(Model.fishingCustodianField2)) ? (string)Model.fishingCustodianField2 : null;
+            int fishingCustodian2Id = (Model != null && Model.id_FishingCustodian2.HasValue ) ? Model.id_FishingCustodian2.Value : 0;
+            FishingCustodianValueDto modelField2 = new FishingCustodianValueDto
+            {
+                FishingCustodianId = fishingCustodian2Id,
+                ControlName = "fishingCustodianField2",
+                CodeValue = fishingCustodianField2,
+                ControlDependName = "id_FishingCustodian2"
+            };
+            Html.RenderPartial("LogisticShared/comboboxcascading/_cmbFishingCustodiaValue", modelField2);
+        }
+
+    </td>
+</tr>
+<!-- END VALOR 2 -->

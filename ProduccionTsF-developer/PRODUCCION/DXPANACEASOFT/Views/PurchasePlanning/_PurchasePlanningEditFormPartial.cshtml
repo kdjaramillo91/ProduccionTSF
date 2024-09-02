@@ -1,0 +1,127 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PurchasePlanning
+
+@{
+    int id_purchasePlanning = (Model != null) ? Model.id : 0;
+}
+
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditPurchasePlanning", name = "formEditPurchasePlanning" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_purchasePlanning", id_purchasePlanning)
+
+    
+
+    @Html.DevExpress().PageControl(tabs =>
+    {
+        tabs.Name = "tabControl";
+        tabs.Width = Unit.Percentage(100);
+
+        tabs.ClientSideEvents.ActiveTabChanged = "TabControl_ActiveTabChanged";
+
+        tabs.TabPages.Add(tab =>
+        {
+            tab.Name = "tabDocument";
+            tab.Text = "Documento    ";
+            tab.TabStyle.Width = Unit.Percentage(100);
+
+            tab.TabImage.Width = Unit.Pixel(16);
+            tab.TabImage.Height = Unit.Pixel(16);
+            tab.TabImage.Align = ImageAlign.Right;
+            tab.TabImage.Url = "/Content/image/noimage.png";
+            tab.ActiveTabImage.Align = ImageAlign.Right;
+            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+            tab.SetContent(() =>
+            {
+                Html.RenderPartial("_PurchasePlanningDocumentFormEdit", Model.Document);
+            });
+        });
+        tabs.TabPages.Add(tab =>
+        {
+            tab.Name = "tabReception";
+            tab.Text = "Planificación    ";
+            tab.TabStyle.Width = Unit.Percentage(100);
+
+            tab.TabImage.Width = Unit.Pixel(16);
+            tab.TabImage.Height = Unit.Pixel(16);
+            tab.TabImage.Align = ImageAlign.Right;
+            tab.TabImage.Url = "/Content/image/noimage.png";
+            tab.ActiveTabImage.Align = ImageAlign.Right;
+            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+            tab.SetContent(() =>
+            {
+                Html.RenderPartial("_PurchasePlanningMainFormTabPurchasePlanning");
+            });
+        });
+        tabs.TabPages.Add(tab =>
+        {
+            tab.Name = "tabItemsDetails";
+            tab.Text = "Detalle de la Planificación    ";
+            tab.TabStyle.Width = Unit.Percentage(100);
+
+            tab.TabStyle.Width = Unit.Percentage(100);
+            tab.TabImage.Width = Unit.Pixel(16);
+            tab.TabImage.Height = Unit.Pixel(16);
+            tab.TabImage.Align = ImageAlign.Right;
+            tab.TabImage.Url = "/Content/image/noimage.png";
+            tab.ActiveTabImage.Align = ImageAlign.Right;
+            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+            tab.SetContent(() =>
+            {
+                Html.RenderPartial("ProductionTemplates/_ProductionDetailsActionsButtons");
+                var itemsDetail = (Model != null && Model.PurchasePlanningDetail != null) ? Model.PurchasePlanningDetail.OrderBy(od => od.datePlanning).ToList() : new List<PurchasePlanningDetail>();
+                Html.RenderPartial("_PurchasePlanningEditFormItemsDetailPartial", itemsDetail);
+            });
+        });
+    }).GetHtml()
+
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdate_EditForm";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        //button.ClientEnabled = true;
+                        //button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnCancel_EditForm";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        //button.ClientEnabled = true;
+                        //button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/purchaseplanning/editform.js"></script>
+
+

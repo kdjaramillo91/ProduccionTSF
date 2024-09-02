@@ -1,0 +1,127 @@
+﻿@using DevExpress.Data
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<RemissionGuideRiver>(settings =>
+    {
+        settings.Name = "gvRemissionGuideRiverControlVehicle";
+        settings.CallbackRouteValues = new { Controller = "RemissionGuideRiverControlVehicle", Action = "RemissionGuideRiverPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "OnGridViewRemissionGuideRiverControlVehicleInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewRemissionGuideRiverControlVehicleSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewRemissionGuideRiverControlVehicleEndCallback";
+
+//Panel para cantidad de registros
+settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""GridViewPurchaseOrderDetailsSelectAllRow();"">Seleccionar Todos</a>
+              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""GridViewPurchaseOrderDetailsClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(m => m.Document.number, column =>
+        {
+            column.Caption = "No. Guía";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.Person1.processPlant, column =>
+        {
+            column.Caption = "Proceso";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.Document.emissionDate, column =>
+        {
+            column.Caption = "Fecha de Emisión";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            ((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+            ((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+        });
+
+        settings.Columns.Add(m => m.RemissionGuideRiverTransportation.Vehicle.carRegistration, column =>
+        {
+            column.Caption = "Placa";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(m => m.PurchaseOrderShippingType.name, column =>
+        {
+            column.Caption = "Medio de Transporte";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.RemissionGuideRiverTransportation.driverName, column =>
+        {
+            column.Caption = "Conductor";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        string[] values = new string[] { "id" };
+        foreach (var key in grid.GetCurrentPageRowValues(values))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+

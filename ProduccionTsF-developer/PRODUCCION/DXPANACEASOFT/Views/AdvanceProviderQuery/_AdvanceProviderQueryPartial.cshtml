@@ -1,0 +1,238 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<AdvanceProvider>(settings =>
+    {
+        settings.Name = "gvAdvanceProvider";
+        settings.CallbackRouteValues = new { Controller = "AdvanceProviderQuery", Action = "AdvanceProviderQueryPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.SettingsExport.EnableClientSideExportAPI = true;
+        settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Settings.ShowFooter = true;
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Anticipos a Proveedores</span>");
+        });
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.Toolbars.Add(t =>
+        {
+            t.EnableAdaptivity = true;
+            t.Items.Add(GridViewToolbarCommand.ExportToXls).Text = "Exportar a Excel (2003)";
+        });
+
+//MASTER DETAILS
+settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = false;
+
+//DETALLES EN GRID LLAMADA A OTRA TABLA
+//settings.SetDetailRowTemplateContent(columns =>
+//{
+//    int? id_remissionGuide = (int?)DataBinder.Eval(columns.DataItem, "id");
+//    RemissionGuide remissionGuide = DataProviderRemissionGuide.RemissionGuide(id_remissionGuide);
+//    Html.RenderPartial("_RemissionGuideDetailViewPartial", remissionGuide);
+//});
+
+settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+
+        settings.Columns.Add(m => m.Document.number, column =>
+ {
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+        });
+        settings.Columns.Add(m => m.Provider.Person.fullname_businessName, column =>
+ {
+            column.Name = "proveedor";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(m => m.Lot.ProductionLot.receptionDate, column =>
+        {
+            column.Caption = "Fecha de Recepción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+
+        });
+
+        settings.Columns.Add(m => m.Document.emissionDate, column =>
+  {
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+
+        });
+
+
+
+        settings.Columns.Add(m => m.Lot.number, column =>
+  {
+            column.Caption = "Sec. Tran";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(m => m.Lot.ProductionLot.internalNumber, column =>
+        {
+            column.Caption = "Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+
+        });
+
+        settings.Columns.Add(m => m.Lot.ProductionLot.Person1.processPlant, column =>
+        {
+            column.Caption = "Proceso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+
+        });
+
+        settings.Columns.Add(m => m.PriceList.name, column =>
+        {
+            column.Caption = "Lista de Precios";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(30);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+        });
+
+        settings.Columns.Add(m => m.Lot.ProductionLot.Person.fullname_businessName, column =>
+        {
+            column.Caption = "Comprador";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(25);
+        });
+
+
+        settings.Columns.Add(m => m.QuantityPoundReceived, column =>
+ {
+            column.Caption = "Libras Recibidas";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "#0";
+
+        });
+
+
+        settings.Columns.Add(m => m.valueAverage, column =>
+  {
+            column.Caption = "Precio Promedio";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "#0.00";
+
+        });
+
+        settings.Columns.Add(m => m.AdvanceValuePercentageUsed, column =>
+        {
+            column.Caption = "Porcentaje Anticipo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "#0";
+
+        });
+
+
+        settings.Columns.Add(m => m.valueAdvanceTotalRounded, column =>
+  {
+            column.Caption = "Valor Anticipo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+            column.PropertiesEdit.DisplayFormatString = "#0";
+
+        });
+
+
+
+        settings.Columns.Add(m => m.Document.DocumentState.name, column =>
+ {
+
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+
+
+
+
+
+        });
+        settings.SettingsExport.RenderBrick = (sender, e) =>
+        {
+            if (e.RowType == GridViewRowType.Data && e.VisibleIndex % 2 == 0)
+                e.BrickStyle.BackColor = System.Drawing.Color.FromArgb(0xEE, 0xEE, 0xEE);
+        };
+        DXPANACEASOFT.Helper.GridViewFeaturesHelper.SetupGlobalGridViewBehavior(settings);
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}

@@ -1,0 +1,93 @@
+﻿@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.InventoryMoveP.InventoryMoveModel
+
+@model InventoryMoveDetail
+
+@{
+
+    var id_lotAux = Model.id_lot == 0 ? (int?)null :  Model.id_lot;
+    var idItemAux = Model.id_item == 0 ? (int?)null : Model.id_item;
+    var idWarehouseLocationAux = Model.id_warehouseLocation == 0 ? (int?)null : Model.id_warehouseLocation;
+    string numberAux = (Model.Lot != null ? Model.Lot.number : "");
+    string internalNumberAux = (Model.Lot != null ? Model.Lot.internalNumber : "");
+    internalNumberAux = (internalNumberAux != "" && internalNumberAux != null) ? internalNumberAux : (Model.Lot != null && Model.Lot.ProductionLot != null ? Model.Lot.ProductionLot.internalNumber : "");
+    DateTime? fechaEmision = (ViewData["fechaEmision"] != null) ? (DateTime?)ViewData["fechaEmision"] : null;
+    var lotReceptionDatePar = DataProviderSetting.ValueSetting("VALLOT");
+    string code = (string)ViewData["code"];
+
+    var lots = new List<CustomLot>();
+    if (code.Equals("34"))
+    {
+        lots.Add(new CustomLot
+        {
+            id = Model.Lot != null ? Model.Lot.id : 0,
+            number = (numberAux + ((numberAux != "" && numberAux != null && internalNumberAux != "" && internalNumberAux != null) ? "-" : "") + internalNumberAux),
+
+        });
+    }
+    else
+    {
+        List<CustomLot> tempResultLots  = TempData["inventoryMoveSaldoDetailItem"] as List<CustomLot>;
+        int countLot = tempResultLots == null ? 0 : tempResultLots.Count;
+
+        bool forceResetLots  = ViewBag.forceresetlots == null ? false : ViewBag.forceresetlots;
+        if(forceResetLots)
+        {
+            TempData["inventoryMoveSaldoDetailItem"] = null;
+            TempData.Keep("inventoryMoveSaldoDetailItem");
+        }
+        else
+        {
+            if (countLot == 0)
+            {
+                var resultLots = DataProviderInventoryMove
+                    .LotsWithItemInventoryCodeDocumentTypeWarehouseWarehouseLocationAndCurrent((int)ViewData["id_company"],
+                                                                                                idItemAux,
+                                                                                                code,
+                                                                                                (int?)ViewBag.idWarehouse,
+                                                                                                idWarehouseLocationAux,
+                                                                                                id_lotAux,
+                                                                                                (bool?)ViewBag.withLotSystem,
+                                                                                                (bool?)ViewBag.withLotCustomer,
+                                                                                                fechaEmision);
+                lots = (List<CustomLot>)resultLots;
+            }
+            else
+            {
+                lots = tempResultLots;
+            }
+        }
+
+    }
+}
+
+@Html.DevExpress().ComboBox(
+comboBox =>
+{
+    comboBox.Name = "id_lot";
+    comboBox.Width = Unit.Percentage(100);
+    comboBox.CallbackRouteValues = new { Controller = "InventoryMove", Action = "FillLotDiff" };
+
+    var prop = comboBox.Properties;
+    prop.ClientInstanceName = "id_lot";
+    prop.ValueField = "id";
+    prop.TextFormatString = "{0}";
+    prop.ValueType = typeof(int);
+    prop.Columns.Add("number", "Lote", 40);
+    prop.Columns.Add("Saldo", "Saldo", 8);
+
+    if (lotReceptionDatePar == "SI")
+        prop.Columns.Add("FechaLoteStr", "Fecha Lote", 20);
+
+    prop.DropDownStyle = DropDownStyle.DropDownList;
+    prop.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    prop.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    prop.CallbackPageSize = 50;
+
+    prop.ClientSideEvents.Validation = "OnLotDetailComboValidation";
+    prop.ClientSideEvents.SelectedIndexChanged = "OnLotDetailCombo_SelectedIndexChanged";
+    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+    prop.ClientSideEvents.BeginCallback = "OnLotDetailBeginCallback";
+
+}).BindList(lots).Bind(id_lotAux).GetHtml();

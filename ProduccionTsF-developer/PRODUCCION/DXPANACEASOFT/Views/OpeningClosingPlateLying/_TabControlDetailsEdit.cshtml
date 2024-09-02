@@ -1,0 +1,16 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingDTO
+
+@Html.DevExpress().PageControl(settings =>
+{
+    settings.Name = "pcFeaturesDetails";
+    settings.Width = Unit.Percentage(100);
+    settings.Height = Unit.Pixel(400);
+    settings.TabPages.Add("Detalles").SetContent(() =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='divTabDetailsEdit'>" +
+            @Html.Partial("_TabDetailsEdit", Model)
+            + "</div>");
+    });
+}).GetHtml()
+

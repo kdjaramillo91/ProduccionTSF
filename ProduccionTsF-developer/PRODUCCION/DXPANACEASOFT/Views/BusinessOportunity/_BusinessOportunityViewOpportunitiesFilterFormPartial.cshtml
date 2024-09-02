@@ -1,0 +1,514 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.BusinessOportunity
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterBusinessOportunityViewOpportunities", name = "formFilterBusinessOportunityViewOpportunities" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+        <tr>
+            <td style="width: 90%">
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="5">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Criterios de Filtros</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.Document.id_documentType, settings =>
+                            {
+                                settings.Name = "documentTypeLabel";
+                                settings.Text = "Tipo de Oportunidad:";
+                                settings.AssociatedControlName = "id_documentType";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().ComboBox(settings =>
+                            {
+                                settings.Name = "id_documentType";
+                                settings.Properties.ClientInstanceName = "id_documentType";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                            }).BindList(DataProviderDocumentType.DocumentTypeOpportunities((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.Person.address, settings =>
+                            {
+                                settings.Name = "addressLabel";
+                                settings.Text = "Localidad(Socio de Negocio):";
+                                settings.AssociatedControlName = "address";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().TextBox(settings =>
+                            {
+                                settings.Name = "address";
+                                settings.Properties.ClientInstanceName = "address";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.id_person, settings =>
+                            {
+                                settings.Name = "personLabel";
+                                settings.Text = "Socio de Negocio:";
+                                settings.AssociatedControlName = "id_person";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "persons";
+                                settings.Properties.ClientInstanceName = "persons";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "fullname_businessName";
+                            }).BindList(DataProviderPerson.ProvidersAndCustomers((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.startDate, settings =>
+                            {
+                                settings.Name = "startStartDateLabel";
+                                settings.Text = "Fecha Inicio:";
+                                settings.AssociatedControlName = "startStartDate";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            <table>
+                                <tr>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().DateEditFor(m => m.startDate, settings =>
+                                           {
+                                               settings.Name = "startStartDate";
+                                               settings.Properties.ClientInstanceName = "startStartDate";
+                                               settings.Width = Unit.Percentage(100);
+
+                                               settings.Properties.NullDisplayText = "Desde";
+                                               settings.Properties.NullText = "Desde";
+
+                                               settings.Properties.DisplayFormatInEditMode = true;
+                                               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                               settings.Properties.EditFormat = EditFormat.Custom;
+                                               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                               settings.Properties.CalendarProperties.Columns = 2;
+                                               settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                               settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                                           }).GetHtml()
+                                    </td>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().DateEditFor(m => m.startDate, settings =>
+                                        {
+                                            settings.Name = "endStartDate";
+                                            settings.Properties.ClientInstanceName = "endStartDate";
+                                            settings.Width = Unit.Percentage(100);
+
+                                            settings.Properties.NullDisplayText = "Hasta";
+                                            settings.Properties.NullText = "Hasta";
+
+                                            settings.Properties.DisplayFormatInEditMode = true;
+                                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                            settings.Properties.EditFormat = EditFormat.Custom;
+                                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                            settings.Properties.CalendarProperties.Columns = 2;
+                                            settings.Properties.DateRangeSettings.StartDateEditID = "startStartDate";
+                                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                                        }).GetHtml()
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.id_executivePerson, settings =>
+                            {
+                                settings.Name = "executivePersonLabel";
+                                settings.Text = "Empleado(Ejecutivo):";
+                                settings.AssociatedControlName = "id_executivePerson";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "executivePersons";
+                                settings.Properties.ClientInstanceName = "executivePersons";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "fullname_businessName";
+                            }).BindList(DataProviderPerson.EmployeesbyCompany((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.endDate, settings =>
+                            {
+                                settings.Name = "startEndDateLabel";
+                                settings.Text = "Fecha Cierre:";
+                                settings.AssociatedControlName = "startEndDate";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            <table>
+                                <tr>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().DateEditFor(m => m.endDate, settings =>
+                                           {
+                                               settings.Name = "startEndDate";
+                                               settings.Properties.ClientInstanceName = "startEndDate";
+                                               settings.Width = Unit.Percentage(100);
+
+                                               settings.Properties.NullDisplayText = "Desde";
+                                               settings.Properties.NullText = "Desde";
+
+                                               settings.Properties.DisplayFormatInEditMode = true;
+                                               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                               settings.Properties.EditFormat = EditFormat.Custom;
+                                               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                               settings.Properties.CalendarProperties.Columns = 2;
+                                               settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                               settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                                           }).GetHtml()
+                                    </td>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().DateEditFor(m => m.endDate, settings =>
+                                        {
+                                            settings.Name = "endEndDate";
+                                            settings.Properties.ClientInstanceName = "endEndDate";
+                                            settings.Width = Unit.Percentage(100);
+
+                                            settings.Properties.NullDisplayText = "Hasta";
+                                            settings.Properties.NullText = "Hasta";
+
+                                            settings.Properties.DisplayFormatInEditMode = true;
+                                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                            settings.Properties.EditFormat = EditFormat.Custom;
+                                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                            settings.Properties.CalendarProperties.Columns = 2;
+                                            settings.Properties.DateRangeSettings.StartDateEditID = "startEndDate";
+                                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                                        }).GetHtml()
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "phaseLabel";
+                                settings.Text = "Etapa:";
+                                settings.AssociatedControlName = "id_phase";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "documentTypePhases";
+                                settings.Properties.ClientInstanceName = "documentTypePhases";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                            }).BindList(DataProviderBusinessOportunityDocumentTypePhase.BusinessOportunityDocumentTypePhases((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.BusinessOportunityPlaninng.amount, settings =>
+                            {
+                                settings.Text = "Monto de Oportunidad(Planificación):";
+                                settings.AssociatedControlName = "amount";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            <table>
+                                <tr>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().ComboBox(settings =>
+                                        {
+                                            settings.Name = "id_logicalOperator";
+                                            settings.Properties.ClientInstanceName = "id_logicalOperator";
+                                            settings.Width = Unit.Percentage(100);
+                                            settings.Properties.ValueField = "id";
+                                            settings.Properties.TextField = "name";
+                                            settings.Properties.ValueType = typeof(int);
+
+                                            settings.Properties.NullDisplayText = ">";
+                                            settings.Properties.NullText = ">";
+
+                                            settings.Properties.Width = Unit.Percentage(100);
+                                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                                        }).BindList(DataProviderLogicalOperator.LogicalOperators()).GetHtml()
+                                    </td>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().SpinEdit(settings =>
+                                           {
+                                               //settings.Properties.ClientInstanceName = "amount";
+                                               settings.Name = "amount";
+
+                                               settings.Width = Unit.Percentage(100);
+
+                                               settings.Properties.DisplayFormatString = "N2";
+                                               settings.Properties.DisplayFormatInEditMode = true;
+                                               settings.Properties.DecimalPlaces = 2;
+                                               settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                                               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+                                               settings.Properties.Increment = 1.00M;
+                                               settings.Properties.LargeIncrement = 0.5M;
+                                               settings.Properties.MinValue = 0;
+                                               //settings.Properties.MaxValue = 100;
+                                               settings.Properties.NumberType = SpinEditNumberType.Float;
+                                               settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+                                               settings.Properties.NullText = "0,00";
+                                               //settings.ShowModelErrors = true;
+                                               //settings.Properties.ClientSideEvents.Validation = "OnMetricUnitConversionFactorValidation";
+                                           }).GetHtml()
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Text = "Porcentaje de Cierre(Última Etapa):";
+                                settings.AssociatedControlName = "percentClosureLabel";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            <table>
+                                <tr>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().ComboBox(settings =>
+                                        {
+                                            settings.Name = "id_logicalOperatorPC";
+                                            settings.Properties.ClientInstanceName = "id_logicalOperatorPC";
+                                            settings.Width = Unit.Percentage(100);
+                                            settings.Properties.ValueField = "id";
+                                            settings.Properties.TextField = "name";
+                                            settings.Properties.ValueType = typeof(int);
+
+                                            settings.Properties.NullDisplayText = ">";
+                                            settings.Properties.NullText = ">";
+
+                                            settings.Properties.Width = Unit.Percentage(100);
+                                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                                        }).BindList(DataProviderLogicalOperator.LogicalOperators()).GetHtml()
+                                    </td>
+                                    <td style="width: 50%">
+                                        @Html.DevExpress().SpinEdit(settings =>
+                                        {
+                                            //settings.Properties.ClientInstanceName = "percentClosure";
+                                            settings.Name = "percentClosure";
+                                            settings.Width = Unit.Percentage(100);
+
+                                            settings.Properties.DisplayFormatString = "N2";
+                                            settings.Properties.DisplayFormatInEditMode = true;
+                                            settings.Properties.DecimalPlaces = 2;
+                                            settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                                            settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+                                            settings.Properties.Increment = 1.00M;
+                                            settings.Properties.LargeIncrement = 0.5M;
+                                            settings.Properties.MinValue = 0;
+                                            settings.Properties.MaxValue = 100;
+                                            settings.Properties.NumberType = SpinEditNumberType.Float;
+                                            settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+                                            settings.Properties.NullText = "0,00";
+                                            //settings.ShowModelErrors = true;
+                                            //settings.Properties.ClientSideEvents.Validation = "OnMetricUnitConversionFactorValidation";
+
+                                        }).GetHtml()
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 10%">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Text = "Talla del Producto:";
+                                settings.AssociatedControlName = "percentClosureLabel";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "itemSizes";
+                                settings.Properties.ClientInstanceName = "itemSizes";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                            }).BindList(DataProviderItemSize.ItemSizebyCompany((int?)ViewData["id_company"])).GetHtml()
+                            @*@Html.DevExpress().ComboBox(settings =>
+                            {
+                                settings.Name = "id_itemSize";
+                                settings.Properties.ClientInstanceName = "id_itemSize";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                            }).BindList(DataProviderItemSize.ItemSizebyCompany((int?)ViewData["id_company"])).GetHtml()*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">
+                            @Html.DevExpress().LabelFor(m => m.Document.id_documentState, settings =>
+                            {
+                                settings.Name = "documentStateLabel";
+                                settings.Text = "Estado:";
+                                settings.AssociatedControlName = "id_documentState";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().ComboBox(settings =>
+                            {
+                                settings.Name = "id_documentState";
+                                settings.Properties.ClientInstanceName = "id_documentState";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.Width = Unit.Percentage(100);
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                            }).BindList(DataProviderDocumentState.DocumentStatesByDocumentType(null, (int?)ViewData["id_company"])).GetHtml()
+                        </td>
+
+                        <td style="width: 10%">
+                           @Html.DevExpress().LabelFor(m => m.BusinessOportunityResults.BusinessOportunityState.name, settings =>
+                            {
+                                settings.Name = "businessOportunityStateLabel";
+                                settings.Text = "Estado de la Oportunidad:";
+                                settings.AssociatedControlName = "businessOportunityState";
+                            }).GetHtml()
+                        </td>
+                        <td style="width: 40%">
+                            @Html.DevExpress().ComboBoxFor(m => m.BusinessOportunityResults.id_businessOportunityState, settings =>
+                       {
+                           settings.Name = "id_businessOportunityState";
+                           settings.Properties.ClientInstanceName = "id_businessOportunityState";
+                           settings.Width = Unit.Percentage(100);
+                           //settings.ClientEnabled = codeState != "01";//Pendiente
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueType = typeof(int);
+                           settings.Properties.Width = Unit.Percentage(100);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                           settings.Properties.NullDisplayText = "Todos";
+                           settings.Properties.NullText = "Todos";
+
+                       }).BindList(DataProviderDocumentState.BusinessOportunityStatesByCompany((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td>
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnSearch";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Consultar";
+                                settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnSearch_click";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "Clear";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Limpiar";
+                                settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnClear_click";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+}

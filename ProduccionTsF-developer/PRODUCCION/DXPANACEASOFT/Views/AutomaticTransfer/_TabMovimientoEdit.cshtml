@@ -1,0 +1,299 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+@{ 
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+}
+<style>
+	.etiqueta-cabecera {
+		margin: 5px;
+		padding: .2em 0 .2em 4em;
+		margin-left: 0px;
+		background-color: White;
+		color: #B2B2B2;
+		font-weight: bold;
+	}
+	.datos-envio,
+	.datos-ingreso{
+		padding: .9em 1.4em;
+		border: 1px solid #E5E5E5;
+	}
+</style>
+<div class="row">
+	<div class="col-sm-6">
+		<div class="row etiqueta-cabecera">
+			Datos de Env&iacute;o
+		</div>
+		<div class="datos-envio">
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Bodega Egreso:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxWarehouseExitEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Ubicación Egreso:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxWarehouseLocationExitEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Motivo:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxReasonExitEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Centro de Costo:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxCostCenterExitEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Sub Centro de Costo:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxSubCostCenterExitEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Proceso";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.DevExpress().ComboBoxFor(m => m.idProcessPlantExit, settings =>
+				   {
+					   settings.Name = "processPlantExit";
+					   settings.Properties.ClientInstanceName = "processPlantExit";
+					   settings.Properties.NullDisplayText = "Seleccione...";
+					   settings.Properties.NullText = "Seleccione...";
+					   settings.Properties.ValueField = "id";
+					   settings.Properties.TextFormatString = "{1}";
+					   settings.Properties.Columns.Add("planta", "Planta", 50);
+					   settings.Properties.Columns.Add("processPlant", "Nombre", 100);
+					   settings.Width = Unit.Percentage(100);
+					   settings.Height = Unit.Percentage(100);
+					   settings.Properties.ValueType = typeof(int);
+					   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					   settings.Properties.ClientSideEvents.Validation = "OnProcessPlantExitValidation";
+					   settings.ReadOnly = !(this.ViewBag.Editable);
+				   }).BindList(DataProviderPerson.GetPersonProcesPlant()).GetHtml()
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Requerimiento No:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.DevExpress().TextBoxFor(model => model.RequerimentNumber, settings =>
+				   {
+					   settings.Name = "RequerimentNumber";
+					   settings.Width = Unit.Percentage(100);
+					   settings.ReadOnly = !(this.ViewBag.Editable);
+				   }).GetHtml()
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Despachador:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxUserDispatcherEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "No. Mov. Egreso";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.DevExpress().TextBoxFor(model => model.ExitNumberMove, settings =>
+					{
+						settings.Name = "ExitNumberMove";
+						settings.Width = Unit.Percentage(100);
+						settings.ReadOnly = true;
+					}).GetHtml()
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="row etiqueta-cabecera">
+			Datos de Ingreso
+		</div>
+		<div class="datos-ingreso">
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Bodega Ingreso:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxWarehouseEntryEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Ubicación Ingreso:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxWarehouseLocationEntryEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Motivo:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxReasonEntryEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Centro de Costo:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxCostCenterEntryEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Sub Centro de Costo:";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.Partial("CmbBoxesEdit/_ComboBoxSubCostCenterEntryEdit", Model)
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "Proceso";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.DevExpress().ComboBoxFor(m => m.idProcessPlantEntry, settings =>
+				   {
+					   settings.Name = "processPlantEntry";
+					   settings.Properties.ClientInstanceName = "processPlantEntry";
+					   settings.Properties.NullDisplayText = "Seleccione...";
+					   settings.Properties.NullText = "Seleccione...";
+					   settings.Properties.ValueField = "id";
+					   settings.Properties.TextFormatString = "{1}";
+					   settings.Properties.Columns.Add("planta", "Planta", 50);
+					   settings.Properties.Columns.Add("processPlant", "Nombre", 100);
+					   settings.Width = Unit.Percentage(100);
+					   settings.Height = Unit.Percentage(100);
+					   settings.Properties.ValueType = typeof(int);
+					   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+					   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+					   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+					   settings.Properties.ClientSideEvents.Validation = "OnProcessPlantEntryValidation";
+					   settings.ReadOnly = !(this.ViewBag.Editable);
+				   }).BindList(DataProviderPerson.GetPersonProcesPlant()).GetHtml()
+				</div>
+			</div>
+			<div class="row">
+				<div style="visibility:hidden">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "espacio";
+					}).GetHtml()
+				</div>
+			</div>
+			<div class="row">
+				<div style="visibility: hidden">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "espacio";
+					}).GetHtml()
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 col-sm-4">
+					@Html.DevExpress().Label(settings =>
+					{
+						settings.Width = Unit.Percentage(100);
+						settings.Text = "No. Mov. Ingreso";
+					}).GetHtml()
+				</div>
+				<div class="col-8 col-sm-8">
+					@Html.DevExpress().TextBoxFor(model => model.EntryNumberMove, settings =>
+					{
+						settings.Name = "EntryNumberMove";
+						settings.Width = Unit.Percentage(100);
+						settings.ReadOnly = true;
+					}).GetHtml()
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

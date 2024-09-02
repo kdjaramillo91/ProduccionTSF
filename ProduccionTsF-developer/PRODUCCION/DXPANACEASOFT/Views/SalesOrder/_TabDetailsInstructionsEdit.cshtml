@@ -1,0 +1,63 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.SalesOrderDTO
+
+<div>
+	<div class="Etiqueta"><b>Documentación Enviada</b></div>
+	<hr style="width: 100%; margin: 0px;">
+	<div class="MyContainer">
+		<div class="row">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   settings.ControlStyle.Font.Bold = true;
+					   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+					   settings.Text = "Detalle de Documentos: ";
+				   }).GetHtml()
+			</div>
+			<div class="col-sm-10">
+	
+				@Html.DevExpress().MemoFor(m => m.shippingDocument, settings =>
+		   {
+			   settings.Name = "shippingDocument";
+			   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+			   settings.ReadOnly = !((bool)ViewBag.enabled);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.Rows = 10;
+		   }).GetHtml()
+			</div>
+
+		</div>
+
+	</div>
+	<div class="Etiqueta"><b>Inf. Adicional</b></div>
+	<hr style="width: 100%; margin: 0px;">
+	<div class="MyContainer">
+		<div class="row">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   settings.ControlStyle.Font.Bold = true;
+					   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+					   settings.Text = "Instrucciones Adicionales: ";
+				   }).GetHtml()
+			</div>
+			<div class="col-sm-10">
+				@{
+					var instruccionesAdc = Model.additionalInstructions;
+				}
+				@Html.DevExpress().MemoFor(m => m.additionalInstructions, settings =>
+		   {
+			   settings.Name = "additionalInstructions";
+			   settings.ControlStyle.ForeColor = System.Drawing.Color.Gray;
+			   settings.ReadOnly = !((bool)ViewBag.enabled);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.Rows = 20;
+		   }).GetHtml()
+			</div>
+
+		</div>
+
+	</div>
+</div>

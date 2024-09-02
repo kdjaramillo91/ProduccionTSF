@@ -1,0 +1,360 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+<!DOCTYPE html>
+
+<html lang="es-ec">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta charset="UTF-8" />
+	<title>@ViewBag.Title</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+	<!-- bootstrap & fontawesome -->
+	<link rel="stylesheet" href="~/Scripts/assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/Scripts/assets/font-awesome/4.2.0/css/font-awesome.min.css" />
+
+	<!-- page specific plugin styles -->
+	<link rel="stylesheet" href="~/Content/plugins/jqPagination/css/jqpagination.css" />
+
+	<!-- text fonts -->
+	<link rel="stylesheet" href="~/Scripts/assets/fonts/fonts.googleapis.com.css" />
+
+	<!-- ace styles -->
+	<link rel="stylesheet" href="~/Scripts/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+	<!--Estilos Generales-->
+	<link rel="stylesheet" href="~/Content/EstilosGenerales.css" />
+	<!--[if lte IE 9]>
+		<link rel="stylesheet" href="~/Scripts/assets/css/ace-part2.min.css" class="ace-main-stylesheet" />
+	<![endif]-->
+	<!--[if lte IE 9]>
+	  <link rel="stylesheet" href="~/Scripts/assets/css/ace-ie.min.css" />
+	<![endif]-->
+	<!-- inline styles related to this page -->
+	<!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+	<!--[if lte IE 8]>
+	<script src="~/Scripts/assets/js/html5shiv.min.js"></script>
+	<script src="~/Scripts/assets/js/respond.min.js"></script>
+	<![endif]-->
+
+	<link href="~/Content/styles/shared/_layout.css" rel="stylesheet" />
+
+	<link href="~/Content/styles/shared/jquery.fancybox-1.3.4.css" rel="stylesheet" type="text/css" media="screen" />
+
+	<style>
+		.dx-button-content {
+			color: white;
+			background-color: #F78119;
+		}
+	</style>
+
+	<script src="~/Scripts/jquery-1.11.3.min.js"></script>
+
+
+	@Html.DevExpress().GetStyleSheets(
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.CardView },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.PivotGrid },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.SpellChecker },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.HtmlEditor },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.RichEdit },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.Editors },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.VerticalGrid },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.Spreadsheet },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.Scheduler },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.Chart },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.Report },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.GridView },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.TreeList },
+				 //new StyleSheet { ExtensionSuite = ExtensionSuite.DashboardDesigner },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.DashboardViewer },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.Icons },
+				 new StyleSheet { ExtensionType = ExtensionType.WebDocumentViewer },
+				 new StyleSheet { ExtensionType = ExtensionType.ReportDesigner },
+				 new StyleSheet { ExtensionSuite = ExtensionSuite.Report }
+			 )
+
+	@Html.DevExpress().GetScripts(
+				 new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+				 new Script { ExtensionSuite = ExtensionSuite.CardView },
+				 new Script { ExtensionSuite = ExtensionSuite.PivotGrid },
+				 new Script { ExtensionSuite = ExtensionSuite.SpellChecker },
+				 new Script { ExtensionSuite = ExtensionSuite.HtmlEditor },
+				 new Script { ExtensionSuite = ExtensionSuite.RichEdit },
+				 new Script { ExtensionSuite = ExtensionSuite.Editors },
+				 new Script { ExtensionSuite = ExtensionSuite.VerticalGrid },
+				 new Script { ExtensionSuite = ExtensionSuite.Spreadsheet },
+				 new Script { ExtensionSuite = ExtensionSuite.Scheduler },
+				 new Script { ExtensionSuite = ExtensionSuite.Chart },
+				 new Script { ExtensionSuite = ExtensionSuite.Report },
+				 new Script { ExtensionSuite = ExtensionSuite.GridView },
+				 new Script { ExtensionSuite = ExtensionSuite.TreeList },
+				 //new Script { ExtensionSuite = ExtensionSuite.DashboardDesigner },
+				 new Script { ExtensionSuite = ExtensionSuite.DashboardViewer },
+				 new Script { ExtensionType = ExtensionType.WebDocumentViewer },
+				 new Script { ExtensionType = ExtensionType.ReportDesigner },
+				 new Script { ExtensionSuite = ExtensionSuite.Report }
+
+			 )
+</head>
+
+<body id="body" class="no-skin">
+	<div id="navbar" class="navbar navbar-default navbar-fixed-top">
+		<div class="navbar-container" id="navbar-container">
+			<button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
+				<span class="sr-only">Toggle sidebar</span>
+
+				<span class="icon-bar"></span>
+
+				<span class="icon-bar"></span>
+
+				<span class="icon-bar"></span>
+			</button>
+
+			<div class="navbar-header pull-left">
+				<a href="/" class="navbar-brand">
+					<small>
+						@*<i class="fa fa-leaf"></i>*@
+						<img src="~/Content/image/panacea-logo.png" style="width: 60px; height: auto; margin-top: -7px;" />
+						Panaceasoft
+						<span style="font-size: small; vertical-align: top;">&reg;</span>
+					</small>
+				</a>
+			</div>
+
+			<div class="navbar-buttons navbar-header pull-right" role="navigation">
+				<ul class="nav ace-nav">
+					<li>
+						@{
+							int countNotifications = @DataProviderNotification.CountNewNotificationsForUser(1);
+						}
+						<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+							<i class="ace-icon fa fa-envelope icon-animated-vertical"></i>
+							<span class="badge badge-success">
+								@countNotifications
+							</span>
+						</a>
+						<ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
+							<li class="dropdown-header">
+								<i class="ace-icon fa fa-envelope-o"></i>
+								Nuevas Notificaciones
+							</li>
+
+							<li class="dropdown-content">
+								<ul class="dropdown-menu dropdown-navbar">
+									@{
+										using (var db = new DBContext())
+										{
+											var notifications = db.Notification.Where(n => n.id_user == 1 && !n.reading);
+											foreach (var notification in notifications)
+											{
+												<li>
+													<a href="#" class="clearfix">
+														<span class="msg-body" style="margin-left: 2px;">
+															<span class="msg-title blue">
+																<u>@notification.title</u>
+															</span>
+															<br />
+															@notification.description
+															<span class="msg-time">
+																<i class="ace-icon fa fa-clock-o"></i>
+																<span>
+																	@notification.dateTime
+																</span>
+															</span>
+														</span>
+													</a>
+												</li>
+											}
+										}
+									}
+								</ul>
+							</li>
+
+							<li class="dropdown-footer">
+								<a href="#" id="btn_go_notifications">
+									Ver Todas
+									<i class="ace-icon fa fa-arrow-right"></i>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="light-blue">
+						<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+							<img class="nav-user-photo" src="~/Scripts/assets/avatars/user.jpg" alt="Jason's Photo" />
+							<span class="user-info">
+								<small>Bienvenido,</small>
+								@Html.Raw((string)ViewData["username"])
+							</span>
+
+							<i class="ace-icon fa fa-caret-down"></i>
+						</a>
+
+						<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+							<li>
+								<a href="#">
+									<i class="ace-icon fa fa-cog"></i>
+									Settings
+								</a>
+							</li>
+
+							<li>
+								<a href="profile.html">
+									<i class="ace-icon fa fa-user"></i>
+									Profile
+								</a>
+							</li>
+
+							<li class="divider"></li>
+
+							<li>
+								<a id="logout" href="javascript:;">
+									<i class="ace-icon fa fa-power-off"></i>
+									Logout
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div><!-- /.navbar-container -->
+	</div>
+
+	<div class="main-container" id="main-container">
+
+		<div id="sidebar" class="sidebar responsive sidebar-fixed sidebar-scroll">
+			<ul id="treemenu" class="nav nav-list"></ul>
+
+			<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+				<i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+			</div>
+		</div>
+
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="breadcrumbs responsive breadcrumbs-fixed" id="breadcrumbs">
+
+					<ul class="breadcrumb">
+						<li>
+							<i class="ace-icon responsive fa fa-home home-icon"></i>
+							<div style="display: inline-block; margin-bottom: 3px;">
+								@Html.Raw(ViewData["company"])
+							</div>
+						</li>
+						<li>
+							<i class="ace-icon responsive fa fa-building home-icon"></i>
+							<div style="display: inline-block; margin-bottom: 3px;">
+								@Html.Raw(ViewData["division"])
+							</div>
+						</li>
+						<li>
+							<i class="ace-icon responsive fa fa-institution home-icon"></i>
+							<div style="display: inline-block; margin-bottom: 3px;">
+								@Html.Raw(ViewData["sucursal"])
+							</div>
+						</li>
+						<li>
+							<i class="ace-icon responsive fa fa-desktop home-icon"></i>
+							<div style="display: inline-block; vertical-align: middle;">
+								@Html.DevExpress().ComboBox(comboBox =>
+									 {
+										 comboBox.Name = "id_activeEmissionPoint";
+										 comboBox.Properties.ValueField = "id";
+										 comboBox.Properties.TextField = "name";
+										 comboBox.Properties.ValueType = typeof(int);
+
+										 comboBox.ControlStyle.BackColor = System.Drawing.Color.FromArgb(255, 245, 245, 245);
+
+									 }).BindList(DataProviderEmissionPoint.EmissionPointsOfUser((int?)ViewData["id_user"])).Bind((int?)ViewData["id_emissionPoint"]).GetHtml()
+							</div>
+						</li>
+					</ul><!-- /.breadcrumb -->
+
+					<div class="nav-search" id="nav-search">
+						@*<form class="form-search">*@
+						<span class="input-icon">
+							<input type="text" placeholder="Buscar ..." class="nav-search-input" id="search-box" autocomplete="off" style="width:100%" />
+							<i class="ace-icon fa fa-search nav-search-icon"></i>
+						</span>
+						@*</form>*@
+					</div><!-- /.nav-search -->
+				</div>
+
+				<div class="page-content">
+					<div id="maincontainer" class="row">
+						<div id="maincontent" class="col-xs-12">
+							@RenderBody()
+						</div>
+						@Html.DevExpress().LoadingPanel(
+						settings =>
+						{
+							settings.Name = "LoadingPanel";
+							settings.Modal = true;
+							settings.ContainerElementID = "body";
+						}).GetHtml()
+					</div><!-- /.row -->
+				</div><!-- /.page-content -->
+
+
+			</div>
+
+
+		</div><!-- /.main-content -->
+		@{
+			var currentYear = DateTime.Now.Year;
+			var lastCurrentYear = String.Concat(currentYear);
+		}
+		<div class="footer">
+			<div class="footer-inner">
+				<div class="footer-content">
+					<div class="center" style="font-size:13px;line-height:1.5">
+						<span class="bolder">Sistema de Lista de Precios</span>
+						- @DXPANACEASOFT.Helper.ApplicationVersionInfo.GetApplicationVersionInfo()
+					</div>
+					<div class="center" style="font-size:13px;line-height:1.5">
+						<span class="bolder" style="color: #ff8800;">Panaceasoft</span>
+						-  &copy; @lastCurrentYear
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		</a>
+	</div><!-- /.main-container -->
+
+	<script src="~/Scripts/assets/js/bootstrap.min.js"></script>
+
+	<!-- ace settings handler -->
+	<script src="~/Scripts/assets/js/ace-extra.min.js"></script>
+
+	<!-- ace scripts -->
+	<script src="~/Scripts/assets/js/ace-elements.min.js"></script>
+	<script src="~/Scripts/assets/js/ace.min.js"></script>
+
+	<!-- inline scripts related to this page -->
+	<script src="~/Scripts/shared/jquery.autocomplete.min.js"></script>
+	<script src="~/Content/plugins/jqPagination/js/jquery.jqpagination.min.js"></script>
+	<script src="~/Content/plugins/jquery-fullscreen/jquery.fullscreen-min.js"></script>
+	<script src="~/Scripts/shared/_layout.js"></script>
+
+	@*<script src="~/Scripts/fancybox/jquery.mousewheel-3.0.4.pack.js"></script>*@
+	<script src="~/Scripts/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+
+	@{
+		Html.RenderPartial("DialogTemplates/_ConfirmationDialog");
+	}
+
+	@*<script type="text/javascript">
+			try { ace.settings.check('navbar', 'fixed') } catch (e) { }
+			try { ace.settings.check('main-container', 'fixed') } catch (e) { }
+			try { ace.settings.check('sidebar', 'fixed') } catch (e) { }
+			try { ace.settings.check('sidebar', 'collapsed') } catch (e) { }
+			try { ace.settings.check('breadcrumbs', 'fixed') } catch (e) { }
+		</script>*@
+
+	<script src="~/Scripts/shared/comun-function.js"></script>
+</body>
+</html>

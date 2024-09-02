@@ -1,0 +1,323 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.BusinessOportunityPlanningDetail>
+@{
+    string codeBusinessOportunityDocumentType = (string)ViewData["codeBusinessOportunityDocumentType"];
+    if(codeBusinessOportunityDocumentType == "" || codeBusinessOportunityDocumentType == null)
+    {
+        var businessOportunity = DataProviderBusinessOportunity.BusinessOportunityById((int?)ViewData["id_businessOportunity"]);
+        codeBusinessOportunityDocumentType = (businessOportunity != null) ? businessOportunity.Document.DocumentType.code : "";
+    }
+}
+@{
+    var grid = Html.DevExpress().GridView<BusinessOportunityPlanningDetail>(settings => {
+        settings.Name = "gvBusinessOportunityPlanningDetails" + ViewData["id_businessOportunity"];
+
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessOportunityViewPlanningDetailsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "BusinessOportunity_OnBeginCallback";
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdBusinessOportunity"] = 0;
+            }
+            e.Properties["cpIdBusinessOportunity"] = ViewData["id_businessOportunity"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Caption = "Producto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+
+                string item = (detail != null && detail.Item != null) ? detail.Item.name : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                ViewContext.Writer.Write(item);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "metricUnit";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+
+                string metricUnitPurchase = (detail != null && detail.Item != null && detail.Item.ItemPurchaseInformation != null && detail.Item.ItemPurchaseInformation.MetricUnit != null) ? detail.Item.ItemPurchaseInformation.MetricUnit.code : "";
+                string metricUnitSale = (detail != null && detail.Item != null && detail.Item.ItemSaleInformation != null && detail.Item.ItemSaleInformation.MetricUnit != null) ? detail.Item.ItemSaleInformation.MetricUnit.code : "";
+//string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                string metricUnit = (codeBusinessOportunityDocumentType == "15") ? metricUnitSale : ((codeBusinessOportunityDocumentType == "16") ? metricUnitPurchase : "");
+                ViewContext.Writer.Write(metricUnit);
+
+            });
+
+        });
+
+        //size
+        settings.Columns.Add(column =>
+        {
+            column.Name = "size";
+            column.Caption = "Talla";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "size";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+
+                string size = (item != null && item.ItemGeneral != null && item.ItemGeneral.ItemSize != null) ? item.ItemGeneral.ItemSize.name : "";
+
+                ViewContext.Writer.Write(size);
+
+            });
+
+        });
+
+        //itemTypeCategory
+        settings.Columns.Add(column =>
+        {
+            column.Name = "itemTypeCategory";
+            column.Caption = "Tipo Categoría de Item";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "itemTypeCategory";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+                Item item = DataProviderItem.Item(id_item);
+
+                string itemTypeCategory = (item != null && item.ItemTypeCategory != null) ? item.ItemTypeCategory.name : "";
+
+                ViewContext.Writer.Write(itemTypeCategory);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantity";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantity = (decimal)DataBinder.Eval(c.DataItem, "quantity");
+                ViewContext.Writer.Write(quantity.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "price";
+            column.Caption = "Precio";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantity = (decimal)DataBinder.Eval(c.DataItem, "price");
+                ViewContext.Writer.Write(quantity.ToString("C2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "totalItemDetail";
+            column.Caption = "Total";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(7);
+            column.ReadOnly = true;
+            column.PropertiesEdit.ClientInstanceName = "totalItemDetail";
+
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+
+                decimal quantity = (detail != null) ? detail.quantity : 0;
+                decimal price = (detail != null) ? detail.price : 0;
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                string total = (quantity * price).ToString("$#,###.00");
+                ViewContext.Writer.Write(total);
+
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+
+                decimal quantity = (detail != null) ? detail.quantity : 0;
+                decimal price = (detail != null) ? detail.price : 0;
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                var total = (quantity * price);
+
+                Html.DevExpress().SpinEdit(p =>
+                {
+                    p.Name = "totalItemDetail";
+                    p.Properties.ClientInstanceName = "totalItemDetail";
+                    p.Properties.DisplayFormatString = "C2";
+                    //p.DisplayFormatInEditMode = true;
+                    p.Properties.DecimalPlaces = 2;
+                    p.Properties.SpinButtons.ShowIncrementButtons = false;
+                    p.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+                    p.Width = Unit.Percentage(100);
+                    p.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+
+                    p.ReadOnly = true;
+                    p.ShowModelErrors = false;
+                }).Bind(total).GetHtml();//.Render();//.Bind(metricUnit).Render();
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_person";
+            column.Caption = "Socio de Negocio";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+
+                string person = (detail != null && detail.Person != null) ? detail.Person.fullname_businessName : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                ViewContext.Writer.Write(person);
+
+            });
+
+        });
+
+        //id_priceList
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_priceList";
+            column.Caption = "Lista de Precio/Cotización";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id_priceList = (int?)DataBinder.Eval(c.DataItem, "id_priceList");
+                var priceList = DataProviderPriceList.PriceListById(id_priceList);
+                string strPriceList = (priceList != null) ? (priceList.name + " (" + priceList.Document.DocumentType.name + ") " + priceList.CalendarPriceList.CalendarPriceListType.name + " [" + priceList.CalendarPriceList.startDate.ToString("dd/MM/yyyy") + " - " +
+                                                                           priceList.CalendarPriceList.endDate.ToString("dd/MM/yyyy") + "]") : "";
+                ViewContext.Writer.Write(strPriceList);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_document";
+            column.Caption = codeBusinessOportunityDocumentType == "15" ? "Requerimiento Pedido de Venta" :
+                           (codeBusinessOportunityDocumentType == "16" ? "Requerimiento Orden de Compra" : "Requerimiento Pedido de Venta/Orden de Compra");
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                //var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+                BusinessOportunityPlanningDetail detail = (BusinessOportunityPlanningDetail)Model[c.ItemIndex];
+
+                string document = (detail != null && detail.Document != null) ? detail.Document.number : "";
+                //string codeBusinessOportunityDocumentType = (detail != null && detail.BusinessOportunityPlaninng != null && detail.BusinessOportunityPlaninng.BusinessOportunity != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document != null && detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType != null) ? detail.BusinessOportunityPlaninng.BusinessOportunity.Document.DocumentType.code : "";
+
+                //15: Oportunidad de Venta y 16: Oportunidad de Compra
+                ViewContext.Writer.Write(document);
+
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "referencePlanning";
+            column.Caption = "Referencia";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string referencePlanning = (string)DataBinder.Eval(c.DataItem, "referencePlanning");
+
+                ViewContext.Writer.Write(referencePlanning);
+            });
+
+        });
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

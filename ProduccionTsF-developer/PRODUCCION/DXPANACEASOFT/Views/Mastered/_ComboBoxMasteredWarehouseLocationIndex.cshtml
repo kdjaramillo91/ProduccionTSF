@@ -1,0 +1,18 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComboBoxMasteredWarehouseLocationIndex";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Mastered",
+        Action = "ComboBoxMasteredWarehouseLocationIndex",
+    };
+    settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxMasteredWarehouseLocationIndex_BeginCallback";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}).BindList(ViewData["MasteredWarehouseLocationIndex"]).GetHtml()
+

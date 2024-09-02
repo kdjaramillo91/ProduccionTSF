@@ -1,0 +1,375 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using System.Collections;
+
+@model List<DXPANACEASOFT.Models.MachineProdOpeningDetail>
+
+@{
+	var grid = Html.DevExpress().GridView<MachineProdOpeningDetail>(settings =>
+	{
+		settings.Name = "gvMachineProdOpeningDetailEditForm";
+		settings.CallbackRouteValues = new { Controller = "MachineProdOpening", Action = "MachineProdOpeningEditFormDetailPartial" };
+
+//settings.ClientSideEvents.BeginCallback = "InvoiceCommercialsDetail_OnBeginCallback";
+
+settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "MachineProdOpening", Action = "MachineProdOpeningEditFormDetailAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "MachineProdOpening", Action = "MachineProdOpeningEditFormDetailUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "MachineProdOpening", Action = "MachineProdOpeningEditFormDetailDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+//settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+//settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+//settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+//settings.SettingsEditing.BatchEditSettings.HighlightDeletedRows = true;
+
+settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		settings.SettingsBehavior.ConfirmDelete = false;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId";
+
+settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+//Checkbox de registros de tabla
+settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+////Eventos
+//settings.ClientSideEvents.Init = "OnGridViewInitDetail";
+//settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedDetail";
+settings.ClientSideEvents.BeginCallback = "OnGridViewMachineProdOpeningDetailEditForm_BeginCallback";
+//settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackDetail";
+//settings.ClientSideEvents.CallbackError = "";
+
+//Pie de tabla
+settings.Settings.ShowFooter = true;
+
+//Panel para cantidad de registros
+settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+			List<MachineProdOpeningDetail> rows = (Model as List<MachineProdOpeningDetail>);
+			rows = (rows != null) ? rows.ToList() : new List<MachineProdOpeningDetail>();
+
+			e.Properties["cpRowsCount"] = rows.Count;
+
+			e.Properties["cpTimeInit"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "timeInit") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "timeInit") : new DateTime(2014, 1, 1, 0, 0, 0);
+		};
+
+//settings.SetFooterRowTemplateContent(c =>
+//{
+//    ViewContext.Writer.Write(@"<span id=""lblInfoDetails""></span>");
+//    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+//    {
+//        ViewContext.Writer.Write(
+//            @"<a id=""lnkSelectAllRowsDetails"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRowsDetail()"">Seleccionar Todos</a>
+//              <a id=""lnkClearSelectionDetails"" style=""cursor: pointer;"" onclick=""gvEditClearSelectionDetail()"">Anular Selección</a>"
+//        );
+//    }
+//});
+
+settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+//settings.InitNewRow = (s, e) =>
+//{
+//    e.NewValues["timeInit"] = 0;
+//    e.NewValues["timeEnd"] = 0;
+//    //e.NewValues["arrivalBadCondition"] = 0.00M;
+//    //e.NewValues["arrivalGoodCondition"] = 0.00M;
+//};
+//settings.RowValidating = "";
+settings.Styles.Header.Font.Bold = true;
+
+//Pie de tabla
+//settings.Settings.ShowFooter = true;
+
+//settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "numBoxes").DisplayFormat = "<b>{0:#,##0}</b>";
+//settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountInvoice").DisplayFormat = "<b>{0:n2}</b>";
+//settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>{0:c2}</b>";
+
+#region ColumnsAdd
+
+//code 14
+settings.Columns.Add(m => m.MachineForProd.code, column =>
+		{
+			column.Name = "codeMachineForProd";
+			column.Caption = "Código";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(14);
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "codeMachineForProd";
+				p.Width = Unit.Percentage(100);
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+
+		});
+
+//name 25
+settings.Columns.Add(m => m.id_MachineForProd, column =>
+		{
+			column.Name = "id_MachineForProd";
+			column.FieldName = "id_MachineForProd";
+			column.Caption = "Máquina";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.Width = Unit.Percentage(25);
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "nameMachineForProd";
+				p.DataSource = DataProviderMachineForProd
+								.MachineByUserRol((EntityObjectPermissions)ViewData["entityObjectPermissions"], (int?)ViewData["id_user"], true);
+				p.ValueField = "id";
+				p.TextFormatString = "{1}";
+				p.ValueType = typeof(int);
+				p.CallbackPageSize = 30;
+				p.Width = Unit.Percentage(100);
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.Columns.Add("code", "Código", 70);//, Unit.Percentage(50));
+		p.Columns.Add("name", "Máquina", 200);//, Unit.Percentage(70));
+		p.ClientSideEvents.Init = "NameMachineProdOpeningDetailDetailCombo_OnInit";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				p.ClientSideEvents.SelectedIndexChanged = "NameMachineProdOpeningDetailDetailCombo_SelectedIndexChanged";
+				p.ClientSideEvents.Validation = "OnNameMachineProdOpeningDetailValidation";
+			});
+		});
+
+//person 25
+settings.Columns.Add(m => m.id_Person, column =>
+		{
+			column.Name = "id_Person";
+			column.FieldName = "id_Person";
+			column.Caption = "Responsable";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.Width = Unit.Percentage(25);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int id_Person = (int)DataBinder.Eval(c.DataItem, "id_Person");
+				Person aPerson = DataProviderPerson.PersonById(id_Person);
+
+				string name = (aPerson != null) ? aPerson.fullname_businessName : "";
+
+				ViewContext.Writer.Write(name);
+			});
+
+			column.EditorProperties().ComboBox(p =>
+			{
+				p.ClientInstanceName = "personMachineProdOpening";
+				p.DataSource = null;//DataProviderPerson.PersonsByMachineRolAndInputRol((int?)ViewData["id_company"], "Supervisor", (int?)ViewData["id_user"]);
+		p.ValueField = "id";
+				p.TextField = "fullname_businessName";
+		//p.TextFormatString = "{1}";
+		p.ValueType = typeof(int);
+				p.CallbackPageSize = 30;
+				p.Width = Unit.Percentage(100);
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				p.CallbackRouteValues = new { Controller = "MachineProdOpening", Action = "GetSupervisor" };
+				p.ClientSideEvents.BeginCallback = "PersonMachineProdOpening_BeginCallback";
+				p.ClientSideEvents.EndCallback = "PersonMachineProdOpening_EndCallback";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				p.ClientSideEvents.Validation = "OnPersonMachineProdOpeningDetailValidation";
+
+			});
+		});
+
+//timeInit 13
+settings.Columns.Add(m => m.timeInit, column =>
+		{
+			column.Name = "timeInitDetail";
+			column.Caption = "Hora Inicio";
+	//column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+	column.Width = Unit.Percentage(13);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				TimeSpan? timeInit = (TimeSpan?)DataBinder.Eval(c.DataItem, "timeInit");
+
+				string code = (timeInit != null) ? timeInit.ToString() : "00:00:00";
+
+				ViewContext.Writer.Write(code);
+			});
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				TimeSpan? timeInit = (TimeSpan?)DataBinder.Eval(c.DataItem, "timeInit");
+
+		//string code = (machineForProd != null) ? machineForProd.code : "";
+		var dateTimeAux = (timeInit == null) ? new DateTime(2014, 1, 1, 0, 0, 0) :
+																	   new DateTime(2014, 1, 1, timeInit.Value.Hours, timeInit.Value.Minutes, timeInit.Value.Seconds);
+				Html.DevExpress().TimeEdit(timeEdit =>
+				{
+					timeEdit.Name = "timeInitDetail";
+					timeEdit.Properties.ClientInstanceName = "timeInitDetail";
+					timeEdit.Width = Unit.Percentage(100);
+			//timeEdit.ReadOnly = true;
+			timeEdit.Properties.DisplayFormatInEditMode = true;
+					timeEdit.Properties.EditFormatString = "HH:mm:ss";
+					timeEdit.Properties.DisplayFormatString = "HH:mm:ss";
+					timeEdit.Properties.EditFormat = EditFormat.Custom;
+					timeEdit.ShowModelErrors = false;
+					timeEdit.DateTime = dateTimeAux;
+					timeEdit.Properties.ClientSideEvents.Validation = "OnTimeInitDetailValidation";
+					timeEdit.Properties.ClientSideEvents.ValueChanged = "TimeInitCombo_ValueChanged";
+					timeEdit.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+				}).GetHtml();//.Render();//.Bind(masterCode).Render();
+	});
+
+		});
+
+//timeEnd 13
+settings.Columns.Add(m => m.timeEnd, column =>
+		{
+			column.Name = "timeEndDetail";
+			column.Caption = "Hora Fin";
+			column.ColumnType = MVCxGridViewColumnType.TimeEdit;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(13);
+
+			column.SetEditItemTemplateContent(c =>
+			{
+				TimeSpan? timeEnd = (TimeSpan?)DataBinder.Eval(c.DataItem, "timeEnd");
+
+		//string code = (machineForProd != null) ? machineForProd.code : "";
+		var dateTimeAux = (timeEnd == null) ? new DateTime(2014, 1, 1, 0, 0, 0) :
+																	   new DateTime(2014, 1, 1, timeEnd.Value.Hours, timeEnd.Value.Minutes, timeEnd.Value.Seconds);
+				Html.DevExpress().TimeEdit(timeEdit =>
+				{
+					timeEdit.Name = "timeEndDetail";
+					timeEdit.Properties.ClientInstanceName = "timeEndDetail";
+					timeEdit.Width = Unit.Percentage(100);
+					timeEdit.ReadOnly = true;
+					timeEdit.ShowModelErrors = false;
+					timeEdit.Properties.DisplayFormatInEditMode = true;
+					timeEdit.Properties.EditFormatString = "HH:mm:ss";
+					timeEdit.Properties.DisplayFormatString = "HH:mm:ss";
+					timeEdit.Properties.EditFormat = EditFormat.Custom;
+					timeEdit.DateTime = dateTimeAux;
+					timeEdit.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				}).GetHtml();//.Render();//.Bind(masterCode).Render();
+	});
+
+
+		});
+
+		settings.Columns.Add(m => m.numPerson, column =>
+		{
+			column.Name = "numPerson";
+			column.Caption = "No. Personas";
+
+	//column.ReadOnly = true;
+	column.Width = Unit.Percentage(13);
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "numPerson";
+				p.NumberType = SpinEditNumberType.Integer;
+				p.DisplayFormatInEditMode = true;
+				p.SpinButtons.ShowIncrementButtons = false;
+				p.SpinButtons.ShowLargeIncrementButtons = false;
+				p.Increment = 0.01M;
+				p.LargeIncrement = 1.0M;
+				p.MinValue = 1;
+				p.MaxValue = 99;
+		//p.NumberFormat = SpinEditNumberFormat.Custom;
+		p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+				p.ClientSideEvents.Validation = "OnNumPersonDetailValidation";
+			});
+
+
+		});
+
+
+
+//Botones de comandos para registros de la tabla
+MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = true,
+			ShowDeleteButton = true,
+			ShowCancelButton = true,
+			ShowUpdateButton = true,
+			Visible = true,
+			VisibleIndex = 15,
+			Caption = "Acciones"
+		};
+		commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		commandColumn.Width = Unit.Percentage(10);
+
+//settings.CommandColumn..cli
+
+settings.Columns.Add(commandColumn);
+
+		settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+
+#endregion
+
+//#region EditorLayout
+
+//settings.SetEditFormTemplateContent(content =>
+//{
+//    int? id_invoiceCommercialDetail = (int?)DataBinder.Eval(content.DataItem, "id");
+//    List<InvoiceCommercialDetail> rows = (Model as List<InvoiceCommercialDetail>);
+//    rows = (rows != null) ? rows.ToList() : new List<InvoiceCommercialDetail>();
+//    InvoiceCommercialDetail invoiceCommercialDetail = rows.FirstOrDefault(fod => fod.id == id_invoiceCommercialDetail);
+//    invoiceCommercialDetail = ((invoiceCommercialDetail == null) ? new InvoiceCommercialDetail() : invoiceCommercialDetail);
+//    //Item item = (id_item != null) ? DataProviderItem.Item((int)id_item) : new Item { isActive = true };
+//    Html.RenderPartial("_InvoiceCommercialDetailFormEdit", invoiceCommercialDetail);
+//});
+
+//#endregion
+
+});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+
+}
+
+@*<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingDetailsEditForm.js"></script>*@

@@ -1,0 +1,326 @@
+﻿@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.Filter
+
+@{
+    var grid = Html.DevExpress().GridView<FilterTypeWithCondition>(settings =>
+    {
+        settings.Name = "gvFilterBoxDateGridViewRight";
+        settings.CallbackRouteValues = new { Controller = "ProductionLot", Action = "FilterBoxDateGridViewRightPartial" };
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "PurchaseOrder", Action = "PurchaseOrderDetailsPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductionLot", Action = "FilterBoxDateGridViewRightPartialUpdate" };
+        //settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "PurchaseOrder", Action = "PurchaseOrderDetailsPartialDelete" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.Width = Unit.Percentage(100);
+        settings.Height = Unit.Pixel(65); //Percentage(100);
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible; //Percentage(100);
+        settings.Settings.VerticalScrollableHeight = 65; //Percentage(100);
+        settings.SettingsPager.PageSize = 100;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsPager.Visible = false;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //settings.CommandColumn.Visible = true;
+        //settings.CommandColumn.ShowSelectCheckbox = true;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.KeyFieldName = "id";
+
+        //Eventos
+        //settings.ClientSideEvents.Init = "PurchaseOrderDetailsOnGridViewInit";
+        //settings.ClientSideEvents.SelectionChanged = "PurchaseOrderDetailsOnGridViewSelectionChanged";
+        //settings.ClientSideEvents.BeginCallback = "PurchaseOrderDetailsOnGridViewBeginCallback";
+        //settings.ClientSideEvents.EndCallback = "PurchaseOrderDetailsOnGridViewEndCallback";
+
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            //if (gv.IsEditing)
+            //{
+            //    List<PurchaseOrderDetailPurchaseRequest> purchaseRequests = null;
+
+            //    try
+            //    {
+            //        purchaseRequests = (List<PurchaseOrderDetailPurchaseRequest>)gv.GetRowValues(gv.EditingRowVisibleIndex, "PurchaseOrderDetailPurchaseRequest");
+            //    }
+            //    catch (Exception)
+            //    {
+            //        try
+            //        {
+            //            HashSet<PurchaseOrderDetailPurchaseRequest> temp = (HashSet<PurchaseOrderDetailPurchaseRequest>)gv.GetRowValues(gv.EditingRowVisibleIndex, "PurchaseOrderDetailPurchaseRequest");
+            //            purchaseRequests = temp.ToList();
+            //        }
+            //        catch (Exception)
+            //        {
+            //            purchaseRequests = null;
+            //        }
+            //    }
+            //    if (purchaseRequests != null && purchaseRequests.Count > 0)
+            //    {
+            //        e.Properties["cpEditingRowPurchaseRequestDetail"] = purchaseRequests[0].id_purchaseRequestDetail;
+            //    }else
+            //    {
+            //        e.Properties["cpEditingRowPurchaseRequestDetail"] = 0;
+            //    }
+            //    //e.Properties["cpEditingRowSalesOrderDetail"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "PurchaseOrderDetailPurchaseRequest") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "PurchaseOrderDetailPurchaseRequest") : (new List<PurchaseOrderDetailPurchaseRequest>());
+
+            //}
+
+
+
+            List<FilterTypeWithCondition> rows = (Model as List<FilterTypeWithCondition>);
+            rows = (rows != null) ? rows.ToList() : new List<FilterTypeWithCondition>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        //settings.SetFooterRowTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+        //    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+        //    {
+        //        ViewContext.Writer.Write(
+        //            @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""PurchaseOrderDetailsSelectAllRows();"">Seleccionar Todos</a>
+        //              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""PurchaseOrderDetailsClearSelection();"">Anular Selección.</a>"
+        //        );
+        //    }
+        //});
+
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        //settings.InitNewRow = (s, e) =>
+        //{
+        //    e.NewValues["quantityRequested"] = 0.00M;
+        //    e.NewValues["quantityOrdered"] = 1.00M;
+        //    e.NewValues["quantityApproved"] = 1.00M;
+        //    e.NewValues["quantityReceived"] = 0.00M;
+        //    e.NewValues["price"] = 0.00M;
+        //    e.NewValues["iva"] = 0.00M;
+        //    e.NewValues["subtotal"] = 0.00M;
+        //    e.NewValues["total"] = 0.00M;
+        //};
+        //#region EDITORS INITIALIZE
+
+        //settings.CellEditorInitialize = (s, e) =>
+        //{
+        //    if (e.Column.Name == "valueConditionToDateTime")
+        //    {
+        //        MVCxDateEdit editor = (MVCxDateEdit)e.Editor;
+        //        editor.Enabled = 
+        //        //editor.DataSource = ViewBag.InMart;
+        //        //editor.DataBind();
+
+        //        //editor.ReadOnly = true;//(editor.SelectedItem != null);
+        //    }
+
+        //    //if (e.Column.Name == "procostoMO" || e.Column.Name == "procantidadMO" || e.Column.Name == "procostoMO")
+        //    //{
+        //    //    e.Editor.ReadOnly = true;
+        //    //}
+        //};
+
+        //#endregion
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        #region Columns
+        //20
+        settings.Columns.Add(m => m.filterType.alias, column =>
+        {
+            column.Name = "aliasRight";
+            column.Caption = "Campo";
+            column.ReadOnly = true;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(20);
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+        });
+        //10
+        settings.Columns.Add(m=> m.id_logicalOperator, column =>
+        {
+            //column.FieldName = "id_logicalOperator";
+            //column.Name = "id_logicalOperator";
+            column.Caption = "Operador Lógico";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_logicalOperatorDate";
+                p.DataSource = DataProviderLogicalOperator.LogicalOperatorDateNumbers();
+                p.ValueField = "id";
+                p.TextField = "name";
+                //p.TextFormatString = "{1}";
+                p.ValueType = typeof(int);
+                //p.CallbackPageSize = 30;
+                p.Width = Unit.Percentage(100);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                //p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                //p.Columns.Add("masterCode", "Código", 70);//, Unit.Percentage(50));
+                //p.Columns.Add("name", "Nombre del Producto", 300);//, Unit.Percentage(70));
+                ////p.Columns.Add("barCode", "EAN", Unit.Percentage(50));
+                //p.Columns.Add("ItemPurchaseInformation.MetricUnit.code", "UM", 50);//, Unit.Percentage(20));
+                //p.ClientSideEvents.Init = "ItemCombo_OnInit";
+                ////p.ClientSideEvents.DropDown = "ItemCombo_DropDown";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ClientSideEvents.SelectedIndexChanged = "LogicalOperatorDate_SelectedIndexChanged";
+                //p.ClientSideEvents.Validation = "OnItemValidation";
+                //p.ClientSideEvents.ValueChanged = "ItemsCombo_ValueChanged";}
+            });
+        });
+        //25
+        settings.Columns.Add(m => m.valueConditionFromDateTime, column =>
+        {
+            column.FieldName = "valueConditionFromDateTime";
+            column.Name = "valueConditionFromDateTime";
+            column.Caption = "Desde";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(25);
+
+            column.EditorProperties().DateEdit(p =>
+            {
+                p.ClientInstanceName = "valueConditionFromDateTime";
+                p.Width = Unit.Percentage(100);
+                //p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.NullDisplayText = "Desde";
+                p.NullText = "Desde";
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.DisplayFormatInEditMode = true;
+                p.DisplayFormatString = "dd/MM/yyyy";
+                p.EditFormat = EditFormat.Custom;
+                p.EditFormatString = "dd/MM/yyyy";
+            });
+        });
+        //25
+        settings.Columns.Add(m => m.valueConditionToDateTime, column =>
+        {
+            column.FieldName = "valueConditionToDateTime";
+            column.Name = "valueConditionToDateTime";
+            column.Caption = "Hasta";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(25);
+
+            column.EditorProperties().DateEdit(p =>
+            {
+                p.ClientInstanceName = "valueConditionToDateTime";
+                p.Width = Unit.Percentage(100);
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                p.NullDisplayText = "Hasta";
+                p.NullText = "Hasta";
+
+                p.DisplayFormatInEditMode = true;
+                p.DisplayFormatString = "dd/MM/yyyy";
+                p.EditFormat = EditFormat.Custom;
+                p.EditFormatString = "dd/MM/yyyy";
+                p.ClientSideEvents.Init = "ValueConditionToDateTime_Init";
+            });
+        });
+
+        #endregion
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = false,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 10,
+            Caption = "Acciones",
+            Width = Unit.Percentage(15)
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.CellStyle.VerticalAlign = VerticalAlign.Middle;
+
+        settings.Columns.Add(commandColumn);
+
+        //commandColumn.CustomButtons.Add(
+        //    new GridViewCommandColumnCustomButton
+        //    {
+        //        ID = "btnCancelRow",
+        //        Text = "Cancelar"
+        //    }
+        //);
+        //settings.ClientSideEvents.CustomButtonClick = "function(s, e) {gvPurchaseOrderEditFormDetails_Canceling(s,e);}";
+        //settings.Columns.Add(commandColumn);
+
+        //settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton() { ID = "btnCopy", Text = "Copy" });
+        ////copy record and all dependents see client script in the Index.cshtml
+        //settings.ClientSideEvents.CustomButtonClick =
+        //    string.Format("function(s, e) {{ CustomButtonClick(s, e, '{0}'); }}", Url.Action("Copy", "Mfr"));
+        //settings.ClientSideEvents.CommandButtonClick = "gvPurchaseOrderEditFormDetails_Canceling";
+
+        //settings.PreRender = (s, e) =>
+        //{
+        //    MVCxGridView g = (s as MVCxGridView);
+        //    if (g != null)
+        //    {
+        //        g.FilterExpression = "isActive = true";
+        //    }
+        //};
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}
+
+
+

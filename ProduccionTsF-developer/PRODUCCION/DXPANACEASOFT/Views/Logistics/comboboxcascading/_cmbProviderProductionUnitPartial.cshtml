@@ -1,0 +1,32 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuide
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+    int? id_productionUnitProvider = (Model != null && Model.id_productionUnitProvider != 0) ? (int?)Model.id_productionUnitProvider : null;
+    int? id_providerRemisionGuide = (Model != null && Model.id_providerRemisionGuide != 0) ? (int?)Model.id_providerRemisionGuide : null;
+    //   TempData["ProductionUnitProviderByProvider"] = DataProviderProductionUnitProvider.ProductionUnitProviderByProvider(null, id_providerRemisionGuide);
+    TempData.Keep("ProductionUnitProviderByProvider");
+    //List<RemissionGuideReason> aRemissionGuideReasons = (List<RemissionGuideReason>)DataProviderRemissionGuideReason.RemisisonGuideReasonsByCompanyAndCurrent((int?)ViewData["id_company"], Model.id_reason);
+    //RemissionGuideReason aRemissionGuideReason = aRemissionGuideReasons.FirstOrDefault(fod=> fod.id == Model.id_reason);
+    //bool aRemissionGuideReasonBool = aRemissionGuideReason != null ? aRemissionGuideReason.name == "COMPRA DE MATERIA PRIMA" : false;
+}
+
+
+@Html.DevExpress().ComboBoxFor(m => m.id_productionUnitProvider, settings =>
+{
+    settings.Name = "id_productionUnitProvider";
+    settings.Properties.ClientInstanceName = "id_productionUnitProvider";
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Width = Unit.Percentage(100);
+    settings.ReadOnly = codeState != "01" || !this.ViewBag.isManual;// || !aRemissionGuideReasonBool;
+    settings.ShowModelErrors = true;
+    settings.CallbackRouteValues = new { Controller = "Logistics", Action = "ProductionUnitProviderByProvider" };
+
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_provider'] = id_providerRemisionGuide.GetValue();  }";
+    settings.Properties.ClientSideEvents.Init = "function(s, e) { if(id_reason.GetText() === 'COMPRA DE MATERIA PRIMA'){s.SetEnabled(true); }else{s.SetValue(null); s.SetEnabled(false);}   }";
+    settings.Properties.CallbackPageSize = 20;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProductionUnitProvider_SelectedIndexChanged";
+
+}).BindList(TempData["ProductionUnitProviderByProvider"]).Bind(id_productionUnitProvider).GetHtml()

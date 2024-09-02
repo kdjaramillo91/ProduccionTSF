@@ -1,0 +1,65 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.SalesOrderDTO
+
+@Html.Hidden("id_salesOrder", Model.id)
+@Html.Hidden("enabled", ((bool)ViewBag.enabled))
+@Html.Hidden("code_documentType", Model.code_documentType)
+@Html.Hidden("dateHoy", Model.dateHoy)
+@Html.Hidden("dateHoyMin", Model.dateHoyMin)
+@{
+	string exportPlant = DataProviderSetting.ValueSetting("PLNEXEOP");
+}
+
+@Html.DevExpress().PageControl(settings =>
+{
+	settings.Name = "pcFeatures";
+	settings.Width = Unit.Percentage(100);
+	settings.Height = Unit.Pixel(400);
+	settings.ActiveTabIndex = 1;
+	settings.TabPages.Add("Documento").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabDocumentEdit'>" +
+			@Html.Partial("_TabDocumentEdit", Model)
+			+ "</div>");
+	});
+	settings.TabPages.Add("Orden").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabOrderEdit'>" +
+			@Html.Partial("_TabOrderEdit", Model)
+			+ "</div>");
+	});
+	settings.TabPages.Add("Detalles").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabDetailsEdit'>" +
+			@Html.Partial("_TabDetailsEdit", Model)
+			+ "</div>");
+	});
+	settings.TabPages.Add("MP & Materiales", "tabMPMaterialDetails").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabMPMeterialDetailsEdit'>" +
+			@Html.Partial("_TabMPMaterialDetailsEdit", Model)
+			+ "</div>");
+	});
+	if(exportPlant == "SI")
+	{
+		settings.TabPages.Add("Planta Exportadora").SetContent(() =>
+		{
+			ViewContext.Writer.Write(
+				"<div id='divTabExportPlantEdit'>" +
+				@Html.Partial("_TabExportPlantEdit", Model)
+				+ "</div>");
+		});
+	}
+	settings.TabPages.Add("Instrucciones").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabDetailsInstruccionesEdit'>" +
+			@Html.Partial("_TabDetailsInstructionsEdit", Model)
+			+ "</div>");
+	});
+
+}).GetHtml()
+

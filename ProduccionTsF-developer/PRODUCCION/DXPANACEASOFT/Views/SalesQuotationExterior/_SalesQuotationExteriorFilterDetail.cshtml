@@ -1,0 +1,315 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Invoice
+
+<table id="filteDetailSalesQuotationExterior" class="table table-condensed" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Filtros Opcionales</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "nameItemFilterLabel";
+				settings.Text = "Producto:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().TextBox(settings =>
+			{
+				settings.Name = "nameItemFilter";
+				settings.Properties.ClientInstanceName = "nameItemFilter";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "idSizeBeginLabel";
+				settings.Text = "Talla Inicial:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "idSizeBegin";
+				settings.Properties.ClientInstanceName = "idSizeBegin";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith; // (filter enabled)
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;   // (use to restrict user from custom entry)
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+			}).BindList(DataProviderItemSize.ItemSizes()).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "idSizeEndLabel";
+				settings.Text = "Talla Final:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "idSizeEnd";
+				settings.Properties.ClientInstanceName = "idSizeEnd";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith; // (filter enabled)
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;   // (use to restrict user from custom entry)
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+			}).BindList(DataProviderItemSize.ItemSizes()).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_inventoryLineLabel";
+				settings.Text = "Línea de Inventario:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_inventoryLine";
+				settings.Properties.ClientInstanceName = "id_inventoryLine";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "InventoryLinesComboBox_SelectedIndexChanged";
+			}).BindList(DataProviderInventoryLine.InventoryLinesCartPTByCart((int)ViewData["id_company"])).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_itemTypeLabel";
+				settings.Text = "Tipo de Producto:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_itemType";
+				settings.Properties.ClientInstanceName = "id_itemType";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+
+				settings.CustomJSProperties = (sender, e) =>
+				{
+					e.Properties.Add("cpTipos", DataProviderItemType.ItemTypesSimplified((int)ViewData["id_company"]));
+				};
+
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemTypesComboBox_SelectedIndexChanged";
+			}).BindList(new ItemType[] { }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_itemTypeCategoryLabel";
+				settings.Text = "Categoría:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_itemTypeCategory";
+				settings.Properties.ClientInstanceName = "id_itemTypeCategory";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+
+				settings.CustomJSProperties = (sender, e) =>
+				{
+					e.Properties.Add("cpCategorias", DataProviderItemTypeCategory.ItemsTypesCategoriesSimplified((int)ViewData["id_company"]));
+				};
+			}).BindList(new ItemTypeCategory[] { }).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_groupLabel";
+				settings.Text = "Grupo:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_group";
+				settings.Properties.ClientInstanceName = "id_group";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+
+				settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemGroupsComboBox_SelectedIndexChanged";
+			}).BindList(DataProviderItemGroup.ItemGroups((int)ViewData["id_company"])).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_subgroupLabel";
+				settings.Text = "Subgrupo:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_subgroup";
+				settings.Properties.ClientInstanceName = "id_subgroup";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+
+				settings.CustomJSProperties = (sender, e) =>
+				{
+					e.Properties.Add("cpSubgrupos", DataProviderItemGroup.ItemGroupsSimplified((int)ViewData["id_company"]));
+				};
+			}).BindList(new ItemGroup[] { }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_sizeLabel";
+				settings.Text = "Talla:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_size";
+				settings.Properties.ClientInstanceName = "id_size";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+			}).BindList(DataProviderItemSize.ItemSizes()).GetHtml()
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_trademarkLabel";
+				settings.Text = "Marca:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_trademark";
+				settings.Properties.ClientInstanceName = "id_trademark";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+			}).BindList(DataProviderItemTrademark.ItemTrademarks((int)ViewData["id_company"])).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_trademarkModelLabel";
+				settings.Text = "Modelo:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_trademarkModel";
+				settings.Properties.ClientInstanceName = "id_trademarkModel";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+			}).BindList(DataProviderItemTrademarkModel.ItemTrademarkModels()).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "id_colorLabel";
+				settings.Text = "Color:";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().ComboBox(settings =>
+			{
+				settings.Name = "id_color";
+				settings.Properties.ClientInstanceName = "id_color";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.TextFormatString = "{0}";
+				settings.Properties.ValueType = typeof(int);
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+			}).BindList(DataProviderItemColor.ItemsColors()).GetHtml()
+		</td>
+	</tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "nameCodigoItemFilterLabel";
+                settings.Text = "Código del Producto:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = "nameCodigoItemFilter";
+                settings.Properties.ClientInstanceName = "nameCodigoItemFilter";
+                settings.Width = Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+       
+    </tr>
+</table>
+<br />

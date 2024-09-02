@@ -1,0 +1,172 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using System.Drawing
+
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.MachineProdOpening
+
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) ? Model.Document.DocumentState.code : "";
+    @*@Html.Hidden("id_typeFiltersConfiguration", null)
+        @Html.Hidden("code_typeFiltersConfiguration", null)
+        @Html.Hidden("datasource_advancedFiltersConfiguration", null)*@
+    @*@Html.HiddenFor(m => m.ciacodigo, new { @id = "ciacodigoPopup" })*@
+
+Html.DevExpress<MachineProdOpening>().FormLayout(settings =>
+{
+    settings.Name = "formLayoutEditMachineProdOpening";
+    settings.Width = Unit.Percentage(100);
+    settings.ColCount = 3;//5, 2, 2, 1, 1
+
+    //GroupItem1 
+    #region GroupItem1
+    var groupItem1 = settings.Items.AddGroupItem(i =>
+    {
+        i.Name = "groupItem1FormLayoutEditMachineProdOpening";
+        i.Caption = "";
+        i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+        i.ColCount = 3;
+        i.ColSpan = 3;
+        i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+    });
+
+    //Fila 1
+    #region Fila 1
+
+    //Turno
+    groupItem1.Items.Add(m => m.id_Turn, item =>
+    {
+        item.Name = "id_Turn";
+        item.Caption = "Turno";
+        item.CaptionStyle.Font.Bold = true;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 5;
+        item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        item.Width = Unit.Percentage(50);
+
+        item.NestedExtension().ComboBox(comboBox =>
+        {
+            comboBox.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            comboBox.Properties.ClientInstanceName = "id_Turn";
+            //spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+            comboBox.ReadOnly = codeState != "01";//PENDIENTE
+            comboBox.Properties.DataSource = DataProviderTurn.AllTurns();
+            comboBox.Properties.ValueField = "id";
+            comboBox.Properties.TextField = "name";
+            comboBox.Properties.ValueType = typeof(int);
+            comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            comboBox.Properties.ValidationSettings.CausesValidation = true;
+            comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+            comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //comboBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+            comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "Turn_SelectedIndexChanged";
+            comboBox.Properties.ClientSideEvents.Init = "Turn_Init";
+            comboBox.Properties.ClientSideEvents.Validation = "Turn_Validation";
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            comboBox.ShowModelErrors = true;
+        });
+    });
+
+    //TimeInit
+    groupItem1.Items.Add(m => m.Turn.timeInit, item =>
+    {
+        item.Name = "timeInitTurn";
+        item.Caption = "Hora Inicial";
+        item.CaptionStyle.Font.Bold = true;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 5;
+        item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        item.Width = Unit.Percentage(25);
+
+        item.NestedExtension().TimeEdit(timeEdit =>
+        {
+            timeEdit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            timeEdit.Properties.DisplayFormatString = "HH:mm:ss";
+            timeEdit.Properties.ClientInstanceName = "timeInitTurn";
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+            //timeEdit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+            timeEdit.ReadOnly = true;
+
+            //timeEdit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            timeEdit.ShowModelErrors = true;
+        });
+    });
+
+    //TimeEnd
+    groupItem1.Items.Add(m => m.Turn.timeEnd, item =>
+    {
+        item.Name = "timeEndTurn";
+        item.Caption = "Hora Fin";
+        item.CaptionStyle.Font.Bold = true;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 5;
+        item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        item.Width = Unit.Percentage(25);
+
+        item.NestedExtension().TimeEdit(timeEdit =>
+        {
+            timeEdit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            timeEdit.Properties.DisplayFormatString = "HH:mm:ss";
+            timeEdit.Properties.ClientInstanceName = "timeEndTurn";
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+            //timeEdit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+            timeEdit.ReadOnly = true;
+
+            //timeEdit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            timeEdit.ShowModelErrors = true;
+        });
+    });
+
+    #endregion
+
+    #endregion
+
+    //GroupItem2
+    #region GroupItem2
+    var groupItem2 = settings.Items.AddGroupItem(i =>
+    {
+        i.Caption = "";
+        i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+        i.ColCount = 3;
+        i.ColSpan = 3;
+        i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+        //i.Width = Unit.Percentage(100);
+    });
+
+    #endregion
+
+}).Render();
+
+}
+
+    
+    @*<script src="~/Scripts/productionlotreception/_productionLotReceptionHeadFormProductionLotClose.js"></script>*@

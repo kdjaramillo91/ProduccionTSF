@@ -1,0 +1,578 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.PurchaseOrder
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterPurchaseOrder", name = "formFilterPurchaseOrder" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+        <tr>
+            <td style="width: 20%">
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="2">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Documento</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%">
+                            @Html.DevExpress().LabelFor(m => m.Document.id_documentState, settings =>
+                            {
+                                settings.Name = "documentStateLabel";
+                                settings.Text = "Estado:";
+                                settings.AssociatedControlName = "id_documentState";
+                            }).GetHtml()
+                        </td>
+                        @{
+                            var id_documentType = Model.Document.DocumentType == null ? (int?)null : Model.Document.DocumentType.id;
+                        }
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                            {
+                                settings.Name = "id_documentState";
+                                settings.Properties.ClientInstanceName = "id_documentState";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+                                
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                            }).BindList(DataProviderDocumentState.DocumentStatesByDocumentType(id_documentType, (int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.number, settings =>
+                            {
+                                settings.Name = "numberLabel";
+                                settings.Text = "Número:";
+                                settings.AssociatedControlName = "number";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBoxFor(m => m.Document.number, settings =>
+                            {
+                                settings.Name = "number";
+                                settings.Properties.ClientInstanceName = "number";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 45%">
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="3">
+                            @*<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Emisi&oacute;n y Autorizaci&oacute;n</span>*@
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Emisi&oacute;n</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%">
+                            @Html.DevExpress().LabelFor(m => m.Document.emissionDate, settings =>
+                            {
+                                settings.Name = "startEmissionDateLabel";
+                                settings.Text = "Fecha Emisión:";
+                                settings.AssociatedControlName = "startEmissionDate";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                       {
+                           settings.Name = "startEmissionDate";
+                           settings.Properties.ClientInstanceName = "startEmissionDate";
+                           settings.Width = Unit.Percentage(100);
+
+                           settings.Properties.NullDisplayText = "Desde";
+                           settings.Properties.NullText = "Desde";
+
+                           settings.Properties.DisplayFormatInEditMode = true;
+                           settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                           settings.Properties.EditFormat = EditFormat.Custom;
+                           settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                           settings.Properties.ClientSideEvents.Validation = "OnRangeEmissionDateValidation";
+
+                       }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                       {
+                           settings.Name = "endEmissionDate";
+                           settings.Properties.ClientInstanceName = "endEmissionDate";
+                           settings.Width = Unit.Percentage(100);
+
+                           settings.Properties.NullDisplayText = "Hasta";
+                           settings.Properties.NullText = "Hasta";
+
+                           settings.Properties.DisplayFormatInEditMode = true;
+                           settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                           settings.Properties.EditFormat = EditFormat.Custom;
+                           settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                           settings.Properties.ClientSideEvents.Validation = "OnRangeEmissionDateValidation";
+
+                       }).GetHtml()
+                        </td>
+                    </tr>
+                    @*<tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.emissionDate, settings =>
+                            {
+                                settings.Name = "startAuthorizationDateLabel";
+                                settings.Text = "Fecha Autorización:";
+                                settings.AssociatedControlName = "startAuthorizationDate";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                            {
+                                settings.Name = "startAuthorizationDate";
+                                settings.Properties.ClientInstanceName = "startAuthorizationDate";
+                                settings.Width = Unit.Percentage(100);
+                                
+                                settings.Properties.NullDisplayText = "Desde";
+                                settings.Properties.NullText = "Desde";
+
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                settings.Properties.EditFormat = EditFormat.Custom;
+                                settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                settings.Properties.CalendarProperties.Columns = 2;
+                                settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                            {
+                                settings.Name = "endAuthorizationDate";
+                                settings.Properties.ClientInstanceName = "endAuthorizationDate";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Hasta";
+                                settings.Properties.NullText = "Hasta";
+
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                settings.Properties.EditFormat = EditFormat.Custom;
+                                settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                settings.Properties.CalendarProperties.Columns = 2;
+                                settings.Properties.DateRangeSettings.StartDateEditID = "startAuthorizationDate";
+                                settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.accessKey, settings =>
+                            {
+                                settings.Name = "accessKeyLabel";
+                                settings.Text = "Clave de Acceso";
+                                settings.AssociatedControlName = "accessKey";
+                            }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().TextBoxFor(m => m.Document.accessKey, settings =>
+                            {
+                                settings.Name = "accessKey";
+                                settings.Properties.ClientInstanceName = "accessKey";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.NullDisplayText = "Todas";
+                                settings.Properties.NullText = "Todas";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.authorizationNumber, settings =>
+                            {
+                                settings.Name = "authorizationNumberFilterLabel";
+                                settings.Text = "No. Autorización";
+                                settings.AssociatedControlName = "authorizationNumberFilter";
+                            }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().TextBoxFor(m => m.Document.authorizationNumber, settings =>
+                            {
+                                settings.Name = "authorizationNumberFilter";
+                                settings.Properties.ClientInstanceName = "authorizationNumber";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+                            }).GetHtml()
+                        </td>
+                    </tr>*@
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "paymentFilterLabel";
+                                settings.Text = "Plazo de Pago:";
+                                settings.AssociatedControlName = "id_paymentTerm";
+                            }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().ComboBox(settings =>
+                            {
+                                settings.Name = "id_paymentTerm";
+                                settings.Properties.ClientInstanceName = "id_paymentTerm";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.ShowModelErrors = true;
+
+                            }).BindList(DataProviderPaymentTerm.PaymentsTerms((int)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "paymentMethodFilterLabel";
+                                settings.Text = "Medio de Pago:";
+                                settings.AssociatedControlName = "id_paymentMethod";
+                            }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().ComboBox(settings =>
+                            {
+                                settings.Name = "id_paymentMethod";
+                                settings.Properties.ClientInstanceName = "id_paymentMethod";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                                settings.Properties.ValueType = typeof(int);
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                settings.ShowModelErrors = true;
+
+                            }).BindList(DataProviderPaymentMethod.PaymentsMethods((int)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.requiredLogistic, settings =>
+                            {
+                                settings.Name = "requiredLogisticLabel";
+                                settings.Text = "Logística:";
+                                settings.AssociatedControlName = "requiredLogistic";
+                            }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @*@Html.DevExpress().CheckBox(settings =>
+                            {
+                                settings.Name = "requiredLogistic";
+                                settings.Properties.ClientInstanceName = "filterLogistic";
+                                settings.Width = Unit.Percentage(100);
+                                settings.Checked = true;
+                                //settings.Properties.DropDownButton.Visible = false;
+                            }).GetHtml()*@
+
+                            @Html.DevExpress().ComboBox(settings =>
+                                        {
+                                            settings.Name = "id_logicalOperator";
+                                            settings.Properties.ClientInstanceName = "id_logicalOperator";
+                                            settings.Width = Unit.Percentage(50);
+                                            settings.Properties.ValueField = "id";
+                                            settings.Properties.TextField = "name";
+                                            settings.Properties.ValueType = typeof(int);
+
+                                            settings.Properties.NullDisplayText = "Todos";
+                                            settings.Properties.NullText = "Todos";
+
+                                            
+                                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                                        }).BindList(DataProviderLogicalOperator.LogicalBoleam()).GetHtml()
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 25%">
+                <table class="table table-condensed" style="border: 0px solid #ffffff">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="4">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Orden de Compra</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 35%;">
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "id_providerLabel";
+                                settings.Text = "Proveedor:";
+                                settings.AssociatedControlName = "id_provider";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_provider";
+                           settings.Properties.ClientInstanceName = "id_provider";
+
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueType = typeof(int);
+
+                           settings.Properties.NullDisplayText = "Todos";
+                           settings.Properties.NullText = "Todos";
+
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                       }).BindList(DataProviderPerson.ProvidersShrimpPerson()).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.id_buyer, settings =>
+                            {
+                                settings.Name = "id_buyerLabel";
+                                settings.Text = "Comprador:";
+                                settings.AssociatedControlName = "id_buyer";
+                            }).GetHtml()
+                        </td>
+                        <td>
+
+                            @{
+                                int? id_buyer = (Model != null && Model.id_buyer != 0) ? (int?)Model.id_buyer : null;
+                            }
+                            @Html.DevExpress().ComboBoxFor(m => m.id_buyer, settings =>
+                       {
+                           settings.Name = "id_buyer";
+                           settings.Properties.ClientInstanceName = "id_buyer";
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.TextField = "fullname_businessName";
+                           settings.Properties.ValueType = typeof(int);
+                           settings.Properties.NullDisplayText = "Todos";
+                           settings.Properties.NullText = "Todos";
+
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                       }).BindList(DataProviderPerson.BuyersByCompanyAndCurrent((int?)ViewData["id_company"], id_buyer)).Bind(id_buyer).GetHtml()
+
+                            @*@Html.DevExpress().ComboBox(settings =>
+                {
+                    settings.Name = "id_buyer";
+                    settings.Properties.ClientInstanceName = "id_buyer";
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "fullname_businessName";
+                    settings.Properties.ValueType = typeof(int);
+
+                    settings.Properties.NullDisplayText = "Todos";
+                    settings.Properties.NullText = "Todos";
+
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                }).BindList(DataProviderPerson.Providers()).GetHtml()*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "itemLabel";
+                                settings.Text = "Producto:";
+                                settings.AssociatedControlName = "item";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "items";
+                                settings.Properties.ClientInstanceName = "items";
+                                settings.Properties.ValueField = "id";
+
+                                settings.Properties.TextField = "name";
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Width = Unit.Percentage(100);
+
+                            }).BindList(DataProviderItem.PurchaseItems()).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.PriceList, settings =>
+                            {
+                                settings.Name = "priceListLabel";
+                                settings.Text = "Lista de Precios:";
+                                settings.AssociatedControlName = "priceListe";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_priceList";
+                           settings.Properties.ClientInstanceName = "id_priceList";
+
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueType = typeof(int);
+
+                           settings.Properties.NullDisplayText = "Todos";
+                           settings.Properties.NullText = "Todos";
+
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                           //   }).BindList(DataProviderPriceList.PriceLists()).GetHtml()
+                       }).BindList(DataProviderPriceList.PriceListsForPurchaseByCompany((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.id_certification, settings =>
+                              {
+                                  settings.Name = "certificationLabel";
+                                  settings.Text = "Certificado";
+                                  settings.AssociatedControlName = "id_certification";
+                              }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_certification";
+                           settings.Properties.ClientInstanceName = "id_certification";
+
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.TextField = "name";
+                           settings.Properties.ValueType = typeof(int);
+
+                           settings.Properties.NullDisplayText = "Todos";
+                           settings.Properties.NullText = "Todos";
+
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                       }).BindList(DataProviderCertification.CertificationsFilter()).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td>
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnSearch";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Buscar";
+                                settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnSearch_click";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "Clear";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Limpiar";
+                                settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "btnClear_click";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnNew";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Nueva";
+                                settings.Images.Image.IconID = IconID.ActionsAdd16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "AddNewItemManual";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    @*<tr>
+            <td>
+                <div class="btn-group" style="width: 100%;">
+                    <button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Nueva</span><span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="javascript:;"onclick="AddNewItemManual();">Manual</a></li>
+                        <li><a href="javascript:;" onclick="AddNewItemFromPurchaseRequest();">Desde Requerimiento</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>*@
+                    @*<tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+        {
+            settings.Name = "Replicate";
+            settings.UseSubmitBehavior = false;
+            settings.Text = "Replica LP Terceros";
+            settings.Images.Image.IconID = IconID.ActionsRefresh16x16;
+            settings.Width = Unit.Percentage(100);
+            settings.ClientSideEvents.Click = "btnRefreshLPThird_click";
+        }).GetHtml()
+                    </td>
+                </tr>*@
+                </table>
+            </td>
+        </tr>
+    </table>
+}

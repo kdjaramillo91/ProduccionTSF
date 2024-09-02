@@ -1,0 +1,50 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.BusinessOportunityPhase
+
+@{
+    //ViewData["id_item"] = Model.id;
+    ViewData["id_businessOportunityPhaseView"] = Model.id;
+}
+
+@Html.Hidden("id_businessOportunityPhaseView", Model.id)
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Documentos Adjuntos</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{
+                if (Model != null && Model.BusinessOportunityPhaseAttachment != null)
+                {
+                    ViewContext.Writer.Write(Html.Partial("_BusinessOportunityPhaseAttachmentPartial", Model.BusinessOportunityPhaseAttachment.OrderByDescending(od => od.id).ToList()));
+                }
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Actividades</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{
+                if (Model != null && Model.BusinessOportunityPhaseActivity != null)
+                {
+                    ViewContext.Writer.Write(Html.Partial("_BusinessOportunityPhaseActivityPartial", Model.BusinessOportunityPhaseActivity.OrderByDescending(od => od.id).ToList()));
+                }
+            }
+        </td>
+    </tr>
+</table>
+
+@*@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}*@

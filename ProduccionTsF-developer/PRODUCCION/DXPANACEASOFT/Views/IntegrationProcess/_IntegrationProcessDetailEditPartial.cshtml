@@ -1,0 +1,207 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.IntegrationProcessDetailDTO
+
+
+@{
+
+    var grid = Html.DevExpress().GridView<IntegrationProcessDetailDTO>(settings =>
+    {
+        settings.Name = "gvIntegrationProcessDetail";
+        settings.CallbackRouteValues = new { Controller = "IntegrationProcess", Action = "CallBackDocumentProcessDocument" };
+
+        settings.Width = Unit.Percentage(100);
+
+//settings.SettingsSearchPanel.Visible = true;
+//settings.Styles.SearchPanel.CssClass = "searchPanel";
+settings.EnableRowsCache = false;
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.AllPages;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id_Document";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+//settings.Settings.ShowFilterRow = true;
+settings.SettingsBehavior.AllowSelectByRowClick = true;
+//settings.Settings.ShowFooter = true;
+//settings.Settings.ShowFilterRowMenu = true;
+
+settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+/* Funcion Javascript*/
+
+// TODO PROGRAMING
+settings.ClientSideEvents.Init = "OIntegrationProcess.InitGridDocuments";
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+        settings.SettingsExport.EnableClientSideExportAPI = true;
+        settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+        settings.SettingsExport.FileName = "Lote_Proceso_Integración_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+        settings.Toolbars.Add(t =>
+        {
+            t.EnableAdaptivity = true;
+            t.Items.Add(GridViewToolbarCommand.ExportToXls);
+            t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+        });
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle""> Listado de Documentos Lote </span>");
+        });
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpidRow"] = 0;
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+        };
+
+//MASTER DETAILS
+settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = false;
+
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        settings.Columns.Add(m => m.id_Document, column =>
+        {
+            column.Name = "id_Document";
+            column.PropertiesEdit.ClientInstanceName = "id_Document";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(0);
+            column.Visible = false;
+
+
+        });
+
+//Document
+settings.Columns.Add(m => m.documentNumber, column =>
+        {
+            column.Name = "number";
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(11);
+
+        });
+
+        settings.Columns.Add(m => m.documentEmissionDate, column =>
+        {
+            column.Name = "emissionDate";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(12);
+        });
+
+        settings.Columns.Add(m => m.sequentialLiquidation, column =>
+        {
+            column.Name = "sequentialLiquidation";
+            column.Caption = "Número Liquidación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(11);
+
+        });
+
+        settings.Columns.Add(m => m.glossData, column =>
+        {
+            column.Name = "glossData";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.Width = Unit.Percentage(70);
+
+    //column.PropertiesEdit.EncodeHtml = false;
+    column.SetDataItemTemplateContent(c =>
+            {
+                string tempGlossData = (string)DataBinder.Eval(c.DataItem, "glossDataHTML");
+                ViewContext.Writer.Write(tempGlossData);
+            });
+        });
+
+        settings.Columns.Add(m => m.totalValueDocument, column =>
+        {
+            column.Name = "totalValueDocument";
+            column.Caption = "Valor Documento";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            var SpinEdit = column.PropertiesEdit as SpinEditProperties;
+            SpinEdit.NumberFormat = SpinEditNumberFormat.Currency;
+            SpinEdit.DisplayFormatString = "C2";
+            SpinEdit.DecimalPlaces = 0;
+
+        });
+        settings.Columns.Add(m => m.integrationProcessCodeLote, column =>
+        {
+            column.Name = "numberlot";
+            column.Caption = "Número de Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(m => m.integrationProcessIntegrationStateName, column =>
+        {
+            column.Name = "statelot";
+            column.Caption = "Estado del Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(m => m.integrationProcessDocumentTypeDescription, column =>
+        {
+            column.Name = "typeDocument";
+            column.Caption = "Tipo de Documento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+        });
+
+        settings.Columns.Add(m => m.integrationProcessDateAccounting, column =>
+        {
+            column.Name = "accountingDate";
+            column.Caption = "Fecha de Contabilización";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(10);
+        });
+    }
+);
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+
+}@grid.Bind(Model).GetHtml()
+
+@functions {
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

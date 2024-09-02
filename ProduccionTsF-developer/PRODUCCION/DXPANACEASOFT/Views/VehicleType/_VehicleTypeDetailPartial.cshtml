@@ -1,0 +1,169 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    VehicleType vehicle = Model ?? new VehicleType();
+}
+
+@Html.Hidden("id_VehicleType", vehicle.id)
+
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 30%;">
+                <strong>
+                    C&oacute;digo:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.name)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <strong>
+                    Nombre:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.description)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    N&uacute;mero Axis:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.axisNumber)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    C&oacute;digo Inen:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.codeInen)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Sub-C&oacute;digo Inen:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.subCodeInen)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Altura:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.high)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Anchura:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.width)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Longitud:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.@long)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Unidad M&eacute;trica de Carga M&aacute;xima:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.MetricUnit.name)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Unidad M&eacute;trica de Carga C&uacute;bica  M&aacute;xima:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.MetricUnit1.name)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Tipo de Viaje:
+                </strong>
+            </td>
+            <td colspan="4">
+                @Html.Raw(vehicle.PurchaseOrderShippingType.name)
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 10%;">
+                <strong>
+                    Creado por:
+                </strong>
+            </td>
+            <td style="width: 10%;">
+                @Html.Raw(UsernameById(vehicle.id_userCreate))
+            </td>
+            <td style="width: 15%;">
+                <strong>
+                    Fecha de Creaci&oacute;n:
+                </strong>
+            </td>
+            <td>
+                @Html.Raw(vehicle.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>
+                    Modificado por:
+                </strong>
+            </td>
+            <td>
+                @Html.Raw(UsernameById(vehicle.id_userUpdate))
+            </td>
+
+            <td>
+                <strong>
+                    Fecha de Modificaci&oacute;n:
+                </strong>
+            </td>
+            <td>
+                @Html.Raw(vehicle.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+            </td>
+        </tr>
+    </table>
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

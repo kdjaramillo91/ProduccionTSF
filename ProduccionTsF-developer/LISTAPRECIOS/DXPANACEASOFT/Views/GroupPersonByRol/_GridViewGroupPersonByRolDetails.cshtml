@@ -1,0 +1,72 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.Models.DTOModel
+@using DXPANACEASOFT.DataProviders
+
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvEditing";
+        settings.KeyFieldName = "id";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "GroupPersonByRol",
+            Action = "GridViewGroupPersonByRolDetails",
+            enabled = ViewBag.enabled
+        };
+        settings.Enabled = ViewBag.enabled;
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "GroupPersonByRol", Action = "EditFormLayoutAddNewPartial" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "GroupPersonByRol", Action = "EditFormLayoutUpdatePartial" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "GroupPersonByRol", Action = "EditFormLayoutDeletePartial" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.VisibleIndex = 2;
+
+        settings.Columns.Add(c =>
+        {
+            c.FieldName = "id_person";
+            c.Caption = "Persona";
+            c.SetDataItemTemplateContent(tc =>
+            {
+                var id = (int)DataBinder.Eval(tc.DataItem, "id_person");
+                var person = DataProviderPerson.Person(id);
+                if (person != null)
+                    ViewContext.Writer.Write(person.identification_number + " - " + person.fullname_businessName);
+                else
+                    ViewContext.Writer.Write("");
+            });
+            c.EditorProperties().ComboBox(p =>
+            {
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+                p.CallbackRouteValues = new { Controller = "GroupPersonByRol", Action = "DataSourceComboBoxPersonsRol" };
+                p.ClientSideEvents.Init = "InitLoadPersonByRol";
+                p.ClientSideEvents.BeginCallback = "LoadPersonByRol";
+            });
+        });
+
+        settings.EditFormLayoutProperties.ColCount = 2;
+        settings.EditFormLayoutProperties.Items.Add("id_person");
+        settings.EditFormLayoutProperties.Items.AddCommandItem(itemSettings =>
+        {
+            itemSettings.Width = Unit.Percentage(100);
+            itemSettings.HorizontalAlign = FormLayoutHorizontalAlign.Left;
+        });
+        settings.EditFormLayoutProperties.SettingsAdaptivity.AdaptivityMode = FormLayoutAdaptivityMode.SingleColumnWindowLimit;
+        settings.EditFormLayoutProperties.SettingsAdaptivity.SwitchToSingleColumnAtWindowInnerWidth = 700;
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

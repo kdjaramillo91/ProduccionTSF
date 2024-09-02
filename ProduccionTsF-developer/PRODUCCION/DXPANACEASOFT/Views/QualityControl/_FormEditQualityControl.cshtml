@@ -1,0 +1,23 @@
+﻿
+<h4>Editar Análisis de Calidad</h4>
+<hr style="margin: 10px 0px;" />
+
+@{
+	Model.hasUpd = Model.hasUpd != null ? (bool)Model.hasUpd : true;
+
+	if (Model.hasUpd == true)
+	{
+		@Html.Hidden("hasupdate", "Y")
+		Html.RenderPartial("DocumentTemplates/_DocumentFormEditActionsButtons");
+	}
+	else
+	{
+		@Html.Hidden("hasupdate", "N")
+	}
+	<div id="mainform">
+		@Html.Partial("_QualityControlMainFormPartial")
+	</div>
+}
+
+<script src="~/Scripts/qualitycontrol/_qualitycontrolEditFormPartial.js"></script>
+<script src="~/Scripts/qualitycontrol/validations.js"></script>

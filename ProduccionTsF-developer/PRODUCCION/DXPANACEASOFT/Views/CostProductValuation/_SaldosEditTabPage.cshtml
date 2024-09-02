@@ -1,0 +1,27 @@
+﻿@model IList<ProductionCostProductValuationBalance>
+<table width="100%">
+	<tr>
+		<td>
+			@Html.DevExpress().Button(
+				button =>
+				{
+					button.Name = "SaldosToolbarButton";
+					button.Text = "";
+					button.ToolTip = "Refrescar contenido";
+					button.Images.Image.IconID = EmpacadorasIconID.RefrescarContenido;
+					button.ClientSideEvents.Click = "onRecargarSaldosValorizacionButtonClick";
+					button.Style.Add("margin-left", "10px");
+				}).GetHtml()
+
+			<hr style="margin-top: 8px; margin-bottom: 2px;" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@using (Html.BeginForm())
+			{
+				@Html.Partial("_ProductValuationBalanceGridViewPartial", this.Model)
+			}
+		</td>
+	</tr>
+</table>

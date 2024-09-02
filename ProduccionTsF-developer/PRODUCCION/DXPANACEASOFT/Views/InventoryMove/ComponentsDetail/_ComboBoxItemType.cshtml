@@ -1,0 +1,16 @@
+﻿
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxItemType";
+	settings.Width = Unit.Percentage(100);
+	settings.CallbackRouteValues = new
+	{
+		Controller = "InventoryMove",
+		Action = "ComboBoxItemType",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	//settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["ItemType"]).GetHtml()

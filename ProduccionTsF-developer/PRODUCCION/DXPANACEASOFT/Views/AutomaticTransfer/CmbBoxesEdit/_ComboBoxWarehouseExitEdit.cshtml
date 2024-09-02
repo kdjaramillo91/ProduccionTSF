@@ -1,0 +1,31 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string _id_WarehouseExit = Model.id_WarehouseExit != null ? Model.id_WarehouseExit.ToString() : "";
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+}
+
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxWarehouseExitEdit";
+	settings.Properties.ClientInstanceName = "ComboBoxWarehouseExitEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxWarehouseExitEdit",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	//settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.DisplayFormatString = "{0}";
+	settings.Properties.Columns.Add("Text", "Descripción", Unit.Percentage(70));
+	settings.Properties.Columns.Add("allowsNegativeBalances", "ValoresNegativos", Unit.Percentage(1));
+	//settings.Properties.ValueField = "Value";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxWarehouseExitEdit_SelIndexChanged";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.ReadOnly = !(this.ViewBag.Editable);
+}).BindList(ViewData["CmbBoxWarehouseExitEdit"]).Bind(_id_WarehouseExit).GetHtml()

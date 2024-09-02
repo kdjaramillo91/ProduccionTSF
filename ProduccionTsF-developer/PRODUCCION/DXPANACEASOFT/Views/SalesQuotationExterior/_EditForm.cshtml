@@ -1,0 +1,245 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using ValidationSettings = System.Web.UI.ValidationSettings
+@model DXPANACEASOFT.Models.Invoice
+
+@{
+    int id_invoice = (Model != null) ? Model.id : 0;
+    DocumentState documentState = (Model != null && Model.Document != null && Model.Document.id_documentState != 0) ? DataProviderDocumentState.DocumentStateById(Model.Document.id_documentState) : DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+    tbsysDocumentDocumentStateControlsState _ControlsState = DataProviderControlState.ControlStateByDocumentByStateByControl("07", documentState.code, "btnUpdateFoot");
+    var parmHabilita = DataProviderSetting.SettingByCode("HABDUPL").value == "SI";
+    var iteracion = DataProviderSetting.SettingByCode("DUPELEM").value == "50";
+}
+
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditSalesQuotationExterior", name = "formEditSalesQuotationExterior" }))
+{
+
+    // presenta mensajes del codeBehind
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    if (ViewData["EditError"] != null)
+    {
+        @Html.Raw(ViewData["EditError"]);
+    }
+
+    @Html.Hidden("id_invoice", id_invoice)
+    @Html.Hidden("parmHabilita", parmHabilita)
+    @Html.Hidden("iteraDuplicidad", iteracion)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+
+    // Documento
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var document = (Model != null && Model.Document != null) ? Model.Document : new Document();
+            Html.RenderPartial("_TabDocument", document);
+        });
+    });
+
+    // Cabecera FE
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabSalesQuotationExterior";
+        tab.Text = "Proforma del Exterior    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                "<div id='divTabSalesQuotationExterior'>" +
+                @Html.Partial("_TabSalesQuotationExterior")
+                + "</div>");
+        });
+    });
+
+    // Detalle FE
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabSalesQuotationExteriorDetails";
+        tab.Text = "Detalles    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_TabDetails");
+        });
+    });
+
+    //Facturas relacionadas
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabInvoicesRelations";
+        tab.Text = "Facturas Relacionadas";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var documents = (Model != null && Model.Document.Document1 != null) ? Model.Document.Document1.ToList() : new List<Document>();
+            Html.RenderPartial("_InvoicesRelationView", documents);
+        });
+    });
+
+    //Orden de Producción Relacionadas
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabproductionorderRelations";
+        tab.Text = "Ordenes de Producción Relacionadas";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var documents = (Model != null && Model.SalesQuotationExterior != null) 
+                ? Model.SalesQuotationExterior.SalesOrderDetailSalesQuotationExterior.Select(a => a.SalesOrderDetail.SalesOrder.Document).Distinct().ToList() 
+                : new List<Document>();
+            Html.RenderPartial("_ProductionOrderRelationGridView", documents);
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabAttachedDocument";
+        tab.Text = "Documentación    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            var documents = (Model != null && Model.SalesQuotationExterior != null && Model.SalesQuotationExterior.SalesQuotationExteriorDocument != null)
+                ? Model.SalesQuotationExterior.SalesQuotationExteriorDocument.ToList()
+                : new List<SalesQuotationExteriorDocument>();
+
+            if (documentState.code == "01")//01: PENDIENTE
+            {
+                Html.RenderPartial("_SalesQuotationExteriorMainFormTabAttachedDocuments", documents.OrderByDescending(od => od.id).ToList());
+
+            }
+            else
+            {
+                ViewData["id_invoice"] = id_invoice;
+                Html.RenderPartial("_SalesQuotationExteriorAttachedDocumentsPartial", documents.OrderByDescending(od => od.id).ToList());
+            }
+
+        });
+    });
+
+}).GetHtml()
+
+<table class="table table-condensed">
+    <tr style="border-top: 1px Solid #C0C0C0;">
+        <td colspan="6" style="text-align: right; margin-top: 5px;">
+            @{
+            Html.DevExpress().Button(button =>
+            {
+                button.Name = "btnUpdateFoot";
+                button.Text = "Actualizar";
+                button.RenderMode = ButtonRenderMode.Button;
+                button.ImagePosition = ImagePosition.Left;
+                button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                button.UseSubmitBehavior = false;
+                button.ClientVisible = IsEnabled(1);
+                button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                button.ClientEnabled = _ControlsState.isRequired;
+            }).Render();
+
+            ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+            Html.DevExpress().Button(button =>
+            {
+                button.Name = "btnCancelFoot";
+                button.Text = "Cerrar";
+                button.RenderMode = ButtonRenderMode.Button;
+                button.ImagePosition = ImagePosition.Left;
+                button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                button.UseSubmitBehavior = false;
+                button.ClientSideEvents.Click = "ButtonCancel_Click";
+            }).Render();
+            }
+        </td>
+    </tr>
+</table>
+}
+
+@Html.Partial("Dialogs/_DuplicateDialogPartial")
+<script src="~/Scripts/salesquotationexterior/editform.js"></script>
+
+@* validar permisos *@
+@functions{
+
+    bool IsEnabled(int id_permission)
+    {
+        int id_user = (int)ViewData["id_user"];
+        int id_menu = (int)ViewData["id_menu"];
+
+        User user = DataProviderUser.UserById(id_user);
+
+        if (user == null)
+            return false;
+
+        UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+        if (userMenu == null)
+            return false;
+
+        Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+        return (permission != null);
+    }
+
+}

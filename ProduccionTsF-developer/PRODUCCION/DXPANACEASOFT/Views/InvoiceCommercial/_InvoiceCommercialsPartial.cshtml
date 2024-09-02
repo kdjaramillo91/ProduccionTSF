@@ -1,0 +1,240 @@
+﻿@using System.Globalization;
+@using System.Drawing
+@using DevExpress.CodeParser
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+	var grid = Html.DevExpress().GridView<InvoiceCommercial>(settings =>
+	{
+		settings.Name = "gvInvoiceCommercials";
+		settings.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "InvoiceCommercialsPartial" };
+		settings.CommandColumn.Visible = true;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		//Panel de Busqueda
+		settings.SettingsSearchPanel.Visible = true;
+		settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		//Checkbox de registros de tabla
+		settings.CommandColumn.ShowSelectCheckbox = true;
+		settings.CommandColumn.Width = Unit.Percentage(3);
+		settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+		//Eventos
+		settings.ClientSideEvents.Init = "OnGridViewInit";
+		settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+		settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+		settings.Settings.ShowTitlePanel = true;
+		settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+		//Pie de tabla
+		settings.Settings.ShowFooter = true;
+
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+		};
+
+
+		settings.SetTitlePanelTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Facturas Comerciales</span>");
+		});
+
+		settings.SetFooterRowTemplateContent(c =>
+		{
+			ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+			if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+			{
+				ViewContext.Writer.Write(
+					@"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+			  <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+				);
+			}
+		});
+
+		//Boton de filtro para las columnas de la tabla
+		settings.Settings.ShowFilterRowMenu = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+
+		// Preparación de columnas calculadas
+		settings.CustomUnboundColumnData = (s, e) =>
+		{
+			if (e.Column.FieldName == "OrigenCustom")
+			{
+				string tipoDocumento = string.Empty;
+				var document = (Document)e.GetListSourceFieldValue("Document");
+				if(document != null)
+				{
+					var documentOrigin = DataProviderDocument.Document(document.id_documentOrigen);
+					tipoDocumento = ((documentOrigin != null) && documentOrigin.DocumentType.code == "131")
+						? "Proforma" : ((documentOrigin != null) && documentOrigin.DocumentType.code == "07")
+						? "Factura" : "Manual";
+				}
+
+				e.Value = tipoDocumento;
+			}
+		};
+
+
+		#region ColumnsAdd
+
+		//number 15
+		settings.Columns.Add(m => m.Document.number, column =>
+		{
+			column.Name = "number";
+			column.Caption = "Número";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+		// Numero de referencia
+		settings.Columns.Add(m => m.referenceInvoice, column =>
+		{
+			column.Name = "referenceInvoice";
+			column.Caption = "Referencia";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//emissionDate 15
+		settings.Columns.Add(m => m.Document.emissionDate, column =>
+		{
+			column.Name = "emissionDate";
+			column.Caption = "Fecha de Emisión";
+			column.ColumnType = MVCxGridViewColumnType.DateEdit;
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "OrigenCustom";
+			column.Caption = "Origen";
+			column.Width = Unit.Percentage(5);
+			column.MinWidth = 80;
+			column.AdaptivePriority = 20;
+			column.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+		});
+
+		settings.Columns.Add(m => m.Document.Document2.number, column =>
+		{
+			column.Name = "proforma";
+			column.Caption = "Proforma / Factura";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.PropertiesEdit.NullDisplayText = "0";
+		});
+
+		//id_ForeignCustomer 15
+		settings.Columns.Add(m => m.ForeignCustomer.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_ForeignCustomer";
+			column.Caption = "Cliente";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//id_Consignee 15
+		settings.Columns.Add(m => m.ForeignCustomer1.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_Consignee";
+			column.Caption = "Consignatario";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//id_Notifier 15
+		settings.Columns.Add(m => m.ForeignCustomer2.Person.fullname_businessName, column =>
+		{
+			column.Name = "id_Notifier";
+			column.Caption = "Notificador";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+		});
+
+		//documentState 15
+		settings.Columns.Add(m => m.Document.DocumentState.name, column =>
+		{
+			column.Name = "documentState";
+			column.Caption = "Estado";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		});
+
+		//Botones de comandos para registros de la tabla
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn();
+		commandColumn.ShowEditButton = false;
+		commandColumn.ShowDeleteButton = false;
+		commandColumn.Visible = true;
+		commandColumn.VisibleIndex = 10;
+		commandColumn.Caption = "Acciones";
+		commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		commandColumn.AllowDragDrop = DefaultBoolean.False;
+		commandColumn.CustomButtons.Add(
+			new GridViewCommandColumnCustomButton
+			{
+				ID = "btnUpdateInvoiceCommercial",
+				Text = "Editar"
+			}
+		);
+		settings.ClientSideEvents.CustomButtonClick = "OnClickUpdateInvoiceCommercial";
+		settings.Columns.Add(commandColumn);
+
+		settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+		settings.SettingsDetail.ShowDetailRow = true;
+
+		settings.SetDetailRowTemplateContent(c =>
+		{
+			//int? id = (int?)DataBinder.Eval(c.DataItem, "id");
+			//PurchasePlanning productionLot = DataProviderPurchasePlanning.PurchasePlanningById(id);
+			InvoiceCommercial invoiceCommercial = (InvoiceCommercial)Model[c.ItemIndex];
+			Html.RenderPartial("_InvoiceCommercialDetailPartial", invoiceCommercial);
+		});
+
+		#endregion
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+	String GetUserName(int id)
+	{
+		var user = DataProviderUser.UserById(id);
+		return user.username;
+	}
+}
+
+
+

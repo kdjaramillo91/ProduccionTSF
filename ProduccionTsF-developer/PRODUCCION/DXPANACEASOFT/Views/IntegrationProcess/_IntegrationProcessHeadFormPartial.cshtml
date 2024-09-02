@@ -1,0 +1,243 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Auxiliares
+@using DXPANACEASOFT.Controllers
+@using ValidationSettings = System.Web.UI.ValidationSettings
+@model DXPANACEASOFT.Models.IntegrationProcess
+
+
+
+@{
+
+    int id_IntegrationProcess = (Model != null) ? Model.id : 0;
+    string code_IntegrationState = "01";
+    if ((Model.id_StatusLote != 0))
+    {
+        IntegrationState _integrationState = DataProviderIntegrationProcess.StatesById(Model.id_StatusLote);
+        if (_integrationState != null)
+        {
+            code_IntegrationState = DataProviderIntegrationProcess.StatesById(Model.id_StatusLote).code;
+        }
+
+    }
+
+    //Boolean isRequiredDate = (  Model.id_DocumentType == 0 )? true: DataProviderIntegrationProcess.GetSourceDateProcess(Model.id_DocumentType);
+
+
+}
+
+
+
+<table id="mainTabIntegrationProcess" class="table table-condensed" style="margin: 0px;">
+    <tr class="ps-header">
+        <td colspan="6" class="ps-bar-collapse" dtx="psn-invclgen">
+            <span class="dxflGroupBoxCaption_Metropolis">Lote</span>
+            <span class="arrow fa fa-angle-down ps_floatrt"> </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Número de Lote: </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.codeLote, settings =>
+            {
+                settings.Name = "codeLote";
+                settings.Properties.ClientInstanceName = "codeLote";
+                settings.Width = Unit.Pixel(300);
+                settings.Properties.ValidationSettings.Display = Display.Dynamic;
+                settings.ShowModelErrors = false;
+                settings.ReadOnly = true;
+
+            }).GetHtml()
+        </td>
+        <td>Estado del Lote: </td>
+        <td>
+            @Html.HiddenFor(m => m.id_StatusLote, new { @id = "id_StatusLote" })
+
+            @Html.DevExpress().TextBoxFor(m => m.IntegrationState.description, settings =>
+           {
+               settings.Name = "integrationState";
+               settings.Properties.ClientInstanceName = "integrationState";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ValidationSettings.Display = Display.Dynamic;
+               settings.ShowModelErrors = false;
+               settings.ReadOnly = true;
+           }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td>Tipo de Documento: </td>
+        <td>
+            @{
+                int? _id_DocumentType = (Model != null && Model.id_DocumentType != 0) ? (int?)Model.id_DocumentType : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_DocumentType, settings =>
+       {
+           settings.Name = "id_DocumentType";
+           settings.Properties.ClientInstanceName = "id_DocumentType";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.ValueType = typeof(int);
+           settings.Width = Unit.Pixel(300);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.Columns.Add("code", "Cod.", 20);
+           settings.Properties.Columns.Add("description", "Nombre", 120);
+           settings.Properties.Columns.Add("isRequiredDate", ".", 0);
+           settings.Properties.Columns.Add("isGroup", ".", 0);
+
+
+
+           //settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "OIntegrationProcess.SelectedIndexChangedDocumentType";
+
+           settings.ReadOnly = (id_IntegrationProcess != 0);
+
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           settings.CustomJSProperties = (s, e) =>
+           {
+               e.Properties["cpTabContainer"] = "tabIntegrationProcess";
+               e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               e.Properties["cpIsRequired"] = "true";
+               e.Properties["cpTabControl"] = "tabControl";
+               // e.Properties["cpisRequiredDate"] = isRequiredDate;
+
+
+           };
+
+       }).BindList(DataProviderDocumentType.DocumentTypeForIntegrationProcess((int)ViewData["id_company"])).Bind(_id_DocumentType).GetHtml()
+        </td>
+        <td>Fecha de Contabilización</td>
+        <td>
+
+            @Html.DevExpress().DateEditFor(m => m.dateAccounting, settings =>
+       {
+
+           //if(id_IntegrationProcess != 0 )
+           //{
+           //    settings.Date = Model.dateAccounting;
+           //}
+           //else if(!Model.isRequeridDate)
+           //{
+           //    settings.Date = DateTime.Now;
+           //}
+
+           settings.Date = Model.dateAccounting;
+
+           settings.Name = "dateAccounting";
+           settings.Properties.ClientInstanceName = "dateAccounting";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NullDisplayText = "Fecha Contabilización";
+           settings.Properties.NullText = "Fecha Contabilización";
+
+           // settings.Properties.DisplayFormatInEditMode = true;
+           // settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+           //settings.Properties.EditFormat = EditFormat.Custom;
+           //settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+           settings.Properties.CalendarProperties.Columns = 1;
+           settings.Properties.DateRangeSettings.MinDayCount = 1;
+           settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+           settings.ReadOnly = (id_IntegrationProcess != 0);
+
+           settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           settings.CustomJSProperties = (s, e) =>
+           {
+               e.Properties["cpTabContainer"] = "tabIntegrationProcess";
+               e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               e.Properties["cpIsRequired"] = "true";
+               e.Properties["cpTabControl"] = "tabControl";
+
+           };
+
+       }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Observación: </td>
+        <td colspan="5">
+
+            @Html.DevExpress().MemoFor(m => m.description, settings =>
+           {
+
+               settings.Name = "description";
+               settings.Properties.ClientInstanceName = "description";
+               settings.Width = Unit.Percentage(100);
+               //settings.Text = descriptionData;
+               settings.Height = Unit.Pixel(60);
+
+           }).GetHtml()
+        </td>
+
+    </tr>
+
+
+    <tr>
+        <td>Fecha Creación: </td>
+        <td>
+            @{
+                // TODO: Obtener Fecha de Procesamiento
+                string dateCreateData = (Model.dateCreate == null)? DateTime.Now.ToString() : Model.dateCreate.ToString();
+            }
+
+            @Html.DevExpress().TextBox(settings =>
+           {
+
+               settings.Name = "dateCreate";
+               settings.Properties.ClientInstanceName = "dateCreate";
+               settings.Width = Unit.Percentage(100);
+               settings.Text = dateCreateData;
+               settings.ReadOnly = true;
+
+           }).GetHtml()
+
+        </td>
+        <td>Fecha Trasmisión: </td>
+        <td>
+
+            @{
+
+                IntegrationProcessLog _integrationProcessLog = Model.IntegrationProcessLog.FirstOrDefault(r => r.IntegrationState.code == EnumIntegrationProcess.States.Transmitted);
+                string dateProcesingData = (_integrationProcessLog == null) ? null : _integrationProcessLog.dateAction.ToString();
+
+            }
+
+            @Html.DevExpress().TextBox(settings =>
+           {
+
+               settings.Name = "dateProcesing";
+               settings.Width = Unit.Percentage(100);
+               settings.Text = dateProcesingData;
+               settings.ReadOnly = true;
+
+           }).GetHtml()
+
+        </td>
+        <td>Fecha Integración: </td>
+        <td>
+            @{
+                // TODO: Obtener fecha de Integración
+                IntegrationProcessLog _integrationProcessLog2 = Model.IntegrationProcessLog.FirstOrDefault(r => r.IntegrationState.code == EnumIntegrationProcess.States.Process);
+                string dateIntegrationData = (_integrationProcessLog2 == null) ? null : _integrationProcessLog2.dateAction.ToString();
+
+            }
+
+            @Html.DevExpress().TextBox(settings =>
+           {
+               settings.Name = "dateProcess";
+               settings.Width = Unit.Percentage(100);
+               settings.Text = dateIntegrationData;
+               settings.ReadOnly = true;
+           }).GetHtml()
+
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,221 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ItemTypeCategory
+
+    <table class="table table-condensed">
+      
+        @*<tr>
+            <td style="width: 12%;">
+                @Html.DevExpress().LabelFor(m => m.id_inventoryLine, settings =>
+                {
+                    settings.Text = "Linea de Inventario:*";
+                    settings.AssociatedControlName = "id_inventoryLine";
+
+                }).GetHtml()
+            </td>
+            <td colspan="2">
+                @{
+                    int? id_inventoryLine = (Model != null && Model.id_inventoryLine != 0) ? (int?) Model.id_inventoryLine : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_inventoryLine, settings => {
+                    settings.Properties.ClientInstanceName = "id_inventoryLine";
+
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueType = typeof(int);
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "Seleccione Linea de Inventario";
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnItemTypeCategoriesInventoryLineValidation";
+                    
+
+                }).BindList(DataProviderInventoryLine.InventoryLinesByCompanyAndCurrent((int)ViewData["id_company"], id_inventoryLine)).Bind(id_inventoryLine).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_itemType, settings =>
+                {
+                    settings.Text = "Tipo de Producto:*";
+                    settings.AssociatedControlName = "id_itemType";
+                }).GetHtml()
+            </td>
+            <td colspan="2">
+                @{
+                    int? id_itemType = (Model != null && Model.id_itemType != 0) ? (int?) Model.id_itemType : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_itemType, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "id_itemType";
+
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueType = typeof(int);
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.NullText = "Seleccione Tipo de Produdcto";
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnItemTypeCategoriesItemTypeValidation";
+                }).BindList(DataProviderItemType.ItemsTypesByInventoryLineCompanyCurrent((int)ViewData["id_company"], id_inventoryLine, id_itemType)).Bind(id_itemType).GetHtml()
+
+            </td>
+        </tr>*@
+        <tr>  
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.name, settings =>
+                {
+                    settings.Text = "Nombre:*";
+                    settings.AssociatedControlName = "name";
+                }).GetHtml()
+            </td>
+            <td style="width: 42%;">
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+                {
+                    settings.Name = "name";
+                    settings.Properties.ClientInstanceName = "name";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "Nombre del Tipo de Producto";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnItemTypeCategoriesNameValidation";
+                }).GetHtml()
+            </td>
+            <td style="width: 13%;">
+                @Html.DevExpress().LabelFor(m => m.code, settings =>
+                {
+                    settings.Text = "Código:";
+                    settings.AssociatedControlName = "code";
+                }).GetHtml()
+            </td>
+            <td style="width: 37%;">
+                @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+                {
+                    settings.Name = "code";
+                    settings.Properties.ClientInstanceName = "code";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "Ej: Código";
+                    settings.Properties.ClientSideEvents.Validation = "OnItemTypeCategoriesCodeValidation";
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Text = "Tipo de Producto:*";
+               settings.Name = "itemTypeLabel";
+               //settings.AssociatedControlName = "id_itemType";
+           }).GetHtml()
+            </td>
+            <td style="width: 42%;">
+                @{
+                    int? id_itemTypeCategory = (Model != null && Model.id != 0) ? (int?)Model.id : null;
+                }
+                @Html.Hidden("id_itemTypeCategory", id_itemTypeCategory)
+                @Html.DevExpress().TokenBox(settings =>
+               {
+                   settings.Name = "itemTypes";
+                   settings.Properties.ClientInstanceName = "itemTypes";
+
+                   settings.Properties.ValueField = "id";
+                   settings.Properties.TextField = "name";
+                   //settings.Properties.ValueType = typeof(int);
+
+                   settings.Width = Unit.Percentage(100);
+
+                   settings.Properties.NullDisplayText = "Seleccione Tipo de Produdcto";
+                   settings.Properties.NullText = "Seleccione Tipo de Produdcto";
+                   //settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                   //settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                   //settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                   settings.Properties.ClientSideEvents.Init = "TokenItemType_Init";
+                   settings.ShowModelErrors = true;
+                   settings.Properties.ClientSideEvents.ValueChanged = "TokenItemType_ValueChanged";
+                   settings.Properties.ClientSideEvents.Validation = "OnItemTypeCategoriesItemTypeValidation";
+               }).BindList(DataProviderItemType.ItemsTypesByCompanyAndCurrent((int)ViewData["id_company"], null)).GetHtml()
+            </td>
+            <td style="width: 13%;">
+                
+            </td>
+            <td style="width: 37%;">
+                
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.description, settings =>
+                {
+                    settings.Text = "Descripción:";
+                    settings.AssociatedControlName = "description";
+
+                }).GetHtml()
+            </td>
+            <td colspan="3">
+                @Html.DevExpress().MemoFor(m => m.description, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "description";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "";
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 8%;">
+                @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+                {
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "isActive";
+
+                }).GetHtml()</td>
+            <td colspan="3">
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "isActive";
+                    settings.Width = Unit.Percentage(100);
+
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr id="itemTypeCategoryAlertRow" style="display: none;">
+            <td colspan="4">
+                <div class="alert alert-danger fade in" style="margin-top: 18px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                    <span id="itemTypeCategoryErrorMessage"></span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+<script src="~/Scripts/itemtypecategory/editform.js"></script>

@@ -1,0 +1,1340 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InvoiceCommercial
+@{ 
+	var documentOrigin = DataProviderDocument.Document(Model.Document.id_documentOrigen);
+	var etiqueta = ((documentOrigin != null) && documentOrigin.DocumentType.code == "131")
+		? "Proforma" : ((documentOrigin != null) && documentOrigin.DocumentType.code == "07")
+		? "Factura" : string.Empty;
+}
+
+
+<div id="formLayoutEditInvoiceCommercialMainFormTab">
+	@{
+		DocumentState documentState = (Model != null && Model.Document != null && Model.Document.id_documentState != 0)
+			? DataProviderDocumentState.DocumentStateById(Model.Document.id_documentState)
+			: DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+
+		Html.DevExpress<InvoiceCommercial>
+			().FormLayout(settings =>
+			{
+
+				settings.Name = "formLayoutEditInvoiceCommercialMainFormTab2";
+				settings.ColCount = 2;
+
+				#region groupEditMainFormTab
+
+				var groupEditMainFormTab = settings.Items.AddGroupItem(i =>
+				{
+					i.Caption = "   ";
+					i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+					i.ColSpan = 2;
+					i.ColCount = 2;
+					i.GroupBoxDecoration = GroupBoxDecoration.None;
+				});
+
+				#endregion
+
+				#region Fila 3
+
+				//id_Language
+				groupEditMainFormTab.Items.Add(m => m.id_Language, item =>
+				{
+					item.Name = "id_Language";
+					item.Caption = "Idioma Factura";
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_Language";
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.DataSource = DataProvidertbsysCatalogue.AlltbsysCatalogueDetailByCode("LANG");
+						comboBox.Properties.ValueType = typeof(string);
+
+						comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_Language_CSI.isReadOnly;
+
+						if (Model.id_Language_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+					});
+				});
+
+				if (!String.IsNullOrEmpty(etiqueta))
+				{
+					groupEditMainFormTab.Items.Add(m => m.Document.Document2.number, item =>
+					{
+						item.Name = "noProforma";
+						item.Caption = etiqueta;
+
+						item.NestedExtension().TextBox(textbox =>
+						{
+							textbox.Width = Unit.Percentage(100);
+							textbox.Properties.NullText = "0";
+							textbox.Enabled = false;
+						});
+					});
+				}
+				else
+				{
+					groupEditMainFormTab.Items.AddEmptyItem();
+				}
+
+
+				#endregion
+
+				#region groupGeneralInformation
+
+				var groupGeneralInformation = settings.Items.AddGroupItem(i =>
+				{
+					i.Caption = "Información General";
+					i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+					i.ColSpan = 2;
+					i.ColCount = 2;
+					i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+				});
+
+				#region Fila 1
+
+				//id_ForeignCustomer
+				groupGeneralInformation.Items.Add(m => m.id_ForeignCustomer, item =>
+				{
+					item.Name = "id_ForeignCustomer";
+					item.Caption = "Cliente del Exterior";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_ForeignCustomer";
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.DataSource = DataProviderPerson.CustomerByCompanyWithForeignCustomer((int?)ViewData["id_company"]);
+						comboBox.Properties.ValueType = typeof(string);
+
+						comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_ForeignCustomer_CSI.isReadOnly;
+
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnChangeBuyer";
+						if (Model.id_ForeignCustomer_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+						comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+					});
+				});
+
+				//businessNameForeignCustomer
+				groupGeneralInformation.Items.Add(m => m.ForeignCustomer.Person.fullname_businessName, item =>
+				{
+					item.Name = "businessNameForeignCustomer";
+					item.Caption = "Razón Social";
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+
+						textBox.Width = Unit.Percentage(100);
+
+						textBox.ReadOnly = true;
+						textBox.Properties.ClientInstanceName = "businessNameForeignCustomer";
+						textBox.ShowModelErrors = true;
+					});
+				});
+
+				#endregion
+
+				#region Fila 2
+
+				//identification_numberForeignCustomer
+				groupGeneralInformation.Items.Add(m => m.ForeignCustomer.Person.identification_number, item =>
+				{
+					item.Name = "identification_numberForeignCustomer";
+					item.Caption = "Ruc/C.I.";
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+						textBox.Width = Unit.Percentage(100);
+
+						textBox.ReadOnly = true;
+						textBox.Properties.ClientInstanceName = "identification_numberForeignCustomer";
+						textBox.ShowModelErrors = true;
+					});
+				});
+
+				//emailForeignCustomer
+				groupGeneralInformation.Items.Add(m => m.ForeignCustomer.Person.email, item =>
+				{
+					item.Name = "emailForeignCustomer";
+					item.Caption = "E-mail";
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+						textBox.Width = Unit.Percentage(100);
+
+						textBox.ReadOnly = true;
+						textBox.Properties.ClientInstanceName = "emailForeignCustomer";
+						textBox.ShowModelErrors = true;
+
+					});
+				});
+
+				#endregion
+
+				#region Fila 3
+
+				//addressForeignCustomer
+				groupGeneralInformation.Items.Add(m => m.ForeignCustomerIdentification.addressForeign, item =>
+				{
+
+					item.Name = "addressForeignCustomer";
+					item.Caption = "Dirección";
+					item.ColSpan = 2;
+
+					item.NestedExtension().Memo(memo =>
+					{
+						memo.Properties.ClientInstanceName = "addressForeignCustomer";
+						memo.Width = Unit.Percentage(100);
+						memo.Properties.Rows = 2;
+						memo.ReadOnly = true;
+						memo.ShowModelErrors = true;
+					});
+				});
+
+				#endregion
+
+
+				#region Fila 4
+
+				//id_Consignee
+				groupGeneralInformation.Items.Add(m => m.id_Consignee, item =>
+				{
+					item.Name = "id_Consignee";
+					item.Caption = "Consignatario";
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_Consignee";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.Columns.Add("name", "Nombre", 140);
+						comboBox.Properties.Columns.Add("phone", "phone", 0);
+						comboBox.Properties.Columns.Add("fax", "fax", 0);
+
+						comboBox.Properties.DataSource = DataProviderPerson.CustomerByCompanyWithForeignCustomer((int?)ViewData["id_company"]);
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{0}";
+						comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_Consignee_CSI.isReadOnly;
+
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpSubFijo"] = "Consignee";
+						};
+
+						if (Model.id_Consignee_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "person2_SelectedIndexChanged";
+						comboBox.Enabled = (Model.Document.id_documentOrigen == null);
+					});
+				});
+
+				#endregion
+
+
+				#region Fila 4/2
+
+				//Telefono Consignee
+				groupGeneralInformation.Items.Add(m => m.ForeignCustomerIdentification.phone1FC, item =>
+				{
+					item.Name = "telefono_Consignee";
+					item.Caption = "Teléfono";
+
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+						textBox.Width = Unit.Percentage(100);
+
+
+						textBox.ReadOnly = true;
+						textBox.Properties.ClientInstanceName = "telefono_Consignee";
+						textBox.ShowModelErrors = true;
+					});
+				});
+				groupGeneralInformation.Items.AddEmptyItem();
+
+				#endregion
+
+				#region Fila 5
+
+				//id_Notifier
+				groupGeneralInformation.Items.Add(m => m.id_Notifier, item =>
+				{
+					item.Name = "id_Notifier";
+					item.Caption = "Notificador";
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_Notifier";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.Columns.Add("name", "Nombre", 140);
+						comboBox.Properties.Columns.Add("phone", "phone", 0);
+						comboBox.Properties.Columns.Add("fax", "fax", 0);
+						comboBox.Properties.DataSource = DataProviderPerson.CustomerByCompanyWithForeignCustomer((int?)ViewData["id_company"]);
+						comboBox.Properties.ValueType = typeof(string);
+						comboBox.Properties.TextFormatString = "{0}";
+						comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_Notifier_CSI.isReadOnly;
+
+						comboBox.CustomJSProperties = (s, e) =>
+						{
+							e.Properties["cpSubFijo"] = "Notifier";
+						};
+
+						if (Model.id_Notifier_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "person2_SelectedIndexChanged";
+
+
+					});
+				});
+
+
+				#region Fila 5/2
+
+				//Telefono Notify
+				groupGeneralInformation.Items.Add(m => m.Person.cellPhoneNumberPerson, item =>
+				{
+					item.Name = "telefono_Notifier";
+					item.Caption = "Teléfono";
+
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+						textBox.Width = Unit.Percentage(100);
+
+
+						textBox.ReadOnly = true;
+						textBox.Properties.ClientInstanceName = "telefono_Notifier";
+						textBox.ShowModelErrors = true;
+					});
+				});
+
+				groupGeneralInformation.Items.AddEmptyItem();
+
+				#endregion
+
+
+				//id_Notifier 2
+				groupGeneralInformation.Items.Add(m => m.id_Notifier2, item =>
+				{
+					item.Name = "id_Notifier2";
+					item.Caption = "Notificador 2";
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_Notifier2";
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.DataSource = DataProviderPerson.CustomerByCompanyWithForeignCustomer((int?)ViewData["id_company"]);
+						comboBox.Properties.ValueType = typeof(string);
+
+						comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_Notifier2_CSI.isReadOnly;
+
+						if (Model.id_Notifier2_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+						comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+					});
+				});
+
+				#endregion
+
+				#endregion
+
+				#region groupNegotiationInformation
+
+				var groupNegotiationInformation = settings.Items.AddGroupItem(i =>
+				{
+					i.Caption = "Información de Negociación";
+					i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+					i.ColSpan = 2;
+					i.ColCount = 2;
+					i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+				});
+
+				#region Fila 1
+
+				//purchaseOrder
+				groupNegotiationInformation.Items.Add(m => m.purchaseOrder, item =>
+				{
+					item.Name = "purchaseOrderInvoiceCommercial";
+					item.Caption = "Orden de Pedido";
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+						textBox.Width = Unit.Percentage(100);
+
+						textBox.ReadOnly = Model.purchaseOrder_CSI.isReadOnly;
+						textBox.Properties.ClientInstanceName = "purchaseOrderInvoiceCommercial";
+						if (Model.purchaseOrder_CSI.isRequired)
+						{
+							textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						textBox.Properties.ValidationSettings.CausesValidation = true;
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						textBox.Properties.ValidationSettings.SetFocusOnError = true;
+						textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+						textBox.Enabled = (Model.Document.id_documentOrigen == null);
+					});
+				});
+
+				//Empty Col1
+				groupNegotiationInformation.Items.AddEmptyItem();
+
+				#endregion
+
+				#region Fila 1/2
+
+				//letterCredit
+				groupNegotiationInformation.Items.Add(m => m.letterCredit, item =>
+				{
+					item.Name = "letterCredit";
+					item.Caption = "Carta de Crédito";
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+
+						textBox.Width = Unit.Percentage(100);
+						//textBox.Properties.MaxLength = 20;
+						//textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+						textBox.ReadOnly = Model.letterCredit_CSI.isReadOnly;
+						textBox.Properties.ClientInstanceName = "letterCredit";
+						if (Model.letterCredit_CSI.isRequired)
+						{
+							textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						textBox.Properties.ValidationSettings.CausesValidation = true;
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						textBox.Properties.ValidationSettings.SetFocusOnError = true;
+						textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+					});
+				});
+
+				//Empty Col1
+				groupNegotiationInformation.Items.AddEmptyItem();
+
+				#endregion
+
+				#region Fila 2
+
+				//id_termsNegotiation
+				groupNegotiationInformation.Items.Add(m => m.id_termsNegotiation, item =>
+				{
+					item.Name = "id_termsNegotiation";
+					item.Caption = "Término de Negociación";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_termsNegotiation";
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.Columns.Add("code", "Cod.", 40);
+						comboBox.Properties.Columns.Add("name", "Nombre", 160);
+
+						comboBox.Properties.DataSource = DataProviderTermsNegotiation.AllTermsNegotiation();
+						comboBox.Properties.ValueType = typeof(string);
+
+						//comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_termsNegotiation_CSI.isReadOnly;
+
+						if (Model.id_termsNegotiation_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "TermsNegotiation_SelectedIndexChanged";
+						comboBox.Enabled = (Model.Document.id_documentOrigen == null);
+					});
+				});
+
+				//Empty Col1
+				groupNegotiationInformation.Items.AddEmptyItem();
+
+				#endregion
+
+
+
+				//id_PaymentMethod
+				groupNegotiationInformation.Items.Add(m => m.idPortfolioFinancing, item =>
+				{
+					item.Name = "idPortfolioFinancing";
+					item.Caption = "Financiamiento de Cartera:";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "idPortfolioFinancing";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.DataSource = DataProvidertbsysCatalogue.AlltbsysCatalogueDetailByCode("PFN");
+						comboBox.Properties.ValueType = typeof(string);
+
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.ReadOnly = Model.idPortfolioFinancing_CSI.isReadOnly;
+
+						if (Model.idPortfolioFinancing_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.AllowNull = true;
+
+					});
+				});
+
+				#region Fila 3
+
+				//id_PaymentMethod
+				groupNegotiationInformation.Items.Add(m => m.id_PaymentMethod, item =>
+				{
+					item.Name = "id_PaymentMethod";
+					item.Caption = "Forma de Pago";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_PaymentMethod";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.TextField = "name";
+						comboBox.Properties.DataSource = DataProviderPaymentMethod.FXPaymentMethods();
+						comboBox.Properties.ValueType = typeof(string);
+
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.Columns.Add("code", "Cod.", 25);
+						comboBox.Properties.Columns.Add("description", "Forma de Pago", 170);
+
+
+						comboBox.ReadOnly = Model.id_PaymentMethod_CSI.isReadOnly;
+
+						if (Model.id_PaymentMethod_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "InvoiceCommercialPaymentMethod_SelectedIndexChanged";
+					});
+				});
+
+				#endregion
+
+				#region Fila 4
+
+				//id_PaymentTerm
+				groupNegotiationInformation.Items.Add(m => m.id_PaymentTerm, item =>
+				{
+					item.Name = "id_PaymentTerm";
+					item.Caption = "Plazo";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						int? id_PaymentMethod2 = (Model != null && Model.id_PaymentMethod != null) ? (int?)Model.id_PaymentMethod : null;
+						int? id_PaymentTerm = (Model != null && Model.id_PaymentTerm != null) ? (int?)Model.id_PaymentTerm : null;
+
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_PaymentTerm";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.DataSource = DataProviderPaymentTerm.InvoiceExteriorPaymentsTermsByPaymentsMethodandCurrent(id_PaymentMethod2, id_PaymentTerm);
+						comboBox.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "GetPaymentTerm" };
+						comboBox.Properties.ValueType = typeof(int);
+						comboBox.Properties.Columns.Add("code", "Cod.", 20);
+						comboBox.Properties.Columns.Add("description", "Plazo", 160);
+						comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_PaymentTerm_CSI.isReadOnly;
+
+						if (Model.id_PaymentTerm_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+
+					});
+				});
+
+				#endregion
+
+				#region Fila 4-1 BankTransfer
+				groupNegotiationInformation.Items.Add(m => m.id_BankTransfer, item =>
+				{
+					item.Name = "id_BankTransfer";
+					//item.ClientVisible = false;
+					item.Caption = "Banco de Transferencia";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_BankTransfer";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.DataSource = DataProviderCatalogue.GetTbsysCatalogueDetailBySetting("DBK");
+						comboBox.Properties.ValueType = typeof(int);
+						comboBox.Properties.Columns.Add("code", "Cod.", 20);
+						comboBox.Properties.Columns.Add("description", "Plazo", 160);
+						comboBox.ShowModelErrors = true;
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.ClientEnabled = false;
+
+						comboBox.Properties.NullDisplayText = "";
+						comboBox.Properties.NullText = "";
+
+
+						PaymentMethod _PaymentMethod = DataProviderPaymentMethod.PaymentMethodById(Model.id_PaymentMethod);
+
+						if (_PaymentMethod != null)
+						{
+							if (_PaymentMethod.code == "TR")
+							{
+								comboBox.ClientEnabled = true;
+							}
+						}
+
+
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "BankTransfer_SelectedIndexChanged";
+
+
+					});
+				});
+
+
+				/* incluir si id_BankTransfer != null seccion */
+				string htmlBankInfo = "";
+				if (Model.id_BankTransfer != null)
+				{
+					tbsysCatalogueDetail _catalogueDetail = DataProviderCatalogue.GetCatalogueDetailById((int)Model.id_BankTransfer);
+					if (_catalogueDetail != null)
+					{
+						htmlBankInfo = @_catalogueDetail.fldFullText;
+					}
+
+				}
+
+				groupNegotiationInformation.Items.Add(item =>
+				{
+					item.Name = "infoBankTransfer";
+					item.Caption = "Información Transferencia";
+
+					item.NestedExtension().Memo(memoD =>
+					{
+
+						memoD.Width = Unit.Percentage(100);
+						memoD.Text = htmlBankInfo;
+
+						memoD.ReadOnly = true;
+						memoD.Properties.ClientInstanceName = "infoBankTransfer";
+						memoD.Properties.Rows = (Model.id_BankTransfer == null) ? 1 : 10;
+
+
+					});
+				});
+
+				#endregion
+
+
+
+
+				#region Fila 5
+
+				//idVendor
+				groupNegotiationInformation.Items.Add(m => m.idVendor, item =>
+				{
+					item.Name = "idVendor";
+					item.Caption = "Vendedor";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "idVendor";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.DataSource = DataProviderVendor.VendorList();
+						comboBox.Properties.ValueType = typeof(string);
+
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.Columns.Add("identification_number", "Doc. Identidad");
+						comboBox.Properties.Columns.Add("fullname_businessName", "Vendedor");
+
+
+						comboBox.ReadOnly = Model.idVendor_CSI.isReadOnly;
+
+						if (Model.idVendor_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Enabled = (Model.Document.id_documentOrigen == null);
+
+					});
+				});
+
+				#endregion
+
+				#endregion
+
+				#region Informacion Transporte
+				var groupNegotiationTransporte = settings.Items.AddGroupItem(i =>
+				{
+					i.Caption = "Información de Transporte";
+					i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+					i.ColSpan = 2;
+					i.ColCount = 2;
+					i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+				});
+
+				#region Fila 5
+
+				//dateShipment
+				groupNegotiationTransporte.Items.Add(m => m.dateShipment, item =>
+				{
+					item.Name = "dateShipment";
+					item.Caption = "Fecha de Embarque";
+					item.NestedExtension().DateEdit(dateEdit =>
+					{
+
+						dateEdit.Width = Unit.Percentage(100);
+
+						dateEdit.ReadOnly = Model.dateShipment_CSI.isReadOnly;
+
+						dateEdit.Properties.DisplayFormatInEditMode = true;
+						dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+						dateEdit.Properties.ClientInstanceName = "dateShipment";
+						if (Model.dateShipment_CSI.isRequired)
+						{
+							dateEdit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							dateEdit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						dateEdit.Properties.ValidationSettings.CausesValidation = true;
+						dateEdit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						dateEdit.Properties.ValidationSettings.ValidateOnLeave = true;
+						dateEdit.Properties.ValidationSettings.SetFocusOnError = true;
+						dateEdit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						dateEdit.Properties.ClientSideEvents.Validation = "DateEditdateShipment_Validation";
+					});
+				});
+
+				//id_portShipment
+				groupNegotiationTransporte.Items.Add(m => m.id_portShipment, item =>
+				{
+					item.Name = "id_portShipment";
+					item.Caption = "Puerto de Embarque";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_portShipment";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.Columns.Add("code", "Cod.", 70);
+						comboBox.Properties.Columns.Add("name", "Nombre", 150);
+						comboBox.Properties.Columns.Add("idCity", "idCity", 0);
+						comboBox.Properties.DataSource = DataProviderPort.PortAllCityCountry((int)ViewData["id_company"],true);
+						comboBox.Properties.ValueType = typeof(string);
+
+						//comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_portShipment_CSI.isReadOnly;
+
+						if (Model.id_portShipment_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+					});
+				});
+
+				#endregion
+
+				#region Fila 6
+
+				//id_portDestination
+				groupNegotiationTransporte.Items.Add(m => m.id_portDestination, item =>
+				{
+					item.Name = "id_portDestination";
+					item.Caption = "Puerto Destino";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_portDestination";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("code", "Cod.", 70);
+						comboBox.Properties.Columns.Add("name", "Nombre", 150);
+						comboBox.Properties.Columns.Add("idCity", "idCity", 0);
+						comboBox.Properties.DataSource = DataProviderPort.PortAllCityCountry((int)ViewData["id_company"]);
+						comboBox.Properties.ValueType = typeof(string);
+
+						//comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_portDestination_CSI.isReadOnly;
+
+						if (Model.id_portDestination_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "portDestination_SelectedIndexChanged";
+					});
+				});
+
+				//id_portDischarge
+				groupNegotiationTransporte.Items.Add(m => m.id_portDischarge, item =>
+				{
+					item.Name = "id_portDischarge";
+					item.Caption = "Puerto Descarga";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_portDischarge";
+						comboBox.Properties.ValueField = "id";
+
+						comboBox.Properties.TextFormatString = "{1}";
+
+						comboBox.Properties.Columns.Add("code", "Cod.", 700);
+						comboBox.Properties.Columns.Add("name", "Nombre", 120);
+
+						comboBox.Properties.DataSource = DataProviderPort.PortAllCityCountry((int)ViewData["id_company"]);
+						comboBox.Properties.ValueType = typeof(string);
+
+						// comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_portDischarge_CSI.isReadOnly;
+
+						if (Model.id_portDischarge_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+					});
+				});
+
+				#endregion
+
+				#region Fila 6 1 / 7
+				groupNegotiationTransporte.Items.Add(m => m.etaDate, item =>
+				{
+					item.Name = "etaDate";
+					item.Caption = "Fecha de Arribo";
+
+
+					item.NestedExtension().DateEdit(textBox =>
+					{
+
+						textBox.Width = Unit.Percentage(110);
+						textBox.ReadOnly = Model.etaDate_CSI.isReadOnly;
+						textBox.Properties.ClientInstanceName = "etaDate";
+						if (Model.etaDate_CSI.isRequired)
+						{
+							textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+							textBox.Properties.ClientSideEvents.Validation = "DateEtaDate_Validation";
+						}
+
+						textBox.ShowModelErrors = true;
+					});
+				});
+
+				groupNegotiationTransporte.Items.AddEmptyItem();
+
+				#endregion
+
+				#region Fila 6/7
+				groupNegotiationTransporte.Items.Add(m => m.id_CityDelivery, item =>
+				{
+					item.Name = "id_CityDelivery";
+					item.Caption = "Ciudad de Entrega";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.ColSpan = 2;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_CityDelivery";
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextFormatString = "{2}";
+
+						comboBox.Properties.Columns.Add("code", "Cod.", 40);
+						comboBox.Properties.Columns.Add("nombrePais", "País", 200);
+						comboBox.Properties.Columns.Add("nombreCiudad", "Ciudad", 120);
+						comboBox.Properties.DataSource = DataProviderCountry.ContriesCities((int)ViewData["id_company"]);
+						comboBox.Properties.ValueType = typeof(string);
+
+						//comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_CityDelivery_CSI.isReadOnly;
+
+						if (Model.id_CityDelivery_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+					});
+				});
+
+
+				#endregion
+
+
+				#region Fila 7
+
+				//id_shippingAgency
+				groupNegotiationTransporte.Items.Add(m => m.id_shippingAgency, item =>
+				{
+					item.Name = "id_shippingAgency";
+					item.Caption = "Agencia Naviera";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_shippingAgency";
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.Columns.Add("code", "Cod.", 50);
+						comboBox.Properties.Columns.Add("name", "Agencia Naviera", 160);
+						comboBox.Properties.DataSource = DataProviderShippingAgency.AllShippingAgency();
+						comboBox.Properties.ValueType = typeof(string);
+
+						//comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_shippingAgency_CSI.isReadOnly;
+						if (Model.id_shippingAgency_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+						comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "InvoiceCommercialShippingAgency_SelectedIndexChanged";
+					});
+				});
+
+
+				//id_shippingAgency
+				groupNegotiationTransporte.Items.Add(m => m.id_shippingLine, item =>
+				{
+					item.Name = "id_shippingLine";
+					item.Caption = "Línea Naviera";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						int? id_ShippingAgency2 = (Model != null && Model.id_shippingAgency != null) ? (int?)Model.id_shippingAgency : null;
+						int? id_ShippingLine = (Model != null && Model.id_shippingLine != 0) ? (int?)Model.id_shippingLine : null;
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_shippingLine";
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.Columns.Add("code", "Cod.", 50);
+						comboBox.Properties.Columns.Add("description", "Linea Naviera", 160);
+						comboBox.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "GetShippingLine"/*, TextField = "CityName"*/ };
+						comboBox.Properties.ClientSideEvents.EndCallback = "OnshippingLine_EndCallback";
+						comboBox.Properties.DataSource = DataProviderShippingLine.InvoiceExteriorShippingLineByShippingAgencyandCurrent(id_ShippingAgency2, id_ShippingLine);
+						comboBox.Properties.ValueType = typeof(string);
+
+						//comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_shippingLine_CSI.isReadOnly;
+						if (Model.id_shippingLine_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+					});
+				});
+
+				#endregion
+
+				#region Fila 8
+
+
+				//shipName
+				groupNegotiationTransporte.Items.Add(m => m.shipName, item =>
+				{
+					item.Name = "shipName";
+					item.Caption = "Buque";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.NestedExtension().TextBox(textBox =>
+					{
+
+						textBox.Width = Unit.Percentage(100);
+						textBox.Properties.MaxLength = 80;
+
+						textBox.ReadOnly = Model.shipName_CSI.isReadOnly;
+						textBox.Properties.ClientInstanceName = "shipName";
+						if (Model.shipName_CSI.isRequired)
+						{
+							textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						textBox.Properties.ValidationSettings.CausesValidation = true;
+						textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						textBox.Properties.ValidationSettings.SetFocusOnError = true;
+						textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+					});
+				});
+				//shipNumberTrip
+				groupNegotiationTransporte.Items.Add(m => m.shipNumberTrip, item =>
+				{
+					item.Name = "shipNumberTrip";
+					item.Caption = "Viaje";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+					item.NestedExtension().TextBox(spinedit =>
+					{
+
+						spinedit.Width = Unit.Percentage(100);
+						spinedit.Properties.ClientInstanceName = "shipNumberTrip";
+						spinedit.RightToLeft = DefaultBoolean.False;// Properties.text
+						spinedit.Properties.MaxLength = 10;
+						spinedit.ReadOnly = Model.shipNumberTrip_CSI.isReadOnly;
+
+						if (Model.shipNumberTrip_CSI.isRequired)
+						{
+							spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+							spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						spinedit.Properties.ValidationSettings.CausesValidation = true;
+						spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+						spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+						spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+					});
+				});
+
+				#endregion
+
+				#region Fila 9
+
+
+				//id_tariffHeading
+				groupNegotiationTransporte.Items.Add(m => m.id_tariffHeading, item =>
+				{
+					item.Name = "id_tariffHeading";
+					item.Caption = "Partida Arancelaria";
+					item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+					item.NestedExtension().ComboBox(comboBox =>
+					{
+
+						comboBox.Width = Unit.Percentage(100);
+						comboBox.Properties.ClientInstanceName = "id_tariffHeading";
+						comboBox.Properties.ValueField = "id";
+						comboBox.Properties.TextFormatString = "{1}";
+						comboBox.Properties.Columns.Add("code", "Cod.", 120);
+						comboBox.Properties.Columns.Add("nombre", "Partida Arancelaria", 160);
+						comboBox.Properties.DataSource = DataProviderTariffHeading.AllTariffHeading();
+						comboBox.Properties.ValueType = typeof(string);
+
+						//comboBox.ShowModelErrors = true;
+						comboBox.ReadOnly = Model.id_tariffHeading_CSI.isReadOnly;
+
+						if (Model.id_tariffHeading_CSI.isRequired)
+						{
+							comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+						comboBox.Properties.ValidationSettings.CausesValidation = true;
+						comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+						comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+						comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+						comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+						comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+
+
+					});
+				});
+
+				groupNegotiationTransporte.Items.AddEmptyItem();
+
+				groupNegotiationTransporte.Items.Add(m => m.BLNumber, item =>
+				{
+					item.Name = "BLNumber";
+					item.Caption = "Número B/L";
+
+					item.NestedExtension().TextBox(textBox =>
+					{
+
+						textBox.Width = Unit.Percentage(100);
+
+
+						textBox.ReadOnly = Model.BLNumber_CSI.isReadOnly;
+						textBox.Properties.ClientInstanceName = "BLNumber";
+						if (Model.BLNumber_CSI.isRequired)
+						{
+							textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+
+						textBox.ShowModelErrors = true;
+					});
+				});
+
+				groupNegotiationTransporte.Items.Add(m => m.blDate, item =>
+				{
+					item.Name = "blDate";
+					item.Caption = "Fecha B/L";
+
+
+
+					item.NestedExtension().DateEdit(textBox =>
+					{
+
+						textBox.Width = Unit.Percentage(100);
+
+						textBox.ReadOnly = Model.blDate_CSI.isReadOnly;
+						textBox.Properties.ClientInstanceName = "blDate";
+						if (Model.blDate_CSI.isRequired)
+						{
+							textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+						}
+
+
+						textBox.ShowModelErrors = true;
+					});
+				});
+
+				groupNegotiationTransporte.Items.AddEmptyItem();
+				#endregion
+
+
+				#endregion
+
+			}).Render();
+
+	}
+
+</div>

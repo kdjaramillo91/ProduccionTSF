@@ -1,0 +1,199 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.Document
+@{
+    string codeState = (Model != null && Model.DocumentState != null && Model.DocumentState.code != "") ? Model.DocumentState.code : "";
+    var productionSchedulePeriod = (Model != null && Model.ProductionSchedule != null && Model.ProductionSchedule.ProductionSchedulePeriod != null) ? Model.ProductionSchedule.ProductionSchedulePeriod : null;
+    string dateEndProductionSchedulePeriod = (productionSchedulePeriod != null) ? productionSchedulePeriod.dateEnd.ToString("dd/MM/yyyy") : "";
+    string dateStarProductionSchedulePeriod = (productionSchedulePeriod != null) ? DateTime.Now.ToString("dd/MM/yyyy")/*productionSchedulePeriod.dateStar.ToString("dd/MM/yyyy")*/ : "";
+}
+@Html.Hidden("dateStarProductionSchedulePeriod", dateStarProductionSchedulePeriod)
+@Html.Hidden("dateEndProductionSchedulePeriod", dateEndProductionSchedulePeriod)
+
+<table id="productionScheduleDocument" class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.DocumentType.name, settings =>
+            {
+                settings.Name = "documentTypeLabel";
+                settings.Text = "Tipo de Documento:";
+                settings.AssociatedControlName = "documentType";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.HiddenFor(m => m.id_documentType, new { @id = "id_documentType" })
+            @Html.DevExpress().TextBoxFor(m => m.DocumentType.name, settings =>
+       {
+           settings.Name = "documentTypeName";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnValidation";
+           //settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+       }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.number, settings =>
+            {
+                settings.Name = "numberLabel";
+                settings.Text = "No. Documento:";
+                settings.AssociatedControlName = "number";
+
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.number, settings =>
+       {
+           settings.Name = "number";
+           settings.Properties.ClientInstanceName = "number";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnValidation";
+           //settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+       }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.DocumentState.name, settings =>
+            {
+                settings.Name = "documentStateLabel";
+                settings.Text = "Estado:";
+                settings.AssociatedControlName = "documentState";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.HiddenFor(m => m.id_documentState, new { @id = "id_documentState" })
+            @Html.DevExpress().TextBoxFor(m => m.DocumentState.name, settings =>
+       {
+           settings.Name = "documentStateName";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnValidation";
+           //settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+       }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.emissionDate, settings =>
+            {
+                settings.Name = "emissionDateLabel";
+                settings.Text = "Fecha de Emisión:";
+                settings.AssociatedControlName = "emissionDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.emissionDate, settings =>
+           {
+               settings.Name = "emissionDate";
+               settings.Properties.ClientInstanceName = "emissionDate";
+               settings.Width = Unit.Percentage(100);
+               settings.ReadOnly = codeState != "01"; //(@Model.id != 0);
+                //settings.Properties.DropDownButton.Visible = false;
+               settings.Properties.ClientSideEvents.Validation = "OnProductionScheduleEmissionDateValidation";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionSchedule.id_productionSchedulePeriod, settings =>
+                {
+                    settings.Name = "productionSchedulePeriodLabel";
+                    settings.Text = "Período:";
+                    settings.AssociatedControlName = "productionSchedulePeriod";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_productionSchedulePeriod = (Model != null && Model.ProductionSchedule != null && Model.ProductionSchedule.id_productionSchedulePeriod != 0) ? (int?)Model.ProductionSchedule.id_productionSchedulePeriod : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.ProductionSchedule.id_productionSchedulePeriod, settings =>
+       {
+           settings.Name = "id_productionSchedulePeriod";
+           settings.Properties.ClientInstanceName = "id_productionSchedulePeriod";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "periodo";
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Enabled = id_productionSchedulePeriod == null;
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Init = "ProductionSchedulePeriodCombo_Init";
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "ProductionSchedulePeriodCombo_SelectedIndexChanged";
+           settings.Properties.ClientSideEvents.Validation = "OnProductionSchedulePeriodValidation";
+
+       }).BindList(DataProviderProductionSchedulePeriod.ProductionSchedulePeriodsByCompanyAndCurrentWithout((int?)ViewData["id_company"], id_productionSchedulePeriod)).Bind(id_productionSchedulePeriod).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionSchedule.Employee.Person.fullname_businessName, settings =>
+            {
+                settings.Name = "personScheduleLabel";
+                settings.Text = "Planificador:";
+                settings.AssociatedControlName = "personSchedule";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_personSchedule = (Model != null && Model.ProductionSchedule != null && Model.ProductionSchedule.id_personSchedule != 0) ? (int?)Model.ProductionSchedule.id_personSchedule : null;
+                List<string> rols = new List<string> { "Empleado", "Planificador"};
+            }
+                @Html.DevExpress().ComboBoxFor(m => m.ProductionSchedule.id_personSchedule, settings =>
+       {
+                    settings.Name = "id_personSchedule";
+                    settings.Properties.ClientInstanceName = "id_personSchedule";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.TextField = "fullname_businessName";
+                    settings.Properties.ValueType = typeof(int);
+                    settings.Properties.Width = Unit.Percentage(100);
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                    settings.ReadOnly = codeState != "01";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnPersonScheduleValidation";
+
+       }).BindList(DataProviderPerson.RolsByCompanyAndCurrent((int?)ViewData["id_company"], id_personSchedule, rols)).Bind(id_personSchedule).GetHtml()
+        </td>
+
+        @*<td>
+            @Html.DevExpress().Label( settings =>
+            {
+                settings.Name = "accessKeyLabel";
+                settings.Text = "";
+                settings.AssociatedControlName = "accessKey";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "accessKeyLabel2";
+               settings.Text = "";
+               settings.AssociatedControlName = "accessKey2";
+           }).GetHtml()
+        </td>*@
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+            {
+                settings.Name = "descriptionLabel";
+                settings.Text = "Descripción:";
+                settings.AssociatedControlName = "description";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().MemoFor(m => m.description, settings =>
+       {
+           settings.Name = "description";
+           settings.Properties.ClientInstanceName = "description";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";
+           settings.Properties.ClientSideEvents.Validation = "OnValidation";
+           //settings.ShowModelErrors = true;
+       }).GetHtml()
+        </td>
+    </tr>
+</table>

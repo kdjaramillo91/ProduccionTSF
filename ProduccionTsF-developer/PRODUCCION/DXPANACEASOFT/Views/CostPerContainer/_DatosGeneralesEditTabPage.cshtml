@@ -1,0 +1,274 @@
+﻿@model CostPerContenedor
+<div id="datosGeneralesEditForm">
+	<div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "documentTypeLabel";
+						label.Text = "Tipo de Documento:";
+						label.AssociatedControlName = "documentType";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.Document.DocumentType.name,
+					textBox =>
+					{
+						textBox.Name = "documentType";
+						textBox.Properties.ClientInstanceName = "documentType";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "documentNumberLabel";
+						label.Text = "Nº de Documento:";
+						label.AssociatedControlName = "documentNumber";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.Document.number,
+					textBox =>
+					{
+						textBox.Name = "documentNumber";
+						textBox.Properties.ClientInstanceName = "documentNumber";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "documentStateLabel";
+						label.Text = "Estado:";
+						label.AssociatedControlName = "documentState";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBoxFor(
+					m => m.Document.DocumentState.name,
+					textBox =>
+					{
+						textBox.Name = "documentState";
+						textBox.Properties.ClientInstanceName = "documentState";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "periodoLabel";
+						label.Text = "Período:*";
+						label.AssociatedControlName = "mes";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				<table style="padding:0; border:0;">
+					<tr>
+						<td width="50%">
+							@Html.DevExpress().ComboBoxFor(
+								m => m.año,
+								comboBox =>
+								{
+									comboBox.Name = "año";
+									comboBox.Properties.ClientInstanceName = "año";
+									comboBox.Width = Unit.Percentage(100);
+
+									comboBox.Properties.ValueField = "Anio";
+									comboBox.Properties.TextField = "Anio";
+									comboBox.Properties.ValueType = typeof(int);
+
+									comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+									comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+									comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+									comboBox.ShowModelErrors = true;
+									comboBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+
+									comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnAnioCostPerContainerSelectedIndexChanged";
+
+									comboBox.CustomJSProperties = (s, e) =>
+									{
+										e.Properties["cpPeriodosUsables"] = this.ViewBag.PeriodosUsables;
+									};
+
+								}).BindList(this.ViewBag.AnioListModel).GetHtml()
+						</td>
+						<td width="50%">
+							@Html.DevExpress().ComboBoxFor(
+								m => m.mes,
+								comboBox =>
+								{
+									comboBox.Name = "mes";
+									comboBox.Properties.ClientInstanceName = "mes";
+									comboBox.Width = Unit.Percentage(100);
+
+									comboBox.Properties.ValueField = "Mes";
+									comboBox.Properties.TextField = "Mes";
+									comboBox.Properties.ValueType = typeof(int);
+
+									comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+									comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+									comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+									comboBox.ShowModelErrors = true;
+									comboBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+
+									comboBox.Properties.ClientSideEvents.Validation = "OnMesCostPerContainerValidation";
+									comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "OnMesCostPerContainerSelectedIndexChanged";
+
+								}).BindList(this.ViewBag.MesListModel).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "emissionDateLabel";
+						label.Text = "Fecha Emisión:*";
+						label.AssociatedControlName = "emissionDate";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().DateEditFor(
+					m => m.Document.emissionDate,
+					dateEdit =>
+					{
+						dateEdit.Name = "emissionDate";
+						dateEdit.Properties.ClientInstanceName = "emissionDate";
+						dateEdit.Width = Unit.Percentage(100);
+
+						dateEdit.Properties.DisplayFormatInEditMode = true;
+						dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+						dateEdit.Properties.EditFormat = EditFormat.Custom;
+						dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+
+						dateEdit.ShowModelErrors = true;
+						dateEdit.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+
+						dateEdit.Properties.ClientSideEvents.Validation = "OnEmissionDateCostPerContainerValidation";
+
+					}).GetHtml()
+			</div>
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "responsableLabel";
+						label.Text = "Responsable:";
+						label.AssociatedControlName = "responsable";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-3">
+				@Html.DevExpress().TextBox(
+					textBox =>
+					{
+						textBox.Name = "responsable";
+						textBox.Properties.ClientInstanceName = "responsable";
+						textBox.Width = Unit.Percentage(100);
+						textBox.ShowModelErrors = true;
+						textBox.ReadOnly = true;
+						textBox.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+
+						textBox.Text = this.ViewBag.ResponsableNombre;
+					}).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "referenceLabel";
+						label.Text = "Referencia:";
+						label.AssociatedControlName = "reference";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-11">
+				@Html.DevExpress().MemoFor(
+					m => m.Document.reference,
+					memo =>
+					{
+						memo.Name = "reference";
+						memo.Properties.ClientInstanceName = "reference";
+						memo.Width = Unit.Percentage(100);
+						memo.ShowModelErrors = true;
+						memo.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+		</div>
+		<div class="row" style="padding-top: 10px">
+			<div class="col-sm-1">
+				@Html.DevExpress().Label(
+					label =>
+					{
+						label.Name = "descriptionLabel";
+						label.Text = "Descripción:";
+						label.AssociatedControlName = "description";
+					}).GetHtml()
+			</div>
+			<div class="col-sm-11">
+				@Html.DevExpress().MemoFor(
+					m => m.Document.description,
+					memo =>
+					{
+						memo.Name = "description";
+						memo.Properties.ClientInstanceName = "description";
+						memo.Width = Unit.Percentage(100);
+						memo.ShowModelErrors = true;
+						memo.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+					}).GetHtml()
+			</div>
+		</div>
+	</div>
+	<div style="padding-top: 10px"></div>
+	<hr style="width: 100%;">
+	<div style="width: 100%;">
+		@using (Html.BeginForm())
+		{
+			@Html.Partial("_EditPoundDetailsPartial", this.Model.CostPerContenedorManualPoundDetail.ToArray())
+		}
+	</div>
+	<div class="row" style="padding-top: 10px">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-3"></div>
+		<div class="col-sm-2"></div>
+		<div class="col-sm-2"></div>
+		<div class="col-sm-4">
+			<div style="text-align:right;">
+				@Html.DevExpress().Button(
+					button =>
+					{
+						button.Name = "ProcesarCostosEditButton";
+						button.Text = "Procesar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.SpreadsheetCreatefromselection16x16;
+						button.UseSubmitBehavior = false;
+						button.Style.Add("margin-right", "25px");
+						button.ClientVisible = (bool)this.ViewBag.PuedeEditarDocumento;
+						button.ClientSideEvents.Click = "onProcesarCostoBodegaButtonClick";
+					}).GetHtml()
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,21 @@
+﻿@model IList<Warehouse>
+@{
+	var habModificacionUbiDestino = DataProviderSetting.SettingByCode("MODUNTP").value == "SI";
+	var modelo = Model ?? new Warehouse[] { };
+	var id_DestinyWarehouse = (int?)ViewBag.id_DestinyWarehouse;
+}
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = "ComboBoxDestinyWarehouse";
+		settings.Properties.ClientInstanceName = "ComboBoxDestinyWarehouse";
+		settings.Width = Unit.Percentage(100);
+		settings.ReadOnly = true;
+		settings.Properties.CallbackPageSize = 15;
+		settings.Properties.TextField = "name";
+		settings.Properties.ValueField = "id";
+		settings.Properties.ValueType = typeof(int);
+
+		settings.ClientVisible = habModificacionUbiDestino;
+		settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	}).BindList(modelo).Bind(id_DestinyWarehouse).GetHtml()

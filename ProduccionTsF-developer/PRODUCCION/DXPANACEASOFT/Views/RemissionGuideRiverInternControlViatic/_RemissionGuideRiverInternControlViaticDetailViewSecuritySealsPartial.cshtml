@@ -1,0 +1,109 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvSecuritySealsEditFormDetails";
+        settings.CallbackRouteValues = new { Controller = "RemissionGuideRiverInternControlViatic", Action = "RemissionGuideRiverControlVehicleDetailViewSecuritySeals" };
+
+        settings.ClientSideEvents.BeginCallback = "RemissionGuideRiverControlVehicleDetailViewSecuritySeals_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = false;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "number";
+            column.Name = "number";
+            column.Caption = "No. Sello";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_travelType";
+            column.Name = "id_travelType";
+            column.Caption = "Viaje";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var id = (int)DataBinder.Eval(c.DataItem, "id_travelType");
+                RemissionGuideTravelType travelType = DataProviderTravelType.TravelType(id);
+                if (travelType != null)
+                {
+                    var name = travelType.name;
+                    ViewContext.Writer.Write(name);
+                }
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_exitState";
+            column.Name = "id_exitState";
+            column.Caption = "Estado de Salida";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_exitState = (int?)DataBinder.Eval(c.DataItem, "id_exitState");
+
+                SecuritySealState state = DataProviderSecuritySealState.SecuritySealStateById(id_exitState);
+                if (state != null)
+                {
+                    ViewContext.Writer.Write(state.name);
+                }
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_arrivalState";
+            column.Name = "id_arrivalState";
+            column.Caption = "Estado de Llegada";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_arrivalState = (int?)DataBinder.Eval(c.DataItem, "id_arrivalState");
+
+                SecuritySealState state = DataProviderSecuritySealState.SecuritySealStateById(id_arrivalState);
+                if (state != null)
+                {
+                    ViewContext.Writer.Write(state.name);
+                }
+            });
+
+        });
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+

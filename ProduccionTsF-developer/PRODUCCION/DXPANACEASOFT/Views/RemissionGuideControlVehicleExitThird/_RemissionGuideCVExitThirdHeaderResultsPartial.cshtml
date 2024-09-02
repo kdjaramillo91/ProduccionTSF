@@ -1,0 +1,33 @@
+﻿@model List<DXPANACEASOFT.Models.RemissionGuide>
+
+<div id="GridMessageErrorRemissionGuideCVE" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorRemissionGuideCVE";
+           settings.Properties.ClientInstanceName = "gridMessageErrorRemissionGuideCVE";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnAssignDateTimeRemissionGuideControlExitThird";
+    settings.Text = "Asignar Fecha y Hora";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "GenerateRemissionGuideControlVehicleExitThird";
+}).GetHtml()
+
+
+
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+    Html.RenderPartial("_RemissionGuideCVExitThirdResultsPartial", Model);
+}
+
+
+
+

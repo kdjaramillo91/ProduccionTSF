@@ -1,0 +1,248 @@
+﻿@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.BusinessOportunity
+@{
+    int id_businessOportunity = (Model != null) ? Model.id : 0;
+    var codeBusinessOportunityDocumentType = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+
+    var endDateCurrent = (Model != null) ? Model.endDate : null;
+
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null) ? Model.Document.DocumentState.code : "";
+    string codeBusinessOportunityResultsState = (Model != null && Model.BusinessOportunityResults != null && Model.BusinessOportunityResults.BusinessOportunityState != null) ? Model.BusinessOportunityResults.BusinessOportunityState.code : "";
+
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formEditBusinessOportunity", name = "formEditBusinessOportunity" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_businessOportunity", id_businessOportunity, new { idBusinessOportunity = id_businessOportunity})
+
+    Html.RenderPartial("_GridMessageErrorBO");
+    @Html.Hidden("codeBusinessOportunityDocumentType", codeBusinessOportunityDocumentType)
+    @Html.Hidden("endDateCurrent", endDateCurrent)
+
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabOportunity";
+        tab.Text = "Oportunidad    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_BusinessOportunityMainFormTabBusinessOportunity");
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabPlanification";
+        tab.Text = "Planificación    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            BusinessOportunityPlaninng planning = (Model != null && Model.BusinessOportunityPlaninng != null)
+                                                  ? Model.BusinessOportunityPlaninng
+                                                  : new BusinessOportunityPlaninng();
+            planning.BusinessOportunity = (planning.BusinessOportunity == null) ? Model: planning.BusinessOportunity;
+            Html.RenderPartial("_BusinessOportunityMainFormTabPlanification", planning);
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabPhases";
+        tab.Text = "Etapas    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            List<BusinessOportunityPhase> phases = (Model != null && Model.BusinessOportunityPhase != null)
+                                                    ? Model.BusinessOportunityPhase.ToList()
+                                                    : new List<BusinessOportunityPhase>();
+
+            if (codeBusinessOportunityResultsState == "01" && codeState != "05")//01: ABIERTA y 05: ANULADA
+            {
+                Html.RenderPartial("_BusinessOportunityMainFormTabPhases", phases.OrderByDescending(od => od.id).ToList());
+            }
+            else
+            {
+                //var id_businessOportunity = (Model != null && Model.id != 0)
+                //                                 ? Model.id
+                //                                 : 0;
+                ViewData["id_businessOportunity"] = id_businessOportunity;
+                Html.RenderPartial("_BusinessOportunityViewPhasesPartial", phases.OrderByDescending(od => od.id).ToList());
+            }
+
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabPartner";
+        tab.Text = "Socios de Negocio    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            List<BusinessOportunityPartner> partners = (Model != null && Model.BusinessOportunityPartner != null)
+                                                       ? Model.BusinessOportunityPartner.ToList()
+                                                       : new List<BusinessOportunityPartner>();
+            if (codeBusinessOportunityResultsState == "01" && codeState != "05")//01: ABIERTA y 05: ANULADA
+            {
+                Html.RenderPartial("_BusinessOportunityMainFormTabPartners", partners.OrderByDescending(od => od.id).ToList());
+            }
+            else
+            {
+                ViewData["id_businessOportunity"] = id_businessOportunity;
+                Html.RenderPartial("_BusinessOportunityPartnersPartial", partners.OrderByDescending(od => od.id).ToList());
+            }
+
+
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabCompetition";
+        tab.Text = "Competidores    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            List<BusinessOportunityCompetition> competitions = (Model != null && Model.BusinessOportunityCompetition != null)
+                                                                ? Model.BusinessOportunityCompetition.ToList()
+                                                                : new List<BusinessOportunityCompetition>();
+
+            if (codeBusinessOportunityResultsState == "01" && codeState != "05")//01: ABIERTA y 05: ANULADA
+            {
+                Html.RenderPartial("_BusinessOportunityMainFormTabCompetitions", competitions.OrderByDescending(od => od.id).ToList());
+
+            }
+            else
+            {
+                ViewData["id_businessOportunity"] = id_businessOportunity;
+                Html.RenderPartial("_BusinessOportunityCompetitionsPartial", competitions.OrderByDescending(od => od.id).ToList());
+            }
+
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabAttachedDocument";
+        tab.Text = "Documentos Adjuntos    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            List<BusinessOportunityDocument> documents = (Model != null && Model.BusinessOportunityDocument != null)
+                                                            ? Model.BusinessOportunityDocument.ToList()
+                                                            : new List<BusinessOportunityDocument>();
+
+            if (codeBusinessOportunityResultsState == "01" && codeState != "05")//01: ABIERTA y 05: ANULADA
+            {
+                Html.RenderPartial("_BusinessOportunityMainFormTabAttachedDocuments", documents.OrderByDescending(od => od.id).ToList());
+
+            }
+            else
+            {
+                ViewData["id_businessOportunity"] = id_businessOportunity;
+                Html.RenderPartial("_BusinessOportunityAttachedDocumentsPartial", documents.OrderByDescending(od => od.id).ToList());
+            }
+
+        });
+    });
+
+}).GetHtml()
+
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdateFoot";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ClientEnabled = codeBusinessOportunityResultsState == "01" && codeState != "05"; //01: ABIERTA y 05: ANULADA
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnCancelFoot";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/businessoportunity/editform.js"></script>
+

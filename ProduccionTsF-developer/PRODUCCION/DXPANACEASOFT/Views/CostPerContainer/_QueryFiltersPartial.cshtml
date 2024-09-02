@@ -1,0 +1,286 @@
+﻿@using DXPANACEASOFT.DataProviders
+@{
+	var idCompany = (int)this.ViewBag.id_company;
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterCostPerContainer", name = "formFilterCostPerContainer" }))
+{
+	<table class="table table-condenced" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+		<tr>
+			<td style="width: 20%">
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px solid #c0c0c0">
+						<td colspan="2">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px">Documento</span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 30%">
+							@Html.DevExpress().Label(
+								label =>
+								{
+									label.Name = "id_documentStateLabel";
+									label.Text = "Estado:";
+									label.AssociatedControlName = "id_documentState";
+								}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().ComboBox(
+								comboBox =>
+								{
+									comboBox.Name = "id_documentState";
+									comboBox.Properties.ClientInstanceName = "id_documentState";
+									comboBox.Width = Unit.Percentage(100);
+
+									comboBox.Properties.ValueField = "id";
+									comboBox.Properties.TextField = "name";
+									comboBox.Properties.ValueType = typeof(int);
+
+									comboBox.Properties.NullDisplayText = "Todos";
+									comboBox.Properties.NullText = "Todos";
+
+									comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+									comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+									comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+								}).BindList(DataProviderCostProductValuation.DocumentStatesByDocumentType(idCompany)).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Label(
+								label =>
+								{
+									label.Name = "numberLabel";
+									label.Text = "Número:";
+									label.AssociatedControlName = "number";
+								}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().TextBox(
+								textBox =>
+								{
+									textBox.Name = "number";
+									textBox.Properties.ClientInstanceName = "number";
+									textBox.Width = Unit.Percentage(100);
+									textBox.Properties.NullDisplayText = "Todos";
+									textBox.Properties.NullText = "Todos";
+
+								}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Label(
+								label =>
+								{
+									label.Name = "referenceLabel";
+									label.Text = "Referencia:";
+									label.AssociatedControlName = "reference";
+								}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().TextBox(
+								textBox =>
+								{
+									textBox.Name = "reference";
+									textBox.Properties.ClientInstanceName = "reference";
+									textBox.Width = Unit.Percentage(100);
+									textBox.Properties.NullDisplayText = "Todos";
+									textBox.Properties.NullText = "Todos";
+
+								}).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td style="width: 45%">
+				<table class="table table-condensed" style="padding-top: 0px; margin-top: 0px">
+					<tr style="border-bottom: 1px solid #c0c0c0">
+						<td colspan="4">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px">Fechas</span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 30%">
+							@Html.DevExpress().Label(
+								label =>
+								{
+									label.Name = "startEmissionDateLabel";
+									label.Text = "Fecha Emisión:";
+									label.AssociatedControlName = "startEmissionDate";
+								}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().DateEdit(
+								dateEdit =>
+								{
+									dateEdit.Name = "startEmissionDate";
+									dateEdit.Properties.ClientInstanceName = "startEmissionDate";
+									dateEdit.Width = Unit.Percentage(100);
+
+									dateEdit.Properties.NullDisplayText = "Desde";
+									dateEdit.Properties.NullText = "Desde";
+
+									dateEdit.Properties.DisplayFormatInEditMode = true;
+									dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+									dateEdit.Properties.EditFormat = EditFormat.Custom;
+									dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+
+								}).GetHtml()
+						</td>
+						<td>
+							@Html.DevExpress().DateEdit(
+								dateEdit =>
+								{
+									dateEdit.Name = "endEmissionDate";
+									dateEdit.Properties.ClientInstanceName = "endEmissionDate";
+									dateEdit.Width = Unit.Percentage(100);
+
+									dateEdit.Properties.NullDisplayText = "Hasta";
+									dateEdit.Properties.NullText = "Hasta";
+
+									dateEdit.Properties.DisplayFormatInEditMode = true;
+									dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+									dateEdit.Properties.EditFormat = EditFormat.Custom;
+									dateEdit.Properties.EditFormatString = "dd/MM/yyyy";
+									dateEdit.Properties.DateRangeSettings.StartDateEditID = "startEmissionDate";
+
+									dateEdit.Properties.ClientSideEvents.Validation = "OnRangeEmissionDateQueryValidation";
+
+								}).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td style="width: 25%">
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px Solid #C0C0C0;">
+						<td colspan="2">
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Costos</span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 30%">
+							@Html.DevExpress().Label(
+								label =>
+								{
+									label.Name = "anioLabel";
+									label.Text = "Año:";
+									label.AssociatedControlName = "anio";
+								}).GetHtml()
+						</td>
+						<td colspan="2">
+							@Html.DevExpress().ComboBox(
+								comboBox =>
+								{
+									comboBox.Name = "anio";
+									comboBox.Properties.ClientInstanceName = "anio";
+									comboBox.Width = Unit.Percentage(100);
+
+									comboBox.Properties.ValueField = "year";
+									comboBox.Properties.TextField = "year";
+									comboBox.Properties.ValueType = typeof(int);
+
+									comboBox.Properties.NullDisplayText = "Todos";
+									comboBox.Properties.NullText = "Todos";
+
+									comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+									comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+									comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+								}).BindList(DataProviderCostProductValuation.AllocationCostYear()).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 30%">
+							@Html.DevExpress().Label(
+								label =>
+								{
+									label.Name = "mesLabel";
+									label.Text = "Mes:";
+									label.AssociatedControlName = "mes";
+								}).GetHtml()
+						</td>
+						<td colspan="2">
+							@Html.DevExpress().SpinEdit(
+								spinEdit =>
+								{
+									spinEdit.Name = "mes";
+									spinEdit.Properties.ClientInstanceName = "mes";
+									spinEdit.Width = Unit.Percentage(66);
+
+									spinEdit.Properties.NumberType = SpinEditNumberType.Integer;
+									spinEdit.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+									spinEdit.Properties.DisplayFormatString = "N0";
+									spinEdit.Properties.DisplayFormatInEditMode = true;
+									spinEdit.Properties.DecimalPlaces = 0;
+
+									spinEdit.Properties.NullText = "0";
+									spinEdit.Properties.ButtonStyle.HorizontalAlign = HorizontalAlign.Right;
+
+									spinEdit.Properties.MinValue = 1;
+									spinEdit.Properties.MaxValue = 12;
+								}).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td>
+				<table class="table table-condensed">
+					<tr style="border-bottom: 1px Solid #C0C0C0">
+						<td>
+							<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 25%">
+							@Html.DevExpress().Button(
+								button =>
+								{
+									button.Name = "btnSearch";
+									button.Text = "Buscar";
+									button.Width = Unit.Percentage(100);
+									button.RenderMode = ButtonRenderMode.Button;
+									button.ImagePosition = ImagePosition.Left;
+									button.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+									button.UseSubmitBehavior = false;
+									button.ClientSideEvents.Click = "onSearchQueryButtonClick";
+								}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(
+								button =>
+								{
+									button.Name = "btnClear";
+									button.Text = "Limpiar";
+									button.Width = Unit.Percentage(100);
+									button.RenderMode = ButtonRenderMode.Button;
+									button.ImagePosition = ImagePosition.Left;
+									button.Images.Image.IconID = IconID.ActionsClear16x16;
+									button.UseSubmitBehavior = false;
+									button.ClientSideEvents.Click = "onClearQueryButtonClick";
+								}).GetHtml()
+						</td>
+					</tr>
+					<tr>
+						<td>
+							@Html.DevExpress().Button(
+								button =>
+								{
+									button.Name = "btnAddNew";
+									button.Text = "Nuevo";
+									button.Width = Unit.Percentage(100);
+									button.RenderMode = ButtonRenderMode.Button;
+									button.ImagePosition = ImagePosition.Left;
+									button.Images.Image.IconID = IconID.ActionsAdd16x16;
+									button.UseSubmitBehavior = false;
+									button.ClientSideEvents.Click = "onAddNewQueryButtonClick";
+								}).GetHtml()
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+}

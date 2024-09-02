@@ -1,0 +1,777 @@
+﻿@model AdvanceProvider
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "01";
+
+    var minValue = 2;
+    var maxValue = 7;
+    Int32.TryParse(DataProviderSetting.ValueSetting("MINDPANTPR"), out minValue);
+    Int32.TryParse(DataProviderSetting.ValueSetting("MAXDPANTPR"), out maxValue);
+
+    bool modificaAnticipoHabilitado = true;
+    // Verificación del parámetro de para habilitar la modificación del anticipo
+    modificaAnticipoHabilitado = DataProviderSetting.ValueSetting("MODANT") == "0";
+
+    if (this.Model.diasPlazo.HasValue)
+    {
+        if (this.Model.diasPlazo.Value < minValue)
+        {
+            this.Model.diasPlazo = minValue;
+        }
+        if (this.Model.diasPlazo.Value > maxValue)
+        {
+            this.Model.diasPlazo = maxValue;
+        }
+    }
+    else
+    {
+        this.Model.diasPlazo = minValue;
+    }
+}
+<table id="mainTabAdvanceProviderPL" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="9">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n General</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_Lot, settings =>
+           {
+               settings.Name = "id_LotLabel";
+               settings.Text = "Sec. Transaccional:";
+               settings.AssociatedControlName = "id_LotLabel";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.number, settings =>
+       {
+           //settings.Name = "numberPLName";
+           settings.Properties.ClientInstanceName = "numberPLName";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "id_LotInternalLabel";
+               settings.Text = "No. Lote:";
+               settings.AssociatedControlName = "id_LotInternalLabel";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.internalNumber, settings =>
+           {
+               //settings.Name = "numberPLName";
+               settings.Properties.ClientInstanceName = "internalNumberPLName";
+               settings.Width = Unit.Percentage(100);
+               settings.ReadOnly = true;
+               settings.Properties.MaxLength = 100;
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Proceso:";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.Person1.processPlant, settings =>
+            {
+                settings.Name = "process";
+                settings.Properties.ClientInstanceName = "process";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                settings.Properties.MaxLength = 100;
+            }).GetHtml()
+        </td>
+    </tr>
+    <!--FILA 1 Proveedor y Ruc 2 Columnas-->
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_provider, settings =>
+       {
+           settings.Name = "id_providerLabel";
+           settings.Properties.ClientInstanceName = "id_providerLabel";
+           settings.Text = "Proveedor:";
+           settings.AssociatedControlName = "id_providerLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Provider.Person.fullname_businessName, settings =>
+       {
+           settings.Name = "providerName";
+           settings.Properties.ClientInstanceName = "providerName";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Provider.Person.identification_number, settings =>
+       {
+           settings.Name = "rucLabel";
+           settings.Properties.ClientInstanceName = "rucLabel";
+           settings.Text = "Ruc:";
+           settings.AssociatedControlName = "rucLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Provider.Person.identification_number, settings =>
+       {
+           settings.Name = "ruc";
+           settings.Properties.ClientInstanceName = "ruc";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Lot.ProductionLot.receptionDate, settings =>
+       {
+           settings.Name = "receptionDateLabel";
+           settings.Properties.ClientInstanceName = "receptionDateLabel";
+           settings.Text = "Fecha de Recepción:";
+           settings.AssociatedControlName = "receptionDateLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Lot.ProductionLot.receptionDate, settings =>
+       {
+           settings.Name = "receptionDate";
+           settings.Properties.ClientInstanceName = "receptionDate";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+    </tr>
+
+    <!--FECHA ORDEN DE COMPRA-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "datePurchaseOrderLabel";
+                settings.Text = "Fecha Orden de Compra:";
+                settings.AssociatedControlName = "purchaseOrderDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEditFor(m => m.purchaseOrderDate, settings =>
+            {
+                settings.Name = "purchaseOrderDate";
+                settings.Properties.ClientInstanceName = "purchaseOrderDate";
+                settings.Width = Unit.Percentage(100);
+                settings.ReadOnly = true;
+                //= codeState != "01";//Codigo de Estado Pendiente
+                settings.Properties.EditFormat = EditFormat.Custom;
+                settings.Properties.EditFormatString = "dd/MM/yyyy";
+                settings.Properties.ClientSideEvents.ValueChanged = "OnPurchaseOrderDateValueChanged";
+            }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <!--FILA 3 Listas de Precios-->
+    <tr>
+        <td>
+            @Html.DevExpress().Label( settings =>
+       {
+           settings.Name = "CalendarPriceListLabel";
+           settings.Text = "Lista de Precio:";
+           settings.AssociatedControlName = "CalendarPriceListLabel";
+       }).GetHtml()
+        </td>
+        <td colspan="3">
+            @{
+                Html.RenderPartial("combobox/_cmbPriceListByProvider");
+            }
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_processType, settings =>
+       {
+           settings.Name = "id_processTypeLabel";
+           settings.Properties.ClientInstanceName = "id_processTypeLabel";
+           settings.Text = "Tipo de Proceso:";
+           settings.AssociatedControlName = "id_processTypeLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProcessType.name, settings =>
+       {
+           settings.Name = "processTypeName";
+           settings.Properties.ClientInstanceName = "processTypeName";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(
+                m => m.diasPlazo,
+                label =>
+                {
+                    label.Name = "DiasPlazoAnticipoLabel";
+                    label.Properties.ClientInstanceName = "DiasPlazoAnticipoLabel";
+                    label.Text = "Días de Plazo de Pago:";
+                    label.AssociatedControlName = "diasPlazo";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(
+                m => m.diasPlazo,
+                spinEdit =>
+                {
+                    spinEdit.Name = "diasPlazo";
+                    spinEdit.Properties.ClientInstanceName = "diasPlazo";
+                    spinEdit.Width = Unit.Percentage(100);
+
+                    spinEdit.Properties.NumberType = SpinEditNumberType.Integer;
+                    spinEdit.Properties.DecimalPlaces = 0;
+                    spinEdit.Properties.AllowMouseWheel = true;
+                    spinEdit.Properties.Increment = 1m;
+                    spinEdit.Properties.LargeIncrement = 1m;
+                    spinEdit.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+                    spinEdit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                    spinEdit.ReadOnly = (codeState != "01"); //Pendiente
+
+                    spinEdit.Properties.MinValue = minValue;
+                    spinEdit.Properties.MaxValue = maxValue;
+                }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="9">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n Camaronera</span>
+        </td>
+    </tr>
+    <!-- FILA 3 Nombre Camaronero y Dirección -->
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionUnitProvider.name, settings =>
+       {
+           settings.Name = "namePupLabel";
+           settings.Properties.ClientInstanceName = "namePupLabel";
+           settings.Text = "Camaronera:";
+           settings.AssociatedControlName = "namePupLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.name, settings =>
+       {
+           settings.Name = "namePup";
+           settings.Properties.ClientInstanceName = "namePup";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionUnitProvider.id_FishingZone, settings =>
+       {
+           settings.Name = "id_FishingZoneLabel";
+           settings.Properties.ClientInstanceName = "id_FishingZoneLabel";
+           settings.Text = "Zona:";
+           settings.AssociatedControlName = "id_FishingZoneLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.FishingSite.FishingZone.name, settings =>
+       {
+           settings.Name = "fishingZone";
+           settings.Properties.ClientInstanceName = "fishingZone";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionUnitProvider.id_FishingSite, settings =>
+       {
+           settings.Name = "id_FishingSiteLabel";
+           settings.Properties.ClientInstanceName = "id_FishingSiteLabel";
+           settings.Text = "Sitio:";
+           settings.AssociatedControlName = "id_provider";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.FishingSite.name, settings =>
+       {
+           settings.Name = "fishingSite";
+           settings.Properties.ClientInstanceName = "fishingSite";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+
+    </tr>
+    <!-- FILA 4 Zona y Sitio 2 Columnas-->
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionUnitProvider.address, settings =>
+       {
+           settings.Name = "addressPupLabel";
+           settings.Properties.ClientInstanceName = "addressPupLabel";
+           settings.Text = "Dirección Camaronera:";
+           settings.AssociatedControlName = "addressPupLabel";
+       }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.address, settings =>
+       {
+           settings.Name = "addressPup";
+           settings.Properties.ClientInstanceName = "addressPup";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+        @*<td>
+
+            </td>
+            <td>
+
+            </td>*@
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionUnitProvider.INPnumber, settings =>
+       {
+           settings.Name = "INPProviderLabel";
+           settings.Properties.ClientInstanceName = "INPProviderLabel";
+           settings.Text = "INP:";
+           settings.AssociatedControlName = "INPProviderLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.INPnumber, settings =>
+       {
+           settings.Name = "INPProvider";
+           settings.Properties.ClientInstanceName = "INPProvider";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionUnitProvider.ministerialAgreement, settings =>
+       {
+           settings.Name = "ministerialAgreementProviderLabel";
+           settings.Properties.ClientInstanceName = "ministerialAgreementProviderLabel";
+           settings.Text = "Acuerdo Ministerial Proveedor:";
+           settings.AssociatedControlName = "ministerialAgreementProviderLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.ministerialAgreement, settings =>
+       {
+           settings.Name = "ministerialAgreement";
+           settings.Properties.ClientInstanceName = "ministerialAgreement";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionUnitProvider.tramitNumber, settings =>
+       {
+           settings.Name = "tramitNumberProviderLabel";
+           settings.Properties.ClientInstanceName = "tramitNumberProviderLabel";
+           settings.Text = "Número Trámite:";
+           settings.AssociatedControlName = "tramitNumberProviderLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.ProductionUnitProvider.tramitNumber, settings =>
+       {
+           settings.Name = "tramitNumberProvider";
+           settings.Properties.ClientInstanceName = "tramitNumberProvider";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.MaxLength = 100;
+       }).GetHtml()
+        </td>
+    </tr>
+
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="9">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Par&aacute;metros Generales</span>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.TailPerformanceUsed, settings =>
+       {
+           settings.Name = "TailPerformanceUsedLabel";
+           settings.Properties.ClientInstanceName = "TailPerformanceUsedLabel";
+           settings.ControlStyle.Font.Bold = true;
+           settings.Text = "% Rendimiento Cola:";
+           settings.AssociatedControlName = "TailPerformanceUsedLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.TailPerformanceUsed, settings =>
+       {
+           settings.Name = "TailPerformanceUsed";
+           settings.Properties.ClientInstanceName = "TailPerformanceUsed";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+           settings.Properties.MinValue = 0;
+           settings.Properties.MaxValue = 100;
+       }).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.AdvanceValuePercentageUsed, settings =>
+       {
+           settings.Name = "AdvanceValuePercentageUsedLabel";
+           settings.Properties.ClientInstanceName = "AdvanceValuePercentageUsedLabel";
+           settings.ControlStyle.Font.Bold = true;
+           settings.Text = "% Anticipo:";
+           settings.AssociatedControlName = "AdvanceValuePercentageUsedLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.AdvanceValuePercentageUsed, settings =>
+       {
+           settings.Name = "AdvanceValuePercentageUsed";
+           settings.Properties.ClientInstanceName = "AdvanceValuePercentageUsed";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.Properties.MinValue = 0;
+           settings.Properties.MaxValue = 100;
+       }).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.QuantityPoundsReceivedMinimun, settings =>
+       {
+           settings.Name = "QuantityPoundsReceivedMinimunLabel";
+           settings.Properties.ClientInstanceName = "QuantityPoundsReceivedMinimunLabel";
+           settings.Text = "Cantidad Mínima Libras:";
+           settings.AssociatedControlName = "QuantityPoundsReceivedMinimunLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.QuantityPoundsReceivedMinimun, settings =>
+       {
+           settings.Name = "QuantityPoundsReceivedMinimun";
+           settings.Properties.ClientInstanceName = "QuantityPoundsReceivedMinimun";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+           settings.Properties.MinValue = 0;
+       }).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.QuantityPoundReceived, settings =>
+       {
+           settings.Name = "QuantityPoundReceivedLabel";
+           settings.Properties.ClientInstanceName = "QuantityPoundReceivedLabel";
+           settings.Text = "Total Libras Remitidas:";
+           settings.AssociatedControlName = "QuantityPoundReceivedLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.QuantityPoundReceived, settings =>
+       {
+           settings.Name = "QuantityPoundReceived";
+           settings.Properties.ClientInstanceName = "QuantityPoundReceived";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+           settings.Properties.MinValue = 0;
+       }).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.grammageLot, settings =>
+       {
+           settings.Name = "grammageLotLabel";
+           settings.Properties.ClientInstanceName = "grammageLotLabel";
+           settings.Text = "Gramaje Promedio:";
+           settings.AssociatedControlName = "grammageLotLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.grammageLot, settings =>
+       {
+           settings.Name = "grammageLot";
+           settings.Properties.ClientInstanceName = "grammageLot";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+           settings.Properties.MinValue = 0;
+       }).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.wholePerformanceLot, settings =>
+       {
+           settings.Name = "wholePerformanceLotLabel";
+           settings.Properties.ClientInstanceName = "wholePerformanceLotLabel";
+           settings.Text = "Rendimiento Promedio Lote:";
+           settings.AssociatedControlName = "grammageLotLabel";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.wholePerformanceLot, settings =>
+       {
+           settings.Name = "wholePerformanceLot";
+           settings.Properties.ClientInstanceName = "wholePerformanceLot";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+
+           settings.Properties.MinValue = 0;
+       }).GetHtml()
+        </td>
+    </tr>
+
+</table>
+<br />
+
+<button type="button" class="btn btn-info btn-md" id="idCalcularAnticipo" onclick="CalculateAdvanceProvider()">Calcular Anticipo</button>
+
+<br />
+<table id="mainTabAdvanceProviderPL2" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="9">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;"></span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueAdvance, settings =>
+       {
+           settings.Name = "valueAdvanceLabel";
+           settings.Properties.ClientInstanceName = "valueAdvanceLabel";
+           settings.Text = "Valor:";
+           settings.AssociatedControlName = "valueAdvanceLabel";
+           settings.ControlStyle.Font.Size = 16;
+           settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+           settings.ControlStyle.Font.Bold = true;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.valueAdvance, settings =>
+       {
+           settings.Name = "valueAdvance";
+           settings.Properties.ClientInstanceName = "valueAdvance";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 0;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = true;
+           settings.ControlStyle.Font.Size = 16;
+           settings.ControlStyle.ForeColor = System.Drawing.Color.DarkBlue;
+           settings.ControlStyle.Font.Bold = true;
+           settings.Properties.MinValue = 0;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueAdvanceTotalRounded, settings =>
+       {
+           settings.Name = "valueAdvanceTotalLabel";
+           settings.Properties.ClientInstanceName = "valueAdvanceTotalLabel";
+           settings.Text = "%:";
+           settings.AssociatedControlName = "valueAdvanceTotalLabel";
+           settings.ControlStyle.Font.Size = 16;
+           settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+           settings.ControlStyle.Font.Bold = true;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.valueAdvanceTotalRounded, settings =>
+       {
+           settings.Name = "valueAdvanceTotal";
+           settings.Properties.ClientInstanceName = "valueAdvanceTotal";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 0;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = codeState == "03" || codeState == "06" || modificaAnticipoHabilitado;
+           settings.ControlStyle.Font.Size = 16;
+           settings.ControlStyle.ForeColor = System.Drawing.Color.DarkBlue;
+           settings.ControlStyle.Font.Bold = true;
+           settings.Properties.MinValue = 0;
+           settings.Properties.ClientSideEvents.NumberChanged = "Quantity_NumberChange";
+
+
+
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.valueAverage, settings =>
+       {
+           settings.Name = "valueAverageLabel";
+           settings.Properties.ClientInstanceName = "valueAverageLabel";
+           settings.Text = "Valor Promedio:";
+           settings.AssociatedControlName = "valueAverageLabel";
+           settings.ControlStyle.Font.Size = 16;
+           settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+           settings.ControlStyle.Font.Bold = true;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.valueAverage, settings =>
+       {
+           settings.Name = "valueAverage";
+           settings.Properties.ClientInstanceName = "valueAverage";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberType = SpinEditNumberType.Float;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.AllowMouseWheel = true;
+           settings.Properties.Increment = 0.1M;
+           settings.Properties.LargeIncrement = 1;
+           settings.ReadOnly = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.ControlStyle.Font.Size = 16;
+           settings.ControlStyle.ForeColor = System.Drawing.Color.DarkBlue;
+           settings.Properties.MinValue = 0;
+           settings.ControlStyle.Font.Bold = true;
+       }).GetHtml()
+        </td>
+    </tr>
+</table>
+<br />
+<table id="mainTabAdvanceProviderPL2" class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td><button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#myModal">Ver Detalle</button></td>
+        <td><button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#myModal2">Ver Detalle Guías</button></td>
+        <td><button type="button" onclick="OnPriceListDetailClick()" class="btn btn-info btn-md">Ver Detalle Lista Precios</button></td>
+    </tr>
+</table>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Detalle de Tallas</h4>
+            </div>
+            <div class="modal-body">
+                @{
+                    if (Model.AdvanceProviderDetail != null)
+                    {
+                        Html.RenderPartial("_AdvanceProviderPLMainFormTabAdvanceProviderPLDetail", Model.AdvanceProviderDetail.ToList());
+                    }
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="myModal2" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Detalle de Gu&iacute;as</h4>
+            </div>
+            <div class="modal-body">
+                @{
+                    if (Model.aplRg != null)
+                    {
+                        Html.RenderPartial("_AdvanceProviderPLMainFormTabAdvanceProviderPLDetailRG", Model.aplRg.OrderByDescending(o => o.seq_RemissionGuide).ToList());
+                    }
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $('#myModal2').on('show.bs.modal', function () {
+        $(this).find('.modal-body').css({
+            width: 'auto', //probably not needed
+            height: 'auto', //probably not needed
+            'max-height': '100%'
+        });
+    });
+</script>
+
+<script src="~/Scripts/advanceprovider/editform.js"></script>

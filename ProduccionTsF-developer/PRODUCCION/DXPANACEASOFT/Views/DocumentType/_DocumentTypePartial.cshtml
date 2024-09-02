@@ -1,0 +1,183 @@
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvDocumentType";
+        settings.CallbackRouteValues = new { Controller = "DocumentType", Action = "DocumentTypePartial" };
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "DocumentType", Action = "DocumentTypePartialAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "DocumentType", Action = "DocumentTypePartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "DocumentType", Action = "DocumentTypePartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"">Seleccionar Todos</a>
+                  <a id=""lnkClearSelection"" style=""cursor: pointer;"">Anular Selección.</a>"
+                );
+            }
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Caption = "Nombre";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "code";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "description";
+            column.Caption = "Descipción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "daysToExpiration";
+            column.Caption = "Dias de Expiración";
+            column.Width = Unit.Percentage(5);
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Caption = "Estados";
+            column.UnboundType = UnboundColumnType.String;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                List<DocumentState> documentStates = new List<DocumentState>();
+                try
+                {
+                    documentStates = (List<DocumentState>)DataBinder.Eval(c.DataItem, "DocumentState");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        HashSet<DocumentState> tempDocumentStates = (HashSet<DocumentState>)DataBinder.Eval(c.DataItem, "DocumentState");
+                        documentStates = (tempDocumentStates != null) ? tempDocumentStates.Where(s => s.isActive).ToList() : new List<DocumentState>();
+                    }
+                    catch (Exception)
+                    {
+                        documentStates = new List<DocumentState>();
+                    }
+                }
+
+                if (documentStates != null)
+                {
+                    ViewContext.Writer.Write(string.Join(",", documentStates.Select(x => x.name).ToArray()));
+                }
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Caption = "¿Activo?";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(3);
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            Visible = true,
+            VisibleIndex = 10,
+            Caption = "Acciones"
+        };
+        settings.Columns.Add(commandColumn);
+
+        #region ColumnsEdit
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_documentType = (int?)DataBinder.Eval(c.DataItem, "id");
+            DocumentType documentType = DataProviderDocumentType.DocumentTypeById(id_documentType);
+
+            documentType = documentType ?? new DocumentType { isActive = true };
+
+            Html.RenderPartial("_DocumentTypeEditForm", documentType);
+        });
+
+        #endregion
+
+        //MASTER DETAILS
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SetDetailRowTemplateContent(colum =>
+        {
+
+        });
+
+
+
+    });
+    // settings.Columns.Add("id_userCreate");
+    //settings.Columns.Add("dateCreate");
+    //settings.Columns.Add("id_userUpdate");
+    //settings.Columns.Add("dateUpdate");
+    //settings.Columns.Add("Document");
+
+
+
+
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+<script src="~/Scripts/documenttype/validation.js"></script>

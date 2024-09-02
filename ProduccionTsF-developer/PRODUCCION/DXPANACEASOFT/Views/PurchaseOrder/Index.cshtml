@@ -1,0 +1,31 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@{
+    Layout = null;
+}
+
+<h4>Orden de Compra</h4>
+
+
+@{
+    @Html.Hidden("codeAdvancedFiltersConfiguration", "OC")
+    ViewData["Model"] = new PurchaseOrder
+    {
+        Document = new Document
+        {
+            DocumentType = null//DataProviderDocumentType.DocumentTypeByCode("02")
+        }
+    };
+    Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_PurchaseOrderFilterFormPartial");
+}
+
+<div id="results">
+
+</div>
+
+<script src="~/Scripts/purchaseorder/index.js"></script>
+@{
+
+    Html.RenderPartial("FilterBoxTemplates/_PopupAdvancedFilter", new AdvancedFilter());
+
+}

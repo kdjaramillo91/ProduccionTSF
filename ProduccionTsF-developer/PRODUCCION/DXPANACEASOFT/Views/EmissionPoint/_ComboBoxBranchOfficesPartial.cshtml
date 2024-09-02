@@ -1,0 +1,25 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.CallbackRouteValues = new { Controller = "EmissionPoint", Action = "ComboBoxBranchOfficesPartial" };
+    settings.Name = "id_branchOffice";
+    settings.Properties.ClientInstanceName = "id_branchOffice";
+
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Width = Unit.Percentage(91.2);
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Properties.ClientSideEvents.BeginCallback = "BranchOfficesCombo_BeginCallback";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "BranchOfficesCombo_SelectedIndexChanged";
+    //settings.Properties.ClientSideEvents.EndCallback = "DivisionsCombo_EndCallback";
+
+
+}).BindList(Model).Bind(ViewData["id_branchOffice"]).GetHtml()

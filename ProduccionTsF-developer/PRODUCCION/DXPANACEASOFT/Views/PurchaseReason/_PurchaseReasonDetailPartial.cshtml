@@ -1,0 +1,90 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PurchaseReason
+
+
+@{
+    PurchaseReason purchaseReason = Model ?? new PurchaseReason();
+}
+
+@Html.Hidden("id_purchaseReason", purchaseReason.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(purchaseReason.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(purchaseReason.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(purchaseReason.description)
+        </td>
+    </tr>
+
+    <td style="width: 10%;">
+        <strong>
+            Creado por:
+        </strong>
+    </td>
+    <td style="width: 10%;">
+        @Html.Raw(GetUserName(purchaseReason.id_userCreate))
+    </td>
+    <td style="width: 10%;">
+        <strong>
+            Fecha de Creaci&oacute;n:
+        </strong>
+    </td>
+    <td>
+        @Html.Raw(purchaseReason.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+    </td>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(GetUserName(purchaseReason.id_userUpdate))
+        </td>
+        <td style="width: 13%;">
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(purchaseReason.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

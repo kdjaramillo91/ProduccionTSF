@@ -1,0 +1,44 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuide
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+    int? id_TransportTariffType = (Model != null && Model.id_TransportTariffType != 0) ? (int?)Model.id_TransportTariffType : null;
+
+    string aditional = "";
+
+    if( id_TransportTariffType != null && id_TransportTariffType>0)
+    {
+        aditional= " e.customArgs['id_TransportTariffTypeCurrent'] = " + id_TransportTariffType.ToString();
+    }
+
+    if(string.IsNullOrEmpty(codeState))
+    {
+        codeState = "01";
+    }
+    TempData.Keep("TransportTariffTypeByshippingType");
+    var isOwnTmp = (Model != null && Model.RemissionGuideTransportation != null) ? Model.RemissionGuideTransportation.isOwn : false;
+}
+
+
+@Html.DevExpress().ComboBoxFor(m => m.id_TransportTariffType, settings =>
+{
+    settings.Name = "id_TransportTariffType";
+    settings.Properties.ClientInstanceName = "id_TransportTariffType";
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Width = Unit.Percentage(100);
+    settings.ReadOnly = codeState != "01"  || isOwnTmp;
+    settings.ShowModelErrors = true;
+    settings.CallbackRouteValues = new { Controller = "Logistics", Action = "TransportTariffTypeByshippingType" };
+
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_shippingType'] = id_shippingType.GetValue();" + aditional  +  "}";
+    settings.Properties.CallbackPageSize = 20;
+    //settings.Properties.ClientSideEvents.Init = "OnTransportTariffTypeInit";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) {  id_vehicle.PerformCallback(); mark.SetValue(null); model.SetValue(null); id_provider.SetValue(null);  CalculatePriceFreightAndRefresh();}";
+    settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { id_vehicle.PerformCallback(); mark.SetValue(null);  model.SetValue(null); id_provider.SetValue(null);}";
+    //settings.Properties.ClientSideEvents.EndCallback = "OnTransportTariffEndCallBack";
+    //"function(s, e) { id_vehicle.PerformCallback(); mark.SetValue(null);  model.SetValue(null); id_provider.SetValue(null);}";
+    settings.Properties.ClientSideEvents.Validation = "OnTransportTariffType";
+
+}).BindList(TempData["TransportTariffTypeByshippingType"]).Bind(id_TransportTariffType).GetHtml()

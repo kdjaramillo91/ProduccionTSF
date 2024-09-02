@@ -1,0 +1,107 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model DXPANACEASOFT.Models.InvoiceCommercial
+@{
+	string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+	List<tbsysDocumentDocumentStateControlsState> _ControlsState = DataProviderControlState.ControlStateByDocumentByState("70", codeState);
+
+	Html.DevExpress<InvoiceCommercial>().FormLayout(settings =>
+	{
+		settings.Name = "formLayoutEditInvoiceCommercialHeadFormDetail";
+		settings.ColCount = 2;
+
+#region groupInvoiceCommercialDetail
+
+var groupInvoiceCommercialDetail = settings.Items.AddGroupItem(i =>
+		{
+			i.Caption = "Detalle Factura";
+			i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+			i.ColSpan = 2;
+			i.ColCount = 2;
+			i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+		});
+
+#region Fila 1
+
+//id_metricUnitInvoice
+groupInvoiceCommercialDetail.Items.Add(m => m.id_metricUnitInvoice, item =>
+{
+	item.Name = "id_metricUnitInvoice";
+	item.ClientVisible = false;
+	item.Caption = "UM Factura Comercial";
+	item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+
+	//item.RequiredField.IsRequired
+	//item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+	//item.Width = Unit.Percentage(35);
+	//item.ColSpan = 3;
+
+	item.NestedExtension().ComboBox(comboBox =>
+			{
+
+
+
+				comboBox.Width = Unit.Percentage(100);
+				comboBox.Properties.ClientInstanceName = "id_metricUnitInvoice";
+				comboBox.Properties.ValueField = "id";
+				comboBox.Properties.TextField = "name";
+				comboBox.Properties.DataSource = DataProviderMetricUnit.WeightMetriUnitInvoiceExterior((int?)ViewData["id_company"]);
+				comboBox.Properties.ValueType = typeof(string);
+
+				comboBox.ShowModelErrors = true;
+				comboBox.ReadOnly = Model.id_metricUnitInvoice_CSI.isReadOnly;
+
+
+				comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				comboBox.Properties.ClientSideEvents.Init = "onInitInvoiceCommercialMetricUnitInvoice";
+				comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "onChangeInvoiceCommercialMetricUnitInvoice";
+				comboBox.Properties.ClientSideEvents.Validation = "validationInvoiceCommercialMetricUnitInvoice";
+		//comboBox.Properties.ClientSideEvents.Init = "ItemComboBox_Init";
+		//comboBox.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "GetDetailItemInvoiceCommercial" };
+		//comboBox.Properties.ClientSideEvents.BeginCallback = "ItemComboBox_BeginCallback";
+
+	});
+		});
+
+// Tiene glaseo
+groupInvoiceCommercialDetail.Items.Add(m => m.hasGlaze, item =>
+		{
+			item.Name = "hasGlaze";
+			item.Caption = "Productos tienen glaseo?:";
+			item.ClientVisible = false;
+
+			item.NestedExtension().CheckBox(checkbox =>
+			{
+
+				checkbox.Width = Unit.Percentage(100);
+				checkbox.Properties.ClientInstanceName = "hasGlaze";
+
+		//spinedit.ReadOnly = true;
+
+		if (Model.glazePercentage_CSI.isRequired)
+				{
+					checkbox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+					checkbox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				}
+
+				checkbox.Properties.ValidationSettings.CausesValidation = true;
+				checkbox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				checkbox.Properties.ValidationSettings.ValidateOnLeave = true;
+				checkbox.Properties.ValidationSettings.SetFocusOnError = true;
+				checkbox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+				checkbox.Properties.ValidationSettings.EnableCustomValidation = true;
+				checkbox.ShowModelErrors = true;
+			});
+		});
+
+#endregion
+
+#endregion
+
+}).Render();
+}
+
+
+@*<script src="~/Scripts/invoiceCommercial/_invoiceCommercialHeadFormDetailPartial.js"></script>*@

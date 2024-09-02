@@ -1,0 +1,134 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ProductionSchedulePeriod
+
+
+    <table class="table table-condensed">
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Nombre:";
+                    settings.AssociatedControlName = "productionSchedulePeriodName";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+           {
+               settings.Properties.ClientInstanceName = "productionSchedulePeriodName";
+
+               settings.Width = Unit.Percentage(100);
+
+               //settings.Properties.NullText = "Nombre de la Linea de Inventario";
+               settings.ReadOnly = true;
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Validation = "OnInventoryLinesNameValidation";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.dateStar, settings =>
+                {
+                    settings.Name = "dateStarLabel";
+                    settings.Text = "Fecha de Inicio:*";
+                    settings.AssociatedControlName = "dateStar";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.dateStar, settings =>
+           {
+               settings.Name = "dateStar";
+               settings.Properties.ClientInstanceName = "dateStar";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnDateStarsValidation";
+               settings.Properties.ClientSideEvents.ValueChanged = "UpdateName";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.dateEnd, settings =>
+                {
+                    settings.Name = "dateEndLabel";
+                    settings.Text = "Fecha de Fin:*";
+                    settings.AssociatedControlName = "dateEnd";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.dateEnd, settings =>
+           {
+               settings.Name = "dateEnd";
+               settings.Properties.ClientInstanceName = "dateEnd";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnDateEndsValidation";
+               settings.Properties.ClientSideEvents.ValueChanged = "UpdateName";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.isActive, settings =>
+                {
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "isActive";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "isActive";
+
+                    settings.Width = Unit.Percentage(100);
+                }).GetHtml()
+            </td>
+            <td>
+                
+            </td>
+            <td>
+                
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.UseSubmitBehavior = false;
+                    settings.ClientSideEvents.Click = "ButtonCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+        @*<tr id="inventoryLineAlertRow" style="display: none;">
+            <td colspan="6">
+                <div class="alert alert-danger fade in" style="margin-top:18px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close" title="close" style="top: 0px; right: 0px;"><span aria-hidden="true">&times;</span></button>
+                    <span id="inventoryLineErrorMessage"></span>
+                </div>
+            </td>
+        </tr>*@
+    </table>
+
+
+<script src="~/Scripts/productionscheduleperiod/editform.js"></script>

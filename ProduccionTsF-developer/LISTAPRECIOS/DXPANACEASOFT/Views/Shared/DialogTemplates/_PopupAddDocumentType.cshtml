@@ -1,0 +1,26 @@
+﻿@{
+    var dialogAddDocumentType = Html.DevExpress().PopupControl(settings =>
+    {
+        settings.Name = "dialogAddDocumentType";
+        settings.PopupElementID = "maincontent";
+        settings.AllowDragging = true;
+        settings.ShowOnPageLoad = false;
+        settings.PopupAction = PopupAction.None;
+        settings.CloseAction = CloseAction.CloseButton;
+        settings.MinWidth = Unit.Pixel(640);
+        //settings.MinHeight = Unit.Pixel(480);
+        settings.PopupHorizontalAlign = PopupHorizontalAlign.Center;
+        settings.PopupVerticalAlign = PopupVerticalAlign.Middle;
+        settings.HeaderText = "Adicionar Tipo de Documento";
+
+        settings.SetContent(() =>
+        {
+            Html.RenderAction("DocumentTypeEditForm", "DocumentType");
+        });
+
+    });
+
+    ViewData["dialogAddDocumentType"] = dialogAddDocumentType;
+}
+
+@dialogAddDocumentType.GetHtml()

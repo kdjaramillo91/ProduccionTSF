@@ -1,0 +1,206 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.Models.AdvanceProviderDTO
+
+@model List<AdvanceProviderPLRG>
+
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "gvAdvanceProviderPLDetailRG";
+        settings.CallbackRouteValues = new { Controller = "AdvanceProvider", Action = "GetDetailAdvanceProviderRG" };
+
+        //settings.ClientSideEvents.BeginCallback = "RemissionGuideDetailViewAssignedStaff_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = false;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.SettingsPager.PageSize = 20;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv != null)
+                gv.ExpandAll();
+        };
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "OCnumber";
+            column.Name = "OCnumber";
+            column.Caption = "No. OC";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "RGnumber";
+            column.Name = "RGnumber";
+            column.Caption = "No. DE GUÍA";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Pnumber";
+            column.Name = "Pnumber";
+            column.Caption = "Piscina";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "QuantityPoundsReceived";
+            column.Name = "QuantityPoundsReceived";
+            column.Caption = "Libras Remitidas";
+
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(5);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var quantityPoundsReceived = DataBinder.Eval(c.DataItem, "QuantityPoundsReceived");
+                if (quantityPoundsReceived != null)
+                {
+                    decimal quantityPoundsReceivedTmp = Convert.ToDecimal(quantityPoundsReceived);
+                    ViewContext.Writer.Write(quantityPoundsReceivedTmp.ToString("N3"));
+                }
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "QuantityPoundsScurrid";
+            column.Name = "QuantityPoundsScurrid";
+            column.Caption = "Libras Recibidas - Escurrido";
+
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(5);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var quantityPoundsScurrid = DataBinder.Eval(c.DataItem, "QuantityPoundsScurrid");
+                if (quantityPoundsScurrid != null)
+                {
+                    decimal quantityPoundsScurridTmp = Convert.ToDecimal(quantityPoundsScurrid);
+                    ViewContext.Writer.Write(quantityPoundsScurridTmp.ToString("N3"));
+                }
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "sGrammage";
+            column.Name = "sGrammage";
+            column.Caption = "Gramaje";
+
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(5);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var sGrammage = DataBinder.Eval(c.DataItem, "sGrammage");
+                if (sGrammage != null)
+                {
+                    decimal sGrammageTmp = Convert.ToDecimal(sGrammage);
+                    ViewContext.Writer.Write(sGrammageTmp.ToString("N2"));
+                }
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Performance";
+            column.Name = "Performance";
+            column.Caption = "Rendimiento";
+
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(8);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                var performance = DataBinder.Eval(c.DataItem, "Performance");
+                if (performance != null)
+                {
+                    decimal performanceTmp = Convert.ToDecimal(performance);
+                    ViewContext.Writer.Write(performanceTmp.ToString("N2"));
+                }
+            });
+        });
+        settings.SummaryDisplayText = (s, e) =>
+        {
+            e.Text = string.Format("Total = {0:0.000}", e.Value);
+        };
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "QuantityPoundsReceived").DisplayFormat = "N3";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "QuantityPoundsScurrid").DisplayFormat = "N3";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Average, "sGrammage").DisplayFormat = "N3";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Average, "Performance").DisplayFormat = "N3";
+        //settings.TotalSummary.Add(new ASPxSummaryItem
+        //{
+        //    SummaryType = DevExpress.Data.SummaryItemType.Sum,
+        //    FieldName = "QuantityPoundsReceived",
+        //    DisplayFormat = "Total Libras: {0:c}"
+        //});
+        //settings.TotalSummary.Add(new ASPxSummaryItem
+        //{
+        //    SummaryType = DevExpress.Data.SummaryItemType.Sum,
+        //    FieldName = "QuantityPoundsScurrid",
+        //    DisplayFormat = "Total Libras Escurrido: {0:0.000}"
+        //});
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+}

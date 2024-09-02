@@ -1,0 +1,347 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data.Entity;
+using System.Web;
+using System.Web.Mvc;
+using DXPANACEASOFT.Models;
+using Excel = Microsoft.Office.Interop.Excel;
+namespace DXPANACEASOFT.Controllers
+{
+    [Authorize]
+    public class IceBagRangeController : DefaultController
+    {
+        [HttpPost]
+        public ActionResult Index()
+        {
+            return PartialView();
+        }
+
+        #region IceBagRange GRIDVIEW
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult IceBagRangePartial(int? keyToCopy)
+        {
+            if (keyToCopy != null)
+            {
+                ViewData["rowToCopy"] = db.IceBagRange.FirstOrDefault(b => b.id == keyToCopy);
+            }
+            var model = db.IceBagRange.Where(whl => whl.id_company == this.ActiveCompanyId);
+            return PartialView("_IceBagRangePartial", model.ToList());
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult IceBagRangePartialAddNew(IceBagRange item)
+        {
+            if (ModelState.IsValid)
+            {
+                using (DbContextTransaction trans = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        item.id_company = this.ActiveCompanyId;
+                        item.id_userCreate = ActiveUser.id;
+                        item.dateCreate = DateTime.Now;
+                        item.id_userUpdate = ActiveUser.id;
+                        item.dateUpdate = DateTime.Now;
+
+                        db.IceBagRange.Add(item);
+                        db.SaveChanges();
+                        trans.Commit();
+
+                        ViewData["EditMessage"] = SuccessMessage("Rango de Fundas de hielo: " + item.name + " guardada exitosamente");
+                    }
+                    catch (Exception)
+                    {
+                        trans.Rollback();
+                        ViewData["EditMessage"] = ErrorMessage();
+                    }
+                }
+
+            }
+            else
+            {
+                ViewData["EditMessage"] = ErrorMessage();
+            }
+
+            var model = db.IceBagRange.Where(o => o.id_company == this.ActiveCompanyId);
+            return PartialView("_IceBagRangePartial", model.ToList());
+        }
+
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult IceBagRangePartialUpdate(IceBagRange item)
+        {
+            if (ModelState.IsValid)
+            {
+                using (DbContextTransaction trans = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var modelItem = db.IceBagRange.FirstOrDefault(it => it.id == item.id);
+                        if (modelItem != null)
+                        {
+
+                            modelItem.code = item.code;
+                            modelItem.name = item.name;
+
+                            modelItem.id_metricUnit = item.id_metricUnit;
+                            modelItem.range_end = item.range_end;
+                            modelItem.range_ini = item.range_ini;
+
+                            modelItem.isActive = item.isActive;
+                            modelItem.id_company = ActiveCompany.id;
+                            modelItem.id_userUpdate = ActiveUser.id;
+                            modelItem.dateUpdate = DateTime.Now;
+
+                            db.IceBagRange.Attach(modelItem);
+                            db.Entry(modelItem).State = EntityState.Modified;
+
+                            db.SaveChanges();
+                            trans.Commit();
+
+                            ViewData["EditMessage"] = SuccessMessage("Rango de Fundas de hielo: " + item.name + " guardada exitosamente");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        trans.Rollback();
+                        ViewData["EditMessage"] = ErrorMessage();
+                    }
+                }
+            }
+            else
+            {
+                ViewData["EditMessage"] = ErrorMessage();
+            }
+
+            var model = db.IceBagRange.Where(o => o.id_company == this.ActiveCompanyId);
+            return PartialView("_IceBagRangePartial", model.ToList());
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult IceBagRangePartialDelete(System.Int32 id)
+        {
+            if (id >= 0)
+            {
+                using (DbContextTransaction trans = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var item = db.IceBagRange.FirstOrDefault(it => it.id == id);
+                        if (item != null)
+                        {
+                            item.isActive = false;
+                            item.id_userUpdate = ActiveUser.id;
+                            item.dateUpdate = DateTime.Now;
+
+                            db.IceBagRange.Attach(item);
+                            db.Entry(item).State = EntityState.Modified;
+
+                            db.SaveChanges();
+                            trans.Commit();
+
+
+                            ViewData["EditMessage"] = SuccessMessage("Rango de Fundas de hielo: " + (item?.name ?? "") + " desactivada exitosamente");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        ViewData["EditMessage"] = ErrorMessage();
+                        trans.Rollback();
+                    }
+                }
+            }
+            else
+            {
+                ViewData["EditMessage"] = ErrorMessage();
+            }
+
+            var model = db.IceBagRange.Where(o => o.id_company == this.ActiveCompanyId);
+            return PartialView("_IceBagRangePartial", model.ToList());
+        }
+
+        [HttpPost]
+        public ActionResult DeleteSelectedIceBagRange(int[] ids)
+        {
+            if (ids != null && ids.Length > 0)
+            {
+                using (DbContextTransaction trans = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var modelItem = db.IceBagRange.Where(i => ids.Contains(i.id));
+                        foreach (var item in modelItem)
+                        {
+                            item.isActive = false;
+
+                            item.id_userUpdate = ActiveUser.id;
+                            item.dateUpdate = DateTime.Now;
+
+                            db.IceBagRange.Attach(item);
+                            db.Entry(item).State = EntityState.Modified;
+                        }
+                        db.SaveChanges();
+                        trans.Commit();
+                        ViewData["EditMessage"] = SuccessMessage("Rango de Fudnas de hielo desactivadas exitosamente");
+                    }
+                    catch (Exception)
+                    {
+                        trans.Rollback();
+                        ViewData["EditMessage"] = ErrorMessage();
+                    }
+                }
+            }
+            else
+            {
+                ViewData["EditMessage"] = ErrorMessage();
+            }
+
+            var model = db.IceBagRange.Where(o => o.id_company == this.ActiveCompanyId);
+            return PartialView("_IceBagRangePartial", model.ToList());
+        }
+        #endregion
+
+        #region REPORTS
+
+        #endregion
+
+        #region AUXILIAR FUNCTIONS
+
+        [HttpPost]
+        public JsonResult ImportFileIceBagRange()
+        {
+            if (Request.Files.Count > 0)
+            {
+                HttpPostedFileBase file = Request.Files[0];
+
+                List<string> errorMessages = new List<string>();
+
+                if (file != null)
+                {
+                    string filename = Server.MapPath("~/App_Data/Temp/" + file.FileName);
+
+                    if (System.IO.File.Exists(filename))
+                    {
+                        System.IO.File.Delete(filename);
+                    }
+                    file.SaveAs(filename);
+
+                    Excel.Application application = new Excel.Application();
+                    Excel.Workbook workbook = application.Workbooks.Open(filename);
+
+                    if (workbook.Sheets.Count > 0)
+                    {
+                        Excel.Worksheet worksheet = workbook.ActiveSheet;
+                        Excel.Range table = worksheet.UsedRange;
+
+                        string code = string.Empty;
+                        string name = string.Empty;
+                        int id_metricUnit = 0;
+                        int range_ini = 0;
+                        int range_end = 0;
+
+                        using (DbContextTransaction trans = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                for (int i = 2; i < table.Rows.Count; i++)
+                                {
+                                    Excel.Range row = table.Rows[i]; // FILA i
+                                    try
+                                    {
+                                        code = row.Cells[1].Text;        // COLUMNA 1
+                                        name = row.Cells[2].Text;
+                                        id_metricUnit = int.Parse(row.Cells[3].Text);
+                                        range_ini = int.Parse(row.Cells[4].Text);
+                                        range_end = int.Parse(row.Cells[5].Text);
+                                    }
+                                    catch (Exception)
+                                    {
+                                        errorMessages.Add($"Error en formato de datos fila: {i}.");
+                                    }
+
+                                    IceBagRange iceBagRange = db.IceBagRange.FirstOrDefault(l => l.code.Equals(code));
+
+                                    if (iceBagRange == null)
+                                    {
+                                        iceBagRange = new IceBagRange
+                                        {
+                                            code = code,
+                                            name = name,
+
+                                            id_metricUnit = id_metricUnit,
+                                            range_ini = range_ini,
+                                            range_end = range_end,
+
+                                            isActive = true,
+                                            id_company = this.ActiveCompanyId,
+                                            id_userCreate = ActiveUser.id,
+                                            dateCreate = DateTime.Now,
+                                            id_userUpdate = ActiveUser.id,
+                                            dateUpdate = DateTime.Now
+                                        };
+
+                                        db.IceBagRange.Add(iceBagRange);
+                                    }
+                                    else
+                                    {
+                                        iceBagRange.code = code;
+                                        iceBagRange.name = name;
+                                        iceBagRange.id_metricUnit = id_metricUnit;
+                                        iceBagRange.range_ini = range_ini;
+                                        iceBagRange.range_end = range_end;
+
+                                        iceBagRange.id_userUpdate = ActiveUser.id;
+                                        iceBagRange.dateUpdate = DateTime.Now;
+
+                                        db.IceBagRange.Attach(iceBagRange);
+                                        db.Entry(iceBagRange).State = EntityState.Modified;
+                                    }
+                                }
+
+                                db.SaveChanges();
+                                trans.Commit();
+                            }
+                            catch (Exception)
+                            {
+                                trans.Rollback();
+                            }
+                        }
+                    }
+
+                    application.Workbooks.Close();
+
+                    if (System.IO.File.Exists(filename))
+                    {
+                        System.IO.File.Delete(filename);
+                    }
+
+                    return Json(file?.FileName, JsonRequestBehavior.AllowGet);
+                }
+            }
+            return Json(null, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ValidateCodeIceBagRange(int id_IceBagRange, string code)
+        {
+            IceBagRange iceBagRange = db.IceBagRange.FirstOrDefault(b => b.id_company == this.ActiveCompanyId
+                                                                            && b.code == code
+                                                                            && b.id != id_IceBagRange);
+
+            if (iceBagRange == null)
+            {
+                return Json(new { isValid = true, errorText = "" }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new { isValid = false, errorText = "Código en uso por otro Rango de Fundas de hielo" }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        #endregion
+    }
+}
+
+
+

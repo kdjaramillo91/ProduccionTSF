@@ -1,0 +1,72 @@
+﻿
+@*@using System.Globalization*@
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProviderPassportImportData
+@*@{
+    string codeState = (Model != null && Model.PurchaseOrder != null && Model.PurchaseOrder.Document.DocumentState.code != "") ? Model.PurchaseOrder.Document.DocumentState.code : "";
+}*@
+<table class="table table-condensed">
+    <tr>
+        <td style="border-spacing: 1px;">
+            @Html.DevExpress().LabelFor(m => m.appliesDoubleTaxationAgreementOnPayment, settings =>
+           {
+               settings.Name = "appliesDoubleTaxationAgreementOnPaymentLabel";
+               settings.Text = "Aplica Convenio de Doble Tributación en el pago:";
+               settings.AssociatedControlName = "appliesDoubleTaxationAgreementOnPayment";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.appliesDoubleTaxationAgreementOnPayment, settings =>
+       {
+           settings.Name = "appliesDoubleTaxationAgreementOnPayment";
+           settings.Properties.ClientInstanceName = "appliesDoubleTaxationAgreementOnPayment";
+           //settings.Properties.ClientSideEvents.CheckedChanged = "ShowDetailRise";
+           //settings.ReadOnly = codeState != "01";
+           //settings.ClientEnabled = code_purchaseReason != "MP";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnImportationValidation";
+       }).GetHtml()
+        </td>
+        <td style="border-spacing: 1px;">
+            @Html.DevExpress().LabelFor(m => m.subjectRetentionApplicationLegalNorm, settings =>
+           {
+               settings.Name = "subjectRetentionApplicationLegalNormLabel";
+               settings.Text = "Sujeto a retención en aplicación a la norma legal:";
+               settings.AssociatedControlName = "subjectRetentionApplicationLegalNorm";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.subjectRetentionApplicationLegalNorm, settings =>
+       {
+           settings.Name = "subjectRetentionApplicationLegalNorm";
+           settings.Properties.ClientInstanceName = "subjectRetentionApplicationLegalNorm";
+           //settings.Properties.ClientSideEvents.CheckedChanged = "ShowDetailRise";
+           //settings.ReadOnly = codeState != "01";
+           //settings.ClientEnabled = code_purchaseReason != "MP";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnImportationValidation";
+       }).GetHtml()
+        </td>
+        <td style="border-spacing: 1px;">
+            @Html.DevExpress().LabelFor(m => m.relatedParty, settings =>
+           {
+               settings.Name = "relatedPartyLabel";
+               settings.Text = "Parte Relacionada:";
+               settings.AssociatedControlName = "relatedParty";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.relatedParty, settings =>
+       {
+           settings.Name = "relatedParty";
+           settings.Properties.ClientInstanceName = "relatedParty";
+           //settings.Properties.ClientSideEvents.CheckedChanged = "ShowDetailRise";
+           //settings.ReadOnly = codeState != "01";
+           //settings.ClientEnabled = code_purchaseReason != "MP";
+           settings.ShowModelErrors = true;
+           //settings.Properties.ClientSideEvents.Validation = "OnImportationValidation";
+       }).GetHtml()
+        </td>
+    </tr>
+</table>

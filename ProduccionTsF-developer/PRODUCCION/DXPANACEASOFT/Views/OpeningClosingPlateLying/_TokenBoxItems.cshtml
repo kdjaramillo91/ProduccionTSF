@@ -1,0 +1,21 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingDTO
+
+@Html.DevExpress().TokenBoxFor(model => model.ids_item, settings =>
+{
+    settings.Name = "TokenBoxItems";
+    settings.Width = Unit.Percentage(100);
+    //settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "OpeningClosingPlateLying",
+        Action = "TokenBoxItems",
+    };
+    settings.Properties.ClientSideEvents.ValueChanged = "TokenBoxItems_ValueChanged";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.AllowCustomTokens = false;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["Items"]).GetHtml()

@@ -1,0 +1,65 @@
+﻿
+@using DXPANACEASOFT.Models
+
+@model ProductionLotLiquidation
+
+@{
+}
+@{
+    var name = String.Concat("ItemDetail", this.Model.id);
+    int? idItem = 0;
+    if (this.Model.id_item > 0)
+    {
+        idItem = this.Model.id_item;
+    }
+    else
+    {
+        idItem = null;
+    }
+
+}
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = name;
+
+
+		var p = settings.Properties;
+		p.ClientInstanceName = name;
+		p.ValueField = "id";
+
+		p.ValueType = typeof(int);
+
+		p.TextFormatString = "{0},{2} - {1}";
+		p.CallbackPageSize = 30;
+		p.DropDownStyle = DropDownStyle.DropDownList;
+		p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		p.IncrementalFilteringDelay = 250;
+		
+		p.Columns.Add("auxCode", "Código Auxiliar", Unit.Pixel(150));
+		p.Columns.Add("masterCode", "Código Producto", Unit.Pixel(100));
+		p.Columns.Add("name", "Nombre del Producto", Unit.Pixel(300));
+		p.DropDownWidth = 550;
+
+		p.ClientSideEvents.Init = "ItemCombo_OnInit";
+		p.ClientSideEvents.BeginCallback = "OnItemDetailBeginCallback";
+		//p.ClientSideEvents.EndCallback = "OnItemDetailEndCallback";
+		p.ClientSideEvents.SelectedIndexChanged = "DetailsItemsCombo_SelectedIndexChanged";
+		p.ClientSideEvents.Validation = "OnItemProductionLotLiquidationDetailValidation";
+		p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+		settings.CallbackRouteValues = new { Controller = "ProductionLot", Action = "GetItems" };
+
+		settings.Width = Unit.Percentage(98);
+		settings.ReadOnly = true;
+
+		settings.ItemTextCellPrepared = (sender, e) =>
+		{
+			e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+			//var comboItem = (DevExpress.Web.Mvc.MVCxComboBox)sender;
+			//e.TextCell.Text = comboItem.Text;
+		};
+
+
+
+	}).BindList(ViewData["_ItemsDetailEditPLL"]).Bind(idItem).GetHtml()

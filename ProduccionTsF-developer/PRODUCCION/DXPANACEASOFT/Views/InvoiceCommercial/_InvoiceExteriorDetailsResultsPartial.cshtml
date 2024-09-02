@@ -1,0 +1,35 @@
+﻿@model List<DXPANACEASOFT.Models.InvoiceExterior>
+
+<div id="GridMessageErrorInvoiceExterior" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorInvoiceExterior";
+           settings.Properties.ClientInstanceName = "gridMessageErrorInvoiceExterior";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGenerateInvoiceCommercial";
+    settings.Text = "Generar Factura Commercial";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "GenerateInvoiceCommercial";
+}).GetHtml()
+
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+    TempData["isInvoiceCmmercialInvFex"] = 1;
+    TempData.Keep("isInvoiceCmmercialInvFex");
+
+
+
+    Html.RenderPartial("_InvoiceExteriorDetailsPartial", Model);
+}
+
+<script src="~/Scripts/invoicecommercial/index.js"></script>

@@ -1,0 +1,124 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PurchaseOrder
+@using DXPANACEASOFT.DataProviders
+
+@{
+    string codeState = (Model != null) ? Model.Document.DocumentState.code : "";
+    string parOCDetail = DataProviderSetting.ValueSetting("DPGOCD");
+    
+}
+<div id="GridMessageErrorPurchaseOrder" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorPurchaseOrder";
+           settings.Properties.ClientInstanceName = "gridMessageErrorPurchaseOrder";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td colspan="6">
+            @{
+                var details = (Model != null && Model.PurchaseOrderDetail != null) ? Model.PurchaseOrderDetail.ToList() : new List<PurchaseOrderDetail>();
+                var detailsBG = (Model != null && Model.PurchaseOrderDetailByGrammage != null) ? Model.PurchaseOrderDetailByGrammage.ToList() : new List<PurchaseOrderDetailByGrammage>();
+                if (parOCDetail == "1")
+                {
+                    if (codeState == "01")
+                    {
+                        Html.RenderPartial("EspecialButtons/PriceListDetails");
+                        Html.RenderPartial("DocumentTemplates/_DocumentDetailsActionsButtonsBG");
+                        Html.RenderPartial("_PurchaseOrderDetailsPartialBG", detailsBG);
+                    }
+                    else
+                    {
+                        Html.RenderPartial("EspecialButtons/PriceListDetails");
+                        Html.RenderPartial("_PurchaseOrderResultsDetailViewDetailsPartialBG", detailsBG);
+                    }
+                }
+                else
+                {
+                    if (codeState == "01")
+                    {
+                        Html.RenderPartial("DocumentTemplates/_DocumentDetailsActionsButtons");
+                        Html.RenderPartial("_PurchaseOrderDetailsPartial", details);
+                    }
+                    else
+                    {
+                        Html.RenderPartial("_PurchaseOrderResultsDetailViewDetailsPartial", details);
+                    }
+                }
+
+            }
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Totales</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Subtotal:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.PurchaseOrderTotal.subtotal, settings =>
+                {
+                    settings.Name = "orderSubtotal";
+                    settings.Properties.ClientInstanceName = "orderSubtotal";
+                    settings.Properties.DisplayFormatString = "C2";
+                    settings.ReadOnly = true;
+                }).GetHtml()
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Base Imponible IVA 12%:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.PurchaseOrderTotal.subtotalIVA12Percent, settings =>
+                {
+                    settings.Name = "orderSubtotalIVA12Percent";
+                    settings.Properties.ClientInstanceName = "orderSubtotalIVA12Percent";
+                    settings.Properties.DisplayFormatString = "C2";
+                    settings.ReadOnly = true;
+                }).GetHtml()
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">IVA 12%:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.PurchaseOrderTotal.totalIVA12, settings =>
+                {
+                    settings.Name = "orderTotalIVA12";
+                    settings.Properties.ClientInstanceName = "orderTotalIVA12";
+                    settings.Properties.DisplayFormatString = "C2";
+                    settings.ReadOnly = true;
+                }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Total:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.PurchaseOrderTotal.total, settings =>
+                {
+                    settings.Name = "orderTotal";
+                    settings.Properties.ClientInstanceName = "orderTotal";
+                    settings.Properties.DisplayFormatString = "C2";
+                    settings.ReadOnly = true;
+                }).GetHtml()
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,89 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.IdentificationType
+
+@{
+    ViewData["id_company"] = Model.id;
+}
+
+
+
+<table>
+    <tr>
+        <td Width="90"> </td>
+        <td></td>
+        <td Width="50"></td>
+        <td Width="125"></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td> Descripci&oacute;n: </td>
+        <td colspan="4">
+            @{
+                if (Model != null)
+                {
+                    ViewContext.Writer.Write(Model.description);
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td> Creado por:</td>
+        <td>
+            @{
+                if (Model != null)
+                {
+                    if (Model.id_userCreate != null)
+                    {
+                        var userCreate = GetUserName((int)Model.id_userCreate);
+                        ViewContext.Writer.Write(userCreate);
+                    }
+                }
+            }
+        </td>
+        <td></td>
+        <td> Fecha de Creaci&oacute;n:</td>
+        <td>
+            @{
+                if (Model != null)
+                {
+                    ViewContext.Writer.Write(Model.dateCreate);
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td> Modificado por:</td>
+        <td>
+            @{
+                if (Model != null)
+                {
+                        if (Model.id_userUpdate != null)
+                        {
+                            var userUpdate = GetUserName((int)Model.id_userUpdate);
+                            ViewContext.Writer.Write(userUpdate);
+                        }
+                }
+            }
+        </td>
+        <td></td>
+        <td> Fecha de Modificaci&oacute;n:</td>
+        <td>
+            @{
+                if (Model != null)
+                {
+                    ViewContext.Writer.Write(Model.dateUpdate);
+                }
+            }
+        </td>
+    </tr>
+</table>
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

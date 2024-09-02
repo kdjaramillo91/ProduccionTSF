@@ -1,0 +1,18 @@
+﻿
+@Html.DevExpress().TokenBox(settings =>
+{
+    settings.Name = "TokenBoxMasteredItemsIndex";
+    settings.Width = Unit.Percentage(100);
+    settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Mastered",
+        Action = "TokenBoxMasteredItemsIndex",
+    };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.AllowCustomTokens = false;   
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+}).BindList(ViewData["MasteredItemsIndex"]).GetHtml()
+

@@ -1,0 +1,29 @@
+﻿
+@model List<DXPANACEASOFT.Models.PurchaseRequestDetail>
+
+<div id="GridMessageErrorPurchaseRequest" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorPurchaseRequest";
+           settings.Properties.ClientInstanceName = "gridMessageErrorPurchaseRequest";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGenerateOrder";
+    settings.Text = "Generar Orden";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "GenerateOrder";
+}).GetHtml()
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+    Html.RenderPartial("_PurchaseRequestDetailsPartial", Model);
+}
+

@@ -1,0 +1,215 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InvoiceCommercial
+
+
+@{
+
+	//int id_invoiceCommercial = (Model != null) ? Model.id : 0;
+	DocumentState documentState = (Model != null && Model.Document != null && Model.Document.id_documentState != 0) ? DataProviderDocumentState.DocumentStateById(Model.Document.id_documentState) : DataProviderDocumentState.DocumentStateByCodeByCompany((int)ViewData["id_company"], "01");
+
+	Html.DevExpress<InvoiceCommercial>().FormLayout(settings =>
+	{
+		settings.Name = "formLayoutEditInvoiceCommercialContainerMainFormTab";
+		settings.Width = Unit.Percentage(60);
+//settings.Attributes.CssStyle.Add("padding", "10");
+settings.ColCount = 2;
+
+
+
+		var groupContainer = settings.Items.AddGroupItem(i =>
+		{
+			i.Caption = "   ";
+			i.ColCount = 2;
+			i.ColSpan = 2;
+			i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+			i.GroupBoxDecoration = GroupBoxDecoration.None;
+		});
+
+#region Fila 1
+
+//numeroContenedores
+groupContainer.Items.Add(m => m.numeroContenedores, item =>
+		{
+			item.Name = "numeroContenedores";
+			item.Caption = "Cantidad de Contenedores";
+			item.Width = Unit.Percentage(30);
+	//item.CaptionStyle.Font.Bold = true;
+	//item.ShowCaption = DefaultBoolean.False;
+	//item.ColSpan = 5;
+	// item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+	//item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+	//item.Width = Unit.Percentage(100);
+
+	item.NestedExtension().SpinEdit(spinedit =>
+			{
+
+
+				spinedit.Properties.DisplayFormatString = "#,##0";
+		//spinedit.Properties.DisplayFormatString = "N2";
+		//spinedit.Properties.DecimalPlaces = 2;
+		spinedit.Properties.NumberType = SpinEditNumberType.Integer;
+				spinedit.Properties.ClientInstanceName = "numeroContenedores";
+		//spinedit.Properties.MaxLength = 6;
+		//spinedit.Properties.MinValue = 0.01M;
+		//spinedit.Properties.MaxValue = 100.00M;
+		//textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+		spinedit.Properties.SpinButtons.ShowIncrementButtons = false;
+				spinedit.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+				spinedit.RightToLeft = DefaultBoolean.True;// Properties.text
+
+		spinedit.ReadOnly = Model.numeroContenedores_CSI.isReadOnly;
+
+		/*if(accesoControl.isRequired)
+		{
+			spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+			spinedit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+		}*/
+
+				spinedit.Properties.ValidationSettings.CausesValidation = true;
+				spinedit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				spinedit.Properties.ValidationSettings.ValidateOnLeave = true;
+				spinedit.Properties.ValidationSettings.SetFocusOnError = true;
+				spinedit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+		//textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+		//spinedit.Properties.ValidationSettings.EnableCustomValidation = true;
+		//spinedit.ShowModelErrors = true;
+		//spinedit.Properties.ClientSideEvents.Validation = (codeState == "01") ? "OnNumeroContenedoresValidation" : "";
+		//spinedit.Properties.ClientSideEvents.Validation = "OnNumeroContenedoresValidation";
+	});
+		});
+
+//id_capacityContainer
+groupContainer.Items.Add(m => m.id_capacityContainer, item =>
+		{
+			item.Name = "id_capacityContainer";
+	//item.ClientVisible = false;
+	item.Caption = "Capacidad del Contenedor";
+			item.ShowCaption = DefaultBoolean.False;
+	//item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+	//item.RequiredField.IsRequired
+	//item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+	item.Width = Unit.Percentage(85);
+	//item.ColSpan = 2;
+
+	item.NestedExtension().ComboBox(comboBox =>
+			{
+
+				comboBox.Properties.ClientInstanceName = "id_capacityContainer";
+				comboBox.Properties.ValueField = "id";
+				comboBox.Properties.TextField = "name";
+				comboBox.Properties.DataSource = DataProviderCapacityContainer.AllCapacityContainer();
+				comboBox.Properties.ValueType = typeof(string);
+
+		//comboBox.ShowModelErrors = true;
+		comboBox.ReadOnly = Model.id_capacityContainer_CSI.isReadOnly;
+
+				if (Model.id_capacityContainer_CSI.isRequired)
+				{
+					comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+					comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				}
+
+				comboBox.Properties.ValidationSettings.CausesValidation = true;
+				comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+				comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+				comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+		//comboBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+		//comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+		comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		//comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "ItemComboBox_SelectedIndexChanged";
+		//comboBox.Properties.ClientSideEvents.Init = "ItemComboBox_Init";
+		//comboBox.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "GetDetailItemInvoiceCommercial" };
+		//comboBox.Properties.ClientSideEvents.BeginCallback = "ItemComboBox_BeginCallback";
+
+	});
+		});
+
+////Empty Col1
+//groupNegotiationInformation.Items.AddEmptyItem();
+
+#endregion
+
+#region Fila 11
+////groupInformationContainer
+//var groupInformationContainer = groupNegotiationInformation.Items.AddGroupItem(i =>
+//{
+//    i.Caption = "Información Contenedores";
+//    i.SettingsItemHelpTexts.Position = HelpTextPosition.Bottom;
+//    i.ColSpan = 1;
+//    i.ColCount = 1;
+//    i.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+//});
+//gvInformationContainer
+groupContainer.Items.Add(item =>
+		{
+
+			item.Width = Unit.Percentage(100);
+			item.Caption = "Información Contenedores";
+			item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+
+			item.SetNestedContent(() =>
+			{
+
+				if (!Model.gvFormContainer_CSI.isReadOnly)
+				{
+					Html.RenderPartial("InvoiceCommercialButtons/_InvoiceCommercialContainerActionsButtons");
+				}
+				ViewData["codeState"] = documentState.code;
+				Html.RenderPartial("_InvoiceCommercialEditFormContainerPartial", Model.InvoiceCommercialContainer.OrderBy(ob => ob.id).ToList());
+			});
+	//item.SetNestedContent(Html.Action("PageControlEdit").ToHtmlString());
+
+});
+
+//descriptionInvoiceCommercial
+groupContainer.Items.Add(m => m.description, item =>
+		{
+			item.Name = "descriptionInvoiceCommercial";
+			item.Caption = "Descripción";
+	//item.Width = Unit.Percentage(35);
+	item.ColSpan = 2;
+	//item.ShowCaption = DefaultBoolean.False;
+	//item.Paddings.PaddingTop = 5;
+
+	item.NestedExtension().Memo(memo =>
+			{
+
+				memo.Properties.ClientInstanceName = "descriptionInvoiceCommercial";
+				memo.Width = Unit.Percentage(100);
+				memo.Properties.MaxLength = 255;
+		//textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+		memo.Properties.Rows = 3;
+				memo.ReadOnly = Model.description_CSI.isReadOnly;
+
+		//memo.Properties.CleaButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		if (Model.description_CSI.isRequired)
+				{
+					memo.Properties.ValidationSettings.RequiredField.IsRequired = true;
+					memo.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+				}
+
+				memo.Properties.ValidationSettings.CausesValidation = true;
+				memo.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+				memo.Properties.ValidationSettings.ValidateOnLeave = true;
+				memo.Properties.ValidationSettings.SetFocusOnError = true;
+				memo.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+		//memo.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+		memo.Properties.ValidationSettings.EnableCustomValidation = true;
+				memo.ShowModelErrors = true;
+			});
+		});
+////Empty Col1
+//groupNegotiationInformation.Items.AddEmptyItem();
+
+#endregion
+
+}).Render();
+}
+

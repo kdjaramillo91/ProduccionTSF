@@ -1,0 +1,101 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.ProductionLotPayment>
+@using System.Collections.Generic;
+
+@{
+	int id_productionLotPayment = ViewBag.idPoductionLotReceptionPayment != null ? (int)ViewBag.idPoductionLotReceptionPayment : 0;
+	DBContext _db = null;
+	_db = new DBContext();
+	var id_productionLotAux = ViewBag.idProductionLotPayment != null ? (int)ViewBag.idProductionLotPayment : 0;
+	var esError = ViewBag.errorSave != null ? (bool)ViewBag.errorSave : false;
+
+	ProductionLotPayment modelAux = new ProductionLotPayment();
+	List<ProductionLotPayment> modelAuxPayment = new List<ProductionLotPayment>();
+	List<ProductionLotPaymentDistributed> modelDistributed = new List<ProductionLotPaymentDistributed>();
+
+	//Acces0 variable Temporal
+	ProductionLotPayment productionLotPayment = (TempData["productionLotPayment"] as ProductionLotPayment);
+
+	if (id_productionLotPayment > 0)
+	{
+		modelAux = _db.ProductionLotPayment.FirstOrDefault(e => e.id == id_productionLotPayment);
+
+		productionLotPayment = productionLotPayment ?? _db.ProductionLotPayment.FirstOrDefault(i => i.id == id_productionLotPayment);
+		productionLotPayment = productionLotPayment ?? new ProductionLotPayment();
+
+		modelDistributed = productionLotPayment.ProductionLotPaymentDistributed.Where(e => e.id_productionLotPayment == id_productionLotPayment && e.isActive == true).ToList();
+
+		if(esError)
+		{
+			modelAuxPayment = productionLotPayment.ProductionLot.ProductionLotPayment.Where(e => e.id == id_productionLotPayment).ToList();
+		}
+
+		if(modelDistributed.Count() == 0)
+		{
+			modelDistributed = _db.ProductionLotPaymentDistributed.Where(e => e.id_productionLotPayment == id_productionLotPayment && e.isActive == true).ToList();
+		}
+
+	}
+	else
+	{
+		modelAux = _db.ProductionLotPayment.FirstOrDefault(e => e.id == id_productionLotAux);
+
+		productionLotPayment = productionLotPayment ?? _db.ProductionLotPayment.FirstOrDefault(i => i.id == id_productionLotAux);
+		productionLotPayment = productionLotPayment ?? new ProductionLotPayment();
+
+		modelDistributed = productionLotPayment.ProductionLotPaymentDistributed.Where(e => e.id_productionLotPayment == id_productionLotAux && e.isActive == true).ToList();
+	}
+
+	var modelL = _db.ProductionLot.FirstOrDefault(e => e.id == modelAux.id_productionLot);
+
+	TempData["productionLotPayment"] = productionLotPayment;
+	TempData.Keep("productionLotPayment");
+}
+
+<div id="GridMessageError" style="display: none;">
+	@Html.DevExpress().Label(settings =>
+	{
+		settings.Name = "gridMessageError";
+		settings.Properties.ClientInstanceName = "gridMessageError";
+		settings.Text = "";
+	}).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+	<tr style="border-bottom: 1px solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Lote:</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6">
+			@{
+				Html.RenderPartial("_ProductionLotReceptionEditFormLotDistributedDetailPartial", modelL);
+			}
+		</td>
+	</tr>
+	<tr style="border-bottom: 1px solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Producto Liquidación</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6">
+			@{
+				Html.RenderPartial("_ProductionLotReceptionDistributedEditPartialDetail", Model);
+			}
+		</td>
+	</tr>
+	<tr style="border-bottom: 1px solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Distribución</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@{ 
+				Html.RenderPartial("_ProductionLotReceptionLiquidationDistributedTableNewDetailPartial", modelDistributed);
+			}
+		</td>
+	</tr>
+</table>

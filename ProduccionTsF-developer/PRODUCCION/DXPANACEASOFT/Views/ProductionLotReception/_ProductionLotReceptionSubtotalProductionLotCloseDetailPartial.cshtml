@@ -1,0 +1,633 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+
+@*<script src="~/Scripts/procpresconstruccion/comentariopospuesto.js"></script>*@
+
+@{
+    @*@Html.Hidden("id_typeFiltersConfiguration", null)
+    @Html.Hidden("code_typeFiltersConfiguration", null)
+    @Html.Hidden("datasource_advancedFiltersConfiguration", null)*@
+    @*@Html.HiddenFor(m => m.ciacodigo, new { @id = "ciacodigoPopup" })*@
+
+Html.DevExpress<ProductionLot>().FormLayout(settings =>
+{
+
+    settings.Name = "formLayoutEditProductionLotSubtotal";
+    settings.Width = Unit.Percentage(100);
+    settings.ColCount = 11;//5, 2, 2, 1, 1
+
+    //Fila 1
+    #region Fila 1
+
+    //Titulo: SubTotal Entero
+    settings.Items.Add(item =>
+    {
+        item.Name = "TitleWholeSubtotal";
+        item.Caption = "SubTotal Entero";
+        //item.RowSpan = 5;
+        item.ColSpan = 5;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        //item.NestedExtension().SpinEdit(spinedit =>
+        //{
+        //    spinedit.Width = Unit.Percentage(100);
+        //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //    spinedit.Properties.DisplayFormatString = "N2";
+        //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //    spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+        //    spinedit.Properties.MaxLength = 17;
+        //    spinedit.Properties.MinValue = 0.01M;
+        //    spinedit.Properties.MaxValue = 99999999999999.99M;
+        //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //    spinedit.ReadOnly = true;
+
+        //    //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+        //    //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+        //    //textBox.Properties.ValidationSettings.CausesValidation = true;
+        //    //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+        //    //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+        //    //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+        //    //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+        //    //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+        //    //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+        //    //textBox.ShowModelErrors = true;
+        //});
+    });
+
+    //Ajuste de libras de entero
+    settings.Items.Add(m => m.totalAdjustmentWholePounds, item =>
+    {
+        item.Name = "totalAdjustmentWholePounds";
+        item.Caption = "SubTotal Entero";
+        item.ShowCaption = DefaultBoolean.False;
+        item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "totalAdjustmentWholePounds";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    //Columna en blanco
+    settings.Items.Add(item =>
+    {
+        item.Name = "blankColumn";
+        item.Caption = "";
+        //item.RowSpan = 5;
+        item.ColSpan = 2;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        //item.NestedExtension().SpinEdit(spinedit =>
+        //{
+        //    spinedit.Width = Unit.Percentage(100);
+        //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //    spinedit.Properties.DisplayFormatString = "N2";
+        //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //    spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+        //    spinedit.Properties.MaxLength = 17;
+        //    spinedit.Properties.MinValue = 0.01M;
+        //    spinedit.Properties.MaxValue = 99999999999999.99M;
+        //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //    spinedit.ReadOnly = true;
+
+        //    //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+        //    //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+        //    //textBox.Properties.ValidationSettings.CausesValidation = true;
+        //    //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+        //    //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+        //    //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+        //    //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+        //    //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+        //    //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+        //    //textBox.ShowModelErrors = true;
+        //});
+    });
+
+    //SubTotal de libras de Entero Ajustado
+    settings.Items.Add(m => m.wholeSubtotalAdjust, item =>
+    {
+        item.Name = "wholeSubtotalAdjust";
+        item.Caption = "SubTotal Entero Ajustado";
+        item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "wholeSubtotalAdjust";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    //Porciento de Rendimiento de Entero Ajustado
+    settings.Items.Add(item =>
+    {
+        item.Name = "percentPerformanceWholeSubtotalAdjust";
+        item.Caption = "% Rendimiento Entero Ajustado";
+        item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "percentPerformanceWholeSubtotalAdjust";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+
+            spinedit.Properties.ClientSideEvents.Init = "PercentPerformanceWholeSubtotalAdjust_Init";
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    #endregion
+
+    //Fila 2
+    #region Fila 2
+
+    //Titulo: SubTotal Cola
+    settings.Items.Add(item =>
+    {
+        item.Name = "titleSubtotalTail";
+        item.Caption = "SubTotal Cola";
+        //item.RowSpan = 5;
+        item.ColSpan = 5;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        //item.NestedExtension().SpinEdit(spinedit =>
+        //{
+        //    spinedit.Width = Unit.Percentage(100);
+        //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //    spinedit.Properties.DisplayFormatString = "N2";
+        //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //    spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+        //    spinedit.Properties.MaxLength = 17;
+        //    spinedit.Properties.MinValue = 0.01M;
+        //    spinedit.Properties.MaxValue = 99999999999999.99M;
+        //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //    spinedit.ReadOnly = true;
+
+        //    //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+        //    //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+        //    //textBox.Properties.ValidationSettings.CausesValidation = true;
+        //    //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+        //    //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+        //    //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+        //    //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+        //    //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+        //    //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+        //    //textBox.ShowModelErrors = true;
+        //});
+    });
+
+    //Ajuste de libras de cola
+    settings.Items.Add(m => m.totalAdjustmentTailPounds, item =>
+    {
+        item.Name = "totalAdjustmentTailPounds";
+        item.Caption = "SubTotal Cola";
+        item.ShowCaption = DefaultBoolean.False;
+        item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "totalAdjustmentTailPounds";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    //Columna en blanco
+    settings.Items.Add(item =>
+    {
+        item.Name = "blankColumn2";
+        item.Caption = "";
+        //item.RowSpan = 5;
+        item.ColSpan = 2;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        //item.NestedExtension().SpinEdit(spinedit =>
+        //{
+        //    spinedit.Width = Unit.Percentage(100);
+        //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //    spinedit.Properties.DisplayFormatString = "N2";
+        //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //    spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+        //    spinedit.Properties.MaxLength = 17;
+        //    spinedit.Properties.MinValue = 0.01M;
+        //    spinedit.Properties.MaxValue = 99999999999999.99M;
+        //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //    spinedit.ReadOnly = true;
+
+        //    //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+        //    //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+        //    //textBox.Properties.ValidationSettings.CausesValidation = true;
+        //    //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+        //    //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+        //    //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+        //    //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+        //    //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+        //    //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+        //    //textBox.ShowModelErrors = true;
+        //});
+    });
+
+    //SubTotal de libras de Cola Ajustado
+    settings.Items.Add(m => m.subtotalTailAdjust, item =>
+    {
+        item.Name = "subtotalTailAdjust";
+        item.Caption = "SubTotal Cola Ajustado";
+        item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "subtotalTailAdjust";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    //Porciento de Rendimiento de Cola Ajustado
+    settings.Items.Add(item =>
+    {
+        item.Name = "percentPerformanceSubtotalTailAdjust";
+        item.Caption = "% Rendimiento Cola Ajustado";
+        item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "percentPerformanceSubtotalTailAdjust";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+
+            //spinedit.Properties.ClientSideEvents.Init = "PercentPerformanceWholeSubtotalAdjust_Init";
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    #endregion
+
+    //Fila 3
+    #region Fila 3
+
+    //Titulo: Total
+    settings.Items.Add(item =>
+    {
+        item.Name = "titleTotal";
+        item.Caption = "Total";
+        //item.RowSpan = 5;
+        item.ColSpan = 5;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        //item.NestedExtension().SpinEdit(spinedit =>
+        //{
+        //    spinedit.Width = Unit.Percentage(100);
+        //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //    spinedit.Properties.DisplayFormatString = "N2";
+        //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //    spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+        //    spinedit.Properties.MaxLength = 17;
+        //    spinedit.Properties.MinValue = 0.01M;
+        //    spinedit.Properties.MaxValue = 99999999999999.99M;
+        //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //    spinedit.ReadOnly = true;
+
+        //    //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+        //    //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+        //    //textBox.Properties.ValidationSettings.CausesValidation = true;
+        //    //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+        //    //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+        //    //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+        //    //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+        //    //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+        //    //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+        //    //textBox.ShowModelErrors = true;
+        //});
+    });
+
+    //Ajuste Total de libras
+    settings.Items.Add(m => m.totalAdjustmentPounds, item =>
+    {
+        item.Name = "totalAdjustmentPounds";
+        item.Caption = "Total Ajustado";
+        item.ShowCaption = DefaultBoolean.False;
+        item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "totalAdjustmentPounds";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    //Columna en blanco
+    settings.Items.Add(item =>
+    {
+        item.Name = "blankColumn3";
+        item.Caption = "";
+        //item.RowSpan = 5;
+        item.ColSpan = 2;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        //item.NestedExtension().SpinEdit(spinedit =>
+        //{
+        //    spinedit.Width = Unit.Percentage(100);
+        //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //    spinedit.Properties.DisplayFormatString = "N2";
+        //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //    spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+        //    spinedit.Properties.MaxLength = 17;
+        //    spinedit.Properties.MinValue = 0.01M;
+        //    spinedit.Properties.MaxValue = 99999999999999.99M;
+        //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //    spinedit.ReadOnly = true;
+
+        //    //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+        //    //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+        //    //textBox.Properties.ValidationSettings.CausesValidation = true;
+        //    //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+        //    //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+        //    //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+        //    //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+        //    //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+        //    //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+        //    //textBox.ShowModelErrors = true;
+        //});
+    });
+
+    //Total de libras Ajustado
+    settings.Items.Add(m => m.totalQuantityLiquidationAdjust, item =>
+    {
+        item.Name = "totalQuantityLiquidationAdjust";
+        item.Caption = "Total de Libras Ajustada";
+        item.ShowCaption = DefaultBoolean.False;
+        //item.ColSpan = 2;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.DisplayFormatString = "N2";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "totalQuantityLiquidationAdjust";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            spinedit.ReadOnly = true;
+
+            //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    //Columna en blanco
+    settings.Items.Add(item =>
+    {
+        item.Name = "blankColumn4";
+        item.Caption = "";
+        //item.RowSpan = 5;
+        //item.ColSpan = 2;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden; //.RequiredField.IsRequired
+        //item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        //item.NestedExtension().SpinEdit(spinedit =>
+        //{
+        //    spinedit.Width = Unit.Percentage(100);
+        //    //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+        //    spinedit.Properties.DisplayFormatString = "N2";
+        //    spinedit.Properties.NumberType = SpinEditNumberType.Float;
+        //    spinedit.Properties.ClientInstanceName = "wholeSubtotal";
+        //    spinedit.Properties.MaxLength = 17;
+        //    spinedit.Properties.MinValue = 0.01M;
+        //    spinedit.Properties.MaxValue = 99999999999999.99M;
+        //    //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+        //    spinedit.ReadOnly = true;
+
+        //    //spinedit.Properties.ValidationSettings.RequiredField.IsRequired = false;
+        //    //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+        //    //textBox.Properties.ValidationSettings.CausesValidation = true;
+        //    //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+        //    //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+        //    //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+        //    //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+        //    //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+        //    //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+        //    //textBox.ShowModelErrors = true;
+        //});
+    });
+
+    #endregion
+
+}).Render();
+}
+

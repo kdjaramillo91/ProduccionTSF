@@ -1,0 +1,31 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ProductionLot
+@{
+	string codeState = (Model != null && Model.ProductionLotState.code != null) ? Model.ProductionLotState.code : "";
+	int? id_productionUnitProvider = (Model != null && Model.id_productionUnitProvider != 0) ? (int?)Model.id_productionUnitProvider : null;
+	int? id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+
+	var loteManual = (bool?)this.ViewBag.loteManual ?? false;
+}
+
+
+@Html.DevExpress().ComboBoxFor(m => m.id_productionUnitProvider, settings =>
+{
+	settings.Name = "id_productionUnitProvider";
+	settings.Properties.ClientInstanceName = "id_productionUnitProvider";
+	settings.Properties.ValueField = "id";
+	settings.Properties.TextField = "name";
+	settings.Properties.ValueType = typeof(int);
+	settings.Width = Unit.Percentage(100);
+	settings.ReadOnly = (!loteManual) ? true: false;// codeState != "01" ;
+	settings.ShowModelErrors = true;
+	settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionUnitProviderByProvider" };
+
+	settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_provider'] = id_provider.GetValue(); }";
+	settings.Properties.CallbackPageSize = 20;
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { id_productionUnitProviderPool.PerformCallback(); }";
+	settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { id_productionUnitProviderPool.PerformCallback();}";
+
+
+	//}).BindList(TempData["ProductionUnitProviderByProvider"]).Bind(id_productionUnitProvider).GetHtml()
+}).BindList(DataProviderProductionUnitProvider.ProductionUnitProviderByProvider(id_productionUnitProvider, id_provider)).Bind(id_productionUnitProvider).GetHtml()

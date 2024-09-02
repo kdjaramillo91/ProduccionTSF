@@ -1,0 +1,42 @@
+﻿@using CriterioResumen = DXPANACEASOFT.Controllers.CostProductValuationController.CriterioResumen
+@model IList<CriterioResumen>
+
+<style type="text/css">
+	.bold {
+		font-weight: bold;
+	}
+</style>
+<div class="section">
+	<table class="table table-condensed" style="max-width: 60%">
+		<thead>
+			<tr>
+				<th>CATEGORÍA</th>
+				<th style="text-align: right;">LIBRAS</th>
+				<th style="text-align: right;">DOLARES</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var criterio in this.Model)
+			{
+			<tr>
+				@if (criterio.EsTitulo)
+				{
+					<td class="bold" colspan="3">@criterio.Titulo</td>
+				}
+				else if (criterio.EsTotal)
+				{
+					<td class="bold" style="border-bottom: solid 1px lightgray">@criterio.Titulo</td>
+					<td class="bold" style="text-align: right; border-bottom: solid 1px lightgray">@criterio.Peso.ToIntegerFormat()</td>
+					<td class="bold" style="text-align: right; border-bottom: solid 1px lightgray">@criterio.Dolares.ToCurrencyFormat()</td>
+				}
+				else 
+				{
+					<td>@criterio.Titulo</td>
+					<td style="text-align: right;">@criterio.Peso.ToIntegerFormat()</td>
+					<td style="text-align: right;">@criterio.Dolares.ToCurrencyFormat()</td>
+				}
+			</tr>
+			}
+		</tbody>
+	</table>
+</div>

@@ -1,0 +1,268 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+
+@{
+    var grid = Html.DevExpress().GridView<ShippingLineShippingAgency>(settings =>
+    {
+        settings.Name = "gvShippingLineShippingAgency";
+        settings.CallbackRouteValues = new { Controller = "ShippingLineShippingAgency", Action = "ShippingLineShippingAgencyPartial" };
+
+
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ShippingLineShippingAgency", Action = "ShippingLineShippingAgencyPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ShippingLineShippingAgency", Action = "ShippingLineShippingAgencyPartialUpdate" };
+
+
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.None;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+        settings.Settings.ShowFooter = true;
+        
+        settings.SettingsExport.EnableClientSideExportAPI = true;
+        settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.WYSIWYG;
+        settings.SettingsExport.FileName = "Linea_Agencia_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss");
+        settings.Toolbars.Add(t =>
+        {
+            t.EnableAdaptivity = true;
+            t.Items.Add(GridViewToolbarCommand.ExportToXls);
+            t.Items.Add(GridViewToolbarCommand.ExportToXlsx);
+            t.Items.Add(GridViewToolbarCommand.ExportToCsv);
+        });
+
+        #region EDITFORM
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsText.PopupEditFormCaption = "Añadir Línea y Agencia Navieras";
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsPopup.EditForm.Width = 800;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+
+        #endregion
+
+
+        settings.ClientSideEvents.Init = "OnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+        #region BOTONES DE COMANDO PARA REGISTRO
+
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 10,
+            Width = Unit.Percentage(5),
+            Caption = "Acciones"
+        };
+
+
+
+
+
+        settings.Columns.Add(commandColumn);
+
+
+        #endregion
+        #region
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+            if (ViewData["EditMessage"] != null)
+            {
+                e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+            }
+        };
+
+        #endregion
+
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Líneas Agencias Navieras</span>");
+        });
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""gvResultsSelectAllRows()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""gvResultsClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+
+
+
+
+        #region ColumnsEdit
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            int? id_ShippingLineShippingAgency = (int?)DataBinder.Eval(c.DataItem, "id");
+            ShippingLineShippingAgency ShippingLineShippingAgency = DataProviderShippingLineShippingAgency.ShippingLineShippingAgencyById(id_ShippingLineShippingAgency);
+
+            ShippingLineShippingAgency = ShippingLineShippingAgency ?? new ShippingLineShippingAgency() {fecha_inicio=DateTime.Now, fecha_fin=DateTime.Now.AddDays(1) };
+
+
+
+            Html.RenderPartial("_FormEditShippingLineShippingAgency", ShippingLineShippingAgency);
+        });
+
+        #endregion
+
+        #region MASTER DETAILS
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            int? id_ShippingLineShippingAgency = (int?)DataBinder.Eval(c.DataItem, "id");
+            ShippingLineShippingAgency ShippingLineShippingAgency = DataProviderShippingLineShippingAgency.ShippingLineShippingAgencyById(id_ShippingLineShippingAgency);
+
+            Html.RenderPartial("_ShippingLineShippingAgencyDetailPartial", ShippingLineShippingAgency);
+        });
+        #endregion
+
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //Document
+
+        settings.Columns.Add(m => m.id, column =>
+        {
+            column.Caption = "Número";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(5);
+
+        });
+
+
+        settings.Columns.Add(m => m.ShippingLine.name, column =>
+        {
+            column.Caption = "Línea Naviera";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(30);
+
+        });
+
+
+
+        settings.Columns.Add(m => m.ShippingAgency.name, column =>
+        {
+            column.Caption = "Agencia Naviera";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(30);
+        });
+
+        settings.Columns.Add(m => m.fecha_inicio, column =>
+        {
+            column.Caption = "Fecha Inicio";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(10);
+
+            ((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+            ((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+
+
+        });
+
+
+        settings.Columns.Add(m => m.fecha_fin, column =>
+        {
+            column.Caption = "Fecha Fin";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(10);
+
+            ((DateEditProperties)column.PropertiesEdit).DisplayFormatString = "dd/MM/yyyy";
+            ((DateEditProperties)column.PropertiesEdit).EditFormatString = "dd/MM/yyyy";
+
+
+        });
+
+
+
+
+
+    });
+
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}
+<script src="~/Scripts/ShippingLineShippingAgency/editform.js"></script>
+
+<script src="~/Scripts/ShippingLineShippingAgency/validations.js"></script>

@@ -1,0 +1,62 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    InventoryMove inventoryMove = Model;
+
+    string natureMoveTmp = (string)ViewData["_natureMove"];
+    if (!string.IsNullOrEmpty(natureMoveTmp))
+    {
+        if (natureMoveTmp.Equals("I"))
+        {
+            if (inventoryMove.Document.DocumentType.code.Equals("03"))//03: Ingreso
+            {
+                <h4>Movimientos de Ingresos</h4>
+            }
+            else if (inventoryMove.Document.DocumentType.code.Equals("04"))//04: Ingreso x Orden de Compra
+            {
+                <h4>Movimientos de Ingresos por Ordenes de Compras</h4>
+            }
+            else if (inventoryMove.Document.DocumentType.code.Equals("34"))//34: Ingresos por Transferencias
+            {
+                <h4>Movimientos de Ingresos por Transferencias</h4>
+            }
+            else
+            {
+                <h4>Movimientos de Ingresos</h4>
+            }
+        }
+        else if (natureMoveTmp.Equals("E"))
+        {
+            if (inventoryMove.Document.DocumentType.code.Equals("32"))//32: Egresos por Transferencias
+            {
+                <h4>Movimientos de Egresos por Transferencias</h4>
+            }
+            else if (inventoryMove.Document.DocumentType.code.Equals("05"))//05: Egresos
+            {
+                <h4>Movimientos de Egresos</h4>
+            }
+            else if (inventoryMove.Document.DocumentType.code.Equals("129"))//129: Egreso Por Transferencia Automática en Inventario
+            {
+                <h4>Movimientos de Transferencias Autom&aacute;ticas</h4>
+            }
+            else
+            {
+                <h4>Movimientos de Egresos</h4>
+            }
+        }
+    }
+    else
+    {
+        <h4>Movimientos de Inventarios</h4>
+    }
+}
+@{
+    ViewData["Model"] = inventoryMove;
+    //ViewData["code"] = inventoryMove.Document.DocumentType.code;
+    Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_InventoryMoveFilterFormPartial");
+}
+<div id="results">
+</div>
+<script src="~/Scripts/inventorymove/index.js"></script>
+

@@ -1,0 +1,45 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@Html.Hidden("id_automatictransfer", Model.id)
+@Html.Hidden("enabled", ((bool)ViewBag.enabled))
+@Html.Hidden("dateHoy", Model.dateHoy)
+@Html.Hidden("dateHoyMin", Model.dateHoyMin)
+
+
+@Html.DevExpress().PageControl(settings =>
+{
+	settings.Name = "pcAutomaticTransfer";
+	settings.Width = Unit.Percentage(100);
+	settings.Height = Unit.Pixel(400);
+
+	settings.CustomJSProperties = (s, e) =>
+	{
+		e.Properties["cpExistenRegistros"] = ((this.Model != null) && (this.Model.lsDetail != null)) ? this.Model.lsDetail.Any() : false;
+	};
+
+	settings.ClientSideEvents.Init = "pcAutomaticTransfer_Init";
+	settings.ClientSideEvents.ActiveTabChanging = "OnIsSetHeaderControls";
+	settings.TabPages.Add("Documento").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabDocumentEdit'>" +
+			@Html.Partial("_TabDocumentEdit", Model)
+			+ "</div>");
+	});
+	settings.TabPages.Add("Movimiento").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabMovimientoEdit'>" +
+			@Html.Partial("_TabMovimientoEdit", Model)
+			+ "</div>");
+	});
+	settings.TabPages.Add("Detalles", "tabDetails").SetContent(() =>
+	{
+		ViewContext.Writer.Write(
+			"<div id='divTabDetallesEdit'>" +
+			@Html.Partial("_TabDetallesEdit", Model)
+			+ "</div>");
+	});
+
+}).GetHtml()
+

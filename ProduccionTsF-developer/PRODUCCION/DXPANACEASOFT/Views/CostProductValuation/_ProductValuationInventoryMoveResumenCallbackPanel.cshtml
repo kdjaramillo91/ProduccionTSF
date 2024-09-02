@@ -1,0 +1,32 @@
+﻿@using CriterioResumen = DXPANACEASOFT.Controllers.CostProductValuationController.CriterioResumen
+@{ 
+	CriterioResumen[] detalles;
+
+	if (this.TempData.ContainsKey("Resumen"))
+	{
+		detalles = this.TempData["Resumen"] as CriterioResumen[];
+	}
+	else
+	{
+		detalles = new CriterioResumen[] { };
+	}
+
+}
+@Html.DevExpress().CallbackPanel(
+	panel =>
+	{
+		panel.Name = "ResumenCallbackPanel";
+		panel.SettingsLoadingPanel.Enabled = true;
+
+		// Eventos y callbacks
+		panel.CallbackRouteValues = new { Controller = "CostProductValuation", Action = "QueryResumenDetailsCallback" };
+
+		var events = panel.ClientSideEvents;
+		events.BeginCallback = "onQueryResumenCallbackBeginCallback";
+
+		panel.SetContent(() =>
+		{
+			Html.RenderPartial("_ProductValuationInventoryMoveResumenPartial", detalles);
+		});
+
+	}).GetHtml()

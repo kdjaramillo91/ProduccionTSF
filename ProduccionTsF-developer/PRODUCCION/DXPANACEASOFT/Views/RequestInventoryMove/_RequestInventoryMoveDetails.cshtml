@@ -1,0 +1,214 @@
+﻿@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.RequestInventoryMoveDTO
+
+@model List<RequestInventoryMoveDetailTransferP>
+
+@{ 
+    string _ReadOnlyBeRemissionGuide = (TempData[ "_ReadOnlyBeRemissionGuide"] != null ? (string)TempData["_ReadOnlyBeRemissionGuide"] : "N");
+    string _CodeDocumentState = (TempData["_codeStateDocumentRim"] != null ? (string)TempData["_codeStateDocumentRim"] : "");
+}
+@{
+    var grid = Html.DevExpress().GridView<RequestInventoryMoveDetailTransferP>(settings =>
+    {
+        settings.Name = "gvRequestInventoryMoveDetails";
+        settings.CallbackRouteValues = new { Controller = "RequestInventoryMove", Action = "RequestInventoryMoveDetailsPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "RequestInventoryMove", Action = "RequestInventoryMoveDetailsPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "RequestInventoryMove", Action = "RequestInventoryMoveDetailsPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "RequestInventoryMove", Action = "RequestInventoryMoveDetailsPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(2);
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.KeyFieldName = "id";
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewInitDetails";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackDetails";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackDetails";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            int index = gv.EditingRowVisibleIndex >= 0 ? gv.EditingRowVisibleIndex : -1;
+            e.Properties["cpRowIndex"] = index;
+            if (gv.EditingRowVisibleIndex >= 0)
+            {
+                e.Properties["cpRowKey"] = gv.GetRowValues(index, "id");
+            }
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+
+            List<RequestInventoryMoveDetailTransferP> rows = (Model as List<RequestInventoryMoveDetailTransferP>);
+            rows = (rows != null) ? rows.Where(d => d.isActive).ToList() : new List<RequestInventoryMoveDetailTransferP>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        settings.CellEditorInitialize = (s, e) =>
+        {
+            if (e.Column.FieldName == "quantityRequest")
+                (e.Editor).Width = System.Web.UI.WebControls.Unit.Pixel(85);
+
+            if (e.Column.FieldName == "quantityUpdate")
+                (e.Editor).Width = System.Web.UI.WebControls.Unit.Pixel(85);
+
+        };
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["quantityUpdate"] = 0.0M;
+            e.NewValues["quantityRequest"] = 0.0M;
+        };
+
+        #region Columns
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "master_code_item";
+            column.Caption = "Código Producto";
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_item";
+            column.Name = "id_item";
+            column.Caption = "Nombre del Producto";
+            column.HeaderStyle.Font.Bold = true;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Pixel(500);
+
+            column.ReadOnly = _ReadOnlyBeRemissionGuide.Equals("Y");
+
+            column.EditorProperties().ComboBox(p => {
+                column.SetEditItemTemplateContent(c =>
+                {
+                    var rqTmp = new RequestInventoryMoveDetailTransferP();
+                    if (c.ItemIndex >= 0) {
+                        rqTmp = Model[c.ItemIndex];
+                    }
+
+                    Html.RenderPartial("ComponentsDetail/_ComboBoxItems", rqTmp);
+                });
+            });
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string cellText = ((DataBinder.Eval(c.DataItem, "aux_code_item") != null) ? DataBinder.Eval(c.DataItem, "aux_code_item").ToString() : "") + "," + ((DataBinder.Eval(c.DataItem, "name_item") != null) ? DataBinder.Eval(c.DataItem, "name_item").ToString() :"");
+                ViewContext.Writer.Write(string.Format("{0}", cellText));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "codeMetricUnit";
+            column.Caption = "Medida";
+            column.ReadOnly = _ReadOnlyBeRemissionGuide.Equals("Y");
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "nameWarehouseLocation";
+            column.Caption = "Ubicación";
+            column.ReadOnly = _ReadOnlyBeRemissionGuide.Equals("Y");
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityRequest";
+            column.Caption = "Cantidad Requerida";
+            column.HeaderStyle.Font.Bold = true;
+            column.ReadOnly = true;
+            column.Width = Unit.Pixel(80);
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.DisplayFormatString = "#.00";
+                p.DisplayFormatInEditMode = true;
+                p.MinValue = 0;
+                p.MaxValue = 1000000;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityUpdate";
+            column.Caption = "Cantidad Entregada";
+            column.HeaderStyle.Font.Bold = true;
+            column.Width = Unit.Pixel(80);
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.DisplayFormatString = "#.00";
+                p.DisplayFormatInEditMode = true;
+                p.MinValue = 0;
+                p.MaxValue = 1000000;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+            });
+        });
+
+        #endregion
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowNewButtonInHeader = _ReadOnlyBeRemissionGuide.Equals("N") && _CodeDocumentState.Equals("01"),
+            ShowEditButton = _CodeDocumentState.Equals("01"),
+            ShowDeleteButton = _ReadOnlyBeRemissionGuide.Equals("N") && _CodeDocumentState.Equals("01"),
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 13,
+            Caption = "Acciones",
+            Width = Unit.Percentage(5),
+        };
+
+        settings.Columns.Add(commandColumn);
+        settings.Styles.Header.Font.Bold = true;
+    });
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+}
+
+<script src="~/Scripts/requestinventorymove/_details.js"></script>

@@ -1,0 +1,129 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<DrainingTestPendingNewDTO>(settings =>
+    {
+        settings.Name = "GridViewPendingNew";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "DrainingTest",
+            Action = "GridViewPendingNew",
+        };
+
+        settings.KeyFieldName = "idProductionLotReceptionDetail";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "idProductionLotReceptionDetail";
+            column.Name = "idProductionLotReceptionDetail";
+            column.Visible = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "number";
+            column.Caption = "Sec. Transaccional";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberLot";
+            column.Caption = "No. Lote";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "dateReception";
+            column.Caption = "Fecha de Recepción";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numberRemissionGuide";
+            column.Caption = "No. de Guía";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "provider";
+            column.Caption = "Proveedor";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "shrimper";
+            column.Caption = "Camaronera";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "item";
+            column.Caption = "Item";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "poundsRemitted";
+            column.Caption = "Cant. Remitida";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            var prop = column.PropertiesEdit as SpinEditProperties;
+            prop.DisplayFormatString = "n";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "metricUnit";
+            column.Caption = "UM";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "countKavetas";
+            column.Caption = "No. Kavetas";
+        });
+
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = false,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 10,
+            Caption = "Acción",
+            Width = Unit.Percentage(8)
+        };
+
+        commandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton
+        {
+            ID = "btnProcess",
+            Text = "Ingresar"
+        });
+
+        settings.ClientSideEvents.CustomButtonClick = "GridViewGenerate_Click";
+        settings.ClientSideEvents.RowDblClick = "GridViewGenerate_Click";
+        settings.Columns.Add(commandColumn);
+
+    });
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,394 @@
+﻿
+@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ItemInventory
+
+<div style="width: 100%; overflow: auto;">
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr class="no-border">
+            @*<td style="width: 15%;">
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Tipo Control de Inventario:";
+                    settings.AssociatedControlName = "id_inventoryControlType";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var comboBox_inventoryControlType = Html.DevExpress().ComboBoxFor(m => m.id_inventoryControlType, settings =>
+                    {
+                        settings.Name = "id_inventoryControlType";
+                        settings.Properties.ClientInstanceName = "id_inventoryControlType";
+                        settings.ControlStyle.CssClass = "editor";
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnInventoryControlTypeValidation";
+
+                    }).BindList(DataProviderInventoryControlType.InventoryControlType((int)ViewData["id_company"]));
+
+                    if (Model != null && Model.id_inventoryControlType != null && Model.id_inventoryControlType != 0)
+                    {
+                        comboBox_inventoryControlType.Bind(Model.id_inventoryControlType).Render();
+                    }
+                    else
+                    {
+                        comboBox_inventoryControlType.Render();
+                    }
+                }
+            </td>*@
+            <td style="width: 15%;">
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Stock Mínimo:";
+                    settings.AssociatedControlName = "minimumStock";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.minimumStock, settings =>
+                {
+                    settings.Name = "minimumStock";
+                    settings.Properties.ClientInstanceName = "minimumStock";
+                    settings.ControlStyle.CssClass = "editor";
+
+                    settings.Properties.NumberType = SpinEditNumberType.Float;
+                    settings.Properties.DecimalPlaces = 2;
+                    settings.Properties.AllowMouseWheel = true;
+                    settings.Properties.Increment = 0.1M;
+                    settings.Properties.LargeIncrement = 1;
+                    settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnMinimumStockValidation";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Stock Máximo:";
+                    settings.AssociatedControlName = "maximumStock";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.maximumStock, settings =>
+                {
+                    settings.Name = "maximumStock";
+                    settings.Properties.ClientInstanceName = "maximumStock";
+                    settings.ControlStyle.CssClass = "editor";
+
+                    settings.Properties.NumberType = SpinEditNumberType.Float;
+                    settings.Properties.DecimalPlaces = 2;
+                    settings.Properties.AllowMouseWheel = true;
+                    settings.Properties.Increment = 0.1M;
+                    settings.Properties.LargeIncrement = 1;
+                    settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnMaximumStockValidation";
+
+                }).GetHtml()
+            </td>
+        </tr>
+        @*<tr class="no-border">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Método Valor de Valoración:";
+                    settings.AssociatedControlName = "id_valueValuationMethod";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var comboBox_valueValuationMethod = Html.DevExpress().ComboBoxFor(m => m.id_valueValuationMethod, settings =>
+                    {
+                        settings.Name = "id_valueValuationMethod";
+                        settings.Properties.ClientInstanceName = "id_valueValuationMethod";
+                        settings.ControlStyle.CssClass = "editor";
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnValueValuationValidation";
+
+                    }).BindList(DataProviderInventoryValueValuationMethod.InventoryValuationMethods());
+
+                    if (Model != null && Model.id_valueValuationMethod != null && Model.id_valueValuationMethod != 0)
+                    {
+                        comboBox_valueValuationMethod.Bind(Model.id_valueValuationMethod).Render();
+                    }
+                    else
+                    {
+                        comboBox_valueValuationMethod.Render();
+                    }
+                }
+            </td>
+
+        </tr>*@
+        <tr class="no-border">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Bodega:";
+                    settings.AssociatedControlName = "id_warehouse";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_warehouse = (Model != null && Model.id_warehouse != 0) ? (int?)Model.id_warehouse : null;
+                }
+                @{
+                    var comboBox_warehouse = Html.DevExpress().ComboBoxFor(m => m.id_warehouse, settings =>
+                    {
+                        settings.Name = "id_warehouse";
+                        settings.Properties.ClientInstanceName = "id_warehouse";
+                        settings.ControlStyle.CssClass = "editor";
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnWarehouseValidation";
+                        settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboWarehouse_SelectedIndexChanged";
+
+                    }).BindList(DataProviderWarehouse.Warehouses((int)ViewData["id_company"])).Bind(id_warehouse).GetHtml();
+
+                    //if (Model != null && Model.id_warehouse != null && Model.id_warehouse != 0)
+                    //{
+                    //    comboBox_warehouse.Bind(Model.id_warehouse).Render();
+                    //}
+                    //else
+                    //{
+                    //    comboBox_warehouse.Render();
+                    //}
+                }
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Stock Actual:";
+                    settings.AssociatedControlName = "currentStock";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => m.currentStock, settings =>
+           {
+               settings.Name = "currentStock";
+               settings.Properties.ClientInstanceName = "currentStock";
+               settings.ControlStyle.CssClass = "editor";
+
+               settings.ReadOnly = true;
+
+               settings.Properties.NumberType = SpinEditNumberType.Float;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.AllowMouseWheel = true;
+               settings.Properties.Increment = 0.1M;
+               settings.Properties.LargeIncrement = 1;
+               settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+
+               settings.ShowModelErrors = true;
+               //settings.Properties.ClientSideEvents.Validation = "OnCurrentStockValidation";
+
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr class="no-border">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Ubicación:";
+                    settings.AssociatedControlName = "id_location";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_warehouseLocation = (Model != null && Model.id_warehouseLocation != 0) ? (int?)Model.id_warehouseLocation : null;
+                }
+                @{
+                    var comboBox_location = Html.DevExpress().ComboBoxFor(m => m.id_warehouseLocation, settings =>
+                    {
+                        settings.Name = "id_warehouseLocation";
+                        settings.Properties.ClientInstanceName = "id_warehouseLocation";
+                        settings.ControlStyle.CssClass = "editor";
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnLocationValidation";
+                        settings.Properties.ClientSideEvents.Init = "ComboWarehouseLocation_Init";
+
+                    }).BindList(DataProviderWarehouseLocation.WarehouseLocations((int?)ViewData["id_company"])).Bind(id_warehouseLocation).GetHtml();
+
+                    //if (Model != null && Model.id_warehouseLocation != null && Model.id_warehouseLocation != 0)
+                    //{
+                    //    comboBox_location.Bind(Model.id_warehouseLocation).Render();
+                    //}
+                    //else
+                    //{
+                    //    comboBox_location.Render();
+                    //}
+                }
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Unidad de Medida:";
+                    settings.AssociatedControlName = "id_metricUnitInventory";
+
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_metricUnitInventory = (Model != null && Model.id_metricUnitInventory != 0) ? (int?)Model.id_metricUnitInventory : null;
+                    int? id_metricType = (Model != null && Model.Item != null && Model.Item.id_metricType != 0) ? (int?)Model.Item.id_metricType : null;
+                }
+                @{
+                    var comboBox_metricUnit = Html.DevExpress().ComboBoxFor(m => m.id_metricUnitInventory, settings =>
+                    {
+                        settings.Name = "id_metricUnitInventory";
+                        settings.Properties.ClientInstanceName = "id_metricUnitInventory";
+                                //settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.TextField = "name";
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.ValueType = typeof(int);
+
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnItemMetricUnitInventoryValidation";
+
+                    }).BindList(DataProviderMetricUnit.MectricUnitByCompanyMetricsTypesAndCurrent((int?)ViewData["id_company"], id_metricType, id_metricUnitInventory)).Bind(id_metricUnitInventory).GetHtml();
+
+                    //if (Model.id_metricUnitPurchase != null && Model.id_metricUnitPurchase != 0)
+                    //{
+                    //    comboBox_metricUnit.Bind(Model.id_metricUnitPurchase).Render();
+                    //}
+                    //else
+                    //{
+                    //    comboBox_metricUnit.Render();
+                    //}
+                }
+            </td>
+            <td>
+                @*@Html.DevExpress().Label(settings =>
+                {
+                    //settings.ControlStyle.CssClass = "label";
+                    settings.Text = "Fecha de Caducidad:";
+                    settings.AssociatedControlName = "expirationDate";
+                }).GetHtml()*@
+            </td>
+            <td>
+                @*@Html.DevExpress().DateEditFor(m => m.expirationDate, settings =>
+                {
+                    settings.Name = "expirationDate";
+                    settings.Properties.ClientInstanceName = "expirationDate";
+                    settings.ControlStyle.CssClass = "editor";
+
+                    settings.Properties.UseMaskBehavior = true;
+                    settings.Properties.EditFormat = EditFormat.Custom;
+                    settings.Properties.EditFormatString = "dd/MM/yyyy";
+                    settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnExpirationDateValidation";
+
+                }).GetHtml()*@
+            </td>
+        </tr>
+        <tr class="no-border">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "¿Es Importado?:";
+                    settings.AssociatedControlName = "isImported";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isImported, settings =>
+                {
+                    settings.Name = "isImported";
+                    settings.Properties.ClientInstanceName = "isImported";
+                    settings.ControlStyle.CssClass = "editor";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "¿Exige Lote?:";
+                    settings.AssociatedControlName = "requiresLot";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.requiresLot, settings =>
+                {
+                    settings.Name = "requiresLot";
+                    settings.Properties.ClientInstanceName = "requiresLot";
+                    settings.ControlStyle.CssClass = "editor";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr class="no-border" id="trIsConsumed">
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "¿Es Consumible?:";
+                    settings.AssociatedControlName = "isConsumed";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.Item.isConsumed, settings =>
+                {
+                    settings.Name = "isConsumed";
+                    settings.Properties.ClientInstanceName = "isConsumed";
+                    settings.ControlStyle.CssClass = "editor";
+                }).GetHtml()
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+</div>
+

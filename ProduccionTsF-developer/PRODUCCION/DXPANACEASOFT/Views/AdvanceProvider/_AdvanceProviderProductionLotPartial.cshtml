@@ -1,0 +1,230 @@
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.AdvanceProviderDTO
+
+@{
+    string labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+}
+
+@{
+    var grid = Html.DevExpress().GridView<AdvanceProviderPL>(settings =>
+    {
+        settings.Name = "gvAdvanceProviderPL";
+
+        settings.CallbackRouteValues = new { Controller = "AdvanceProvider", Action = "AdvanceProviderPLPartial" };
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        settings.CommandColumn.Visible = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+
+//settings.Settings.ShowFooter = true;
+
+settings.ClientSideEvents.Init = "AdvanceProviderPLOnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "AdvanceProviderPLOnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "AdvanceProviderPLOnGridViewEndCallback";
+        settings.ClientSideEvents.RowDblClick = "OnRowDoubleClickProductionLot";
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"">Listado de Lotes de Producci&oacute;n</span>");
+        });
+
+//Panel para cantidad de registros
+settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCountPL"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPagePL"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""AdvanceProviderPLSelectAllRows()"">Seleccionar Todos</a>
+              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""AdvanceProviderPLClearSelection()"">Anular Selección</a>"
+                );
+            }
+        });
+
+//MASTER DETAILS
+settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+
+//DETALLES EN GRID LLAMADA A OTRA TABLA
+//settings.SetDetailRowTemplateContent(column =>
+//{
+//    int? id_purchaseOrder = (int?)DataBinder.Eval(column.DataItem, "id");
+//    PurchaseOrder order = DataProviderPurchaseOrder.PurchaseOrder(id_purchaseOrder);
+//    Html.RenderPartial("_AdvanceProviderResultsDetailViewPartial", order);
+//});
+
+settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+//Document
+settings.Columns.Add(m => m.number, column =>
+        {
+    //CAMBIO FEO
+    column.Name = "number";
+            column.Caption = "Sec. Transaccional";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(25);
+
+        });
+//Document
+settings.Columns.Add(m => m.internalNumber, column =>
+        {
+    //CAMBIO FEO
+    column.Name = "internalNumber";
+            column.Caption = "No. Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(25);
+
+        });
+//ReceptionDate
+settings.Columns.Add(m => m.ReceptionDate, column =>
+        {
+            column.Name = "ReceptionDate";
+            column.Caption = "Fecha Recepción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(25);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+        });
+        settings.Columns.Add(m => m.personProcessPlant, column =>
+        {
+    //CAMBIO FEO
+    column.Name = "process";
+            column.Caption = "Proceso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(25);
+        });
+//ProviderName
+settings.Columns.Add(m => m.ProviderName, column =>
+        {
+            column.Name = "ProviderName";
+            column.Caption = "Nombre Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(35);
+
+        });
+//BuyerName
+settings.Columns.Add(m => m.BuyerName, column =>
+        {
+            column.Name = "BuyerName";
+            column.Caption = "Nombre Comprador";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(35);
+
+        });
+//QuantityPoundsReceived
+settings.Columns.Add(m => m.QuantityPoundsReceived, column =>
+        {
+            column.Name = "QuantityPoundsReceived";
+            column.Caption = "Libras Remitidas";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(20);
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityPoundsReceived = (decimal)DataBinder.Eval(c.DataItem, "QuantityPoundsReceived");
+                ViewContext.Writer.Write(quantityPoundsReceived.ToString("N2"));
+            });
+        });
+//ZoneName
+settings.Columns.Add(m => m.ZoneName, column =>
+        {
+            column.Name = "ZoneName";
+            column.Caption = "Nombre Zona";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(25);
+
+        });
+//SiteName
+settings.Columns.Add(m => m.SiteName, column =>
+        {
+            column.Name = "SiteName";
+            column.Caption = "Nombre Sitio";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(25);
+
+        });
+
+
+// COMMAND COLUMN
+
+MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = false,
+            ShowDeleteButton = false,
+            Visible = true,
+            VisibleIndex = 14,
+            Caption = "Acciones",
+            Width = Unit.Percentage(10)
+        };
+
+        commandColumn.CustomButtons.Add(
+            new GridViewCommandColumnCustomButton
+            {
+                ID = "btnMakeAdvanceRow",
+                Text = "Hacer Anticipo"
+            }
+        );
+
+
+        settings.ClientSideEvents.CustomButtonClick = "AdvanceProviderPLGridViewCustomCommandButton_Click";
+        settings.Columns.Add(commandColumn);
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

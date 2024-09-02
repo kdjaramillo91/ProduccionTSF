@@ -1,0 +1,142 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+@model IList<SalesOrderDetailInstructionsDTO>
+@{
+	var grid = Html.DevExpress().GridView<SalesOrderDetailInstructionsDTO>(settings =>
+	{
+		settings.Name = "GridViewDetailsInstructions";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "SalesOrder",
+			Action = "GridViewDetailsInstructions",
+			enabled = ViewBag.enabled
+		};
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "SalesOrder", Action = "GridViewDetailsInstructionsAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "SalesOrder", Action = "GridViewDetailsInstructionsUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "SalesOrder", Action = "GridViewDetailsInstructionsDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+		//ViewBag.fromProgProduction
+		//settings.CommandColumn.Visible = (ViewBag.enabled == null || (bool)ViewBag.enabled);
+		settings.SettingsBehavior.ConfirmDelete = false;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+		//settings.Enabled = (ViewBag.enabled == null || (bool)ViewBag.enabled);
+
+		settings.Settings.VerticalScrollableHeight = 300;
+		settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+		settings.SettingsPager.Visible = false;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		//settings.Settings.ShowFilterRowMenu = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		//settings.ClientSideEvents.EndCallback = "OnGridViewDetailInstructionsEndCallback";
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		settings.Settings.ShowFooter = false;
+		settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+		#region EDITORS INITIALIZE
+
+
+		#endregion
+
+		//Documentos
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "document";
+			column.Name = "document";
+			column.Caption = "Detalle de Documentos";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "document";
+				p.Width = Unit.Percentage(100);
+			});
+		});
+
+		//Copias
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "copy";
+			column.Name = "copy";
+			column.Caption = "Copias";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.ClientInstanceName = "copy";
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Integer;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.DecimalPlaces = 0;
+				p.SpinButtons.ShowIncrementButtons = true;
+				p.SpinButtons.ShowLargeIncrementButtons = false;
+			});
+		});
+
+		//Digital
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "digital";
+			column.Name = "digital";
+			column.Caption = "Digital";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.ClientInstanceName = "digital";
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Integer;
+				p.NumberFormat = SpinEditNumberFormat.Custom;
+				p.DecimalPlaces = 0;
+				p.SpinButtons.ShowIncrementButtons = true;
+				p.SpinButtons.ShowLargeIncrementButtons = false;
+			});
+		});
+
+
+		//Botones de comandos para registros de la tabla
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = true,
+			ShowDeleteButton = true,
+			ShowCancelButton = true,
+			ShowUpdateButton = true,
+			Visible = true,
+			VisibleIndex = 4,
+			Caption = "Acciones"
+		};
+		commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		commandColumn.Width = Unit.Percentage(10);
+
+		if ((ViewBag.enabled == null || (bool)ViewBag.enabled))
+		{
+			settings.Columns.Add(commandColumn);
+
+			settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+		}
+
+	});
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()

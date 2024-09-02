@@ -1,0 +1,48 @@
+﻿@using DXPANACEASOFT.Controllers;
+<table class="table table-condensed" style="border:none;margin-bottom:0;">
+	<tr>
+		<td style="width:10%;">
+			@using (Html.BeginForm("upload-file", "costCenter", FormMethod.Post))
+			{
+				@Html.DevExpress().UploadControl(
+					uploadControl =>
+					{
+						uploadControl.Name = "CostCenterArchivoUploadControl";
+						//uploadControl.CallbackRouteValues = new { Controller = "itemType", Action = "upload-file", };
+						uploadControl.Height = Unit.Pixel(25);
+						uploadControl.Width = Unit.Percentage(100);
+						uploadControl.UploadMode = UploadControlUploadMode.Auto;
+						uploadControl.AutoStartUpload = true;
+						uploadControl.ShowProgressPanel = true;
+						uploadControl.ShowTextBox = false;
+						uploadControl.DialogTriggerID = "CostCenterFileExternalDropZone";
+
+						var advancedModeSettings = uploadControl.AdvancedModeSettings;
+						advancedModeSettings.ExternalDropZoneID = "CostCenterFileExternalDropZone";
+						advancedModeSettings.EnableDragAndDrop = true;
+						advancedModeSettings.EnableFileList = false;
+						advancedModeSettings.EnableMultiSelect = false;
+						advancedModeSettings.TemporaryFolder = @"~/App_Data/UploadedFiles";
+
+						uploadControl.ValidationSettings.Assign(CostCenterController.UploadControlSettings.ExcelUploadValidationSettings);
+
+						var clientSideEvents = uploadControl.ClientSideEvents;
+						clientSideEvents.DropZoneEnter = "function(s, e) { if(e.dropZone.id == 'CostCenterFileExternalDropZone') { $('#costCenterFileDropZone').show(); } }";
+						clientSideEvents.DropZoneLeave = "function(s, e) { if(e.dropZone.id == 'CostCenterFileExternalDropZone') { $('#costCenterFileDropZone').hide(); } }";
+						clientSideEvents.FileUploadComplete = "onCostCenterImportFileUploadComplete";
+
+					}).GetHtml()
+			}
+		</td>
+		<td style="width:90%;vertical-align:middle;">
+			@Html.DevExpress().TextBox(
+				textBox =>
+				{
+					textBox.Name = "CostCenterArchivoEditText";
+					textBox.Width = Unit.Percentage(100);
+					textBox.ReadOnly = true;
+					textBox.Properties.ClientSideEvents.Validation = "onCostCenterImportFileValidate";
+				}).GetHtml()
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,392 @@
+﻿@model DXPANACEASOFT.Models.Invoice
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td style="width: 50%; padding: 5px;">
+            <table class="table table-condensed" style="width: 100%;">
+                <tr class="ps-header">
+                    <td colspan="2">
+                        <span class="dxflGroupBoxCaption_Metropolis">Embarque</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblFechaEtd";
+                            settings.Text = "Fecha ETD/Zarpe:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().DateEditFor(m => m.InvoiceExterior.etdDate, settings =>
+                        {
+                            settings.Name = "etdDate";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = DateTime.Now;
+                            settings.Properties.NullText = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+                            //settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//Model.Document.emissionDate;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblFechaEta";
+                            settings.Text = "Fecha ETA:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().DateEditFor(m => m.InvoiceExterior.etaDate, settings =>
+                        {
+                            settings.Name = "etaDate";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = DateTime.Now;
+                            settings.Properties.NullText = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+                            //settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//Model.Document.emissionDate;
+                        }).GetHtml()
+                    </td>
+
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblFechaDae";
+                            settings.Text = "Fecha DAE:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().DateEditFor(m => m.InvoiceExterior.daeDate, settings =>
+                        {
+                            settings.Name = "daeDate";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = DateTime.Now;
+                            settings.Properties.NullText = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+                            //settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//Model.Document.emissionDate;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblFechaCarga";
+                            settings.Text = "Fecha Carga:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().DateEditFor(m => m.InvoiceExterior.loadingDate, settings =>
+                        {
+                            settings.Name = "loadingDate";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = DateTime.Now;
+                            settings.Properties.NullText = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+                            //settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//Model.Document.emissionDate;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblSeals";
+                            settings.Text = "Sellos:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().MemoFor(m => m.InvoiceExterior.seals, settings =>
+                        {
+                            settings.Name = "seals";
+                            settings.Width = Unit.Percentage(100);
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblBookingNumber";
+                            settings.Text = "No Booking:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().TextBoxFor(m => m.InvoiceExterior.BookingNumber, settings =>
+                   {
+                       settings.Name = "BookingNumber";
+                       settings.Properties.MaxLength = 35;
+                       settings.Width = Unit.Percentage(100);
+                   }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lbltemperatureInstruction";
+                            settings.Text = "Instrucciones de Temperatura:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        <div style="float:left">
+                            <span style="width: 45%; float: left">
+                                @Html.DevExpress().SpinEditFor(m => m.InvoiceExterior.temperatureInstruction, settings =>
+                                {
+                                    settings.Name = "temperatureInstruction";
+
+                                    settings.Properties.MinValue = -100;
+                                    settings.Properties.MaxValue = 100;
+                                    settings.Width = Unit.Percentage(100);
+                                }).GetHtml()
+
+                            </span>
+                            <span style="width: 45%; float: right">
+                                @{
+                                    var idTipoTemperatura = (Model != null && Model.InvoiceExterior.idTipoTemperatura != 0) ? (int?)Model.InvoiceExterior.idTipoTemperatura : null;
+                                }
+                                @Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.idTipoTemperatura, settings =>
+                                {
+                                    settings.Name = "idTipoTemperatura";
+
+
+                                    settings.Properties.ClientInstanceName = "idTipoTemperatura";
+                                    settings.Width = Unit.Percentage(100);
+                                    //settings.ClientEnabled = codeState != "01";//Pendiente
+                                    settings.Properties.ValueField = "id";
+                                    settings.Properties.TextField = "name";
+                                    settings.Properties.ValueType = typeof(int);
+                                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.None;
+
+
+                                    settings.Width = Unit.Percentage(100);
+                                }).BindList(DataProvidertbsysCatalogue.AlltbsysCatalogueDetailByCode("TEMPE")).Bind(idTipoTemperatura).GetHtml()
+
+                            </span>
+
+                        </div>
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @*@Html.DevExpress().LabelFor(m => m.InvoiceExterior.containers, settings =>
+                        {
+                            settings.Name = "lblContainers";
+                            settings.Text = "Contenedores:";
+                        }).GetHtml()*@
+                    </td>
+                    <td style="width: 50%;">
+                        @*@Html.DevExpress().MemoFor(m => m.InvoiceExterior.containers, settings =>
+                        {
+                            settings.Name = "containers";
+                            settings.Width = Unit.Percentage(100);
+                        }).GetHtml()*@
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 50%; padding: 5px;">
+            <table class="table table-condensed" style="width: 100%;">
+                <tr class="ps-header">
+                    <td colspan="2">
+                        <span class="dxflGroupBoxCaption_Metropolis">Estado de Documentos</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblEstadoCliente";
+                            settings.Text = "Estado Cliente:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().ComboBoxFor(m => m.Person.Customer.id_customerState, settings =>
+                        {
+                            settings.Name = "comboEstadoCliente";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Properties.NullText = "-No Asignado-";
+                            settings.Properties.ValueField = "id";
+                            settings.Properties.TextField = "name";
+                            settings.Properties.ValueType = typeof(int);
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                            settings.ReadOnly = true;
+                        }).BindList(DataProviderCustomerState.GetAllActive()).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblFactura";
+                            settings.Text = "Factura:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.isInvoice, settings =>
+                        {
+                        settings.Name = "isInvoice";
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.NullDisplayText = "Seleccione...";
+                        settings.Properties.NullText = "Seleccione...";
+                        settings.Properties.ValueField = "value";
+                        settings.Properties.TextField = "text";
+                        settings.Properties.ValueType = typeof(bool);
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        }).BindList(new List<object> { new { value = true, text = "Si" }, new { value = false, text = "No" } }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblBL";
+                            settings.Text = "B-L:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.BL, settings =>
+                        {
+                            settings.Name = "BL";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Properties.NullDisplayText = "Seleccione...";
+                            settings.Properties.NullText = "Seleccione...";
+                            settings.Properties.ValueField = "value";
+                            settings.Properties.TextField = "name";
+                            settings.Properties.ValueType = typeof(bool);
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        }).BindList(new List<object> { new { value = true, name = "Si" }, new { value = false, name = "No" } }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblPList";
+                            settings.Text = "P.List:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.pList, settings =>
+                        {
+                            settings.Name = "pList";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Properties.NullDisplayText = "Seleccione...";
+                            settings.Properties.NullText = "Seleccione...";
+                            settings.Properties.ValueField = "value";
+                            settings.Properties.TextField = "name";
+                            settings.Properties.ValueType = typeof(bool);
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        }).BindList(new List<object> { new { value = true, name = "Si" }, new { value = false, name = "No" } }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblCertificado";
+                            settings.Text = "Certificado:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().ComboBoxFor(m => m.InvoiceExterior.certificate, settings =>
+                        {
+                            settings.Name = "certificate";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Properties.NullDisplayText = "Seleccione...";
+                            settings.Properties.NullText = "Seleccione...";
+                            settings.Properties.ValueField = "value";
+                            settings.Properties.TextField = "name";
+                            settings.Properties.ValueType = typeof(bool);
+                            settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                            settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                            settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        }).BindList(new List<object> { new { value = true, name = "Si" }, new { value = false, name = "No" } }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblFechaInstrucTemp";
+                            settings.Text = "Fecha Emisión Instrucciones de Temperatura:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().DateEditFor(m => m.InvoiceExterior.temperatureInstrucDate, settings =>
+                        {
+                            settings.Name = "temperatureInstrucDate";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = DateTime.Now;
+                            settings.Properties.NullText = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+                            //settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//Model.Document.emissionDate;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblFechaEmisionISF";
+                            settings.Text = "Fecha Emisión ISF:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().DateEditFor(m => m.InvoiceExterior.isfDate, settings =>
+                        {
+                            settings.Name = "isfDate";
+                            settings.Width = Unit.Percentage(100);
+                            settings.Date = DateTime.Now;
+                            settings.Properties.NullText = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+                            //settings.Properties.MinDate = Model.Document.emissionDate.AddDays(-1);//Model.Document.emissionDate;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr style="width: 100%;">
+                    <td style="width: 50%;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "lblEstadoDoc";
+                            settings.Text = "Estado Documentación:";
+                        }).GetHtml()
+                    </td>
+                    <td style="width: 50%;">
+                        @Html.DevExpress().MemoFor(m => m.InvoiceExterior.documentationState, settings =>
+                        {
+                            settings.Name = "documentationState";
+                            settings.Width = Unit.Percentage(100);
+                        }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,33 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using System.Collections
+@using DXPANACEASOFT.Models.PriceListDet
+
+@model List<PriceListDetItemSize>
+
+
+<script src="~/Scripts/pricelistdet/editform.js"></script>
+
+@{
+    <div class="row">
+        @using (Html.BeginForm())
+        {
+            Html.RenderPartial("_FormEditDetailPriceListPartial", Model);
+        }
+    </div>
+    <div class="row" style="text-align: right; padding: 13px 35px 5px 0px; margin-bottom: 20px; margin-right: 20px;">
+
+        @Html.DevExpress().Button(settings =>
+        {
+            settings.Name = "btnCancelPopupPriceList";
+            settings.Text = "Cancelar";
+            settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+            settings.UseSubmitBehavior = false;
+            settings.ClientSideEvents.Click = "OnBtnCancelPopupPriceList_Click";
+        }).GetHtml()
+        
+    </div>
+
+}
+
+
+

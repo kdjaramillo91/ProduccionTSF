@@ -1,0 +1,135 @@
+﻿@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    var grid = Html.DevExpress().GridView<RemissionGuide>(settings =>
+    {
+        settings.Name = "gvRemissionGuides";
+        settings.CallbackRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "RemissionGuidesPartial" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";//"id_purchaseRequest;id_item";
+
+settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "RemissionGuidesOnGridViewInit";
+        settings.ClientSideEvents.SelectionChanged = "RemissionGuidesOnGridViewSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "RemissionGuidesOnGridViewEndCallback";
+
+//Panel para cantidad de registros
+settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""RemissionGuidesSelectAllRow();"">Seleccionar Todos</a>
+              <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""RemissionGuidesClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+//"No. de Guía" 15
+settings.Columns.Add(m => m.Document.number, column =>
+        {
+            column.Caption = "No. de Guía";
+            column.Width = Unit.Percentage(15);
+
+        });
+
+//emissionDate 10
+settings.Columns.Add(m => m.Document.emissionDate, column =>
+        {
+            column.Name = "emissionDate";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+    //column.EditorProperties().DateEdit(d =>
+    //{
+    //    d.EditFormat = "dd/MM/yyyy";
+    //    d.EditFormatString = "dd/MM/yyyy";
+    //});
+    column.Width = Unit.Percentage(10);
+        });
+
+//Proceso
+settings.Columns.Add(m => m.Person2.processPlant, column =>
+        {
+            column.Caption = "Proceso";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(10);
+        });
+
+//"Proveedor" 35
+settings.Columns.Add(m => m.Provider1.Person.fullname_businessName, column =>
+        {
+            column.Caption = "Proveedor";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(25);
+        });
+
+//"Camaronera" 30
+settings.Columns.Add(m => m.ProductionUnitProvider.name, column =>
+        {
+            column.Caption = "Camaronera";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(25);
+        });
+
+//"Placa" 10
+settings.Columns.Add(m => m.RemissionGuideTransportation.carRegistration, column =>
+        {
+            column.Caption = "Placa";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+            column.Width = Unit.Percentage(13);
+        });
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        string[] values = new string[] { "id" };//{ "id_purchaseRequest", "id_item" };
+        foreach (var key in grid.GetCurrentPageRowValues(values))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+

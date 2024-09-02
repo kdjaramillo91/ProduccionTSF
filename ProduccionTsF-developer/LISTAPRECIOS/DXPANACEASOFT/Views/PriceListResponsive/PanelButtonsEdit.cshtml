@@ -1,0 +1,141 @@
+﻿
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnNew";
+    settings.Text = "";
+    settings.ToolTip = "Adicionar Elemento";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "AddNewItem";
+    settings.Enabled = !((bool)ViewBag.readOnly);
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnSave";
+    settings.Text = "";
+    settings.ToolTip = "Guardar Elemento";
+    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "SaveCurrentItem";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.CanSave != null ? ((bool)ViewBag.CanSave) : true);
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnEdit";
+    settings.Text = "";
+    settings.ToolTip = "Editar Elemento";
+    settings.Images.Image.IconID = IconID.ActionsEdit16x16devav;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "EditCurrentItem";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.CanEdit != null ? ((bool)ViewBag.CanEdit) : true);
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnDuplicate";
+    settings.Text = "";
+    settings.ToolTip = "Duplicar Elemento";
+    settings.Images.Image.IconID = IconID.EditCopy16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "DuplicateCurrentItem";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.CanDuplicate != null ? ((bool)ViewBag.CanDuplicate) : true);
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnAproved";
+    settings.Text = "";
+    settings.ToolTip = "Aprobar";
+    settings.Images.Image.IconID = IconID.ActionsApply16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "AprovedItem";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.CanAproved != null ? ((bool)ViewBag.CanAproved) : true);
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnReverse";
+    settings.Text = "";
+    settings.ToolTip = "Reversar";
+    settings.Images.Image.IconID = IconID.ActionsUndo16x16devav;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "ReverseItem";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.CanReverse == null || ((bool)ViewBag.CanReverse));
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnClose";
+    settings.Text = "";
+    settings.ToolTip = "Cerrar";
+    settings.Images.Image.IconID = IconID.ProgrammingTag16x16;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "CloseItem";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.CanClose == null || ((bool)ViewBag.CanClose));
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnAnnul";
+    settings.Text = "";
+    settings.ToolTip = "Anular";
+    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "AnnulItem";
+    settings.Enabled = !((bool)ViewBag.readOnly) && (ViewBag.CanAnnul == null || ((bool)ViewBag.CanAnnul));
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnExit";
+    settings.Text = "";
+    settings.ToolTip = "Cancelar";
+    settings.Images.Image.IconID = IconID.ActionsCancel16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "ExitItem";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnPrint";
+    settings.Text = "";
+    settings.ToolTip = "Imprimir";
+    settings.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "PrintItem";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnRefreshReplicateEdit";
+    settings.Text = "";
+    settings.ToolTip = "Refrescar Replicación";
+    settings.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "RefreshReplicateEdit";
+    settings.Enabled = ViewBag.canRefreshReplicate;
+}).GetHtml()

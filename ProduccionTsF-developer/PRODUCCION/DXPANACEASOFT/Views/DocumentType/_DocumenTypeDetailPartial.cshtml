@@ -1,0 +1,119 @@
+﻿
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.DocumentType
+
+
+@{
+    DocumentType documentType = Model ?? new DocumentType();
+}
+
+@Html.Hidden("id_documentType", documentType.id)
+
+
+<table style="width: 100%;">
+
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(documentType.code)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(documentType.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Estado:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(documentType.DocumentState.Count)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Estado:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(documentType.DocumentState.Count)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(documentType.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td style="width: 10%;">
+            @Html.Raw(GetUserName(documentType.id_userCreate))
+        </td>
+        <td style="width: 10%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(documentType.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(GetUserName(documentType.id_userUpdate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(documentType.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}
+
+
+
+
+

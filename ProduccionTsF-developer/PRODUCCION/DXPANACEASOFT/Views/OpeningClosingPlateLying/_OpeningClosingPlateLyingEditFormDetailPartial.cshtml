@@ -1,0 +1,257 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.OpeningClosingPlateLyingDetail>
+
+@{
+    var grid = Html.DevExpress().GridView<OpeningClosingPlateLyingDetail>(settings =>
+    {
+        settings.Name = "gvOpeningClosingPlateLyingEditFormDetail";
+        settings.CallbackRouteValues = new { Controller = "OpeningClosingPlateLying", Action = "OpeningClosingPlateLyingEditFormDetailPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "ProductionLotDailyCloseProductionLotsDetail_OnBeginCallback";
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "PurchasePlanning", Action = "ProductionLotDailyCloseEditFormProductionLotsDetailAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "PurchasePlanning", Action = "ProductionLotDailyCloseEditFormProductionLotsDetailUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "OpeningClosingPlateLying", Action = "OpeningClosingPlateLyingEditFormDetailDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId"; 
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewInitDetail";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedDetail";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackDetail";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackDetail";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<OpeningClosingPlateLyingDetail> rows = (Model as List<OpeningClosingPlateLyingDetail>);
+            rows = (rows != null) ? rows.ToList() : new List<OpeningClosingPlateLyingDetail>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfoDetails""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRowsDetails"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRowsDetail()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelectionDetails"" style=""cursor: pointer;"" onclick=""gvEditClearSelectionDetail()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        //settings.InitNewRow = (s, e) =>
+        //{
+        //    e.NewValues["quantity"] = 0.00M;
+        //};
+
+        #region ColumnsAdd
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ProductionLotNumber";
+            column.Caption = "Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null) ? ((inventoryMoveDetail.Lot!= null) ? inventoryMoveDetail.Lot.number : "") : "";
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ItemName";
+            column.Caption = "Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null) ? inventoryMoveDetail.Item.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "nameWarehouse";
+            column.Caption = "Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null) ? inventoryMoveDetail.Warehouse.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "nameWarehouseLocation";
+            column.Caption = "Ubicación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null) ? inventoryMoveDetail.WarehouseLocation.name : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityLiquidation";
+            column.Name = "balance";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null) ? inventoryMoveDetail.balance.ToString("#,##0.00") : "";
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_inventoryMoveDetail = (int?)DataBinder.Eval(c.DataItem, "id_inventoryMoveDetail");
+                InventoryMoveDetail inventoryMoveDetail = DataProviderInventoryMove.InventoryMoveDetailById(id_inventoryMoveDetail);
+
+                string text = (inventoryMoveDetail != null && inventoryMoveDetail.MetricUnit != null) ? inventoryMoveDetail.MetricUnit.code : "";
+
+                ViewContext.Writer.Write(text);
+            });
+
+        });
+
+
+
+        //Botones de comandos para registros de la tabla
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            //ShowEditButton = true,
+            ShowDeleteButton = true,
+            //ShowCancelButton = true,
+            //ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 20,
+            Caption = "Acciones"
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.Width = Unit.Percentage(11);
+
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+        #region ColumnsEdit
+
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+
+<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingDetailsEditForm.js"></script>

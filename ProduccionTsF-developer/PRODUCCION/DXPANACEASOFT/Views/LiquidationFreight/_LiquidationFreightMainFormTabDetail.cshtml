@@ -1,0 +1,295 @@
+﻿
+@using DXPANACEASOFT.Controllers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.LiquidationFreight
+@using System.Drawing
+
+@{
+    string codeState = (Model != null) ? Model.Document.DocumentState.code : "";
+    string valLiqAnyProv = DataProviderSetting.ValueSetting("LIQANYPROV");
+    string[] codeStatesBlockProvider = new string[] { "05", "06" };
+}
+
+@Html.Hidden("val_liq_any_prov", valLiqAnyProv);
+
+<div id="GridMessageErrorPurchaseOrder" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorLiquidationFreight";
+           settings.Properties.ClientInstanceName = "gridMessageErrorLiquidationFreight";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Compañía que factura:</label>
+        </td>
+        <td colspan="2">
+            @{
+                int? idProviderTransport = (Model != null && Model.id_providertransport != 0) ? (int?)Model.id_providertransport : null;
+            }
+
+            @if (valLiqAnyProv == "S" && !codeStatesBlockProvider.Contains(codeState))
+            {
+
+
+                @Html.Partial(
+                            "ComboBoxes/_PersonRolComboBoxPartial",
+                                LiquidationFreightController
+                                        .GetPersonRolComboBoxModel((int?)ViewData["id_company"], idProviderTransport, "Proveedor"));
+
+            }
+            else
+            {
+                @Html.DevExpress().TextBoxFor(m => Model.Person.fullname_businessName, settings =>
+                 {
+
+                        settings.Width = Unit.Percentage(100);
+                        settings.ReadOnly = true;
+                 }).GetHtml();
+            }
+
+        </td>
+
+        <td>&nbsp;</td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+
+            &nbsp;
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">N&uacute;mero Factura:</label>
+        </td>
+        <td colspan="2">
+
+            @Html.DevExpress().TextBoxFor(m => m.InvoiceNumber, settings =>
+            {
+                settings.Name = "InvoiceNumber";
+                settings.Properties.ClientInstanceName = "InvoiceNumber";
+                settings.Width = Unit.Percentage(100);
+                settings.Properties.MaxLength = 20;
+                settings.ReadOnly = codeState != "01";
+            }).GetHtml()
+        </td>
+
+        <td>&nbsp;</td>
+        <td>
+            &nbsp;
+        </td>
+        <td>
+
+            &nbsp;
+
+        </td>
+    </tr>
+
+    <!--Detalles-->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Detalles</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{
+                var details = (Model != null && Model.LiquidationFreightDetail != null) ? Model.LiquidationFreightDetail.ToList() : new List<LiquidationFreightDetail>();
+                Html.RenderPartial("_LiquidationFreightResultsDetailViewPartial", details);
+            }
+        </td>
+    </tr>
+    <!--Fin Detalles-->
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Totales</span>
+        </td>
+    </tr>
+
+    <!--AQUI SI ESTA BIEN-->
+    <!--Flete y Subtotal-->
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Flete (+):</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.price, settings =>
+       {
+           settings.Name = "price";
+           settings.Properties.ClientInstanceName = "price";
+           settings.Properties.DisplayFormatString = "C2";
+           settings.ReadOnly = true;
+
+       }).GetHtml()
+
+
+        </td>
+
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Subtotal:</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.pricesubtotal, settings =>
+                {
+                    settings.Name = "pricesubtotal";
+                    settings.Properties.ClientInstanceName = "pricesubtotal";
+                    settings.Properties.DisplayFormatString = "C2";
+                    settings.ReadOnly = true;
+
+                }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <!--Dias adicional y Anticipo-->
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Dias Adicionales (+):</label>
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.pricedays, settings =>
+    {
+        settings.Name = "pricedays";
+        settings.Properties.ClientInstanceName = "pricedays";
+        settings.Properties.DisplayFormatString = "C2";
+        settings.ReadOnly = true;
+        settings.Properties.DecimalPlaces = 2;
+
+        settings.Properties.SpinButtons.ShowIncrementButtons = false;
+        settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+        settings.Properties.Increment = 1.00M;
+        settings.Properties.MinValue = 0.00M;
+        settings.Properties.MaxValue = 80000.00M;
+        settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+        settings.Properties.ClientSideEvents.ValueChanged = "pricedays_ValueChanged";
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+        settings.Properties.ClientSideEvents.Validation = "OnpricedaysValidation";
+    }).GetHtml()
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Anticipo (-):</label>
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.priceavance, settings =>
+       {
+           settings.Name = "priceavance";
+           settings.Properties.ClientInstanceName = "priceavance";
+           settings.Properties.DisplayFormatString = "C2";
+           settings.ReadOnly = true;
+       }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <!--Extension  y Total-->
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Extensión (+):</label>
+        </td>
+        <td>
+
+            @Html.DevExpress().TextBoxFor(m => m.priceextension, settings =>
+       {
+           settings.Name = "priceextension";
+           settings.Properties.ClientInstanceName = "priceextension";
+           settings.Properties.DisplayFormatString = "C2";
+           settings.ReadOnly = true;
+
+       }).GetHtml()
+
+        </td>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Total:</label>
+
+
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.pricetotal, settings =>
+                {
+                    settings.Name = "pricetotal";
+                    settings.Properties.ClientInstanceName = "pricetotal";
+                    settings.Properties.DisplayFormatString = "C2";
+                    settings.ReadOnly = true;
+
+                }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <!--Ajuste-->
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Ajuste (-):</label>
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.priceadjustment, settings =>
+       {
+           settings.Name = "priceadjustment";
+           settings.Properties.ClientInstanceName = "priceadjustment";
+           settings.Properties.DisplayFormatString = "C2";
+           settings.ReadOnly = true;
+           settings.Properties.DecimalPlaces = 2;
+
+           settings.Properties.SpinButtons.ShowIncrementButtons = false;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.Properties.Increment = 1.00M;
+           settings.Properties.MinValue = 0.00M;
+           settings.Properties.MaxValue = 80000.00M;
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+           settings.Properties.ClientSideEvents.ValueChanged = "priceadjustment_ValueChanged";
+           settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+           //    settings.Properties.ClientSideEvents.Init = "priceadjustment_Init";
+           settings.Properties.ClientSideEvents.Validation = "OnpriceadjustmentValidation";
+
+       }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td>
+            <label class="label" style="text-align: left; width: 100%;">Flete Cancelado (-):</label>
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.PriceCancelledTotal, settings =>
+       {
+           settings.Name = "PriceCancelledTotal";
+           settings.Properties.ClientInstanceName = "PriceCancelledTotal";
+           settings.Properties.DisplayFormatString = "C2";
+           settings.ReadOnly = true;
+           settings.Properties.DecimalPlaces = 2;
+
+           settings.Properties.SpinButtons.ShowIncrementButtons = false;
+           settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+           settings.Properties.Increment = 1.00M;
+           settings.Properties.MinValue = 0.00M;
+           settings.Properties.MaxValue = 90000.00M;
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+           settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+           //    settings.Properties.ClientSideEvents.Init = "priceadjustment_Init";
+
+       }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+
+
+

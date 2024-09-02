@@ -1,0 +1,40 @@
+﻿
+@model List<DXPANACEASOFT.Models.IntegrationProcessDetail>
+
+@{
+
+    Html.DevExpress().Button(settings =>
+    {
+        settings.Name = "btnSeleccionar";
+        settings.ToolTip = "Seleccionar Documentos";
+        //settings.Width = 90;
+        settings.Text = "";
+        //settings.RenderMode = ButtonRenderMode.Link;
+        settings.Images.Image.IconID = IconID.ActionsAdd16x16;
+        settings.ClientEnabled = true;
+        settings.UseSubmitBehavior = false;
+        settings.EnableClientSideAPI = true;
+        settings.ClientSideEvents.Click = "OIntegrationProcess.ExecSelection";
+    }).GetHtml();
+
+      
+
+    Html.DevExpress().Button(settings =>
+    {
+        settings.Name = "btnCancelar";
+        settings.ToolTip = "Cancelar";
+        //settings.Width = 90;
+        settings.Text = "";
+        //settings.RenderMode = ButtonRenderMode.Link;
+        settings.Images.Image.IconID = IconID.ActionsCancel16x16;
+        settings.ClientEnabled = true;
+        settings.UseSubmitBehavior = false;
+        settings.EnableClientSideAPI = true;
+        settings.ClientSideEvents.Click = "OIntegrationProcess.CancelEditSelection";
+    }).GetHtml();
+
+    Html.RenderPartial("IntegrationProcessFindDocuments/_IntegrationProcessDocumentResultsPartialGrid", Model);
+
+
+
+}

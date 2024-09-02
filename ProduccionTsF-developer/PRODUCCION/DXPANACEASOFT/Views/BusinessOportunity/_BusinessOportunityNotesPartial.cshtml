@@ -1,0 +1,85 @@
+@using System.Drawing
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.BusinessOportunityNote>
+
+@{
+    var grid = Html.DevExpress().GridView<BusinessOportunityNote>(settings => {
+        settings.Name = "gvBusinessOportunityNotes" + ViewData["id_businessOportunity"];
+
+
+        settings.CallbackRouteValues = new { Controller = "BusinessOportunity", Action = "BusinessOportunityViewNotesPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "BusinessOportunity_OnBeginCallback";
+
+
+        settings.CommandColumn.Visible = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdBusinessOportunity"] = 0;
+            }
+            e.Properties["cpIdBusinessOportunity"] = ViewData["id_businessOportunity"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "referenceNote";
+            column.Caption = "Referencia";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string referenceNote = (string)DataBinder.Eval(c.DataItem, "referenceNote");
+
+                ViewContext.Writer.Write(referenceNote);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "descriptionNote";
+            column.Caption = "Descripción";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string descriptionNote = (string)DataBinder.Eval(c.DataItem, "descriptionNote");
+
+                ViewContext.Writer.Write(descriptionNote);
+            });
+
+        });
+       
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

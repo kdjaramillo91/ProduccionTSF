@@ -1,0 +1,39 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.ProductionLot
+@{
+    string codeState =  (Model != null && Model.ProductionLotState.code != null ) ? Model.ProductionLotState.code : "";
+    int? id_productionUnitProviderPool = (Model != null && Model.id_productionUnitProviderPool != 0) ? (int?)Model.id_productionUnitProviderPool : null;
+    int? id_productionUnitProvider = (Model != null && Model.id_productionUnitProvider != 0) ? (int?)Model.id_productionUnitProvider : null;
+
+}
+
+
+@Html.DevExpress().ComboBoxFor(m => m.id_productionUnitProviderPool, settings =>
+{
+	settings.Name = "id_productionUnitProviderPool";
+	settings.Properties.ClientInstanceName = "id_productionUnitProviderPool";
+	settings.Properties.ValueField = "id";
+	settings.Properties.TextField = "name";
+	settings.Properties.ValueType = typeof(int);
+	settings.Width = Unit.Percentage(100);
+	settings.ReadOnly = codeState != "01";
+	settings.ShowModelErrors = true;
+	settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionUnitProviderPoolByUnitProvider" };
+	//settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_productionUnitProvider'] = id_productionUnitProvider.GetValue();   }";
+	settings.Properties.ClientSideEvents.BeginCallback = "ProductionUnitProviderPool_OnBeginCallback";
+
+	settings.Properties.CallbackPageSize = 20;
+	//settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+	settings.CustomJSProperties = (s, e) =>
+	{
+		e.Properties["cpTabContainer"] = "tabReception";
+		e.Properties["cpMessageError"] = "Campo Obligatorio.";
+		e.Properties["cpIsRequired"] = "true";
+		e.Properties["cpTabControl"] = "tabControl";
+	};
+	  settings.Properties.ClientSideEvents.Validation = "OnPiscinaValidation";
+
+	//}).BindList(TempData["ProductionUnitProviderPoolByUnitProvider"]).Bind(id_productionUnitProviderPool).GetHtml()
+}).BindList(DataProviderProductionUnitProviderPool.ProductionUnitProviderPoolByUnitProvider(id_productionUnitProviderPool, id_productionUnitProvider)).Bind(id_productionUnitProviderPool).GetHtml()
+
+

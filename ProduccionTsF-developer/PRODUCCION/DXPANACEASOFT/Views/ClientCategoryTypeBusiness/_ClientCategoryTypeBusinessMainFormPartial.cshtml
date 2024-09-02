@@ -1,0 +1,181 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ClientCategoryTypeBusiness
+
+@{
+	int id_ClientCategoryTypeBusiness = (Model != null) ? Model.id : 0;
+}
+
+
+@{
+	if (ViewData["EditMessage"] != null)
+	{
+		@Html.Raw(ViewData["EditMessage"]);
+	}
+
+	@Html.Hidden("id_ClientCategoryTypeBusiness", id_ClientCategoryTypeBusiness)
+
+
+	<div id="GridMessageError" style="display: none;">
+
+	</div>
+	<table class="table table-condenced" style="margin: 0px;">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="6">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+			</td>
+		</tr>
+
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_clientCategory, settings =>
+			{
+				settings.Name = "id_clientCategoryLabel";
+				settings.Text = "Categoría:";
+				settings.AssociatedControlName = "id_clientCategory";
+			}).GetHtml()
+
+
+			</td>
+			<td>
+				@{
+					int? id_clientCategory = (Model != null && Model.id_clientCategory != 0) ? (int?)Model.id_clientCategory : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_clientCategory, settings =>
+			{
+				settings.Name = "id_clientCategory";
+				settings.Properties.ClientInstanceName = "id_clientCategory";
+				settings.Properties.ValueField = "id";
+				settings.Properties.TextField = "name";
+				settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+				settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+				settings.Properties.ValueType = typeof(int);
+				settings.Properties.Columns.Add("name", "Nombre", 200);
+				settings.Width = Unit.Percentage(50);
+				settings.Height = Unit.Percentage(50);
+				settings.Properties.EnableClientSideAPI = true;
+				settings.Properties.CallbackPageSize = 20;
+
+				settings.ShowModelErrors = true;
+				settings.Properties.ClientSideEvents.Validation = "OnCategory";
+
+			}).BindList(DataProviderClientCategory.ClientCategoryAll((int?)id_clientCategory)).Bind(id_clientCategory).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_customerType, settings =>
+			{
+				settings.Name = "id_customerTypeLabel";
+				settings.Text = "Tipo de CLiente:";
+				settings.AssociatedControlName = "id_customerType";
+			}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_customerType = (Model != null && Model.id_customerType != 0) ? (int?)Model.id_customerType : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_customerType, settings =>
+		   {
+			   settings.Name = "id_customerType";
+			   settings.Properties.ClientInstanceName = "id_customerType";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnCustomerType";
+
+		   }).BindList(DataProviderCustomerType.CustomerTypeAll((int?)id_customerType)).Bind(id_customerType).GetHtml()
+			</td>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_businessLine, settings =>
+			{
+				settings.Name = "id_businessLineLabel";
+				settings.Text = "Giro de Negocio:";
+				settings.AssociatedControlName = "id_businessLine";
+			}).GetHtml()
+			</td>
+			<td>
+				@{
+					int? id_businessLine = (Model != null && Model.id_businessLine != 0) ? (int?)Model.id_businessLine : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_businessLine, settings =>
+		   {
+			   settings.Name = "id_businessLine";
+			   settings.Properties.ClientInstanceName = "id_businessLine";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			   settings.Width = Unit.Percentage(50);
+			   settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnBusinessLine";
+
+		   }).BindList(DataProviderBusinessLine.BusinessLineAll((int?)id_businessLine)).Bind(id_businessLine).GetHtml()
+			</td>
+
+		</tr>
+
+		<tr></tr>
+
+	</table>
+
+	<table class="table table-condensed">
+		<tr style="border-top: 1px Solid #C0C0C0;">
+			<td colspan="6" style="text-align: right; margin-top: 5px;">
+				@{
+					Html.DevExpress().Button(button =>
+					{
+
+						button.Name = "btnUpdate";
+						button.Text = "Actualizar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.UseSubmitBehavior = false;
+						button.ValidateInvisibleEditors = true;
+						button.ClientSideEvents.Click = "ButtonUpdate_Click";
+
+					}).Render();
+
+					ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnClose";
+						button.Text = "Cerrar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "ButtonCancel_Click";
+					}).Render();
+				}
+			</td>
+		</tr>
+	</table>
+}
+
+<script src="~/Scripts/clientCategoryTypeBusiness/editform.js"></script>
+
+<script src="~/Scripts/clientCategoryTypeBusiness/validations.js"></script>

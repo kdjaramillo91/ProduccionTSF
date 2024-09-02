@@ -1,0 +1,21 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingDTO
+
+@Html.DevExpress().TokenBoxFor(model => model.ids_productionCart, settings =>
+{
+    settings.Name = "TokenBoxProductionCarts";
+    settings.Width = Unit.Percentage(100);
+    //settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "OpeningClosingPlateLying",
+        Action = "TokenBoxProductionCarts",
+    };
+    settings.Properties.ClientSideEvents.ValueChanged = "TokenBoxProductionCarts_ValueChanged";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.AllowCustomTokens = false;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["ProductionCarts"]).GetHtml()

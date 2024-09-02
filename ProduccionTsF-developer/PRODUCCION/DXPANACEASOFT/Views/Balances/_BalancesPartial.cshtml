@@ -1,0 +1,320 @@
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+
+@{
+    var grid = Html.DevExpress().GridView<ResultKardex>(settings => {
+        settings.Name = "gvBalancesDetails";
+        settings.CallbackRouteValues = new { Controller = "Balances", Action = "BalancesPartial" };
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesPartialAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesPartialUpdate" };
+        //settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "InventoryMove", Action = "InventoryMovesPartialDelete" };
+
+        //settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        //settings.SettingsBehavior.ConfirmDelete = true;
+        //settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.SettingsBehavior.AllowFixedGroups = true;
+        //settings.CommandColumn.Visible = true;
+        //settings.CommandColumn.ShowSelectCheckbox = true;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        //settings.SettingsBehavior.ConfirmDelete = false;
+        //settings.CommandColumn.Width = Unit.Percentage(3);
+
+        //settings.CommandColumn.ShowNewButton = false;
+        //settings.CommandColumn.ShowDeleteButton = false;
+        //settings.CommandColumn.ShowEditButton = false;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //settings.ClientSideEvents.Init = "OnGridViewInit";
+        //settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChanged";
+        //settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallback";
+        //settings.ClientSideEvents.EndCallback = "OnGridViewEndCallback";
+
+        #region SearchPanel
+
+        //Panel de Busqueda
+        settings.SettingsSearchPanel.Visible = true;
+        settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        #endregion
+
+        settings.Settings.ShowFooter = true;
+      
+        settings.Columns.Add(m => m.document, column =>
+        {
+            column.Name = "document";
+            column.Caption = "No. Movimiento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+        });
+
+        settings.Columns.Add(m => m.documentType, column =>
+        {
+            column.Name = "documentType";
+            column.Caption = "Tipo de Movimiento";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.inventoryReason, column =>
+        {
+            column.Name = "inventoryReason";
+            column.Caption = "Motivo de Inventario";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.emissionDate, column =>
+        {
+            column.Name = "emissionDate";
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(8);
+        });
+
+        settings.Columns.Add(m => m.code_item, column =>
+        {
+            column.Name = "code_item";
+            column.Caption = "Código-Producto";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(10);
+
+           
+        }).GroupIndex = 2;
+
+        settings.Columns.Add(m => m.metricUnit, column =>
+        {
+            column.Name = "metricUnit";
+            column.Caption = "UM";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(3);
+            
+        });
+        settings.Columns.Add(m => m.number, column =>
+        {
+            column.Name = "number";
+            column.Caption = "Lote";
+            column.ReadOnly = true;
+            //column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(5);
+            
+        });
+
+        settings.Columns.Add(m => m.warehouse, column =>
+        {
+            column.Name = "warehouse";
+            column.Caption = "Bodega";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        }).GroupIndex = 0;
+
+        settings.Columns.Add(m => m.warehouseLocation, column =>
+        {
+            column.Name = "warehouseLocation";
+            column.Caption = "Ubicación";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+        }).GroupIndex = 1;
+      
+
+
+        settings.Columns.Add(m => m.previousBalance, column =>
+        {
+            column.Name = "previousBalance";
+            column.Caption = "Saldo Anterior";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal previousBalance = (decimal)DataBinder.Eval(c.DataItem, "previousBalance");
+
+                string formato = previousBalance >= 1000 ? "0,000.00" : "0.00";
+                string text = previousBalance.ToString(formato);
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.previousBalanceCost, column =>
+        {
+            column.Name = "previousBalanceCost";
+            column.Caption = "Costo Saldo Anterior";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal previousBalance = (decimal)DataBinder.Eval(c.DataItem, "previousBalanceCost");
+
+                string text = previousBalance.ToString("C2");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.entry, column =>
+        {
+            column.Name = "entryAmount";
+            column.Caption = "Ingreso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal entryAmount = (decimal)DataBinder.Eval(c.DataItem, "entry");
+
+                string formato = entryAmount >= 1000 ? "0,000.00" : "0.00";
+                string text = entryAmount.ToString(formato);
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+        settings.Columns.Add(m => m.entryCost, column =>
+        {
+            column.Name = "entryCost";
+            column.Caption = "Costo Ingreso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal entryCost = (decimal)DataBinder.Eval(c.DataItem, "entryCost");
+
+                string text = entryCost.ToString("C2");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.exit, column =>
+        {
+            column.Name = "exitAmount";
+            column.Caption = "Egreso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal exitAmount = (decimal)DataBinder.Eval(c.DataItem, "exit");
+
+                string formato = exitAmount >= 1000 ? "0,000.00" : "0.00";
+                string text = exitAmount.ToString(formato);
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.exitCost, column =>
+        {
+            column.Name = "exitCost";
+            column.Caption = "Costo Egreso";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal exitCost = (decimal)DataBinder.Eval(c.DataItem, "exitCost");
+
+                string text = exitCost.ToString("C2");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.balance, column =>
+        {
+            column.Name = "balance";
+            column.Caption = "Saldo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal balance = (decimal)DataBinder.Eval(c.DataItem, "balance");
+
+                string formato = balance >= 1000 ? "0,000.00" : "0.00";
+                string text = balance.ToString(formato);
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.balanceCost, column =>
+        {
+            column.Name = "balanceCost";
+            column.Caption = "Costo Saldo";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal balanceCost = (decimal)DataBinder.Eval(c.DataItem, "balanceCost");
+
+                string text = balanceCost.ToString("C2");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(m => m.priceCost, column =>
+        {
+            column.Name = "priceCost";
+            column.Caption = "Precio Unitario";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.Width = Unit.Percentage(3);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal priceCost = (decimal)DataBinder.Eval(c.DataItem, "priceCost");
+
+                string text = priceCost.ToString("C2");
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+        
+    });
+}
+@grid.Bind(Model).GetHtml()

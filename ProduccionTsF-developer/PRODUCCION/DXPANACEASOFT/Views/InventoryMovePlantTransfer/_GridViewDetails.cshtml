@@ -1,0 +1,481 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+	var grid = Html.DevExpress().GridView<InventoryMovePlantTransferDetailDTO>(settings =>
+	{
+		settings.Name = "GridViewDetails";
+		settings.CallbackRouteValues = new
+		{
+			Controller = "InventoryMovePlantTransfer",
+			Action = "GridViewDetails",
+			//drawersNumber = ViewBag.drawersNumber,
+			//((List<LiquidationTurnDetailDTO>) Model).Count
+			//idTypeLiquidationTurn = ViewBag.idTypeLiquidationTurn,
+			//percentTara = ViewBag.percentTara,
+			enabled = ViewBag.enabled
+			//dateTimeEmision = ViewBag.dateTimeEmision
+		};
+
+
+		//settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "NonProductiveHour", Action = "GridViewDetailsAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InventoryMovePlantTransfer", Action = "GridViewDetailsUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "InventoryMovePlantTransfer", Action = "GridViewDetailsDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+		//settings.CommandColumn.Visible = (ViewBag.enabled == null || (bool)ViewBag.enabled);
+		//settings.CommandColumn.ShowSelectCheckbox = true;
+		//settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		settings.SettingsBehavior.ConfirmDelete = false;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+		//settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+		settings.Enabled = ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+		//settings.SettingsBehavior.AllowFixedGroups = true;
+		//settings.SettingsBehavior.AllowSort = false;
+
+		//settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+		settings.Settings.VerticalScrollableHeight = 300;
+		settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+		//settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+		settings.SettingsPager.Visible = false;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+		//settings.Settings.ShowFilterRowMenu = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		//Checkbox de registros de tabla
+		//settings.CommandColumn.ShowSelectCheckbox = true;
+		//settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+		//settings.ClientSideEvents.BeginCallback = "OnGridViewDetailBeginCallback";
+		//settings.ClientSideEvents.EndCallback = "OnGridViewDetailEndCallback";
+
+		//settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+		//settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+		//settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Width = Unit.Percentage(100);
+		settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		//Pie de tabla
+		settings.Settings.ShowFooter = true;
+		settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "amountToEnter").DisplayFormat = "<b>{0:n2}</b>";
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			e.Properties["cpEnabled"] = ViewBag.enabled;
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+			var list = (Model as List<LiquidationTurnDetailDTO>) ?? new List<LiquidationTurnDetailDTO>();
+			e.Properties["cpDetailCount"] = list.Count;
+			//e.Properties["cpRowId"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+		};
+
+		//#region SearchPanel
+
+		////Panel de Busqueda
+		//settings.SettingsSearchPanel.Visible = true;
+		//settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+		//#endregion
+
+		//settings.Settings.ShowFooter = false;
+
+		//noInventoryMoveExit - 6
+		settings.Columns.Add(m => m.noInventoryMoveExit, column =>
+		{
+			column.Name = "noInventoryMoveExit";
+			column.Caption = "No.Egreso Por Transferencia";
+			column.Width = Unit.Percentage(6);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "noInventoryMoveExit";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//warehouseExit - 5
+		settings.Columns.Add(m => m.warehouseExit, column =>
+		{
+			column.Name = "warehouseExit";
+			column.Caption = "Bodega Egreso";
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "warehouseExit";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//warehouseLocationExit - 6
+		settings.Columns.Add(m => m.warehouseLocationExit, column =>
+		{
+			column.Name = "warehouseLocationExit";
+			column.Caption = "Ubicación Egreso";
+			column.Width = Unit.Percentage(6);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "warehouseLocationExit";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+		settings.Columns.Add(m => m.machineForProdCartOnCartDetail, column =>
+		{
+			column.Name = "machineForProdCartOnCartDetail";
+			column.Caption = "Máquina";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+			column.Width = Unit.Percentage(4);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var machineForProdCartOnCartDetail = DataBinder.Eval(c.DataItem, "machineForProdCartOnCartDetail");
+
+				ViewContext.Writer.Write(machineForProdCartOnCartDetail);
+			});
+
+		});
+
+		//warehouseEntry - 5
+		settings.Columns.Add(m => m.warehouseEntry, column =>
+		{
+			column.Name = "warehouseEntry";
+			column.Caption = "Bodega Ingreso";
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "warehouseEntry";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//warehouseLocationEntry - 6
+		settings.Columns.Add(m => m.warehouseLocationEntry, column =>
+		{
+			column.Name = "warehouseLocationEntry";
+			column.Caption = "Ubicación Ingreso";
+			column.Width = Unit.Percentage(6);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "warehouseLocationEntry";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//warehouseLocationEntry - 5
+		settings.Columns.Add(m => m.productionCart, column =>
+		{
+			column.Name = "productionCart";
+			column.Caption = "Coche";
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "productionCart";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//codItem - 5
+		settings.Columns.Add(m => m.codItem, column =>
+		{
+			column.Name = "codItem";
+			column.Caption = "Código";
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "codItem";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//nameItem - 10
+		settings.Columns.Add(m => m.nameItem, column =>
+		{
+			column.Name = "nameItem";
+			column.Caption = "Nombre del Producto";
+			column.Width = Unit.Percentage(10);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "nameItem";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//nameItem - 10
+		settings.Columns.Add(m => m.customer, column =>
+		{
+			column.Name = "customer";
+			column.Caption = "Cliente";
+			column.Width = Unit.Percentage(10);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "customer";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//umMovExit - 4
+		settings.Columns.Add(m => m.umMovExit, column =>
+		{
+			column.Name = "umMovExit";
+			column.Caption = "UM Mov.Egr.";
+			column.Width = Unit.Percentage(4);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "umMovExit";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//costCenterEntry - 5
+		settings.Columns.Add(m => m.costCenterEntry, column =>
+		{
+			column.Name = "costCenterEntry";
+			column.Caption = "C. Costo";
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "costCenterEntry";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//subCostCenterEntry - 5
+		settings.Columns.Add(m => m.subCostCenterEntry, column =>
+		{
+			column.Name = "costCenterEntry";
+			column.Caption = "Sub. C.Costo";
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "costCenterEntry";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//amountToEnter - 4
+		settings.Columns.Add(m => m.amountToEnter, column =>
+		{
+			column.Name = "amountToEnter";
+			column.Caption = "Cantidad a Ingresar";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(4);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal amountToEnter = (decimal)DataBinder.Eval(c.DataItem, "amountToEnter");
+
+				ViewContext.Writer.Write(amountToEnter.ToString("N2"));
+			});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "amountToEnter";
+				p.DisplayFormatString = "N2";
+				p.DisplayFormatInEditMode = true;
+				p.DecimalPlaces = 2;
+				p.MinValue = 0;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Number;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+				//p.ClientSideEvents.NumberChanged = "Quantity_NumberChange";
+				p.ClientSideEvents.Validation = "OnAmountToEnterInventoryMovePlantTransferDetailValidation";
+			});
+
+		});
+
+		//umMov - 4
+		settings.Columns.Add(m => m.umMov, column =>
+		{
+			column.Name = "umMov";
+			column.Caption = "UM Mov.";
+			column.Width = Unit.Percentage(4);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "umMov";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		////cost - 6
+		//settings.Columns.Add(m => m.cost, column =>
+		//{
+		//    column.Name = "cost";
+		//    column.Caption = "Costo";
+		//    column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+		//    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//    column.Width = Unit.Percentage(6);
+
+		//    column.SetDataItemTemplateContent(c =>
+		//    {
+		//        decimal cost = (decimal)DataBinder.Eval(c.DataItem, "cost");
+
+		//        ViewContext.Writer.Write(cost.ToString("C6"));
+		//    });
+
+		//});
+
+		////total - 7
+		//settings.Columns.Add(m => m.total, column =>
+		//{
+		//    column.Name = "total";
+		//    column.Caption = "Costo";
+		//    column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+		//    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+		//    column.Width = Unit.Percentage(7);
+
+		//    column.SetDataItemTemplateContent(c =>
+		//    {
+		//        decimal total = (decimal)DataBinder.Eval(c.DataItem, "total");
+
+		//        ViewContext.Writer.Write(total.ToString("C2"));
+		//    });
+
+		//});
+
+		//lot - 7
+		settings.Columns.Add(m => m.lot, column =>
+		{
+			column.Name = "lot";
+			column.Caption = "Lote";
+			column.Width = Unit.Percentage(7);
+			column.ReadOnly = true;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "lot";
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+			});
+		});
+
+		//pending - 5
+		settings.Columns.Add(m => m.pending, column =>
+		{
+			column.Name = "pending";
+			column.Caption = "Pendiente";
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(5);
+			column.ReadOnly = true;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal pending = (decimal)DataBinder.Eval(c.DataItem, "pending");
+
+				ViewContext.Writer.Write(pending.ToString("N2"));
+			});
+
+			column.EditorProperties().SpinEdit(p =>
+			{
+
+				p.Width = Unit.Percentage(100);
+				p.ClientInstanceName = "pending";
+				p.DisplayFormatString = "N2";
+				p.DecimalPlaces = 2;
+				p.SpinButtons.ShowIncrementButtons = false;
+				p.SpinButtons.ShowLargeIncrementButtons = false;
+				p.AllowNull = false;
+				p.NumberType = SpinEditNumberType.Float;
+				p.NumberFormat = SpinEditNumberFormat.Number;
+				p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+			});
+
+		});
+		if ((ViewBag.enabled == null || (bool)ViewBag.enabled)) {
+			MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+			{
+				ShowEditButton = true,
+				ShowDeleteButton = true,
+				ShowCancelButton = true,
+				ShowUpdateButton = true,
+				Visible = true,
+				VisibleIndex = 20,
+				Caption = "Acciones"
+			};
+			commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+			commandColumn.Width = Unit.Percentage(5);
+
+			settings.Columns.Add(commandColumn);
+		}
+		//Botones de comandos para registros de la tabla
+
+
+		settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+
+	});
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,213 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ShippingLineShippingAgency
+
+@{
+    int id_ShippingLineShippingAgency = (Model != null) ? Model.id : 0;
+}
+
+
+@{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("id_ShippingLineShippingAgency", id_ShippingLineShippingAgency)
+
+
+    <div id="GridMessageError" style="display: none;">
+      
+    </div>
+    <table class="table table-condenced" style="margin: 0px;">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+            </td>
+        </tr>
+
+        <tr>
+     
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_ShippingLine, settings =>
+            {
+                settings.Name = "id_ShippingLineLabel";
+                settings.Text = "Línea:";
+                settings.AssociatedControlName = "id_ShippingLine";
+            }).GetHtml()
+
+
+            </td>
+            <td>
+                @{
+                    int? id_ShippingLine = (Model != null && Model.id_ShippingLine != 0) ? (int?)Model.id_ShippingLine : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_ShippingLine, settings =>
+            {
+                settings.Name = "id_ShippingLine";
+                settings.Properties.ClientInstanceName = "id_ShippingLine";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueType = typeof(int);
+                settings.Properties.Columns.Add("name", "Nombre", 200);
+                settings.Width = Unit.Percentage(50);
+                settings.Height = Unit.Percentage(50);
+                settings.Properties.EnableClientSideAPI = true;
+                settings.Properties.CallbackPageSize = 20;
+              
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnShippingLine";
+
+            }).BindList(DataProviderShippingLine.ShippingLineAll((int?)id_ShippingLine)).Bind(id_ShippingLine).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+            <td>
+                @Html.DevExpress().LabelFor(m => m.id_ShippingAgency, settings =>
+            {
+                settings.Name = "id_ShippingAgencyLabel";
+                settings.Text = "Agencia:";
+                settings.AssociatedControlName = "id_ShippingAgency";
+            }).GetHtml()
+            </td>
+            <td>
+                @{
+                    int? id_ShippingAgency = (Model != null && Model.id_ShippingAgency != 0) ? (int?)Model.id_ShippingAgency : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_ShippingAgency, settings =>
+           {
+               settings.Name = "id_ShippingAgency";
+               settings.Properties.ClientInstanceName = "id_ShippingAgency";
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.Columns.Add("name", "Nombre", 200);
+               settings.Width = Unit.Percentage(50);
+               settings.Height = Unit.Percentage(50);
+               settings.Properties.EnableClientSideAPI = true;
+               settings.Properties.CallbackPageSize = 20;
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnShippingAgency";
+
+           }).BindList(DataProviderShippingAgency.ShippingAgencyAll((int?)id_ShippingAgency)).Bind(id_ShippingAgency).GetHtml()
+            </td>
+
+        </tr>
+        <tr>
+            <!--FECHA Inicio-->
+            <td>
+                @Html.DevExpress().LabelFor(m => m.fecha_inicio, settings =>
+            {
+                settings.Name = "startDateLabel";
+                settings.Text = "Fecha Inicio:";
+                settings.AssociatedControlName = "fecha_inicio";
+            }).GetHtml()
+
+
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.fecha_inicio, settings =>
+               {
+                   settings.Name = "fecha_inicio";
+                   settings.Properties.ClientInstanceName = "fecha_inicio";
+                   settings.Properties.UseMaskBehavior = true;
+                   settings.Properties.EditFormat = EditFormat.Custom;
+                   settings.Properties.EditFormatString = "dd/MM/yyyy";
+                   settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                   settings.Width = Unit.Percentage(100);
+                
+                   settings.ShowModelErrors = true;
+                   settings.Properties.ClientSideEvents.Validation = "OnstartDateValidation";
+                   settings.Properties.DisplayFormatInEditMode = true;
+                   settings.Properties.CalendarProperties.Columns = 2;
+                   settings.Properties.DateRangeSettings.MinDayCount = 1;
+                   settings.Properties.DateRangeSettings.MaxDayCount = 90;
+               }).GetHtml()
+
+            </td>
+            <!-- FECHA FIn-->
+            <td>
+                @Html.DevExpress().LabelFor(m => m.fecha_fin, settings =>
+            {
+                settings.Name = "endDateLabel";
+                settings.Text = "Fecha Fin:";
+                settings.AssociatedControlName = "fecha_fin";
+            }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEditFor(m => m.fecha_fin, settings =>
+           {
+               settings.Name = "fecha_fin";
+               settings.Properties.ClientInstanceName = "fecha_fin";
+               settings.Properties.UseMaskBehavior = true;
+               settings.Properties.EditFormat = EditFormat.Custom;
+               settings.Properties.EditFormatString = "dd/MM/yyyy";
+               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+               settings.Width = Unit.Percentage(100);
+
+               settings.ShowModelErrors = true;
+               settings.Properties.CalendarProperties.Columns = 2;
+               settings.Properties.DateRangeSettings.StartDateEditID = "fecha_inicio";
+               settings.Properties.DateRangeSettings.MinDayCount = 1;
+               settings.Properties.DateRangeSettings.MaxDayCount = 90;
+               settings.Properties.AllowNull= true;
+               //settings.Properties.ClientSideEvents.Validation = "OnendDateValidation";
+
+           }).GetHtml()
+            </td>
+            <td colspan="2"></td>
+        </tr>
+
+
+
+        <tr></tr>
+
+    </table>
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+               
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/ShippingLineShippingAgency/editform.js"></script>
+
+<script src="~/Scripts/ShippingLineShippingAgency/validations.js"></script>

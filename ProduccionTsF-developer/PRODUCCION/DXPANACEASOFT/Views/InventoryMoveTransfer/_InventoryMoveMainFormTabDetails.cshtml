@@ -1,0 +1,22 @@
+﻿
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InventoryMove
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td>
+            @{
+                ViewData["code"] = (Model != null && Model.Document != null && Model.Document.DocumentType != null) ? Model.Document.DocumentType.code : "";
+                ViewData["id_inventoryMove"] = (Model != null) ? Model.id : 0;
+                var details = (Model != null && Model.InventoryMoveDetail != null) ? Model.InventoryMoveDetail.ToList() : new List<InventoryMoveDetail>();
+                if(ViewData["code"].Equals("03") || ViewData["code"].Equals("04") /*|| ViewData["code"].Equals("34")*/)
+                {
+                    Html.RenderPartial("_InventoryEntryMoveAuxEditFormPartial", Model);
+                }
+                Html.RenderPartial("ProductionLotGridMessageErrors/_GridMessageErrorMaterialsDetail");
+                Html.RenderPartial("DocumentTemplates/_DocumentDetailsActionsButtons");
+                Html.RenderPartial("_InventoryMoveDetailsEditFormPartial", details);
+            }
+        </td>
+    </tr>
+</table>

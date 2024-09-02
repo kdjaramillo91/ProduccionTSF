@@ -1,0 +1,246 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.SalesRequest
+
+@{
+    //var code_purchaseReason = (Model != null && Model.PurchaseReason != null && Model.PurchaseReason.id != 0) ? Model.PurchaseReason.code : "";
+    string codeState = (Model != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+    bool fromSalesQuotation = Model.SalesRequestDetail.FirstOrDefault(fod => fod.SalesRequestDetailSalesQuotation != null && fod.SalesRequestDetailSalesQuotation.Count() > 0) != null;
+    bool fromSalesBusinessOportunity = Model.SalesRequestDetail.FirstOrDefault(fod=> fod.SalesRequestDetailBusinessOportunity != null && fod.SalesRequestDetailBusinessOportunity.Count() > 0) != null;
+}
+
+<table id="tableTabRequest" class="table table-condenced" style="margin: 0px;">
+    <tr>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.id_customer, settings =>
+                {
+                    settings.Name = "id_customerLabel";
+                    settings.Text = "Cliente:";
+                    settings.AssociatedControlName = "id_customer";
+                }).GetHtml()
+        </td>
+        <td style="width: 25%;">
+            @{
+                int? id_customer = (Model != null && Model.id_customer != 0) ? (int?)Model.id_customer : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.Customer.id, settings =>
+       {
+           settings.Name = "id_customer";
+           settings.Properties.ClientInstanceName = "id_customer";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.CallbackPageSize = 15;
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "fullname_businessName";
+           settings.Properties.ValueType = typeof(int);
+           //settings.Properties.Width = Unit.Percentage(100);
+
+           settings.ReadOnly = codeState != "01" || fromSalesQuotation || fromSalesBusinessOportunity;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "SalesRequestCustomer_SelectedIndexChanged";
+           settings.Properties.ClientSideEvents.Validation = "OnCustomerValitation";
+
+       }).BindList(DataProviderPerson.Customers()).Bind(id_customer).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.Employee.Person.fullname_businessName, settings =>
+                {
+                    settings.Name = "id_employeeSellerLabel";
+                    settings.Text = "Solicitante:";
+                    settings.AssociatedControlName = "employeeSeller";
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.HiddenFor(m => m.id_employeeSeller, new { id = "id_personRequesting" })
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Person.fullname_businessName, settings =>
+                {
+                    settings.Name = "employeeSeller";
+                    settings.Properties.ClientInstanceName = "employeeSeller";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ReadOnly = true;
+                    settings.Properties.ClientSideEvents.Validation = "OnValidation";
+                }).GetHtml()
+        </td>
+        <td style="width: 10%;">
+            @Html.DevExpress().LabelFor(m => m.Employee.Department.name, settings =>
+                {
+                    settings.Name = "employeeDepartamentLabel";
+                    settings.Text = "Departamento:";
+                    settings.AssociatedControlName = "employeeDepartament";
+                    settings.Width = Unit.Percentage(10);
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Employee.Department.name, settings =>
+                {
+                    settings.Name = "employeeDepartament";
+                    settings.Properties.ClientInstanceName = "employeeDepartament";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ReadOnly = true;
+                }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_priceList, settings =>
+                {
+                    settings.Text = "Lista de Precios:";
+                    settings.AssociatedControlName = "id_priceList";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_priceList, settings =>
+       {
+           settings.Name = "id_priceList";
+           settings.Properties.ClientInstanceName = "id_priceList";
+           settings.Width = Unit.Percentage(100);
+
+           settings.CallbackRouteValues = new { Controller = "SalesRequest", Action = "GetPriceList" };
+           settings.Properties.CallbackPageSize = 15;
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           //settings.Properties.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01" || fromSalesQuotation || fromSalesBusinessOportunity;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.BeginCallback = "OnPriceListBeginCallback";
+           settings.Properties.ClientSideEvents.Validation = "OnPriceListValitation";
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnPriceList_SelectedIndexChanged";
+
+       }).BindList(DataProviderPriceList.SaleApprovedPriceLists((int?)ViewData["id_company"], id_priceList, id_customer)).Bind(id_priceList).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.Document.reference, settings =>
+            {
+                settings.Name = "referenceLabel";
+                settings.Text = "Referencia:";
+                settings.AssociatedControlName = "reference";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.Document.reference, settings =>
+       {
+           settings.Name = "reference";
+           settings.Properties.ClientInstanceName = "reference";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01";
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnValidation";
+       }).GetHtml()
+        </td>
+        <td colspan="2">
+            &nbsp;
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Negociaci&oacute;n</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_PaymentMethod, settings =>
+                {
+                    settings.Text = "Forma de Pago:";
+                    settings.AssociatedControlName = "id_PaymentMethod";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_PaymentMethod = (Model != null && Model.id_PaymentMethod != 0) ? (int?)Model.id_PaymentMethod : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_PaymentMethod, settings =>
+       {
+           settings.Name = "id_PaymentMethod";
+           settings.Properties.ClientInstanceName = "id_PaymentMethod";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.CallbackPageSize = 15;
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           //settings.Properties.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01" || fromSalesQuotation || fromSalesBusinessOportunity;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPaymentMethodValitation";
+
+       }).BindList(DataProviderPaymentMethod.PaymentMethodWithCurrent(id_PaymentMethod)).Bind(id_PaymentMethod).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_PaymentTerm, settings =>
+                {
+                    settings.Text = "Plazo:";
+                    settings.AssociatedControlName = "id_PaymentTerm";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_PaymentTerm = (Model != null && Model.id_PaymentTerm != 0) ? (int?)Model.id_PaymentTerm : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_PaymentTerm, settings =>
+       {
+           settings.Name = "id_PaymentTerm";
+           settings.Properties.ClientInstanceName = "id_PaymentTerm";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.CallbackPageSize = 15;
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           //settings.Properties.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01" || fromSalesQuotation || fromSalesBusinessOportunity;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPaymentTermValitation";
+
+       }).BindList(DataProviderPaymentTerm.PaymentTermAll(id_PaymentTerm)).Bind(id_PaymentTerm).GetHtml()
+        </td>
+        <td colspan="2">
+            &nbsp;
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n de Entrega</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_portDestination, settings =>
+                {
+                    settings.Text = "Punto de Entrega:";
+                    settings.AssociatedControlName = "id_portDestination";
+                }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_portDestination = (Model != null && Model.id_portDestination != 0) ? (int?)Model.id_portDestination : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_portDestination, settings =>
+       {
+           settings.Name = "id_portDestination";
+           settings.Properties.ClientInstanceName = "id_portDestination";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.CallbackPageSize = 15;
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "nombre";
+           settings.Properties.ValueType = typeof(int);
+           //settings.Properties.Width = Unit.Percentage(100);
+           settings.ReadOnly = codeState != "01" || fromSalesQuotation || fromSalesBusinessOportunity;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPortDestinationValitation";
+
+       }).BindList(DataProviderPort.PortWithCurrent(id_portDestination)).Bind(id_portDestination).GetHtml()
+        </td>
+        <td colspan="4">
+            &nbsp;
+        </td>
+    </tr>
+</table>

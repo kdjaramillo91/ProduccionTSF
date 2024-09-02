@@ -1,0 +1,35 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.LiquidationMaterialDTO
+
+@Html.Hidden("id_liquidationMaterial", Model.id)
+@Html.Hidden("enabled", ((bool)ViewBag.enabled))
+@Html.Hidden("canAproved", ((bool)(ViewBag.canAproved == null || (bool)ViewBag.canAproved)))
+@Html.Hidden("canAuthorize", ((bool)(ViewBag.canAuthorize == null || (bool)ViewBag.canAuthorize)))
+
+@Html.DevExpress().PageControl(settings =>
+{
+    settings.Name = "pcFeatures";
+    settings.Width = Unit.Percentage(100);
+    settings.Height = Unit.Pixel(400);
+    settings.TabPages.Add("Documento").SetContent(() =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='divTabDocumentEdit'>" +
+            @Html.Partial("_TabDocumentEdit", Model)
+            + "</div>");
+    });
+    settings.TabPages.Add("Liquidación de Materiales").SetContent(() =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='divTabSummaryEdit'>" +
+            @Html.Partial("_TabSummaryEdit", Model)
+            + "</div>");
+    });
+    settings.TabPages.Add("Materiales e Insumos").SetContent(() =>
+    {
+        ViewContext.Writer.Write(
+           "<div id='divTabDetailEdit'>" +
+           @Html.Partial("_TabDetailEdit", Model)
+           + "</div>");
+    });
+}).GetHtml()
+

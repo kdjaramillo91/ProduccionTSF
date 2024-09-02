@@ -1,0 +1,539 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.BoxCardAndBank
+
+@{
+	int id_BoxCardAndBank = (Model != null) ? Model.id : 0;
+
+}
+
+
+@{
+	if (ViewData["EditMessage"] != null)
+	{
+		@Html.Raw(ViewData["EditMessage"]);
+	}
+
+	@Html.Hidden("id_BoxCardAndBank", id_BoxCardAndBank)
+
+
+	<div id="GridMessageError" style="display: none;">
+
+	</div>
+	<table class="table table-condenced" style="margin: 0px;">
+		<tr style="border-bottom: 1px Solid #C0C0C0;">
+			<td colspan="6">
+				<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+			</td>
+		</tr>
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.code, settings =>
+		   {
+			   settings.Name = "codeLabel";
+			   settings.Text = "Código*:";
+			   settings.AssociatedControlName = "code";
+		   }).GetHtml()
+
+
+			</td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.code, settings =>
+		   {
+			   settings.Name = "code";
+			   settings.Properties.ClientInstanceName = "code";
+			   settings.Properties.NullText = "Código";
+
+			   settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 20;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+			   //settings.Width = Unit.Percentage(50);
+			   //settings.Height = Unit.Percentage(50);
+		   }).GetHtml()
+
+			</td>
+			<!-- FECHA FIn-->
+			<td></td>
+			<td></td>
+			<!---->
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.name, settings =>
+			{
+				settings.Name = "nameLabel";
+				settings.Text = " Nombre*:";
+				settings.AssociatedControlName = "name";
+
+			}).GetHtml()
+
+			</td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.name, settings =>
+		   {
+			   settings.Name = "name";
+			   settings.Properties.ClientInstanceName = "name";
+			   settings.Properties.NullText = "Nombre";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+		</tr>
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.companyName, settings =>
+			{
+				settings.Name = "companyNameLabel";
+				settings.Text = "Nombre de compañia*:";
+				settings.AssociatedControlName = "companyname";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.companyName, settings =>
+		   {
+			   settings.Name = "companyname";
+			   settings.Properties.ClientInstanceName = "companyname";
+			   settings.Properties.NullText = "Company Name";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+
+
+		</tr>
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.country, settings =>
+			{
+				settings.Name = "adressLabel";
+				settings.Text = " Dirección*:";
+				settings.AssociatedControlName = "adress";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.adress, settings =>
+		   {
+			   settings.Name = "adress";
+			   settings.Properties.ClientInstanceName = "adress";
+			   settings.Properties.NullText = "Address";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+
+
+		</tr>
+
+
+		<tr>
+
+			<td>
+				@Html.DevExpress().LabelFor(m => m.id_typeBoxCardAndBank, settings =>
+			{
+				settings.Name = "id_typeBoxCardAndBankLabel";
+				settings.Text = "Tipo*:";
+				settings.AssociatedControlName = "id_typeBoxCardAndBank";
+			}).GetHtml()
+
+
+			</td>
+			<td>
+				@{
+					int? id_typeBoxCardAndBank = (Model != null && Model.id_typeBoxCardAndBank != 0) ? (int?)Model.id_typeBoxCardAndBank : null;
+				}
+				@Html.DevExpress().ComboBoxFor(m => m.id_typeBoxCardAndBank, settings =>
+		   {
+			   settings.Name = "id_typeBoxCardAndBank";
+			   settings.Properties.ClientInstanceName = "id_typeBoxCardAndBank";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.NullText = "Seleccione Tipo";
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Properties.Columns.Add("name", "Nombre", 200);
+			  // settings.Width = Unit.Percentage(50);
+			   //settings.Height = Unit.Percentage(50);
+			   settings.Properties.EnableClientSideAPI = true;
+			   settings.Properties.CallbackPageSize = 20;
+
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnTipeValidation";
+
+		   }).BindList(DataProviderBoxCardAndBank.AllTypeBoxCardAndBanks()).GetHtml()
+
+
+			</td>
+			<td></td>
+			<td></td>
+			<!---->
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.country, settings =>
+			{
+				settings.Name = "countryLabel";
+				settings.Text = " País*:";
+				settings.AssociatedControlName = "country";
+
+			}).GetHtml()
+
+			</td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.country, settings =>
+		   {
+			   settings.Name = "country";
+			   settings.Properties.ClientInstanceName = "country";
+			   settings.Properties.NullText = "Country";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+		</tr>
+		<tr>
+
+			<td >
+
+				@Html.DevExpress().LabelFor(m => m.account, settings =>
+			{
+				settings.Name = "accountLabel";
+				settings.Text = "Cuenta*:";
+				settings.AssociatedControlName = "account";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.account, settings =>
+		   {
+			   settings.Name = "account";
+			   settings.Properties.ClientInstanceName = "account";
+			   settings.Properties.NullText = "Account";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			  // settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+			
+
+		</tr>
+
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.currency, settings =>
+			{
+				settings.Name = "currencyLabel";
+				settings.Text = " Divisa*:";
+				settings.AssociatedControlName = "currency";
+
+			}).GetHtml()
+
+			</td>
+			<td >
+				@Html.DevExpress().TextBoxFor(m => m.currency, settings =>
+		   {
+			   settings.Name = "currency";
+			   settings.Properties.ClientInstanceName = "currency";
+			   settings.Properties.NullText = "Currency";
+			   settings.Width = Unit.Percentage(100);
+			  settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			  settings.ShowModelErrors = false;
+			   settings.Properties.MaxLength = 100;
+			  // settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+
+			<td></td>
+
+			<td></td>
+
+			<!---->
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.routing, settings =>
+			{
+				settings.Name = "RoutingLabel";
+				settings.Text = "Enrutamiento*:";
+				settings.AssociatedControlName = "routing";
+
+			}).GetHtml()
+
+			</td>
+			<td>
+				@Html.DevExpress().TextBoxFor(m => m.routing, settings =>
+		   {
+			   settings.Name = "routing";
+			   settings.Properties.ClientInstanceName = "routing";
+			   settings.Properties.NullText = "Routing";
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = false;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+		</tr>
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.countryIntermediary, settings =>
+			{
+				settings.Name = "countryIntermediaryLabel";
+				settings.Text = "País intermediario:";
+				settings.AssociatedControlName = "countryIntermediary";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.countryIntermediary, settings =>
+		   {
+			   settings.Name = "countryIntermediary";
+			   settings.Properties.ClientInstanceName = "countryIntermediary";
+			   settings.Properties.NullText = "País intermediario";
+			   settings.Width = Unit.Percentage(100);
+			  // settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+
+
+		</tr>
+
+		<!---->
+		<tr>
+
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.codeIntermediary, settings =>
+			{
+				settings.Name = "codeintermedaryLabel";
+				settings.Text = "Código intermediario:";
+				settings.AssociatedControlName = "codeIntermediary";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.codeIntermediary, settings =>
+		   {
+			   settings.Name = "codeIntermediary";
+			   settings.Properties.ClientInstanceName = "codeIntermediary";
+			   settings.Properties.NullText = "Codigo intermediario";
+			   settings.Width = Unit.Percentage(100);
+			   //settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+			
+			<!---->
+			
+		</tr>
+
+		<tr>
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.bankNameIntermediary, settings =>
+			{
+				settings.Name = "banknameintermediaryLabel";
+				settings.Text = "Nombre banco intermediario:";
+				settings.AssociatedControlName = "bankNameIntermediary";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.bankNameIntermediary, settings =>
+		   {
+			   settings.Name = "bankNameIntermediary";
+			   settings.Properties.ClientInstanceName = "bankNameIntermediary";
+			   settings.Properties.NullText = "Nombre banco intermediario";
+			   settings.Width = Unit.Percentage(100);
+			   //settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+
+		</tr>
+		<tr>
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.accountIntermediary, settings =>
+			{
+				settings.Name = "accountIntermediaryLabel";
+				settings.Text = "Cuenta Intermediaria:";
+				settings.AssociatedControlName = "accountIntermediary";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.accountIntermediary, settings =>
+		   {
+			   settings.Name = "accountIntermediary";
+			   settings.Properties.ClientInstanceName = "accountIntermediary";
+			   settings.Properties.NullText = "Cuenta Intermediaria";
+			   settings.Width = Unit.Percentage(100);
+			   //settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+			
+			<!---->
+			
+
+		</tr>
+		<tr>
+			<td>
+
+				@Html.DevExpress().LabelFor(m => m.currencyIntermediary, settings =>
+			{
+				settings.Name = "currencyIntermediaryLabel";
+				settings.Text = "Divisa intermediaria:";
+				settings.AssociatedControlName = "currencyIntermediary";
+
+			}).GetHtml()
+
+			</td>
+			<td colspan="5">
+				@Html.DevExpress().TextBoxFor(m => m.currencyIntermediary, settings =>
+		   {
+			   settings.Name = "currencyIntermediary";
+			   settings.Properties.ClientInstanceName = "currencyIntermediary";
+			   settings.Properties.NullText = "Divisa intermediaria";
+			   settings.Width = Unit.Percentage(100);
+			  // settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+			   settings.ShowModelErrors = true;
+			   settings.Properties.MaxLength = 100;
+			   settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+
+		   }).GetHtml()
+
+			</td>
+
+		</tr>
+		
+
+		<tr>
+
+			<td colspan="2">
+
+				@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+	   {
+		   settings.Name = "isActive";
+		   settings.Properties.ClientInstanceName = "isActive";
+		   settings.Text = "Activo";
+
+	   }).GetHtml()
+
+			</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+
+
+
+		<tr></tr>
+
+	</table>
+
+	<table class="table table-condensed">
+		<tr style="border-top: 1px Solid #C0C0C0;">
+			<td colspan="6" style="text-align: right; margin-top: 5px;">
+				@{
+					Html.DevExpress().Button(button =>
+					{
+
+						button.Name = "btnUpdate";
+						button.Text = "Actualizar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+						button.UseSubmitBehavior = false;
+						button.ValidateInvisibleEditors = true;
+						button.ClientSideEvents.Click = "ButtonUpdate_Click";
+
+					}).Render();
+
+					ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+					Html.DevExpress().Button(button =>
+					{
+						button.Name = "btnClose";
+						button.Text = "Cerrar";
+						button.RenderMode = ButtonRenderMode.Button;
+						button.ImagePosition = ImagePosition.Left;
+						button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+						button.UseSubmitBehavior = false;
+						button.ClientSideEvents.Click = "ButtonCancel_Click";
+					}).Render();
+				}
+			</td>
+		</tr>
+	</table>
+}
+
+<script src="~/Scripts/BoxCardAndBank/editform.js"></script>
+
+<script src="~/Scripts/BoxCardAndBank/validations.js"></script>

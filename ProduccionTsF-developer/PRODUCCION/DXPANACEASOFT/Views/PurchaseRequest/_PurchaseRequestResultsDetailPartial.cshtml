@@ -1,0 +1,321 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DevExpress.Data
+@using System.Drawing
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.PurchaseRequestDetail>
+
+@{
+    var grid = Html.DevExpress().GridView<PurchaseRequestDetail>(settings =>
+    {
+        settings.Name = "gvPurchaseRequestResultsDetail"; /*+ ViewData["id_purchaseRequest"];*/
+        settings.SettingsDetail.MasterGridName = "gvPurchaseRequests";
+        //settings.CallbackRouteValues = new { Controller = "PurchaseRequest", Action = "PurchaseRequestResultsDetailPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "PurchaseRequestResultsDetail_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Detalle de Requerimiento</span>");
+        });
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSort = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        #region COLUMNS
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        //id_businessOportunity
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_businessOportunity";
+            column.Caption = "Oportunidad de Compra";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                List<PurchaseRequestDetailBusinessOportunity> purchaseRequestDetailBusinessOportunities = null;
+
+                try
+                {
+                    purchaseRequestDetailBusinessOportunities = (List<PurchaseRequestDetailBusinessOportunity>)DataBinder.Eval(c.DataItem, "PurchaseRequestDetailBusinessOportunity");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        HashSet<PurchaseRequestDetailBusinessOportunity> temp = (HashSet<PurchaseRequestDetailBusinessOportunity>)DataBinder.Eval(c.DataItem, "PurchaseRequestDetailBusinessOportunity");
+                        purchaseRequestDetailBusinessOportunities = temp.ToList();
+                    }
+                    catch (Exception)
+                    {
+                        purchaseRequestDetailBusinessOportunities = null;
+                    }
+                }
+
+                string text = string.Empty;
+
+                if (purchaseRequestDetailBusinessOportunities != null && purchaseRequestDetailBusinessOportunities.Count > 0)
+                {
+                    int id_businessOportunity = purchaseRequestDetailBusinessOportunities[0].id_businessOportunity;
+                    BusinessOportunity businessOportunity = DataProviderBusinessOportunity.BusinessOportunityById(id_businessOportunity);
+
+                    text += businessOportunity.Document.number;
+
+                    if (purchaseRequestDetailBusinessOportunities[0].id_businessOportunityPlanningDetail == null || businessOportunity.Document.DocumentState.code != "03")//03 APROBADA
+                    {
+                        text = "<font color='red'>" + text + "</font>";
+                    }
+                    //text += (purchaseOrders.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseOrders.Count - 1).ToString() + "</a>" : "";
+                }
+
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        //id_productionSchedule
+        settings.Columns.Add(column =>
+        {
+            column.Name = "id_productionSchedule";
+            column.Caption = "No. Programación de Producción";
+            column.ReadOnly = true;
+            column.UnboundType = UnboundColumnType.String;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                List<ProductionScheduleScheduleDetailPurchaseRequestDetail> productionSchedules = null;
+
+                try
+                {
+                    productionSchedules = (List<ProductionScheduleScheduleDetailPurchaseRequestDetail>)DataBinder.Eval(c.DataItem, "ProductionScheduleScheduleDetailPurchaseRequestDetail");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        HashSet<ProductionScheduleScheduleDetailPurchaseRequestDetail> temp = (HashSet<ProductionScheduleScheduleDetailPurchaseRequestDetail>)DataBinder.Eval(c.DataItem, "ProductionScheduleScheduleDetailPurchaseRequestDetail");
+                        productionSchedules = temp.ToList();
+                    }
+                    catch (Exception)
+                    {
+                        productionSchedules = null;
+                    }
+                }
+
+                string text = string.Empty;
+
+                if (productionSchedules != null && productionSchedules.Count > 0)
+                {
+                    int id_productionSchedule = productionSchedules[0].id_productionSchedule;
+                    ProductionSchedule productionSchedule = DataProviderProductionSchedule.ProductionSchedule(id_productionSchedule);
+
+                    text += productionSchedule.Document.number;
+
+                    if (productionSchedules[0].id_productionScheduleScheduleDetail == null || productionSchedule.Document.DocumentState.code != "03")//03 APROBADA
+                    {
+                        text = "<font color='red'>" + text + "</font>";
+                    }
+                    //text += (purchaseOrders.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseOrders.Count - 1).ToString() + "</a>" : "";
+                }
+
+                ViewContext.Writer.Write(text);
+
+            });
+
+        });
+
+        settings.Columns.Add(c => c.Item.masterCode, column =>
+        {
+            column.Name = "masterCode";
+            column.Caption = "Código";
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(m => m.Item.name,column =>
+        {
+            column.Name = "item";
+            column.Caption = "Producto";
+        });
+        //COLOR
+        settings.Columns.Add(m => m.colorReference, column =>
+        {
+            column.FieldName = "colorReference";
+            column.Name = "colorReference";
+            column.Caption = "Color";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(10);
+
+            //column.EditorProperties().TextBox(p =>
+            //{
+            //    p.ClientInstanceName = "colorReference";
+            //    p.DataSource = DataProviderItemColor.ItemsColors();
+            //    p.ValueField = "id";
+            //    p.TextFormatString = "{1}";
+            //    p.ValueType = typeof(int);
+            //    p.CallbackPageSize = 30;
+            //    p.Width = Unit.Percentage(100);
+            //    p.DropDownStyle = DropDownStyle.DropDownList;
+            //    p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            //    p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            //    p.Columns.Add("code", "Código", 70);
+            //    p.Columns.Add("name", "Nombre", 300);
+            //    //p.ClientSideEvents.Init = "ItemCombo_OnInit";
+            //    p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            //    p.ClientSideEvents.Validation = "OnItemColorValidation";
+
+            //});
+        });
+        //GRAMAJE
+        settings.Columns.Add(m => m.Grammage.description , column =>
+        {
+            column.FieldName = "id_grammageFrom";
+            column.Name = "id_grammageFrom";
+            column.Caption = "Gramaje";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_grammageFrom";
+                p.DataSource = DataProviderGrammage.GrammagesByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextFormatString = "{1}";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 30;
+                p.Width = Unit.Percentage(101);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                p.Columns.Add("code", "Código", 70);
+                p.Columns.Add("description", "Gramaje", 300);
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ClientSideEvents.Validation = "OnGrammageValidation";
+
+            });
+        });
+        //GRAMAJE
+        settings.Columns.Add(m => m.Grammage1.description, column =>
+        {
+            column.FieldName = "id_grammageTo";
+            column.Name = "id_grammageTo";
+            column.Caption = "Gramaje";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(10);
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_grammageTo";
+                p.DataSource = DataProviderGrammage.GrammagesByCompany((int?)ViewData["id_company"]);
+                p.ValueField = "id";
+                p.TextFormatString = "{1}";
+                p.ValueType = typeof(int);
+                p.CallbackPageSize = 30;
+                p.Width = Unit.Percentage(101);
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                p.Columns.Add("code", "Código", 70);
+                p.Columns.Add("description", "Gramaje", 300);
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ClientSideEvents.Validation = "OnGrammageValidation";
+
+            });
+        });
+        //settings.Columns.Add(m => m.Provider.Person.fullname_businessName, column =>
+        //{
+        //    column.Name = "proposedProvider";
+        //    column.Caption = "Proveedor Propuesto";
+        //});
+
+        settings.Columns.Add(c => c.Item.ItemPurchaseInformation.MetricUnit.code, column =>
+        {
+            column.Name = "code";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityRequested";
+            column.Caption = "Cantidad Solicitada";
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityRequested = (decimal)DataBinder.Eval(c.DataItem, "quantityRequested");
+                ViewContext.Writer.Write(quantityRequested.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityApproved";
+            column.Caption = "Cantidad Aprobada";
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityApproved = (decimal)DataBinder.Eval(c.DataItem, "quantityApproved");
+                ViewContext.Writer.Write(quantityApproved.ToString("N2"));
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityOutstandingPurchase";
+            column.Caption = "Cantidad Pendiente de Compra";
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal quantityOutstandingPurchase = (decimal)DataBinder.Eval(c.DataItem, "quantityOutstandingPurchase");
+                ViewContext.Writer.Write(quantityOutstandingPurchase > 0 ? quantityOutstandingPurchase.ToString("N2"): "0.00");
+            });
+        });
+
+        #endregion
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView g = (s as MVCxGridView);
+            if (g != null)
+            {
+                g.FilterExpression = "isActive = true";
+            }
+        };
+    });
+}
+@grid.Bind(Model).GetHtml()
+
+

@@ -1,0 +1,278 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.SalesOrderDTO
+
+<div>
+	<div class="Etiqueta"><b>Informaci&oacute;n General</b></div>
+	<hr style="width: 100%; margin: 0px;">
+	<div class="MyContainer">
+		<div class="row">
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "Cliente: ";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-4">
+				@Html.Partial("_ComboBoxCustomer")
+			</div>
+			@{
+				if (Model.code_documentType != "140")
+				{
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = "# de Lote: ";
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().TextBoxFor(model => model.numeroLote,
+						settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Name = "TextBoxNumeroLote";
+							settings.ReadOnly = !((bool)ViewBag.enabled);
+						}).GetHtml()
+					</div>
+				}
+			}
+		</div>
+		@{
+			if (Model.code_documentType != "140")
+			{
+				<div class="row">
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = "Motivo: ";
+							
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.Partial("_ComboBoxReason")
+					</div>
+					<div class="col-sm-2">
+					</div>
+					<div class="col-sm-4">
+					</div>
+				</div>
+			}
+		}
+	</div>
+	@{
+		if (Model.code_documentType != "139")
+		{
+			var labelproformaOrder = (Model.code_documentType == "140") ? "Proforma" : ((Model.code_documentType == "141") ? "Pedido" : "Número");
+			<div class="Etiqueta"><b>Inf. Negociaci&oacute;n</b></div>
+			<hr style="width: 100%; margin: 0px;">
+			<div class="MyContainer">
+				<div class="row">
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = labelproformaOrder + ": ";
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().TextBoxFor(model => model.proformaOrder,
+						settings =>
+						{
+						settings.Width = Unit.Percentage(100);
+						settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+						settings.ReadOnly = true;
+						}).GetHtml()
+					</div>
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = "Vendedor: ";
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().TextBoxFor(model => model.seller,
+						settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							//settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+							settings.ReadOnly = true;
+						}).GetHtml()
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = "Forma de Pago: ";
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().TextBoxFor(model => model.paymentMethod,
+						settings =>
+						{
+						settings.Width = Unit.Percentage(100);
+						settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+						settings.ReadOnly = true;
+						}).GetHtml()
+					</div>
+					<div class="col-sm-2">
+					</div>
+					<div class="col-sm-4">
+					</div>
+				</div>
+			</div>
+		}
+		if (Model.code_documentType == "140")
+		{
+			//var labelproformaOrder = (Model.code_documentType == "140") ? "Proforma" : ((Model.code_documentType == "141") ? "Pedido" : "Número");
+			<div class="Etiqueta"><b>Datos del Embarque</b></div>
+			<hr style="width: 100%; margin: 0px;">
+			<div class="MyContainer">
+				<div class="row">
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   settings.Text = "Fecha de Embarque: ";
+				   }).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().DateEditFor(model => model.dateShipment,
+				   settings =>
+				   {
+					   settings.Name = "dateShipment";
+					   settings.Properties.ClientInstanceName = "dateShipment";
+					   settings.Width = Unit.Percentage(100);
+					   settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+					   settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+					   settings.ReadOnly = !((bool)ViewBag.enabled);
+
+					   settings.Properties.UseMaskBehavior = true;
+					   settings.Properties.EditFormat = EditFormat.Custom;
+					   settings.Properties.EditFormatString = "dd/MM/yyyy";
+					   //settings.Properties.TimeSectionProperties.Visible = true;
+					   //settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+					   //settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "HH:mm";
+				   }).GetHtml()
+					</div>
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   settings.Text = "Requiere Logística: ";
+				   }).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().CheckBoxFor(m => m.logistics, settings =>
+				   {
+					   settings.Name = "logistics";
+					   settings.Properties.ClientInstanceName = "logistics";
+					   settings.ShowModelErrors = true;
+					   settings.ReadOnly = !((bool)ViewBag.enabled);
+				   }).GetHtml()
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = "Puerto Descarga: ";
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.Partial("_ComboBoxPortDischarge")
+					</div>
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = "Puerto Destino: ";
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.Partial("_ComboBoxPortDestination")
+					</div>
+				</div>
+
+			</div>
+		}
+		else
+		{
+			<div class="Etiqueta"><b>Datos de Entrega</b></div>
+			<hr style="width: 100%; margin: 0px;">
+			<div class="MyContainer">
+				<div class="row">
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   settings.Text = "Fecha de Entrega: ";
+				   }).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().DateEditFor(model => model.dateShipment,
+				   settings =>
+				   {
+					   settings.Name = "dateShipment";
+					   settings.Properties.ClientInstanceName = "dateShipment";
+					   settings.Width = Unit.Percentage(100);
+					   settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+					   settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+					   settings.ReadOnly = !((bool)ViewBag.enabled);
+
+					   settings.Properties.UseMaskBehavior = true;
+					   settings.Properties.EditFormat = EditFormat.Custom;
+					   settings.Properties.EditFormatString = "dd/MM/yyyy";
+					   //settings.Properties.TimeSectionProperties.Visible = true;
+					   //settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+					   //settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "HH:mm";
+				   }).GetHtml()
+					</div>
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+						{
+							settings.Width = Unit.Percentage(100);
+							settings.Text = "Punto de Entrega: ";
+						}).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.Partial("_ComboBoxPortDestination")
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-2">
+						@Html.DevExpress().Label(settings =>
+				   {
+					   settings.Width = Unit.Percentage(100);
+					   settings.Text = "Requiere Logística: ";
+				   }).GetHtml()
+					</div>
+					<div class="col-sm-4">
+						@Html.DevExpress().CheckBoxFor(m => m.logistics, settings =>
+				   {
+					   settings.Name = "logistics";
+					   settings.Properties.ClientInstanceName = "logistics";
+					   settings.ShowModelErrors = true;
+					   settings.ReadOnly = !((bool)ViewBag.enabled);
+				   }).GetHtml()
+					</div>
+					<div class="col-sm-2">
+						@Html.Hidden("ComboBoxPortDischarge", Model.id_portDischarge)
+					</div>
+					<div class="col-sm-4">
+					</div>
+				</div>
+			</div>
+		}
+		<div class="row">
+			<div class="col-sm-12">
+				<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+			</div>
+		</div>
+	}
+</div>

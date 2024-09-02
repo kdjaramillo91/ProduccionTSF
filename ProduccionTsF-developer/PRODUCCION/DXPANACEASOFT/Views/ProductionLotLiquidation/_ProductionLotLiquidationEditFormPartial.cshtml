@@ -1,0 +1,221 @@
+﻿@using DXPANACEASOFT.Models
+
+@{
+    int id_order = (Model != null) ? Model.id : 0;
+    String ActionName = (id_order == 0) ? "ProductionLotLiquidationsPartialAddNew" : "ProductionLotLiquidationsPartialUpdate";
+}
+
+@using (Ajax.BeginForm(ActionName, "ProductionLotLiquidation",
+        new AjaxOptions
+        {
+            HttpMethod = "post",
+            OnBegin = "showLoading();",
+            OnComplete = "hideLoading();",
+            UpdateTargetId = "maincontent",
+            InsertionMode = InsertionMode.ReplaceWith
+        },
+        new
+        {
+            id = "formEditProductionLotLiquidation",
+            name = "formEditProductionLotLiquidation"
+        }))
+{
+    Html.RenderPartial("ProductionTemplates/_ProductionFormEditActionsButtons");
+
+    <table class="table table-condensed">
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Liquidaci&oacute;n</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "No. Liquidación:";
+                    settings.AssociatedControlName = "number";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(settings =>
+                {
+                    settings.Name = "number";
+                    settings.Properties.ClientInstanceName = "number";
+                    settings.ClientEnabled = false;
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnSendToValidation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Fecha de Liquidación:";
+                    settings.AssociatedControlName = "dateLiquidation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(settings =>
+                {
+                    settings.Name = "dateLiquidation";
+                    settings.Properties.ClientInstanceName = "dateLiquidation";
+                    settings.ClientEnabled = false;
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnSendToValidation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Estado:";
+                    settings.AssociatedControlName = "id_state";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(settings =>
+                {
+                    settings.Name = "id_state";
+                    settings.Properties.ClientInstanceName = "id_state";
+                    settings.ClientEnabled = false;
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnSendToValidation";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Liquidador:";
+                    settings.AssociatedControlName = "id_person";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(settings =>
+                {
+                    settings.Name = "id_person";
+                    settings.Properties.ClientInstanceName = "id_person";
+                    settings.ClientEnabled = false;
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnSendToValidation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Bodega:";
+                    settings.AssociatedControlName = "id_warehouse";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(settings =>
+                {
+                    settings.Name = "id_warehouse";
+                    settings.Properties.ClientInstanceName = "id_warehouse";
+                    settings.ClientEnabled = false;
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnSendToValidation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Ubicación:";
+                    settings.AssociatedControlName = "id_warehouseLocation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(settings =>
+                {
+                    settings.Name = "id_warehouseLocation";
+                    settings.Properties.ClientInstanceName = "id_warehouseLocation";
+                    settings.ClientEnabled = false;
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnSendToValidation";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Productos/Lotes</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                @{
+                    var details = new List<ProductionLotDetail>();
+                    Html.RenderPartial("_ProductionLotLiquidationeditFormLiquidationDetailsPartial", details);
+                }
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="6">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Descripci&oacute;n</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                @Html.DevExpress().Memo(settings =>
+                {
+                    settings.Name = "description";
+                    settings.Properties.ClientInstanceName = "description";
+                    settings.Width = Unit.Percentage(100);
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdate_EditForm";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        //button.ClientEnabled = true;
+                        //button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        //button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdateClose_EditForm";
+                        button.Text = "Guardar/Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSaveclose16x16devav;
+                        //button.ClientEnabled = true;
+                        //button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        //button.ClientSideEvents.Click = "ButtonUpdateClose_Click";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnCancel_EditForm";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        //button.ClientEnabled = true;//button.UseSubmitBehavior = false;
+                        //button.EnableClientSideAPI = true;
+                        //button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/productionlotliquidation/_productionLiquitaditonEditForm.js"></script>

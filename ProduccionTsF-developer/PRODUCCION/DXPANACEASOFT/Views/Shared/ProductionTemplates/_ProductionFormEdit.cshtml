@@ -1,0 +1,284 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProductionLot
+
+@{
+    int id_productionLot = (Model != null) ? Model.id : 0;
+
+    int imoveEntry = (ViewBag.imoveEntry != null) ? ViewBag.imoveEntry : 0;
+    int imovExit = (ViewBag.imovExit != null) ? ViewBag.imovExit : 0;
+    string isProductionProcess = (ViewBag.isProductionProcess != null && ViewBag.isProductionProcess == "S") ? "S" : "N";
+
+
+}
+
+@Html.Hidden("id_productionLot", id_productionLot)
+@Html.Hidden("imoveEntry", imoveEntry)
+@Html.Hidden("imovExit", imovExit)
+
+
+<table id="documentProductionLot" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="8">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Lote</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.number, settings =>
+       {
+           //CAMBIO FEO
+           settings.Text = "Sec. Transaccional";
+           settings.AssociatedControlName = "number";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.number, settings =>
+       {
+           settings.Name = "number";
+           settings.Properties.ClientInstanceName = "number";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.ProductionLotState.name, settings =>
+       {
+           settings.Text = "Estado:";
+           settings.AssociatedControlName = "productionLotState";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.HiddenFor(m => m.id_ProductionLotState)
+            @{
+                string productionLotState = (Model != null && Model.ProductionLotState != null) ? Model.ProductionLotState.name : "";
+            }
+            @Html.DevExpress().TextBox(settings =>
+       {
+           settings.Name = "state";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+
+           settings.ShowModelErrors = true;
+
+       }).Bind(productionLotState).GetHtml()
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+</table>
+<table id="documentProductionLot2" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Proceso - Producto</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_productionProcess, settings =>
+       {
+           //settings.Name = "productionProcessLabel";
+           settings.Text = "Proceso:";
+           settings.AssociatedControlName = "id_productionProcess";
+       }).GetHtml()
+        </td>
+        <td>
+            @{
+				int? id_productionProcess = (Model != null && Model.id_productionProcess != 0) ? (int?)Model.id_productionProcess : null;
+				var listaCodigos = new[]
+				{
+                    "REC",
+                    "RMM"
+				};
+
+                var codigoModelo = (Model.ProductionProcess != null ? Model.ProductionProcess.code : "");
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_productionProcess, settings =>
+       {
+           settings.Name = "id_productionProcess";
+           settings.Properties.ClientInstanceName = "id_productionProcess";
+           settings.Width = Unit.Percentage(100);
+           settings.ClientEnabled = (!listaCodigos.Contains(codigoModelo));// ? true : false);
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.Width = Unit.Percentage(100);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.ReadOnly = @Model.ProductionLotState.code != "01";
+           settings.ShowModelErrors = true;
+
+           settings.Properties.ClientSideEvents.Validation = "OnProductionProcessValidation";
+           if (isProductionProcess == "S")
+           {
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnProductionProcess_SelectedIndexChanged";
+               
+           }
+
+
+
+
+       }).BindList(DataProviderProductionProcess.ProductionProcessesWithoutRECWithCurrent((int)ViewData["id_company"], (int?)Model.id_productionProcess)).Bind(id_productionProcess).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_productionUnit, settings =>
+       {
+           settings.Text = "Unidad de Producción:";
+           settings.AssociatedControlName = "id_productionUnit";
+       }).GetHtml()
+        </td>
+        <td>
+            @{
+                if (isProductionProcess == "S")
+                {
+                    var unidadProduccionName = DataProviderProductionUnit.ProductionUnitNameByProcessId(Model.id_productionProcess);
+                    //Html.RenderPartial("ProducionComboBox/_ComboBoxUnitProcess", Model);
+                        @Html.DevExpress().TextBox(settings =>
+                   {
+                       settings.Name = "unidadProduccionName";
+                       settings.Properties.ClientInstanceName = "unidadProduccionName";
+                       settings.Width = Unit.Percentage(100);
+                       settings.ReadOnly = true;
+                       settings.ShowModelErrors = true;
+                       settings.Text = unidadProduccionName;
+
+                        }).GetHtml()
+
+                    }
+                else
+                {
+                    int? id_productionUnit = (Model != null && Model.id_productionUnit != 0) ? (int?)Model.id_productionUnit : null;
+
+                    Html.DevExpress().ComboBoxFor(m => m.id_productionUnit, settings =>
+                    {
+                        settings.Name = "id_productionUnit";
+                        settings.Properties.ClientInstanceName = "id_productionUnit";
+                        settings.Width = Unit.Percentage(100);
+                        settings.Properties.ValueField = "id";
+                        settings.Properties.TextField = "name";
+                        settings.Properties.ValueType = typeof(int);
+                        settings.Properties.Width = Unit.Percentage(100);
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                        settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        settings.ReadOnly = @Model.ProductionLotState.code != "01";
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ClientSideEvents.Validation = "OnProductionUnitValidation";
+
+                    }).BindList(DataProviderProductionUnit.ProductionUnitsByProcess((int?)ViewData["id_company"], (int?)Model.id_productionProcess, id_productionUnit)).Bind(id_productionUnit).GetHtml();
+                }
+
+            }
+
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.reference, settings =>
+        {
+            settings.Name = "referenceLabel";
+            settings.Text = "Referencia:";
+            settings.AssociatedControlName = "reference";
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.reference, settings =>
+       {
+           settings.Name = "reference";
+           settings.Properties.ClientInstanceName = "reference";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = @Model.ProductionLotState.code != "01";
+           settings.ShowModelErrors = true;
+
+       }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.totalQuantityRecived, settings =>
+           {
+               settings.Text = DataProviderSetting.ValueSetting("URE") + ":";// "Libras Recibidas:";
+               settings.AssociatedControlName = "totalQuantityRecivedDocLabel";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalQuantityRecived, settings =>
+        {
+            settings.Name = "totalQuantityRecivedDoc";
+            settings.Properties.ClientInstanceName = "totalQuantityRecivedDoc";
+            settings.Width = Unit.Percentage(100);
+
+            settings.Properties.DisplayFormatString = "N2";
+
+            settings.ReadOnly = true;
+            //settings.ClientEnabled = false;
+            //settings.Properties.ClientSideEvents.Validation = "OnTotalQuantityRecivedValidation";
+            settings.ShowModelErrors = true;
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.totalQuantityLiquidation, settings =>
+        {
+            settings.Text = DataProviderSetting.ValueSetting("ULI") + ":";//"Libras Liquidadas:";
+            settings.AssociatedControlName = "totalQuantityLiquidation";
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalQuantityLiquidation, settings =>
+        {
+            settings.Name = "totalQuantityLiquidation";
+            settings.Properties.ClientInstanceName = "totalQuantityLiquidation";
+            settings.Width = Unit.Percentage(100);
+
+            settings.Properties.DisplayFormatString = "N2";
+
+            settings.ClientEnabled = false;
+            settings.ShowModelErrors = true;
+
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.totalQuantityTrash, settings =>
+        {
+            settings.Text = DataProviderSetting.ValueSetting("UDE") + ":";//"Libras de Desperdicio:";
+            settings.AssociatedControlName = "totalQuantityTrash";
+        }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.totalQuantityTrash, settings =>
+        {
+            settings.Name = "totalQuantityTrash";
+            settings.Properties.ClientInstanceName = "totalQuantityTrash";
+            settings.Width = Unit.Percentage(100);
+
+            settings.Properties.DisplayFormatString = "N2";
+
+            settings.ClientEnabled = false;
+            settings.ShowModelErrors = true;
+
+        }).GetHtml()
+        </td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Descripci&oacute;n</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @Html.DevExpress().MemoFor(m => m.description, settings =>
+       {
+           settings.Name = "description";
+           settings.Properties.ClientInstanceName = "description";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = @Model.ProductionLotState.code != "01";
+           settings.ShowModelErrors = true;
+
+       }).GetHtml()
+        </td>
+    </tr>
+</table>

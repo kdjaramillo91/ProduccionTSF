@@ -1,0 +1,202 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.CostPoundManualFactor
+
+@{
+    int id_company = (Model != null) ? Model.id : 0;
+}
+
+@Html.Hidden("id_company", id_company)
+
+<table class="table table-condensed">
+    <tr>
+        <td>
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Año:*";
+                settings.AssociatedControlName = "ruc";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.año, settings =>
+            {
+                settings.Properties.ClientInstanceName = "año";
+                settings.Width = Unit.Percentage(100);
+                settings.SetDefaultSettingsForInteger();
+
+                var p = settings.Properties;
+                p.MinValue = 2010;
+                p.DisplayFormatString = "G";
+                p.ClientSideEvents.Validation = "OnAñoValidation";
+                p.ClientSideEvents.ValueChanged = "OnAñoValueChanged";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.mes, settings =>
+            {
+                settings.Text = "Mes*:";
+                settings.AssociatedControlName = "mes";
+            }).GetHtml()
+        </td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.mes, settings =>
+			{
+				settings.Properties.ClientInstanceName = "mes";
+				settings.Width = Unit.Percentage(100);
+				settings.SetDefaultSettingsForInteger();
+
+				var p = settings.Properties;
+                p.MinValue = 1;
+                p.MaxValue = 12;
+				p.ClientSideEvents.Validation = "OnMesValidation";
+                p.ClientSideEvents.ValueChanged = "OnMesValueChanged";
+			}).GetHtml()
+		</td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Text = "Código:*";
+                settings.AssociatedControlName = "code";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+            {
+                settings.Properties.ClientInstanceName = "code";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+
+				var p = settings.Properties;
+                p.MaxLength = 15;
+				p.ClientSideEvents.Validation = "OnCodeValidation";
+				p.ClientSideEvents.TextChanged = "OnCodeTextChanged";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.category, settings =>
+            {
+                settings.Text = "Categoria:*";
+                settings.AssociatedControlName = "category";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.category, settings =>
+            {
+                settings.Properties.ClientInstanceName = "category";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+
+				var p = settings.Properties;
+                p.MaxLength = 3;
+				p.ClientSideEvents.Validation = "OnCategoryValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+            {
+                settings.Text = "Nombre:";
+                settings.AssociatedControlName = "name";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+            {
+                settings.Properties.ClientInstanceName = "name";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+
+                var p = settings.Properties;
+                p.MaxLength = 150;
+                p.ClientSideEvents.Validation = "OnNameValidation";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.codTiposItem, settings =>
+            {
+                settings.Text = "Cód. Tipos Item:";
+                settings.AssociatedControlName = "codTiposItem";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.codTiposItem, settings =>
+            {
+                settings.Properties.ClientInstanceName = "codTiposItem";
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                
+                var p = settings.Properties;
+                p.MaxLength = 150;
+                p.NullDisplayText = "Ejemplo: COD1|COD2";
+                p.ClientSideEvents.Validation = "OnCodTiposItemValidation";
+            }).GetHtml()
+        </td>
+    </tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.valor, settings =>
+			{
+				settings.Text = "Valor ($USD):";
+				settings.AssociatedControlName = "valor";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.valor, settings =>
+			{
+				settings.Properties.ClientInstanceName = "valor";
+				settings.Width = Unit.Percentage(100);
+				settings.ShowModelErrors = true;
+				settings.SetDefaultSettingsForMoney();
+
+				var p = settings.Properties;
+				p.DecimalPlaces = 6;
+				p.DisplayFormatString = GlobalUtils.Currency6Format;
+				p.ClientSideEvents.Validation = "OnValorValidation";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.isActive, settings =>
+			{
+				settings.Text = "¿Activo?:";
+				settings.AssociatedControlName = "isActive";
+			}).GetHtml()
+		</td>
+		<td colspan="3">
+			@Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+			{
+				settings.Properties.ClientInstanceName = "isActive";
+
+				settings.Width = Unit.Percentage(100);
+			}).GetHtml()
+		</td>
+	</tr>
+    <tr>
+        <td colspan="5" style="text-align: right;">
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnUpdate";
+                settings.Text = "Actualizar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+            }).GetHtml()
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "btnCancel";
+                settings.Text = "Cancelar";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.ImagePosition = ImagePosition.Left;
+                settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                settings.UseSubmitBehavior = false;
+                settings.ClientSideEvents.Click = "ButtonCancel_Click";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>
+
+<script src="~/Scripts/costPoundManualFactor/editform.js"></script>

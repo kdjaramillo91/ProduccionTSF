@@ -1,0 +1,176 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.InvoiceCommercialContainer>
+
+@{ 
+    var codeState = (string)ViewData["codeState"];
+}
+
+@{
+    var grid = Html.DevExpress().GridView<InvoiceCommercialContainer>(settings =>
+    {
+        settings.Name = "gvInvoiceCommercialEditFormContainer";
+        settings.CallbackRouteValues = new { Controller = "InvoiceCommercial", Action = "InvoiceCommercialEditFormContainerPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "InvoiceCommercialsDetail_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "InvoiceCommercial", Action = "InvoiceCommercialEditFormContainerAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InvoiceCommercial", Action = "InvoiceCommercialEditFormContainerUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "InvoiceCommercial", Action = "InvoiceCommercialEditFormContainerDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+
+        //settings.CommandColumn.Visible = (codeState == "01");
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId"; 
+
+        settings.SettingsPager.Visible = false;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        //Eventos
+        //settings.ClientSideEvents.Init = "OnGridViewInitContainer";
+        //settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedContainer";
+        //settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackContainer";
+        //settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackContainer";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = false;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<InvoiceCommercialContainer> rows = (Model as List<InvoiceCommercialContainer>);
+            rows = (rows != null) ? rows.ToList() : new List<InvoiceCommercialContainer>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        //settings.SetFooterRowTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write(@"<span id=""lblInfoDetails""></span>");
+        //    if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+        //    {
+        //        ViewContext.Writer.Write(
+        //            @"<a id=""lnkSelectAllRowsDetails"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRowsDetail()"">Seleccionar Todos</a>
+        //              <a id=""lnkClearSelectionDetails"" style=""cursor: pointer;"" onclick=""gvEditClearSelectionDetail()"">Anular Selección</a>"
+        //        );
+        //    }
+        //});
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        //settings.InitNewRow = (s, e) =>
+        //{
+        //    e.NewValues["quantity"] = 0.00M;
+        //};
+        settings.Styles.Header.Font.Bold = true;
+
+        #region ColumnsAdd
+
+        //numberContainer
+        settings.Columns.Add(m => m.numberContainer, column =>
+        {
+            column.Name = "numberContainer";
+            column.Caption = "Código de Contenedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            //column.Width = Unit.Percentage(20);
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "numberContainer";
+                p.MaxLength = 20;
+                            // p.ClientSideEvents.Validation = "OnNumberContainerValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemBranchOfficeCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+        });
+
+        if (codeState == "01")
+        {
+            //Botones de comandos para registros de la tabla
+            MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+            {
+                ShowEditButton = true,
+                ShowDeleteButton = true,
+                ShowCancelButton = true,
+                //ShowUpdateButton = true,
+                Visible = true,
+                VisibleIndex = 3,
+                Caption = "Acciones"
+            };
+            commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            commandColumn.Width = Unit.Percentage(10);
+
+            settings.Columns.Add(commandColumn);
+        }
+
+
+        #endregion
+
+        //#region EditorLayout
+
+        //settings.SetEditFormTemplateContent(content =>
+        //{
+        //    int? id_invoiceCommercialDetail = (int?)DataBinder.Eval(content.DataItem, "id");
+        //    List<InvoiceCommercialDetail> rows = (Model as List<InvoiceCommercialDetail>);
+        //    rows = (rows != null) ? rows.ToList() : new List<InvoiceCommercialDetail>();
+        //    invoiceCommercialDetail = rows.FirstOrDefault(fod => fod.id == id_invoiceCommercialDetail);
+        //    invoiceCommercialDetail = ((invoiceCommercialDetail == null) ? new InvoiceCommercialDetail() : invoiceCommercialDetail);
+        //    //Item item = (id_item != null) ? DataProviderItem.Item((int)id_item) : new Item { isActive = true };
+        //    Html.RenderPartial("_InvoiceCommercialDetailFormEdit", invoiceCommercialDetail);
+        //});
+
+        //#endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+
+@*<script src="~/Scripts/openingclosingplatelying/_openingClosingPlateLyingDetailsEditForm.js"></script>*@

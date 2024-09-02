@@ -1,0 +1,567 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+
+@{
+    var grid = Html.DevExpress().GridView<NonProductiveHourDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewDetails";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "NonProductiveHour",
+            Action = "GridViewDetails",
+            //drawersNumber = ViewBag.drawersNumber,
+            //((List<LiquidationTurnDetailDTO>) Model).Count
+            //idTypeLiquidationTurn = ViewBag.idTypeLiquidationTurn,
+            //percentTara = ViewBag.percentTara,
+            enabled = ViewBag.enabled
+            //dateTimeEmision = ViewBag.dateTimeEmision
+        };
+
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "NonProductiveHour", Action = "GridViewDetailsAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "NonProductiveHour", Action = "GridViewDetailsUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "NonProductiveHour", Action = "GridViewDetailsDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.Visible = (ViewBag.enabled == null || (bool)ViewBag.enabled);
+        //settings.CommandColumn.ShowSelectCheckbox = true;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+        //settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+        settings.Enabled = ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+        //settings.SettingsBehavior.AllowFixedGroups = true;
+        //settings.SettingsBehavior.AllowSort = false;
+
+        //settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        //settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsPager.Visible = false;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        //settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        //settings.CommandColumn.ShowSelectCheckbox = true;
+        //settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.ClientSideEvents.BeginCallback = "OnGridViewDetailBeginCallback";
+        settings.ClientSideEvents.EndCallback = "OnGridViewDetailEndCallback";
+
+        //settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        //settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        //settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            e.Properties["cpNumPerson"] = ViewBag.numPerson;
+            e.Properties["cpEnabled"] = ViewBag.enabled;
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+            var list = (Model as List<NonProductiveHourDetailDTO>) ?? new List<NonProductiveHourDetailDTO>();
+            e.Properties["cpDetailCount"] = list.Count;
+            e.Properties["cpRowId"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+        };
+
+        //#region SearchPanel
+
+        ////Panel de Busqueda
+        //settings.SettingsSearchPanel.Visible = true;
+        //settings.Styles.SearchPanel.CssClass = "searchPanel";
+
+        //#endregion
+
+        settings.Settings.ShowFooter = false;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        #region EDITORS INITIALIZE
+
+        settings.CellEditorInitialize = (s, e) =>
+        {
+            //if (e.Column.Name == "startTimeDetail" || e.Column.Name == "endTimeDetail" /*|| e.Column.Name == "totalHours"*/)
+            //{
+            //    TimeSpan? timeInit = (TimeSpan?)e.Value;
+
+            //    //var dateTimeEmisionAux = (ViewBag.dateTimeEmision != null) ? (DateTime)ViewBag.dateTimeEmision :
+            //    //                                       new DateTime(2014, 1, 1, 0, 0, 0);
+            //    var dateTimeAux = (timeInit == null) ? new DateTime(2019, 1, 1, 0, 0, 0) :
+            //                                           new DateTime(2019, 1, 1, timeInit.Value.Hours, timeInit.Value.Minutes, timeInit.Value.Seconds);
+
+            //    ASPxTimeEdit editor = (ASPxTimeEdit)e.Editor;
+            //    editor.DateTime = dateTimeAux;
+            //    //editor.DataBind();
+
+            //    //editor.ReadOnly = (editor.SelectedItem != null);
+            //}
+            if (e.Column.Name == "startDate" || e.Column.Name == "endDate")
+            {
+                DateTime? dateInit = (DateTime?)e.Value;
+
+                //string code = (machineForProd != null) ? machineForProd.code : "";
+                var dateTimeAux = (dateInit == null) ? (DateTime?)ViewBag.dateTimeEmision :
+                                                       dateInit;
+
+                ASPxDateEdit editorDateEdit = (ASPxDateEdit)e.Editor;
+                editorDateEdit.Value = dateTimeAux;
+                //editor.DataBind();
+
+                editorDateEdit.ReadOnly = false;//(editor.SelectedItem != null);
+            }
+            if (e.Column.Name == "stop")
+            {
+                ASPxCheckBox editorCheckBox = (ASPxCheckBox)e.Editor;
+                editorCheckBox.ReadOnly = false;
+            }
+            if (e.Column.Name == "id_motiveLotProcessTypeGeneral")
+            {
+                ASPxComboBox editorComboBox = (ASPxComboBox)e.Editor;
+                editorComboBox.ReadOnly = false;
+            }
+            if (e.Column.Name == "startTimeDetail" || e.Column.Name == "endTimeDetail")
+            {
+                ASPxTimeEdit editorTimeEdit = (ASPxTimeEdit)e.Editor;
+                editorTimeEdit.ReadOnly = false;
+            }
+            if (e.Column.Name == "numPersonDetail")
+            {
+                ASPxSpinEdit editorSpinEdit = (ASPxSpinEdit)e.Editor;
+                editorSpinEdit.ReadOnly = false;
+            }
+            if (e.Column.Name == "observation")
+            {
+                ASPxTextBox editorTextBox = (ASPxTextBox)e.Editor;
+                editorTextBox.ReadOnly = false;
+            }
+            if (e.Column.Name == "totalHoursDetail")
+            {
+                ASPxTextBox editorTextBox = (ASPxTextBox)e.Editor;
+                editorTextBox.ReadOnly = true;
+            }
+        };
+
+        #endregion
+
+        settings.CustomUnboundColumnData = (sender, e) =>
+        {
+            if (e.Column.FieldName == "startTimeDetail")
+            {
+                var dateTimeAux = (DateTime)ViewBag.dateTimeEmision;
+                e.Value = dateTimeAux.Add((TimeSpan)e.GetListSourceFieldValue("startTime"));
+                //e.Value = DateTime.MinValue.Add((TimeSpan)e.GetListSourceFieldValue("startTime"));
+            }
+            if (e.Column.FieldName == "endTimeDetail")
+            {
+                var dateTimeAux = (DateTime)ViewBag.dateTimeEmision;
+                e.Value = dateTimeAux.Add((TimeSpan)e.GetListSourceFieldValue("endTime"));
+                //e.Value = DateTime.MinValue.Add((TimeSpan)e.GetListSourceFieldValue("endTime"));
+            }
+        };
+
+        //stop
+        settings.Columns.Add(m => m.stop, column =>
+        {
+            //column.ShowCaption = DefaultBoolean.False;
+            //column.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+            //column.CaptionSettings.Location = LayoutItemCaptionLocation.Right;
+            column.Name = "stop";
+            column.Caption = "Parada?";
+            column.Width = Unit.Percentage(4);
+
+            column.EditorProperties().CheckBox(checkBox =>
+            {
+                checkBox.ClientInstanceName = "stop";
+                checkBox.ClientSideEvents.Init = "StopCheckBox_Init";
+                checkBox.ClientSideEvents.CheckedChanged = "StopCheckBox_CheckedChanged";
+            });
+        });
+
+        //id_motiveLotProcessType
+        settings.Columns.Add(model => model.id_motiveLotProcessTypeGeneral, column =>
+        {
+            column.Name = "id_motiveLotProcessTypeGeneral";
+            column.Caption = "Motivo/Lote";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Width = Unit.Percentage(13);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string motiveLot = (string)DataBinder.Eval(c.DataItem, "motiveLot");
+
+                ViewContext.Writer.Write(motiveLot);
+            });
+
+            column.EditorProperties().ComboBox(combox =>
+            {
+                combox.ClientInstanceName = "id_motiveLotProcessTypeGeneral";
+                combox.ValueField = "Value";
+                combox.TextField = "Text";
+                combox.DataSource = null;//ViewBag.InMartIni;
+                combox.ValueType = typeof(string);
+                //combox.ClientSideEvents.SelectedIndexChanged = "OnSelectedArtCodigoMAChanged";
+                combox.CallbackRouteValues = new
+                {
+                    Controller = "NonProductiveHour",
+                    Action = "ComboBoxMotivoLoteEdit",
+                };
+                combox.CallbackPageSize = 15;
+                combox.ClientSideEvents.BeginCallback = "MotivoLoteComboBox_BeginCallback";
+                combox.ClientSideEvents.EndCallback = "MotivoLoteComboBox_EndCallback";
+                combox.ClientSideEvents.Validation = "MotivoLoteComboBox_Validation";
+                combox.ClientSideEvents.SelectedIndexChanged = "MotivoLoteComboBox_SelectedIndexChanged";
+
+                combox.ValidationSettings.RequiredField.IsRequired = true;
+                combox.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+                combox.ValidationSettings.CausesValidation = true;
+                //combox.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+                combox.ValidationSettings.ValidateOnLeave = true;
+                combox.ValidationSettings.SetFocusOnError = true;
+                combox.ValidationSettings.ErrorText = "Valor Incorrecto";
+
+                combox.ValidationSettings.EnableCustomValidation = true;
+                //combox.ShowModelErrors = true;
+                combox.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+
+                //combox.TextFormatString = "{0} - {1}";
+
+                //combox.Columns.Add(c =>
+                //{
+                //    c.FieldName = "artcodigo";
+                //    c.Width = Unit.Percentage(15);
+                //    c.Caption = "Cod.";
+                //});
+                //combox.Columns.Add(c =>
+                //{
+                //    c.FieldName = "artdescri";
+                //    c.Width = Unit.Percentage(85);
+                //    c.Caption = "Descripción";
+                //});
+            });
+
+        });
+
+        //startDate
+        settings.Columns.Add(m => m.startDate, column =>
+        {
+            column.Name = "startDate";
+            column.Caption = "Fecha Inicio";
+            //column.ReadOnly = true;
+            column.Width = Unit.Percentage(10);
+
+            column.EditorProperties().DateEdit(dateEdit =>
+            {
+                dateEdit.ClientInstanceName = "startDate";
+                dateEdit.ValidationSettings.RequiredField.IsRequired = true;
+                dateEdit.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                dateEdit.MinDate = new DateTime(((DateTime)ViewBag.dateTimeEmision).Year, ((DateTime)ViewBag.dateTimeEmision).Month, ((DateTime)ViewBag.dateTimeEmision).Day);
+                dateEdit.MaxDate = new DateTime(((DateTime)ViewBag.dateTimeEmision).Year, ((DateTime)ViewBag.dateTimeEmision).Month, ((DateTime)ViewBag.dateTimeEmision).Day).AddDays(1);
+                dateEdit.ClientSideEvents.Validation = "StartDateDateEdit_Validation";
+                dateEdit.ClientSideEvents.DateChanged = "StartDateDateEdit_DateChanged";
+                dateEdit.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+        });
+
+        //startTime
+        settings.Columns.Add(m => m.startTime, column =>
+        {
+            column.Name = "startTime";
+            column.ColumnType = MVCxGridViewColumnType.TimeEdit;
+            column.Visible = false;
+
+        });
+        //startTimeDetail
+        settings.Columns.Add(column =>
+        {
+            column.Name = "startTimeDetail";
+            column.FieldName = "startTimeDetail";
+            column.Caption = "Hora Inicio";
+            //column.ReadOnly = true;
+            column.Width = Unit.Percentage(8);
+            column.UnboundType = DevExpress.Data.UnboundColumnType.DateTime;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                TimeSpan? startTime = (TimeSpan?)DataBinder.Eval(c.DataItem, "startTime");
+
+                string text = (startTime != null) ? startTime.Value.Hours.ToString("00") + ":" + startTime.Value.Minutes.ToString("00") : "00:00";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            //column.SetEditItemTemplateContent(c =>
+            //{
+            //    TimeSpan? startTime = (TimeSpan?)DataBinder.Eval(c.DataItem, "startTime");
+            //    var dateTimeEmisionAux = ((DateTime)ViewBag.dateTimeEmision);
+            //    var dateTimeAux = (startTime == null) ? new DateTime(dateTimeEmisionAux.Year, dateTimeEmisionAux.Month, dateTimeEmisionAux.Day, 0, 0, 0) :
+            //                                            new DateTime(dateTimeEmisionAux.Year, dateTimeEmisionAux.Month, dateTimeEmisionAux.Day, startTime.Value.Hours, startTime.Value.Minutes, startTime.Value.Seconds);
+            //    Html.DevExpress().TimeEdit(timeEdit =>
+            //    {
+            //        timeEdit.Name = "startTimeDetail";
+            //        timeEdit.Properties.ClientInstanceName = "startTimeDetail";
+            //        timeEdit.Width = Unit.Percentage(100);
+            //        //timeEdit.ReadOnly = true;
+            //        timeEdit.Properties.DisplayFormatInEditMode = true;
+            //        timeEdit.Properties.EditFormatString = "HH:mm";
+            //        timeEdit.Properties.DisplayFormatString = "HH:mm";
+            //        timeEdit.Properties.EditFormat = EditFormat.Custom;
+            //        timeEdit.ShowModelErrors = false;
+            //        timeEdit.DateTime = dateTimeAux;
+            //        timeEdit.Properties.ClientSideEvents.Validation = "StartTimeTimeEdit_Validation";
+            //        timeEdit.Properties.ClientSideEvents.ValueChanged = "StartTimeTimeEdit_ValueChanged";
+            //        timeEdit.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            //        //timeEdit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+
+            //    }).GetHtml();
+            //});
+
+            column.EditorProperties().TimeEdit(timeEdit =>
+            {
+                timeEdit.ClientInstanceName = "startTimeDetail";
+                timeEdit.ValidationSettings.RequiredField.IsRequired = true;
+                timeEdit.EditFormatString = "HH:mm";
+                timeEdit.DisplayFormatString = "HH:mm";
+                timeEdit.NullText = "00:00";
+                timeEdit.NullDisplayText = "00:00";
+                timeEdit.ClientSideEvents.Validation = "StartTimeTimeEdit_Validation";
+                timeEdit.ClientSideEvents.ValueChanged = "StartTimeTimeEdit_ValueChanged";
+                timeEdit.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                timeEdit.DisplayFormatInEditMode = true;
+            });
+        });
+
+        //endDate
+        settings.Columns.Add(m => m.endDate, column =>
+        {
+            column.Name = "endDate";
+            column.Caption = "Fecha Fin";
+            //column.ReadOnly = true;
+            column.Width = Unit.Percentage(10);
+
+            column.EditorProperties().DateEdit(dateEdit =>
+            {
+                dateEdit.ClientInstanceName = "endDate";
+                dateEdit.ValidationSettings.RequiredField.IsRequired = true;
+                dateEdit.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                dateEdit.MinDate = new DateTime(((DateTime)ViewBag.dateTimeEmision).Year, ((DateTime)ViewBag.dateTimeEmision).Month, ((DateTime)ViewBag.dateTimeEmision).Day);
+                dateEdit.MaxDate = new DateTime(((DateTime)ViewBag.dateTimeEmision).Year, ((DateTime)ViewBag.dateTimeEmision).Month, ((DateTime)ViewBag.dateTimeEmision).Day).AddDays(1);
+                dateEdit.ClientSideEvents.Validation = "EndDateDateEdit_Validation";
+                dateEdit.ClientSideEvents.DateChanged = "EndDateDateEdit_DateChanged";
+                dateEdit.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+        });
+
+        //endTime
+        settings.Columns.Add(m => m.endTime, column =>
+        {
+            column.Name = "endTime";
+            column.ColumnType = MVCxGridViewColumnType.TimeEdit;
+            column.Visible = false;
+
+        });
+        //endTimeDetail
+        settings.Columns.Add(column =>
+        {
+            column.Name = "endTimeDetail";
+            column.FieldName = "endTimeDetail";
+            column.Caption = "Hora Fin";
+            //column.ReadOnly = true;
+            column.Width = Unit.Percentage(8);
+            column.UnboundType = DevExpress.Data.UnboundColumnType.DateTime;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                TimeSpan? endTime = (TimeSpan?)DataBinder.Eval(c.DataItem, "endTime");
+
+                string text = (endTime != null) ? endTime.Value.Hours.ToString("00") + ":" + endTime.Value.Minutes.ToString("00") : "00:00";
+
+                ViewContext.Writer.Write(text);
+            });
+
+            //column.SetEditItemTemplateContent(c =>
+            //{
+            //    TimeSpan? endTime = (TimeSpan?)DataBinder.Eval(c.DataItem, "endTime");
+            //    var dateTimeEmisionAux = ((DateTime)ViewBag.dateTimeEmision);
+            //    var dateTimeAux = (endTime == null) ? new DateTime(dateTimeEmisionAux.Year, dateTimeEmisionAux.Month, dateTimeEmisionAux.Day, 0, 0, 0) :
+            //                                            new DateTime(dateTimeEmisionAux.Year, dateTimeEmisionAux.Month, dateTimeEmisionAux.Day, endTime.Value.Hours, endTime.Value.Minutes, endTime.Value.Seconds);
+            //    Html.DevExpress().TimeEdit(timeEdit =>
+            //    {
+            //        timeEdit.Name = "endTimeDetail";
+            //        timeEdit.Properties.ClientInstanceName = "endTimeDetail";
+            //        timeEdit.Width = Unit.Percentage(100);
+            //        //timeEdit.ReadOnly = true;
+            //        timeEdit.Properties.DisplayFormatInEditMode = true;
+            //        timeEdit.Properties.EditFormatString = "HH:mm";
+            //        timeEdit.Properties.DisplayFormatString = "HH:mm";
+            //        //timeEdit.Properties.EditFormat = EditFormat.Custom;
+            //        //timeEdit.ShowModelErrors = false;
+            //        timeEdit.DateTime = dateTimeAux;
+            //        timeEdit.Properties.ClientSideEvents.Validation = "EndTimeTimeEdit_Validation";
+            //        timeEdit.Properties.ClientSideEvents.ValueChanged = "EndTimeTimeEdit_ValueChanged";
+            //        timeEdit.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            //        //timeEdit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+
+            //    }).GetHtml();
+            //});
+
+            column.EditorProperties().TimeEdit(timeEdit =>
+            {
+                timeEdit.ClientInstanceName = "endTimeDetail";
+                timeEdit.ValidationSettings.RequiredField.IsRequired = true;
+                timeEdit.EditFormatString = "HH:mm";
+                timeEdit.DisplayFormatString = "HH:mm";
+                timeEdit.NullText = "00:00";
+                timeEdit.NullDisplayText = "00:00";
+                timeEdit.ClientSideEvents.Validation = "EndTimeTimeEdit_Validation";
+                timeEdit.ClientSideEvents.ValueChanged = "EndTimeTimeEdit_ValueChanged";
+                timeEdit.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                timeEdit.DisplayFormatInEditMode = true;
+            });
+        });
+
+        //totalHours
+        settings.Columns.Add(column =>
+        {
+            column.Name = "totalHoursDetail";
+            column.FieldName = "totalHours";
+            column.Caption = "Total Horas";
+            column.Width = Unit.Percentage(10);
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    string totalHours = (string)DataBinder.Eval(c.DataItem, "totalHours");
+
+            //    //string text = (totalHours != null) ? totalHours.Value.Hours.ToString("00") + ":" + totalHours.Value.Minutes.ToString("00") : "00:00";
+
+            //    ViewContext.Writer.Write(totalHours);
+            //});
+
+            //column.SetEditItemTemplateContent(c =>
+            //{
+            //    //TimeSpan? totalHours = (TimeSpan?)DataBinder.Eval(c.DataItem, "totalHours");
+            //    //var dateTimeEmisionAux = ((DateTime)ViewBag.dateTimeEmision);
+            //    //var dateTimeAux = (totalHours == null) ? new DateTime(dateTimeEmisionAux.Year, dateTimeEmisionAux.Month, dateTimeEmisionAux.Day, 0, 0, 0) :
+            //    //                                        new DateTime(dateTimeEmisionAux.Year, dateTimeEmisionAux.Month, dateTimeEmisionAux.Day, totalHours.Value.Hours, totalHours.Value.Minutes, totalHours.Value.Seconds);
+            //    string totalHours = (string)DataBinder.Eval(c.DataItem, "totalHours");
+            //    totalHours = string.IsNullOrEmpty(totalHours) ? "00:00" : totalHours;
+
+            //    Html.DevExpress().TextBox(textBox =>
+            //    {
+            //        textBox.Name = "totalHoursDetail";
+            //        textBox.Properties.ClientInstanceName = "totalHoursDetail";
+            //        textBox.Width = Unit.Percentage(100);
+            //        textBox.ReadOnly = true;
+            //        //textBox.ShowModelErrors = false;
+            //        textBox.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            //        //textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //    }).Bind(totalHours).GetHtml();
+            //});
+
+            column.EditorProperties().TextBox(textBox =>
+            {
+                textBox.ClientInstanceName = "totalHoursDetail";
+                textBox.NullDisplayText = "00:00";
+                textBox.NullText = "00:00";
+                //textBox.ReadOnly = true;
+                //timeEdit.ValidationSettings.RequiredField.IsRequired = true;
+                textBox.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+            });
+        });
+
+        //numPerson
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "numPerson";
+            column.Name = "numPersonDetail";
+            column.Caption = "No. Personas";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? anumPerson = (int?)DataBinder.Eval(c.DataItem, "numPerson");
+                int numPerson = anumPerson != null ? anumPerson.Value : 0;
+
+                ViewContext.Writer.Write(numPerson == 0.00M ? "" : numPerson.ToString("#"));
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.Width = Unit.Percentage(100);
+                p.ClientInstanceName = "numPersonDetail";
+                p.DisplayFormatString = "N2";
+                p.DisplayFormatInEditMode = true;
+                p.DecimalPlaces = 2;
+                p.MinValue = 0;
+                p.NumberType = SpinEditNumberType.Float;
+                p.NumberFormat = SpinEditNumberFormat.Number;
+                p.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                p.ValidationSettings.RequiredField.IsRequired = false;
+
+                //p.ClientSideEvents.NumberChanged = "Quantity_NumberChange";
+                p.ClientSideEvents.Validation = "NumPersonDetailSpinEdit_Validation";
+            });
+
+        });
+
+        //observation
+        settings.Columns.Add(m => m.observation, column =>
+        {
+            column.Name = "observation";
+            column.Caption = "Observaciones";
+            //column.ReadOnly = true;
+            column.Width = Unit.Percentage(17);
+
+            column.EditorProperties().TextBox(textBox =>
+            {
+                textBox.ClientInstanceName = "observation";
+                textBox.Width = Unit.Percentage(100);
+                //textBox.ValidationSettings.RequiredField.IsRequired = true;
+            });
+        });
+
+        //Botones de comandos para registros de la tabla
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            ShowEditButton = true,
+            ShowDeleteButton = true,
+            ShowCancelButton = true,
+            ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 10,
+            Caption = "Acciones"
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.Width = Unit.Percentage(10);
+
+        if (ViewBag.enabled == null || (bool)ViewBag.enabled)
+        {
+            settings.Columns.Add(commandColumn);
+
+            settings.ClientSideEvents.RowClick = "function(s, e) { s.StartEditRow(e.visibleIndex); }";
+        }
+
+
+    });
+}
+@grid.Bind(Model).GetHtml()

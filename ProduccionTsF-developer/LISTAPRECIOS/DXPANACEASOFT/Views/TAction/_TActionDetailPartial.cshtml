@@ -1,0 +1,44 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.TAction
+
+
+@{
+    TAction taction = Model ?? new TAction();
+}
+
+@Html.Hidden("id_taction", taction.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>Controlador:</td>
+        <td colspan="4">
+            @Html.Raw(taction.id_controller)
+        </td>
+    </tr>
+    <tr>
+        <td>Nombre:</td>
+        <td colspan="4">
+            @Html.Raw(taction.name)
+        </td>
+    </tr>
+    <tr>
+        <td>Descripción:</td>
+        <td colspan="4">
+            @Html.Raw(taction.description)
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@functions {
+
+    String GetUserName(int id)
+    {
+        var user = DataProviderUser.UserById(id);
+        return user.username;
+    }
+
+}

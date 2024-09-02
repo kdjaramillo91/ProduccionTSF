@@ -1,0 +1,157 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Turn
+
+<div id="GridMessageError" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageError";
+           settings.Properties.ClientInstanceName = "gridMessageError";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+
+
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+            {
+                settings.Name = "codeLabel";
+                settings.Text = "Código:";
+                settings.AssociatedControlName = "code";
+            }).GetHtml()
+
+
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+       {
+           settings.Name = "code";
+           settings.Properties.ClientInstanceName = "code";
+
+           settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 20;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           //settings.Width = Unit.Percentage(50);
+           //settings.Height = Unit.Percentage(50);
+       }).GetHtml()
+
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+            {
+                settings.Name = "nameLabel";
+                settings.Text = " Nombre:";
+                settings.AssociatedControlName = "nombre";
+            }).GetHtml()
+        </td>
+
+        <td colspan="3">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "name";
+           settings.Properties.ClientInstanceName = "name";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+       }).GetHtml()
+        </td>
+
+    </tr>
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.timeInit, settings =>
+            {
+                settings.Name = "timeInitLabel";
+                settings.Text = " Hora de Inicio:";
+                settings.AssociatedControlName = "timeInit";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @{
+                TimeSpan? TimeInit = (Model != null) ? (TimeSpan?)Model.timeInit : null;
+            }
+            @Html.DevExpress().TimeEdit( settings =>
+       {
+           settings.Name = "timeInit";
+           settings.Properties.ClientInstanceName = "timeInit";
+           settings.Properties.EditFormat = EditFormat.Time;
+           settings.Properties.EditFormatString = "HH:mm";
+           settings.Properties.DisplayFormatString = "HH:mm";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           if (TimeInit != null)
+           {
+               settings.DateTime = new DateTime(2014, 1, 1, TimeInit.Value.Hours, TimeInit.Value.Minutes, 0);
+           }
+           settings.ShowModelErrors = false;
+           settings.Properties.ClientSideEvents.Validation = "OntimeInitValidation";
+       }).GetHtml()
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.timeEnd, settings =>
+            {
+                settings.Name = "timeEndLabel";
+                settings.Text = " Hora de Fin:";
+                settings.AssociatedControlName = "timeEnd";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @{
+                TimeSpan? TimeEnd = (Model != null) ? (TimeSpan?)Model.timeEnd : null;
+            }
+            @Html.DevExpress().TimeEdit( settings =>
+       {
+           settings.Name = "timeEnd";
+           settings.Properties.ClientInstanceName = "timeEnd";
+           settings.Properties.EditFormat = EditFormat.Time;
+           settings.Properties.EditFormatString = "HH:mm";
+           settings.Properties.DisplayFormatString = "HH:mm";
+           settings.Width = Unit.Percentage(100);
+           //settings.ReadOnly = true;
+           if (TimeEnd != null)
+           {
+               settings.DateTime = new DateTime(2014, 1, 1, TimeEnd.Value.Hours, TimeEnd.Value.Minutes, 0);
+           }
+           settings.ShowModelErrors = false;
+           //settings.Properties.ClientSideEvents.Validation = "OntimeInitValidation";
+       }).GetHtml()
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+       {
+           settings.Name = "isActive";
+           settings.Properties.ClientInstanceName = "isActive";
+           settings.Text = "Activo";
+       }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+        <td colspan="3"></td>
+    </tr>
+
+    <tr></tr>
+
+</table>
+
+
+
+

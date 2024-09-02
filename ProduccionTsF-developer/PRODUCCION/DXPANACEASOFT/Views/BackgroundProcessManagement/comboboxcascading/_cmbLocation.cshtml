@@ -1,0 +1,30 @@
+﻿
+@Html.DevExpress().ComboBox(
+comboBox =>
+{
+    comboBox.Name = "idLocation";
+    comboBox.Properties.ClientInstanceName = "idLocation";
+    comboBox.Width = Unit.Percentage(100);
+
+    comboBox.Properties.ValueField = "id";
+    comboBox.Properties.TextField = "name";
+    comboBox.Properties.ValueType = typeof(string);
+
+    comboBox.Properties.NullDisplayText = "Todos";
+    comboBox.Properties.NullText = "Todos";
+
+    comboBox.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+
+    comboBox.ShowModelErrors = true;
+    comboBox.CallbackRouteValues = new { Controller = "BackgroundProcessManagement", Action = "LocationOfWarehouse" };
+
+    comboBox.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['idWarehouse'] = idWarehouse.GetValue();  }";
+    comboBox.Properties.CallbackPageSize = 20;
+
+
+
+
+}).BindList(TempData["BackgroundProcessManagementLocations"]).GetHtml()

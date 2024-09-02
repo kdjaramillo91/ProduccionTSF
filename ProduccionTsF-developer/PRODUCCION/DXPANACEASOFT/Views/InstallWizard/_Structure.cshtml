@@ -1,0 +1,99 @@
+﻿@model DXPANACEASOFT.Models.InstallWizard
+
+<div style="padding: 0 10%;">
+    <table class="table table-condensed" style="border: 0 solid #ffffff; margin-bottom: 0;">
+        <tr>
+            <td colspan="4">
+                <h3 style="text-align: center">Estructura de la Compañía</h3>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 20%;">
+                División Principal*:
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.Division.name, settings =>{
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ClientInstanceName = "divisionName";
+               settings.Properties.NullText = "Nombre de la División Principal";
+               settings.ShowModelErrors = true;
+               settings.Properties.ValidationSettings.ValidationGroup = "structure";
+               settings.Properties.ClientSideEvents.Validation = "OnStructureValidation";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 20%;">
+                Sucursal Principal*:
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.BranchOffice.name, settings => {
+                   settings.Width = Unit.Percentage(100);
+                   settings.Properties.ClientInstanceName = "branchOfficeName";
+                   settings.Properties.NullText = "Nombre de la Sucursal Principal";
+                   settings.ShowModelErrors = true;
+                   settings.Properties.ValidationSettings.ValidationGroup = "structure";
+                   settings.Properties.ClientSideEvents.Validation = "OnBranchOfficeValidation";
+               }).GetHtml()
+            </td>
+            <td style="width: 20%;">
+                Código de la Sucursal*:
+            </td>
+            <td>
+                @{
+                    string branchOfficeCode = (Model == null || Model.BranchOffice == null || Model.BranchOffice.code == "")
+                        ? "001"
+                        : Model.BranchOffice.code.ToString().PadLeft(3, '0');
+                }
+                @Html.DevExpress().TextBoxFor(m => m.BranchOffice.code, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "branchOfficeCode";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.NullText = "Código de la Sucursal";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ValidationGroup = "structure";
+                    settings.Properties.ClientSideEvents.Validation = "OnCodeBranchOfficeValidation";
+                }).Bind(branchOfficeCode).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 20%;">
+                Casa Matriz*:
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.EmissionPoint.name, settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ClientInstanceName = "emissionPointName";
+                    settings.Properties.NullText = "Punto de Emisión - Casa Matriz";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ValidationGroup = "structure";
+                    settings.Properties.ClientSideEvents.Validation = "OnEmissionPointValidation";
+                }).GetHtml()
+            </td>
+            <td style="width: 20%;">
+                Código del Punto de Emisión*:
+            </td>
+            <td>
+                @{
+                    string emissionPointCode = (Model == null || Model.EmissionPoint == null || Model.EmissionPoint.code == 0) 
+                        ? "001" 
+                        : Model.EmissionPoint.code.ToString().PadLeft(3, '0');
+                }
+                @Html.DevExpress().TextBoxFor(m => m.EmissionPoint.code, settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ClientInstanceName = "emissionPointCode";
+                    settings.Properties.NullText = "Código del Punto de Emisión";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ValidationGroup = "structure";
+                    settings.Properties.ClientSideEvents.Validation = "OnCodeEmissionPointValidation";
+                }).Bind(emissionPointCode).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+
+

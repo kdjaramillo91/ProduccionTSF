@@ -1,0 +1,148 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.InventoryMovePlantTransferDTO
+
+<div>
+    <div class="Etiqueta"><b>Liquidaci&oacute;n Carro por Carro</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+		<div class="row">
+			@*<div class="col-sm-2">
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Width = Unit.Percentage(100);
+				settings.Text = "Máquina: ";
+			}).GetHtml()
+		</div>
+		<div class="col-sm-4">
+			@Html.DevExpress().TextBoxFor(model => model.machineForProdCartOnCart,
+			settings =>
+			{
+			settings.Width = Unit.Percentage(100);
+			settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+			settings.ReadOnly = true;
+			}).GetHtml()
+		</div>*@
+			<div class="col-sm-2">
+				@Html.DevExpress().Label(settings =>
+				{
+					settings.Width = Unit.Percentage(100);
+					settings.Text = "No. de Liquidación: ";
+				}).GetHtml()
+			</div>
+			<div class="col-sm-4">
+				@Html.DevExpress().TextBoxFor(model => model.numberLiquidationCartOnCart,
+				settings =>
+				{
+				settings.Width = Unit.Percentage(100);
+				settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+				settings.ReadOnly = true;
+				}).GetHtml()
+			</div>
+			<div class="col-sm-2">
+			</div>
+			<div class="col-sm-4">
+			</div>
+		</div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Text = "Liquidador: ";
+            }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.liquidator,
+                settings =>
+                {
+                    settings.Name = "liquidator";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Text = "Proceso: ";
+            }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.processType,
+                settings =>
+                {
+                    settings.Name = "processType";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+        </div>
+    </div>
+    <div class="Etiqueta"><b>Congelamiento y Fresco</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Máquina: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxMachineProdOpeningDetailCogellingFresh")
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Turno: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().TextBoxFor(model => model.turnCogellingFresh,
+                settings =>
+                {
+                    settings.Name = "turnCogellingFresh";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                    settings.ReadOnly = true;
+                }).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Fecha y Hora de Ingreso: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().DateEditFor(model => model.dateTimeEntry,
+                  settings =>
+                  {
+                      settings.Name = "dateTimeEntry";
+                      settings.Properties.ClientInstanceName = "dateTimeEntry";
+                      settings.Width = Unit.Percentage(100);
+                      settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                      settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                      settings.ReadOnly = !((bool)ViewBag.enabled);
+
+                      settings.Properties.UseMaskBehavior = true;
+                      settings.Properties.EditFormat = EditFormat.Custom;
+                      settings.Properties.EditFormatString = "dd/MM/yyyy HH:mm";
+                      settings.Properties.TimeSectionProperties.Visible = true;
+                      settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+                      settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "HH:mm";
+                  }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-4">
+            </div>
+        </div>
+    </div>
+</div>

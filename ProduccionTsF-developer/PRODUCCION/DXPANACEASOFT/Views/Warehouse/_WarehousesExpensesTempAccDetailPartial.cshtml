@@ -1,0 +1,231 @@
+﻿@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model IEnumerable<DXPANACEASOFT.Models.WarehouseExpenseAccountingTemplate>
+
+
+@{
+
+	var grid = Html.DevExpress().GridView<WarehouseExpenseAccountingTemplate>(settings =>
+
+	{
+
+		settings.Name = "gvWarehouseExpenseAccountingTemplate";
+		settings.CallbackRouteValues = new { Controller = "Warehouse", Action = "WarehouseExpenseAccountingDetail" };
+
+		settings.ClientSideEvents.BeginCallback = "WarehouseExpenseAccountingTemplate_OnBeginCallback";
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Warehouse", Action = "WarehouseExpenseAccountingDetailAddNew" };
+		settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Warehouse", Action = "WarehouseExpenseAccountingDetailUpdate" };
+		settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Warehouse", Action = "WarehouseExpenseAccountingDetailDelete" };
+		settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+		//settings.SettingsBehavior.AllowFixedGroups = true;
+		//settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+		settings.CommandColumn.ShowNewButton = false;
+		settings.CommandColumn.ShowDeleteButton = true;
+		settings.CommandColumn.ShowEditButton = true;
+		settings.CommandColumn.ShowNewButtonInHeader = true;
+
+
+		settings.SettingsPopup.EditForm.Modal = true;
+		settings.SettingsPopup.EditForm.Width = 800;
+		settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+		settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+
+		//settings.Settings.ShowGroupPanel = true;
+		//settings.Settings.ShowFilterRow = true;
+		settings.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+		settings.SettingsPager.Visible = true;
+		settings.SettingsPager.PageSize = 9;
+
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.CommandColumn.Width = Unit.Percentage(8);
+		//settings.CommandColumn.SetHeaderCaptionTemplateContent(c =>
+		//{
+		//	Html.DevExpress().Button(button =>
+		//	{
+		//		button.Name = "btnNew";
+		//		button.Text = "Nuevo";
+		//		button.ClientSideEvents.Click = " function (s, e) { gvWarehouseExpenseAccountingTemplate.AddNewRow(); }";
+		//	}).GetHtml();
+		//});
+		/*Gasto de Produccion*/
+		settings.Columns.Add(d => d.id_expenseProduction, column =>
+		{
+			column.FieldName = "id_expenseProduction";
+			column.Caption = "Gasto Producción";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				//var id_expenseProduction = Convert.ToInt32(c.Grid.GetRowValues(c.VisibleIndex, "id_expenseProduction"));
+				int? id_expenseProduction = (int)DataBinder.Eval(c.DataItem, "id_expenseProduction");
+				ProductionExpense expenseProduc = DataProviderProductionExpense.ProductionExpenseById(id_expenseProduction);
+				string expenseProducName = expenseProduc.name ?? "";
+
+				if (!(string.IsNullOrEmpty(expenseProducName) || string.IsNullOrWhiteSpace(expenseProducName)))
+				{
+					ViewContext.Writer.Write(expenseProducName);
+				}
+			});
+			column.EditorProperties().ComboBox(p =>
+			{
+				//column.SetEditItemTemplateContent(c =>
+				//{
+				//	var dbi = new WarehouseExpenseAccountingTemplate();
+				//	if (c.ItemIndex >= 0)
+				//	{
+				//		var ls = Model.ToList();
+				//		dbi = ls[c.ItemIndex];
+				//	}
+				//	Html.RenderPartial("_ComboBoxProductionExpense", dbi);
+				//});
+				p.ClientInstanceName = "id_expenseProduction";
+
+				p.DataSource = DataProviderProductionExpense.ProductionExpenseByCompany((int)ViewData["id_company"]);
+
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+				p.TextFormatString = "{0} - {1}";
+				p.CallbackPageSize = 15;
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				p.ClientSideEvents.Init = "ExpenseProductionCombo_OnInit";
+
+				p.Columns.Add("code", "Código", Unit.Percentage(20));
+				p.Columns.Add("name", "Nombre", Unit.Percentage(70));
+				//p.ClientSideEvents.Validation = "OnPersonValidation";
+				p.CallbackRouteValues = new { Controller = "Warehouse", Action = "GetExpenseProduction" };
+				p.ClientSideEvents.BeginCallback = "ExpenseProductionCombo_BeginCallback";
+				p.ClientSideEvents.SelectedIndexChanged = "ExpenseProductionCombo_SelectedIndexChanged";
+				p.ClientSideEvents.EndCallback = "ExpenseProductionCombo_EndCallback";
+			});
+		});
+
+		/*Plantilla Contable*/
+		settings.Columns.Add(d => d.id_accountingTemplate, column =>
+		{
+			column.FieldName = "id_accountingTemplate";
+			column.Caption = "Plantilla Contable";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				//var id_accountingTemplate = Convert.ToInt32(c.Grid.GetRowValues(c.VisibleIndex, "id_accountingTemplate"));
+				int? id_accountingTemplate = (int)DataBinder.Eval(c.DataItem, "id_accountingTemplate");
+				AccountingTemplate accountTemplate = DataProviderAccountingTemplate.AccountingTemplateById(id_accountingTemplate);
+				string accountTemplateName = accountTemplate.code + " - " + accountTemplate.description ?? "";
+
+				if (!(string.IsNullOrEmpty(accountTemplateName) || string.IsNullOrWhiteSpace(accountTemplateName)))
+				{
+					ViewContext.Writer.Write(accountTemplateName);
+				}
+			});
+			column.EditorProperties().ComboBox(p =>
+			{
+				//column.SetEditItemTemplateContent(c =>
+				//{
+				//	var dbi = new WarehouseExpenseAccountingTemplate();
+				//	if (c.ItemIndex >= 0)
+				//	{
+				//		var ls = Model.ToList();
+				//		dbi = ls[c.ItemIndex];
+				//	}
+				//	Html.RenderPartial("_ComboBoxAccountingTemplate", dbi);
+				//});
+				p.ClientInstanceName = "id_accountingTemplate";
+				p.DataSource = DataProviderAccountingTemplate.AccountingTemplateByCompany((int)ViewData["id_company"]);
+
+				p.ValueField = "id";
+				p.ValueType = typeof(int);
+				p.DisplayFormatString = "{0} - {1}";
+				p.CallbackPageSize = 15;
+				p.DropDownStyle = DropDownStyle.DropDownList;
+				p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+				p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+				p.ClientSideEvents.Init = "AccountingTemplateCombo_OnInit";
+
+				p.Columns.Add("code", "Código", Unit.Percentage(30));
+				p.Columns.Add("description", "Descripción", Unit.Percentage(70));
+				p.CallbackRouteValues = new { Controller = "Warehouse", Action = "GetAccountingTemplate" };
+				p.ClientSideEvents.Init = "AccountingTemplateCombo_Init";
+				p.ClientSideEvents.BeginCallback = "AccountingTemplateCombo_BeginCallback";
+				p.ClientSideEvents.Validation = "AccountingTemplateCombo_Validation";
+				p.ClientSideEvents.SelectedIndexChanged = "AccountingTemplateCombo_SelectedIndexChanged";
+				p.ClientSideEvents.EndCallback = "AccountingTemplateCombo_EndCallback";
+
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Caption = "Planta Proceso";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_accountingTemplate = (int)DataBinder.Eval(c.DataItem, "id_accountingTemplate");
+				AccountingTemplate accountTemplate = DataProviderAccountingTemplate.AccountingTemplateById(id_accountingTemplate);
+				string accountTemplateProcessPlant = accountTemplate != null && accountTemplate.Person != null ? accountTemplate.Person.processPlant : "";
+
+				ViewContext.Writer.Write(accountTemplateProcessPlant);
+
+			});
+
+			column.EditorProperties().TextBox(p =>
+			{
+				p.ClientInstanceName = "processPlant";
+
+			});
+		});
+		//settings.ClientSideEvents.CustomButtonClick = "GridViewItemsWEACustomCommandButton_Click";
+
+		//settings.Columns.Add(commandColumn);
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpIsNewRowEdit"] =  gv.IsNewRowEditing;
+
+			//    e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+			e.Properties["cpEditingRowKey"] = (gv.IsEditing && gv.GetRowValues(gv.EditingRowVisibleIndex, "id") != null) ? gv.GetRowValues(gv.EditingRowVisibleIndex, "id") : 0;
+
+			if (ViewData["EditMessage"] != null)
+			{
+				e.Properties["cpEditMessage"] = ViewData["EditMessage"];
+			}
+
+		};
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model ).GetHtml()

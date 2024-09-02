@@ -1,0 +1,339 @@
+﻿@using System.Globalization;
+@using DevExpress.Data
+@using DevExpress.Data.Helpers
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProductionLotDailyCloseDetail>
+
+@{
+    var grid = Html.DevExpress().GridView<ProductionLotDailyCloseDetail>(settings =>
+    {
+        settings.Name = "gvProductionLotDailyCloseEditFormProductionLotsDetail";
+        settings.CallbackRouteValues = new { Controller = "ProductionLotDailyClose", Action = "ProductionLotDailyCloseEditFormProductionLotsDetailPartial" };
+
+        //settings.ClientSideEvents.BeginCallback = "ProductionLotDailyCloseProductionLotsDetail_OnBeginCallback";
+
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "PurchasePlanning", Action = "ProductionLotDailyCloseEditFormProductionLotsDetailAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "PurchasePlanning", Action = "ProductionLotDailyCloseEditFormProductionLotsDetailUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ProductionLotDailyClose", Action = "ProductionLotDailyCloseEditFormProductionLotsDetailDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.SettingsBehavior.ConfirmDelete = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId"; 
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        //Checkbox de registros de tabla
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        //Eventos
+        settings.ClientSideEvents.Init = "OnGridViewInitProductionLotDetail";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewSelectionChangedProductionLotDetail";
+        settings.ClientSideEvents.BeginCallback = "OnGridViewBeginCallbackProductionLotDetail";
+        settings.ClientSideEvents.EndCallback = "OnGridViewEndCallbackProductionLotDetail";
+
+        //Pie de tabla
+        settings.Settings.ShowFooter = true;
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+            List<ProductionLotDailyCloseDetail> rows = (Model as List<ProductionLotDailyCloseDetail>);
+            rows = (rows != null) ? rows.ToList() : new List<ProductionLotDailyCloseDetail>();
+
+            e.Properties["cpRowsCount"] = rows.Count;
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfoProductionLots""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRowsProductionLots"" style=""cursor: pointer;"" onclick=""gvEditSelectAllRowsProductionLot()"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelectionProductionLots"" style=""cursor: pointer;"" onclick=""gvEditClearSelectionProductionLot()"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["quantity"] = 0.00M;
+        };
+
+        #region ColumnsAdd
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ProductionLotNumber";
+            column.Caption = "Lote";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.Width = Unit.Percentage(12);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+
+                string text = (productionLot != null) ? productionLot.number : "";
+
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityOrdered";
+            column.Name = "totalQuantityOrdered";
+            column.Caption = DataProviderSetting.ValueSetting("UCO");//"Libras Compradas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityOrdered = (productionLot != null) ? productionLot.totalQuantityOrdered : 0;
+                ViewContext.Writer.Write(totalQuantityOrdered.ToString("N2"));
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityOrdered = (productionLot != null) ? productionLot.totalQuantityOrdered : 0;
+                ViewContext.Writer.Write(totalQuantityOrdered.ToString("N2"));
+            });
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+            //    ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+            //    decimal totalQuantityAux = (productionLot != null) ? productionLot.totalQuantityOrdered : 0;
+            //    string formato = (totalQuantityAux >= 1000 ? "0,000.00" : "0.00");
+            //    string text = (productionLot != null) ? productionLot.totalQuantityOrdered.ToString(formato) : "";
+
+            //    ViewContext.Writer.Write(text);
+            //});
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityRemitted";
+            column.Name = "totalQuantityRemitted";
+            column.Caption = DataProviderSetting.ValueSetting("UER");//"Libras Enviadas/Remitidas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityRemitted = (productionLot != null) ? productionLot.totalQuantityRemitted : 0;
+                ViewContext.Writer.Write(totalQuantityRemitted.ToString("N2"));
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityRemitted = (productionLot != null) ? productionLot.totalQuantityRemitted : 0;
+                ViewContext.Writer.Write(totalQuantityRemitted.ToString("N2"));
+            });
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+            //    ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+            //    decimal totalQuantityAux = (productionLot != null) ? productionLot.totalQuantityRemitted : 0;
+            //    string formato = (totalQuantityAux >= 1000 ? "0,000.00" : "0.00");
+            //    string text = (productionLot != null) ? productionLot.totalQuantityRemitted.ToString(formato) : "";
+
+            //    ViewContext.Writer.Write(text);
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityRecived";
+            column.Name = "totalQuantityRecived";
+            column.Caption = DataProviderSetting.ValueSetting("URE");//"Libras Recibidas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityRecived = (productionLot != null) ? productionLot.totalQuantityRecived : 0;
+                ViewContext.Writer.Write(totalQuantityRecived.ToString("N2"));
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityRecived = (productionLot != null) ? productionLot.totalQuantityRecived : 0;
+                ViewContext.Writer.Write(totalQuantityRecived.ToString("N2"));
+            });
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+            //    ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+            //    decimal totalQuantityAux = (productionLot != null) ? productionLot.totalQuantityRecived : 0;
+            //    string formato = (totalQuantityAux >= 1000 ? "0,000.00" : "0.00");
+            //    string text = (productionLot != null) ? productionLot.totalQuantityRecived.ToString(formato) : "";
+
+            //    ViewContext.Writer.Write(text);
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityLiquidation";
+            column.Name = "totalQuantityLiquidation";
+            column.Caption = DataProviderSetting.ValueSetting("ULI");//"Libras Liquidadas";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityLiquidation = (productionLot != null) ? productionLot.totalQuantityLiquidation : 0;
+                ViewContext.Writer.Write(totalQuantityLiquidation.ToString("N2"));
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityLiquidation = (productionLot != null) ? productionLot.totalQuantityLiquidation : 0;
+                ViewContext.Writer.Write(totalQuantityLiquidation.ToString("N2"));
+            });
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+            //    ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+            //    decimal totalQuantityAux = (productionLot != null) ? productionLot.totalQuantityLiquidation : 0;
+            //    string formato = (totalQuantityAux >= 1000 ? "0,000.00" : "0.00");
+            //    string text = (productionLot != null) ? productionLot.totalQuantityLiquidation.ToString(formato) : "";
+
+            //    ViewContext.Writer.Write(text);
+            //});
+        });
+
+        settings.Columns.Add(column =>
+        {
+            //column.FieldName = "totalQuantityTrash";
+            column.Name = "totalQuantityTrash";
+            column.Caption = DataProviderSetting.ValueSetting("UDE");//"Libras de Desperdicio";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityTrash = (productionLot != null) ? productionLot.totalQuantityTrash : 0;
+                ViewContext.Writer.Write(totalQuantityTrash.ToString("N2"));
+            });
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+                ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+                decimal totalQuantityTrash = (productionLot != null) ? productionLot.totalQuantityTrash : 0;
+                ViewContext.Writer.Write(totalQuantityTrash.ToString("N2"));
+            });
+
+            //column.SetDataItemTemplateContent(c =>
+            //{
+            //    int? id_productionLot = (int?)DataBinder.Eval(c.DataItem, "id_productionLot");
+            //    ProductionLot productionLot = DataProviderProductionLot.ProductionLotById(id_productionLot);
+            //    decimal totalQuantityAux = (productionLot != null) ? productionLot.totalQuantityTrash : 0;
+            //    string formato = (totalQuantityAux >= 1000 ? "0,000.00" : "0.00");
+            //    string text = (productionLot != null) ? productionLot.totalQuantityTrash.ToString(formato) : "";
+
+            //    ViewContext.Writer.Write(text);
+            //});
+        });
+
+
+
+        //Botones de comandos para registros de la tabla
+        MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+        {
+            //ShowEditButton = true,
+            ShowDeleteButton = true,
+            //ShowCancelButton = true,
+            //ShowUpdateButton = true,
+            Visible = true,
+            VisibleIndex = 20,
+            Caption = "Acciones"
+        };
+        commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        commandColumn.Width = Unit.Percentage(11);
+
+        settings.Columns.Add(commandColumn);
+
+        #endregion
+
+        #region ColumnsEdit
+
+
+        #endregion
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        foreach (var key in grid.GetCurrentPageRowValues("id"))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}
+
+<script src="~/Scripts/productionlotdailyclose/_productionLotDailyCloseDetailsEditForm.js"></script>

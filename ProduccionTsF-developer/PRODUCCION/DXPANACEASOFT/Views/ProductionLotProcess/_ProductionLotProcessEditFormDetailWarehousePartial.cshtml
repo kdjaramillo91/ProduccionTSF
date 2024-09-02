@@ -1,0 +1,62 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.ProductionLot
+@{
+
+    string warehouseName = string.Empty;
+    string warehouseLocationName = string.Empty;
+
+    if (Model != null && Model.id_productionProcess != 0)
+    {
+        var warehouse = DataProviderWarehouse.WarehouseByProcess(Model.id_productionProcess);
+        if (warehouse != null)
+        {
+            warehouseName = warehouse.name;
+        }
+
+        var warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationByProcess(Model.id_productionProcess);
+        if (warehouse != null)
+        {
+            warehouseLocationName = warehouseLocation.name;
+        }
+
+    }
+
+}
+
+<table id="documentProductionLot" class="table table-condensed" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="8">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Lote</span>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Bodega :</td>
+        <td>
+            @Html.DevExpress().TextBox(settings =>
+       {
+           settings.Name = "WarehouseName";
+           settings.Properties.ClientInstanceName = "WarehouseName";
+           settings.Width = Unit.Percentage(100);
+           settings.ReadOnly = true;
+           settings.ShowModelErrors = true;
+           settings.Text = warehouseName;
+       }).GetHtml()
+        </td>
+        <td>Ubicación :</td>
+        <td>
+           @Html.DevExpress().TextBox(settings =>
+      {
+          settings.Name = "warehouseLocationName";
+          settings.Properties.ClientInstanceName = "warehouseLocationName";
+          settings.Width = Unit.Percentage(100);
+          settings.ReadOnly = true;
+          settings.ShowModelErrors = true;
+          settings.Text = warehouseLocationName;
+
+    }).GetHtml()
+
+        </td>
+    </tr>
+</table>

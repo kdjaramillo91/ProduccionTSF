@@ -1,0 +1,52 @@
+﻿@using DXPANACEASOFT.DataProviders
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "providersDetails" + ViewData["id_item"];
+
+        settings.CommandColumn.Visible = false;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = false;
+        
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id_provider";
+
+        settings.SettingsPager.Visible = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_provider";
+            column.Caption = "Nombre Completo";
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+
+
+            column.SetDataItemTemplateContent(content =>
+            {
+                int id_provider = (int)DataBinder.Eval(content.DataItem, "id_provider");
+                var itemProvider = DataProviderItemProvider.ItemProvider(id_provider);
+
+                if (itemProvider != null)
+                {
+                    ViewContext.Writer.Write(itemProvider.Provider.Person.fullname_businessName);
+                }
+
+            });
+
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isFavorite";
+            column.Caption = "Favorito";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        });
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,26 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.SalesRequest
+@{
+    int? id_priceList = (Model != null && Model.id_priceList != 0) ? (int?)Model.id_priceList : null;
+    int? id_customer = (Model != null && Model.id_customer != 0) ? (int?)Model.id_customer : null;
+}
+@Html.DevExpress().ComboBoxFor(m => m.id_priceList, settings =>
+{
+    settings.Name = "id_priceList";
+    settings.Properties.ClientInstanceName = "id_priceList";
+    settings.Width = Unit.Percentage(100);
+
+    settings.CallbackRouteValues = new { Controller = "SalesRequest", Action = "GetPriceList" };
+    settings.Properties.CallbackPageSize = 5;
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+    //settings.Properties.Width = Unit.Percentage(100);
+    //settings.ReadOnly = codeState != "01";
+    settings.ShowModelErrors = true;
+    settings.Properties.ClientSideEvents.BeginCallback = "OnPriceListBeginCallback";
+    settings.Properties.ClientSideEvents.Validation = "OnPriceListValitation";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnPriceList_SelectedIndexChanged";
+
+}).BindList(DataProviderPriceList.SaleApprovedPriceLists((int?)ViewData["id_company"], id_priceList, id_customer)).Bind(id_priceList).GetHtml()

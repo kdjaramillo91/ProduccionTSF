@@ -1,0 +1,414 @@
+
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+
+@{
+
+    //int estado = ViewData["id_documentState"] != null ? (int)ViewData["id_documentState"] : 1;
+    bool canAproved = ViewBag.canAproved != null && (bool)ViewBag.canAproved;
+    bool canAuthorize = ViewBag.canAuthorize != null && (bool)ViewBag.canAuthorize;
+    bool canReverse = ViewBag.canReverse != null && (bool)ViewBag.canReverse;
+    bool visibleCantidadCero = ViewBag.visibleCantidadCero != null && (bool)ViewBag.visibleCantidadCero;
+}
+
+@{
+    var grid = Html.DevExpress().GridView<LiquidationMaterialDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewDetail";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "LiquidationMaterial",
+            Action = "GridViewDetail",
+
+            canAproved = canAproved,
+            canAuthorize = canAuthorize,
+            canReverse = canReverse
+        };
+
+        settings.KeyFieldName = "id";
+
+        settings.ClientSideEvents.BeginCallback = "OnBeginCallback_GridViewDetail";
+        settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditing";
+//settings.Enabled = canAuthorize || canAproved;//ViewBag.enabled == null || (bool)ViewBag.enabled;
+
+settings.SettingsBehavior.AllowFixedGroups = true;
+        settings.Settings.ShowFooter = true;
+
+//settings.SettingsPager.Position = PagerPosition.TopAndBottom;
+//settings.SettingsPager.FirstPageButton.Visible = true;
+//settings.SettingsPager.LastPageButton.Visible = true;
+//settings.SettingsPager.PageSizeItemSettings.Visible = true;
+//settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "20", "50" };
+settings.Settings.ShowGroupPanel = true;
+
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Row;
+        settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+        settings.SettingsEditing.BatchEditSettings.ShowConfirmOnLosingChanges = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsResizing.ColumnResizeMode = ColumnResizeMode.Control;
+        settings.SettingsResizing.Visualization = ResizingMode.Live;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = false;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+
+
+        settings.CustomJSProperties = (s, e) =>
+{
+        var list = (Model as List<LiquidationMaterialDetailDTO>) ?? new List<LiquidationMaterialDetailDTO>();
+        e.Properties["cpDetailCount"] = list.Count;
+    };
+
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "id";
+        column.Name = "id";
+        column.Caption = "id";
+        column.Width = Unit.Percentage(0);
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "id_guia";
+        column.Name = "id_guia";
+        column.Caption = "id_guia";
+        column.Width = Unit.Percentage(0);
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "aprovedComertial";
+        column.Name = "aprovedComertial";
+        column.Caption = "Aprob. Com.";
+        column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        column.Settings.ShowEditorInBatchEditMode = canAuthorize;//(estado == 3);//Estado APROBADA
+column.Visible = canReverse;// (estado == 3);//Estado APROBADA
+column.ReadOnly = !canAuthorize || !IsEnabled("AprobacionComercial");
+        column.EditorProperties().CheckBox(checkBox =>
+        {
+
+            checkBox.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+        });
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "aprovedLogist";
+        column.Name = "aprovedLogist";
+        column.Caption = "Aprob. Log.";
+        column.ColumnType = MVCxGridViewColumnType.CheckBox;
+        column.Settings.ShowEditorInBatchEditMode = canAproved;//(estado == 1);//Estado PPENDIENTE
+                                                               //column.Visible = canAproved || canAuthorize;// (estado == 3);//Estado APROBADA
+column.ReadOnly = !canAproved || !IsEnabled("AprobacionLogistica");
+        column.EditorProperties().CheckBox(checkBox =>
+        {
+
+            checkBox.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+        });
+    });
+
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "id_guiaDetail";
+        column.Name = "id_guiaDetail";
+        column.Caption = "id_guiaDetail";
+        column.Width = Unit.Percentage(0);
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "numberGuia";
+        column.Name = "numberGuia";
+        column.Caption = "No.Guía";
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.ColumnType = MVCxGridViewColumnType.TextBox;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "personProcessPlant";
+        column.Name = "personProcessPlant";
+        column.Caption = "Proceso";
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.ColumnType = MVCxGridViewColumnType.TextBox;
+        column.Width = Unit.Pixel(100);
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "emisionGuia";
+        column.Name = "emisionGuia";
+        column.Caption = "Fecha Emisión";
+        column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+        column.Settings.ShowEditorInBatchEditMode = false;
+
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "id_item";
+        column.Name = "id_item";
+        column.Caption = "id_item";
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.Width = Unit.Percentage(0);
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "codigo";
+        column.Name = "codigo";
+        column.Caption = "Código";
+        column.ColumnType = MVCxGridViewColumnType.TextBox;
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "name";
+        column.Name = "name";
+        column.Caption = "Nombre del Producto";
+        column.ColumnType = MVCxGridViewColumnType.TextBox;
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "id_metricUnit";
+        column.Name = "id_metricUnit";
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.Width = Unit.Percentage(0);
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "metricUnit";
+        column.Name = "metricUnit";
+        column.Caption = "UM";
+        column.ColumnType = MVCxGridViewColumnType.TextBox;
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "quantityOrigin";
+        column.Name = "quantityOrigin";
+        column.Caption = "Cantidad";
+        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.SetDataItemTemplateContent(c =>
+        {
+            decimal? quantityOrigin = (decimal?)DataBinder.Eval(c.DataItem, "quantityOrigin");
+            ViewContext.Writer.Write(quantityOrigin == null ? "0.00" : quantityOrigin.Value.ToString("N2"));
+        });
+
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "unitCostOrigin";
+        column.Name = "unitCostOrigin";
+        column.Caption = "unitCostOrigin";
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.Width = Unit.Percentage(0);
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "unitCost";
+        column.Name = "unitCost";
+        column.Caption = "Costo Unitario";
+        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.SetDataItemTemplateContent(c =>
+        {
+            decimal? unitCost = (decimal?)DataBinder.Eval(c.DataItem, "unitCost");
+            ViewContext.Writer.Write((unitCost == null || unitCost == 0) ? "<b><font color='red'>$0.0000</font></b>" : unitCost.Value.ToString("C4"));
+        });
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "subTotalOrigin";
+        column.Name = "subTotalOrigin";
+        column.Caption = "subTotalOrigin";
+        column.Width = Unit.Percentage(0);
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "subTotal";
+        column.Name = "subTotal";
+        column.Caption = "SubTotal";
+        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.SetDataItemTemplateContent(c =>
+        {
+            decimal? subTotal = (decimal?)DataBinder.Eval(c.DataItem, "subTotal");
+            ViewContext.Writer.Write((subTotal == null || subTotal == 0) ? "<b><font color='red'>$0.0000</font></b>" : subTotal.Value.ToString("C4"));
+        });
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "iva";
+        column.Name = "iva";
+        column.Caption = "Iva";
+        column.Width = Unit.Percentage(0);
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "subTotalIvaOrigin";
+        column.Name = "subTotalIvaOrigin";
+        column.Caption = "subTotalIvaOrigin";
+        column.Width = Unit.Percentage(0);
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "subTotalIva";
+        column.Name = "subTotalIva";
+        column.Caption = "Iva";
+        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.Width = Unit.Percentage(10);
+        column.SetDataItemTemplateContent(c =>
+        {
+            decimal? subTotalIva = (decimal?)DataBinder.Eval(c.DataItem, "subTotalIva");
+            ViewContext.Writer.Write((subTotalIva == null || subTotalIva == 0) ? "<b><font color='red'>$0.0000</font></b>" : subTotalIva.Value.ToString("C4"));
+        });
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "totalOrigin";
+        column.Name = "totalOrigin";
+        column.Caption = "totalOrigin";
+        column.Width = Unit.Percentage(0);
+        column.Settings.ShowEditorInBatchEditMode = false;
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "total";
+        column.Name = "total";
+        column.Caption = "Total";
+        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        column.Settings.ShowEditorInBatchEditMode = false;
+        column.Width = Unit.Percentage(12);
+        column.SetDataItemTemplateContent(c =>
+        {
+            decimal? total = (decimal?)DataBinder.Eval(c.DataItem, "total");
+            ViewContext.Writer.Write((total == null || total == 0) ? "<b><font color='red'>$0.0000</font></b>" : total.Value.ToString("C4"));
+        });
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "descriptionLogist";
+        column.Name = "descriptionLogist";
+        column.Caption = "Observación Log.";
+        column.ColumnType = MVCxGridViewColumnType.Memo;
+        column.Settings.ShowEditorInBatchEditMode = canAproved;//(estado == 1);//Estado PPENDIENTE
+                                                               //column.Visible = canAproved || canAuthorize;// (estado == 3);//Estado APROBADA
+column.ReadOnly = !canAproved;
+        column.EditorProperties().Memo(memo =>
+        {
+
+            memo.Width = Unit.Percentage(100);
+            memo.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+        });
+    });
+        settings.Columns.Add(column =>
+{
+        column.FieldName = "descriptionComertial";
+        column.Name = "descriptionComertial";
+        column.Caption = "Observación Com.";
+        column.ColumnType = MVCxGridViewColumnType.Memo;
+        column.Settings.ShowEditorInBatchEditMode = canAuthorize;//(estado == 3);//Estado APROBADA
+column.Visible = canReverse;//(estado == 3);//Estado APROBADA
+column.ReadOnly = !canAuthorize;
+        column.EditorProperties().Memo(memo =>
+        {
+
+            memo.Width = Unit.Percentage(100);
+            memo.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+        });
+    });
+
+
+//settings.FormatConditions.AddHighlight("unitCost", "unitCost == 0", GridConditionHighlightFormat.Custom);
+//settings.FormatConditions.AddHighlight("subTotal", "subTotal == 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+//settings.FormatConditions.AddHighlight("subTotalIva", "subTotalIva == 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+//settings.FormatConditions.AddHighlight("total", "total == 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+
+@*GridFormatCondition gridFormatConditionBase = GridFormatConditionBase( canAproved=> { });*@
+
+//GridTopBottomRule gridTopBottomRule = new GridTopBottomRule();
+//gridTopBottomRule.
+//settings.FormatConditions.AddTopBottom("unitCost", gridTopBottomRule, GridConditionHighlightFormat.BoldText);
+
+//    new FormatCondition() (condition) =>
+//{
+//    condition.FieldName = "unitCost";
+//    condition.ShowInColumn = "unitCost";
+//    condition.Expression = "[unitCost] = 0";
+//    condition.CellStyle.ForeColor = System.Drawing.Color.Red;
+//    condition.Format = GridConditionHighlightFormat.Custom;
+//});
+
+//var settingsUnitCost = settings.FormatConditions.AddHighlight("unitCost", "unitCost == 0", GridConditionHighlightFormat.Custom);
+////settingsUnitCost.ApplyToRow = false;
+//settingsUnitCost.ApplyToRow = false;
+//settingsUnitCost.CellStyle.BackColor = System.Drawing.Color.White;
+//settingsUnitCost.CellStyle.ForeColor = System.Drawing.Color.DarkRed;
+//settings.FormatConditions.AddHighlight("subTotal", "subTotal == 0", GridConditionHighlightFormat.RedText);
+////var settingsSubTotal = settings.FormatConditions.AddHighlight("subTotal", "subTotal == 0", GridConditionHighlightFormat.RedText);
+////settingsSubTotal.ApplyToRow = false;
+////settingsSubTotal.RowStyle.ForeColor = System.Drawing.Color.DarkRed;
+//var settingsSubTotalIva = settings.FormatConditions.AddHighlight("subTotalIva", "subTotalIva == 0", GridConditionHighlightFormat.Custom);
+//settingsSubTotalIva.ApplyToRow = false;
+//settingsSubTotalIva.RowStyle.ForeColor = System.Drawing.Color.DarkRed;
+//var settingsTotal = settings.FormatConditions.AddHighlight("total", "total == 0", GridConditionHighlightFormat.Custom);
+//settingsTotal.ApplyToRow = false;
+//settingsTotal.RowStyle.ForeColor = System.Drawing.Color.DarkRed;
+
+
+settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "subTotal").DisplayFormat = "<b>{0:c4}<b/>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "subTotalIva").DisplayFormat = "<b>{0:c4}<b/>";
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "total").DisplayFormat = "<b>{0:c4}<b/>";
+    });
+}
+@grid.Bind(Model).GetHtml()
+
+
+@functions{
+
+    bool IsEnabled(string namePermission)
+    {
+        int id_user = (int)ViewData["id_user"];
+        int id_menu = (int)ViewData["id_menu"];
+
+        User user = DataProviderUser.UserById(id_user);
+
+        if (user == null)
+            return false;
+
+        UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+        if (userMenu == null)
+            return false;
+
+        Permission permission = userMenu.Permission.FirstOrDefault(p => p.name.Equals(namePermission));
+
+        return (permission != null);
+    }
+
+}

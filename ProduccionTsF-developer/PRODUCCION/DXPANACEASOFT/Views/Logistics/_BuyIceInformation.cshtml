@@ -1,0 +1,51 @@
+﻿ 
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.RemissionGuideCustomizedIceBuyInformation
+
+@{
+    string codeState = (ViewData["CodeDoc"] != null) ? (string)ViewData["CodeDoc"] : "01";
+    bool controlsEnabled = (bool)ViewData["OwnGuide"];
+    string answerControlsEnabled = (controlsEnabled) ? "NO" : "SI";
+    decimal dValueMaxAdvance = 0;
+    dValueMaxAdvance = Convert.ToDecimal(DataProviderSetting.ValueSettingDetailByCodes("VMDVAL", "ANTRGTRA"));
+    var isOwnTmp = (ViewData["OwnGuide"] != null) ? (bool)ViewData["OwnGuide"] : false;
+}
+
+@Html.Hidden("answerControlsEnabled", answerControlsEnabled)
+@Html.Hidden("isOwnTransport", isOwnTmp ? "NO":"SI")
+<table class="table table-condenced" style="margin: 0px;">
+    <!--FILA 1  Valor Flete Anticipo-->
+    <tr>
+        <td style="width: 10%">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Proveedor Hielo: ";
+                settings.AssociatedControlName = "id_ProviderIceBags";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.name_ProviderIceBags, settings =>
+            {
+                settings.Properties.ClientInstanceName = "name_ProviderIceBags";
+                settings.Name = "name_ProviderIceBags";
+                settings.Width = Unit.Percentage(50);
+                settings.Properties.MaxLength = 50;
+                //settings.Properties.ClientSideEvents.Init = "OnDriverNameThirdInit";
+                //settings.ReadOnly = true;
+                //settings.ReadOnly = codeState != "01" || (controlsEnabled && ((Model.RemissionGuide.isManual != null ? ((bool)Model.RemissionGuide.isManual) : true) == false));
+            }).GetHtml()
+            
+        </td>
+        <td style="width: 10%">
+
+        </td>
+        <td>
+        </td>
+        <td style="width: 10%">
+        </td>
+        <td>
+        </td>
+    </tr>
+</table>
+

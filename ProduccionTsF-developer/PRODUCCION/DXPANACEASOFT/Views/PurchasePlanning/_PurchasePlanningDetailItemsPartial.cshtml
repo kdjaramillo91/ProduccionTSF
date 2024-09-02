@@ -1,0 +1,114 @@
+﻿@using System.Globalization;
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@*@model List<DXPANACEASOFT.Models.PurchasePlanningDetail>*@
+
+@{
+    var grid = Html.DevExpress().GridView<PurchasePlanningDetail>(settings =>
+    {
+        settings.Name = "gvPurchasePlanningDetailItems" + ViewData["id_purchasePlanning"];
+        settings.CallbackRouteValues = new { Controller = "PurchasePlanning", Action = "PurchasePlanningDetailItemsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "PurchasePlanningDetailItems_BeginCallback";
+
+        settings.CommandColumn.Visible = false;
+        settings.Width = Unit.Percentage(100);
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null)
+            {
+                e.Properties["cpIdPurchasePlanning"] = 0;
+            }
+            e.Properties["cpIdPurchasePlanning"] = ViewData["id_purchasePlanning"];
+        };
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        #region ColumnsAdd
+
+        settings.Columns.Add(m => m.datePlanning, column =>
+        {
+            column.Name = "datePlanning";
+            column.Caption = "Fecha Planificada";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                PurchasePlanningDetail purchasePlanningDetail = (PurchasePlanningDetail)Model[c.ItemIndex];
+                //var provider = DataProviderPerson.GetProviderFromRemissionGuide(remission.id);
+                var text = purchasePlanningDetail.datePlanning.ToString("ddd", CultureInfo.CreateSpecificCulture("es-US")).ToUpper() +
+                           purchasePlanningDetail.datePlanning.ToString("_dd");
+                ViewContext.Writer.Write(text);
+                //ViewContext.Writer.Write(remission?.RemissionGuideDetail?.FirstOrDefault().RemissionGuideDetailPurchaseOrderDetail?.FirstOrDefault().PurchaseOrderDetail?.PurchaseOrder.Provider.Person.fullname_businessName ?? "");
+            });
+            column.Width = Unit.Percentage(12);
+        });
+
+        settings.Columns.Add(m => m.Provider.Person.fullname_businessName, column =>
+        {
+            column.Name = "provider";
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(m => m.Person.fullname_businessName, column =>
+        {
+            column.Name = "buyer";
+            column.Caption = "Comprador";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.Width = Unit.Percentage(15);
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantity";
+            column.Name = "quantity";
+            column.Caption = "Cantidad";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.Width = Unit.Percentage(10);
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "item_itemTypeCategory";
+            column.Caption = "Producto(Categoría)";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            //column.Width = Unit.Percentage(15);
+            column.SetDataItemTemplateContent(c =>
+            {
+                PurchasePlanningDetail purchasePlanningDetail = (PurchasePlanningDetail)Model[c.ItemIndex];
+                //var provider = DataProviderPerson.GetProviderFromRemissionGuide(remission.id);
+                var text = purchasePlanningDetail.id_item == null ? "" : purchasePlanningDetail.Item.name;
+                text += "(" + purchasePlanningDetail.ItemTypeCategory.name + ")";
+                ViewContext.Writer.Write(text);
+                //ViewContext.Writer.Write(remission?.RemissionGuideDetail?.FirstOrDefault().RemissionGuideDetailPurchaseOrderDetail?.FirstOrDefault().PurchaseOrderDetail?.PurchaseOrder.Provider.Person.fullname_businessName ?? "");
+            });
+        });
+
+        #endregion
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

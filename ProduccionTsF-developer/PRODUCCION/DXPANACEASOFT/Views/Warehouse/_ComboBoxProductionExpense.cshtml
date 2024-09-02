@@ -1,0 +1,49 @@
+﻿
+@using DXPANACEASOFT.Models
+
+@model WarehouseExpenseAccountingTemplate
+
+@{
+	int idProdExpense;
+	if (this.Model.id_accountingTemplate > 0)
+	{
+		idProdExpense = this.Model.id_expenseProduction;
+	}
+	else
+	{
+		idProdExpense = 0;
+	}
+}
+
+@Html.DevExpress().ComboBox(
+	settings =>
+	{
+		settings.Name = "id_expenseProduction";
+		settings.Properties.ClientInstanceName = "id_expenseProduction";
+		settings.Width = Unit.Percentage(92);
+
+		settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		settings.Properties.EnableSynchronization = DefaultBoolean.False;
+		settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		settings.CallbackRouteValues = new { Controller = "Warehouse", Action = "GetExpenseProduction" };
+		settings.Properties.CallbackPageSize = 10;
+
+		settings.Properties.TextFormatString = "{0} - {1}";
+		settings.Properties.ValueField = "id";
+		//settings.Properties.TextField = "name";
+		settings.Properties.Columns.Clear();
+		settings.Properties.ValueType = typeof(string);
+		settings.Properties.Columns.Add("code", "Código", Unit.Percentage(20));
+		settings.Properties.Columns.Add("name", "Descripción", Unit.Percentage(70));
+		settings.Properties.ClientSideEvents.BeginCallback = "ExpenseProductionCombo_BeginCallback";
+		settings.Properties.ClientSideEvents.Validation = "ExpenseProductionCombo_Validation";
+		settings.Properties.ClientSideEvents.SelectedIndexChanged = "ExpenseProductionCombo_SelectedIndexChanged";
+		settings.Properties.ClientSideEvents.EndCallback = "ExpenseProductionCombo_EndCallback";
+		settings.ItemTextCellPrepared = (sender, e) =>
+		{
+			e.TextCell.ToolTip = HttpUtility.HtmlDecode(e.TextCell.Text);
+		};
+
+	}).BindList(DataProviderProductionExpense.ProductionExpenseByCompany((int)ViewData["id_company"])).Bind(idProdExpense).GetHtml()

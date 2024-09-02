@@ -1,0 +1,604 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Person
+
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditPerson", name = "formEditPerson" }))
+{
+    @Html.Hidden("id_person", Model.id)
+
+    var isProviderShrimp = (Model != null && Model.Provider != null && Model.Provider.ProviderGeneralData != null && Model.Provider.ProviderGeneralData.ProviderType != null) ? (bool)Model.Provider.ProviderGeneralData.ProviderType.isShrimpPerson : false;
+    var isProviderTransportist = (Model != null && Model.Provider != null && Model.Provider.ProviderGeneralData != null && Model.Provider.ProviderGeneralData.ProviderType != null) ? (bool)Model.Provider.ProviderGeneralData.ProviderType.isTransportist : false;
+
+    @Html.Hidden("isProviderShrimpBit", (isProviderShrimp ? "SI" : "NO"))
+    @Html.Hidden("isProviderTransportistBit", (isProviderTransportist ? "SI" : "NO"))
+
+    var id_provider = Model.Provider != null ? Model.Provider.id : 0;
+    var id_Customer = Model.Customer != null ? Model.Customer.id : 0;
+
+    @Html.Hidden("id_provider", id_provider)
+
+    <table id="generalDataPersonTable" class="table table-condensed">
+        <tr>
+            <td rowspan="12" style="width: 12%;">
+                @Html.DevExpress().BinaryImageFor(m => m.photo, settings =>
+                {
+                    settings.Properties.ImageWidth = 170;
+                    settings.Properties.ImageHeight = 160;
+                    settings.Properties.EnableServerResize = true;
+                    settings.Properties.ImageSizeMode = ImageSizeMode.FitProportional;
+                    settings.CallbackRouteValues = new {Controller = "Person", Action = "BinaryImageColumnPhotoUpdate"};
+                    settings.Properties.EditingSettings.Enabled = true;
+                    settings.Properties.EditingSettings.UploadSettings.UploadValidationSettings.MaxFileSize = 4194304;
+                }).GetHtml()
+            </td>
+            <td style="width: 10%;">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "id_rolesLabel";
+                    settings.Text = "Roles: *";
+                    settings.AssociatedControlName = "id_roles";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var roles = (Model != null && Model.Rol != null) ? Model.Rol.ToList() : new List<Rol>();
+                }
+                @Html.DevExpress().TokenBox(settings =>
+           {
+               settings.Name = "id_roles";
+               settings.Properties.ClientInstanceName = "id_roles";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.ValueField = "id";
+               settings.Properties.TextField = "name";
+
+               settings.Properties.AllowCustomTokens = false;
+
+               settings.Properties.Tokens.AddRange(roles.Select(r => r.name).ToList());
+
+               settings.ShowModelErrors = true;
+               settings.CustomJSProperties = (s, e) =>
+               {
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpHasTab"] = "false";
+               };
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               settings.Properties.ClientSideEvents.TokensChanged = "RolTokenBox_TokensChanged";
+               if (id_provider != 0 || id_Customer != 0)
+               {
+                   settings.Properties.TokenRemoveButtonStyle.Height = 0;
+                   settings.Properties.TokenRemoveButtonStyle.Width = 0;
+               }
+           }).BindList(DataProviderRol.Rol()).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "id_personTypeLabel";
+                    settings.Text = "Tipo de Persona: *";
+                    settings.AssociatedControlName = "id_personType";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_itemType = (Model != null && Model.id_personType != 0) ? (int?)Model.id_personType : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_personType, settings =>
+                {
+                   settings.Name = "id_personType";
+                   settings.Properties.ClientInstanceName = "id_personType";
+                   settings.Width = Unit.Percentage(100);
+
+                   settings.Properties.TextField = "name";
+                   settings.Properties.ValueField = "id";
+                   settings.Properties.ValueType = typeof(int);
+
+                   settings.ShowModelErrors = true;
+                   settings.CustomJSProperties = (s, e) =>
+                   {
+                       e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                       e.Properties["cpIsRequired"] = "true";
+                       e.Properties["cpHasTab"] = "false";
+                   };
+                   settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               }).BindList(DataProviderPersonType.PersonTypes()).Bind(id_itemType).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "id_identificationTypeLabel";
+                    settings.Text = "Tipo de Identificacion: *";
+                    settings.AssociatedControlName = "id_identificationType";
+                }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_identificationType = (Model != null && Model.id_identificationType != 0) ? (int?)Model.id_identificationType : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_identificationType, settings =>
+           {
+               settings.Name = "id_identificationType";
+               settings.Properties.ClientInstanceName = "id_identificationType";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueField = "id";
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboIdentificationType_SelectedIndexChanged";
+               settings.CustomJSProperties = (s, e) =>
+               {
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpHasTab"] = "false";
+               };
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           }).BindList(DataProviderIdentificationType.IdentificationType()).Bind(id_identificationType).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "identification_numberLabel";
+                    settings.Text = "No. Identificación: *";
+                    settings.AssociatedControlName = "identification_number";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.identification_number, settings =>
+                {
+                    settings.Name = "identification_number";
+                    settings.Properties.ClientInstanceName = "identification_number";
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.ShowModelErrors = true;
+
+					settings.Properties.MaxLength = 13;
+                    settings.Properties.ClientSideEvents.Validation = "OnIdentificationNumberValidation";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "fullname_businessNameLabel";
+                    settings.Text = "Nombre Completo: *";
+                    settings.AssociatedControlName = "fullname_businessName";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.fullname_businessName, settings =>
+           {
+               settings.Name = "fullname_businessName";
+               settings.Properties.ClientInstanceName = "fullname_businessName";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+               settings.CustomJSProperties = (s, e) =>
+               {
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpHasTab"] = "false";
+               };
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.tradeName, settings =>
+       {
+           settings.Name = "tradeNameLabel";
+           settings.Text = "Nombre Comercial*:";
+           settings.AssociatedControlName = "tradeName";
+       }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.tradeName, settings =>
+           {
+               settings.Name = "tradeName";
+               settings.Properties.ClientInstanceName = "tradeName";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnTradeNameValidation";
+
+               //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+               //settings.CustomJSProperties = (s, e) =>
+               //     {
+               //         e.Properties["cpTabContainer"] = "tabProvider";
+               //         e.Properties["cpMessageError"] = "Campo Obligatorio.";
+               //         e.Properties["cpIsRequired"] = "true";
+               //         e.Properties["cpTabControl"] = "tabControl";
+               //     };
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+                 <td>
+                     @Html.DevExpress().LabelFor(m => m.processPlant, settings =>
+            {
+                settings.Name = "processPlantLabel";
+                settings.Text = "Nombre Planta:";
+                settings.AssociatedControlName = "processPlant";
+            }).GetHtml()
+                 </td>
+                 <td>
+                     @Html.DevExpress().TextBoxFor(m => m.processPlant, settings =>
+                {
+                    settings.Name = "processPlant";
+                    settings.Properties.ClientInstanceName = "processPlant";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                    //settings.Properties.ClientSideEvents.Validation = "OnprocessPlantValidation";
+
+                    //settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+                    //settings.CustomJSProperties = (s, e) =>
+                    //     {
+                    //         e.Properties["cpTabContainer"] = "tabProvider";
+                    //         e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                    //         e.Properties["cpIsRequired"] = "true";
+                    //         e.Properties["cpTabControl"] = "tabControl";
+                    //     };
+                }).GetHtml()
+                 </td>
+             </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "addressLabel";
+                    settings.Text = "Dirección: *";
+                    settings.AssociatedControlName = "address";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().MemoFor(m => m.address, settings =>
+           {
+               settings.Name = "address";
+               settings.Properties.ClientInstanceName = "address";
+               settings.Width = Unit.Percentage(100);
+
+               settings.ShowModelErrors = true;
+               settings.CustomJSProperties = (s, e) =>
+               {
+                   e.Properties["cpMessageError"] = "Campo Obligatorio.";
+                   e.Properties["cpIsRequired"] = "true";
+                   e.Properties["cpHasTab"] = "false";
+               };
+               settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "emailLabel";
+                    settings.Text = "Email: *";
+                    settings.AssociatedControlName = "email";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.email, settings =>
+           {
+               settings.Name = "email";
+               settings.Properties.ClientInstanceName = "email";
+               settings.Width = Unit.Percentage(100);
+
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnEmailValidation";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().LabelFor(m => m.bCC, settings =>
+                {
+                    settings.Name = "bCCLabel";
+                    settings.Text = "BCC:";
+                    settings.AssociatedControlName = "bCC";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.bCC, settings =>
+                {
+                    settings.Name = "bCC";
+                    settings.Properties.ClientInstanceName = "bCC";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "cellphoneNumberLabel";
+                    settings.Text = "Celular:";
+                    settings.AssociatedControlName = "cellphoneNumberLabel";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.cellPhoneNumberPerson, settings =>
+                {
+                    //settings.Name = "cellphoneNumberPerson";
+                    settings.Properties.ClientInstanceName = "cellPhoneNumberPerson";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.MaxLength = 20;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+                <td>
+                    @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Name = "firmLabel";
+                        settings.Text = "Firma:";
+                        settings.AssociatedControlName = "firm";
+                    }).GetHtml()
+                </td>
+                <td>
+                    @Html.DevExpress().BinaryImageFor(m => m.firm, settings =>
+               {
+                   settings.Properties.ImageWidth = 85;
+                   settings.Properties.ImageHeight = 80;
+                   settings.Properties.EnableServerResize = true;
+                   settings.Properties.ImageSizeMode = ImageSizeMode.FitProportional;
+                   settings.CallbackRouteValues = new {Controller = "Person", Action = "BinaryImageColumnPhotoUpdate"};
+                   settings.Properties.EditingSettings.Enabled = true;
+                   settings.Properties.EditingSettings.UploadSettings.UploadValidationSettings.MaxFileSize = 4194304;
+               }).GetHtml()
+                </td>
+            </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "isActiveLabel";
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "is_Active";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Name = "isActive";
+                    settings.Properties.ClientInstanceName = "isActive";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px Solid #C0C0C0;">
+            <td colspan="3">
+                <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Informaci&oacute;n Adicional Roles</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                @{
+                    Person _personAux = Model ?? new Person();
+                    ViewBag.id_person = _personAux.id;
+                    Html.RenderPartial("_RolsDetailPartial", _personAux.Rol.Where(w => w.name == "Cliente Exterior").ToList());
+                    //Html.RenderPartial("PopupControl/_PopupControlRolForeignCustomerPartial", _personAux);
+                }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                @{
+                    Person _person = Model ?? new Person();
+
+                    Html.DevExpress().PageControl(tabs =>
+                    {
+                        tabs.Name = "tabControl";
+                        tabs.Width = Unit.Percentage(100);
+                        tabs.EnableClientSideAPI = true;
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Datos Generales";
+                            tab.SetContent(() =>
+                            {
+                                    //ViewContext.Writer.Write("Hola Mundo");
+                                    //Html.RenderPartial("_PersonsPartial");
+                                });
+                            tab.ClientVisible = false;
+                        });
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Proveedor    ";
+                            tab.Name = "tabProvider";
+
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                _person.Provider = _person.Provider ?? new Provider();
+                                Html.RenderPartial("_ProviderPartial", _person.Provider);
+                            });
+
+                            tab.ClientVisible = (_person.Provider != null);
+                        });
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Cliente    ";
+                            tab.Name = "tabCustomer";
+
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                    //ViewContext.Writer.Write("Hola Mundo");
+                                    //Html.RenderPartial("_PersonsPartial");
+                                    _person.Customer = _person.Customer ?? new Customer();
+                                Html.RenderPartial("_CustomerPartial", _person.Customer);
+                            });
+
+                            tab.ClientVisible = (_person.Customer != null);
+                        });
+
+
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Empleado    ";
+                            tab.Name = "tabEmployee";
+
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+
+                            tab.SetContent(() =>
+                            {
+                                _person.Employee = _person.Employee ?? new Employee();
+                                Html.RenderPartial("_EmployeePartial", _person.Employee);
+                            });
+
+                            tab.ClientVisible = (_person.Employee != null);
+                        });
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Vendedor";
+                            tab.SetContent(() =>
+                            {
+                                    //ViewContext.Writer.Write("Hola Mundo");
+                                    //Html.RenderPartial("_PersonsPartial");
+                                });
+                            tab.ClientVisible = false;
+                        });
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Transportista";
+                            tab.SetContent(() =>
+                            {
+                                    //ViewContext.Writer.Write("Hola Mundo");
+                                    //Html.RenderPartial("_PersonsPartial");
+                                });
+                            bool isTransportist = false;
+                            if (_person != null
+                                && _person.Provider != null
+                                && _person.Provider.ProviderGeneralData != null
+                                && _person.Provider.ProviderGeneralData.ProviderType != null
+                                && _person.Provider.ProviderGeneralData.ProviderType.isTransportist) isTransportist = true;
+                            tab.ClientVisible = isTransportist;
+                        });
+
+
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Contrato Marco    ";
+                            tab.Name = "tabFrameworkContract";
+
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                    //_person.Provider = _person.Provider ?? new Provider();
+                                    //ViewContext.Writer.Write("Datos Relacionados");
+                                    var frameworkContract = (_person != null && _person.FrameworkContract != null) ? _person.FrameworkContract.OrderByDescending(od => od.id).ToList() :
+                                                                                                         new List<FrameworkContract>();
+                                    //Html.Hidden("providerCustomer", "Provider");
+                                    Html.RenderPartial("_PersonFrameworkContractPartial", frameworkContract);
+                            });
+
+                            tab.ClientVisible = (_person.Provider != null || _person.Customer != null);
+                        });
+
+                    }).Render();
+                }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align: right;">
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnUpdate";
+                    settings.Text = "Actualizar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.ClientVisible = IsEnabled(11);
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    settings.ValidateInvisibleEditors = true;
+                    settings.ClientSideEvents.Click = "ButtonUpdate_Click";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "btnCancel";
+                    settings.Text = "Cancelar";
+                    settings.RenderMode = ButtonRenderMode.Button;
+                    settings.UseSubmitBehavior = false;
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                    settings.ClientSideEvents.Click = "BtnCancel_Click";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+}
+
+@functions{
+
+    bool IsEnabled(int id_permission)
+    {
+        int id_user = (int)ViewData["id_user"];
+        int id_menu = (int)ViewData["id_menu"];
+
+        User user = DataProviderUser.UserById(id_user);
+
+        if (user == null)
+            return false;
+
+        UserMenu userMenu = user.UserMenu.FirstOrDefault(m => m.Menu.id == id_menu);
+
+        if (userMenu == null)
+            return false;
+
+        Permission permission = userMenu.Permission.FirstOrDefault(p => p.id == id_permission);
+
+        return (permission != null);
+    }
+    bool ShowDeleteButton()
+    {
+        var permissions = (ViewData["permissions"] as List<int>);
+        return (permissions != null && permissions.Contains(8));
+    }
+}
+

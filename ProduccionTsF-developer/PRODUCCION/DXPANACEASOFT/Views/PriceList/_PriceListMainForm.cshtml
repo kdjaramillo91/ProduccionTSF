@@ -1,0 +1,178 @@
+﻿
+@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PriceList
+
+@{
+    string codeDocumentType = (Model.Document != null) ? (Model.Document.DocumentType != null ? Model.Document.DocumentType.code : "") : "";
+    string codeDocumentState = (Model.Document != null) ? (Model.Document.DocumentState != null ? Model.Document.DocumentState.code : "") : "";
+    int id_priceList = (Model != null) ? Model.id : 0;
+    ViewData["id_priceList"] = id_priceList;
+}
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "formEditPriceList", name = "formEditPriceList" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    @Html.Hidden("codeDocumentType", codeDocumentType)
+    @*@Html.HiddenFor(m => m.Document.DocumentType, new { @id = "codeDocumentType" })*@
+    @Html.Hidden("id_priceList", id_priceList)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    //tabs.ClientInstanceName = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDocument";
+        tab.Text = "Documento    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_PriceListDocumentFormEdit", Model.Document);
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabPurchase";
+        tab.Text = "Cotización Compra    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+        tab.ClientVisible = codeDocumentType == "19";
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_PriceListTabPurchaseFormEdit");
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabSale";
+        tab.Text = "Cotización Venta    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+        tab.ClientVisible = codeDocumentType == "21";
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_PriceListTabSaleFormEdit");
+        });
+    });
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabHeader";
+        tab.Text = "Cabecera    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_PriceListMainFormTabHeader");
+        });
+    });
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDetails";
+        tab.Text = "Detalles    ";
+
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+            Html.RenderPartial("_PriceListHeadFormPriceListDetailPartial", Model);
+            var priceListDetailCategoryAdjustment = (Model != null && Model.PriceListDetailCategoryAdjustment != null) ? Model.PriceListDetailCategoryAdjustment.ToList() : new List<PriceListDetailCategoryAdjustment>();
+
+            if (codeDocumentState == "01" )
+            {
+                Html.RenderPartial("_PriceListMainFormTabDetails");
+
+                Html.RenderPartial("_PriceListDetailCategoryAdjustmentDetailPartial", priceListDetailCategoryAdjustment);
+            }
+            else
+            {
+                var priceListDetailFilterShow = (Model != null && Model.PriceListDetailFilterShow != null) ? Model.PriceListDetailFilterShow.ToList() : new List<PriceListDetailFilterShow>();
+
+                Html.RenderPartial("_PriceListDetailViewPartialPriceListDetails", priceListDetailFilterShow);
+
+                Html.RenderPartial("_PriceListDetailCategoryAdjustmentViewPartialPriceListDetails", priceListDetailCategoryAdjustment);
+            }
+
+        });
+    });
+
+}).GetHtml()
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td style="text-align: right">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnUpdate";
+                        button.Text = "Actualizar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                        button.ClientEnabled = codeDocumentState != "03" && codeDocumentState != "05";
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+
+}
+
+<script src="~/Scripts/pricelist/editform.js"></script>

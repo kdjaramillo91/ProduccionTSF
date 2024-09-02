@@ -1,0 +1,22 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "id_group";
+    settings.Properties.ClientInstanceName = "id_group";
+    settings.ControlStyle.CssClass = "editor";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueField = "id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.CallbackRouteValues = new { Controller = "Item", Action = "ComboBoxItemGroupPartial" };
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemGroupCombo_SelectedIndexChanged";
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.Properties.ClientSideEvents.Validation = "OnGroupValidation";
+
+}).BindList(Model).Bind(ViewData["id_group"]).GetHtml()

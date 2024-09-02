@@ -1,0 +1,150 @@
+﻿@using DevExpress.Data
+@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.RemGuide
+
+@{ 
+    string labelPup = DataProviderSetting.ValueSetting("EUPPPRIM");
+    string lableEnterprise = DataProviderSetting.ValueSetting("EEPRIM");
+}
+@{
+    var grid = Html.DevExpress().GridView<RGRResultsQuery>(settings =>
+    {
+        settings.Name = "gvRemissionGuideReassignment";
+        settings.CallbackRouteValues = new { Controller = "Logistics", Action = "RemissionGuideListForReassignment" };
+
+        settings.Width = Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = Unit.Percentage(3);
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Settings.ShowFooter = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.ClientSideEvents.Init = "OnGridViewRGReassignmentDetailsInit";
+        settings.ClientSideEvents.SelectionChanged = "OnGridViewRGReassignmentDetailsSelectionChanged";
+        settings.ClientSideEvents.EndCallback = "OnGridViewRGReassignmentDetailsEndCallback";
+
+        //Panel para cantidad de registros
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView gv = s as MVCxGridView;
+            if (gv == null) return;
+
+            e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+            e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+        };
+
+        settings.SetFooterRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblInfo""></span>");
+            if (settings.CommandColumn.SelectAllCheckboxMode != GridViewSelectAllCheckBoxMode.AllPages)
+            {
+                ViewContext.Writer.Write(
+                    @"<a id=""lnkSelectAllRows"" style=""cursor: pointer;"" onclick=""GridViewRGReassingmentSelectAllRow();"">Seleccionar Todos</a>
+                      <a id=""lnkClearSelection"" style=""cursor: pointer;"" onclick=""GridViewRGReassingmentClearSelection();"">Anular Selección</a>"
+                );
+            }
+        });
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+        //Numero de Documento
+        settings.Columns.Add(m => m.numberDoc, column =>
+        {
+            column.Caption = "No. Guía";
+            column.Width = Unit.Percentage(8);
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        //Fecha Emisión
+        settings.Columns.Add(m => m.emissionDateDoc, column =>
+        {
+            column.Caption = "Fecha de Emisión";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(8);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+
+            column.SortOrder = DevExpress.Data.ColumnSortOrder.Descending;
+        });
+        //Proveedor
+        settings.Columns.Add(m => m.providerName, column =>
+        {
+            column.Caption = "Proveedor";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+        });
+        //Unidad de Producción
+        settings.Columns.Add(m => m.productionUnitProviderName, column =>
+        {
+            column.Caption = "Camaronera";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+        });
+        //Fecha Despacho
+        settings.Columns.Add(m => m.despachureDateDoc, column =>
+        {
+            column.Caption = "Fecha de Despacho";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(8);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+
+        });
+        //Fecha Salida
+        settings.Columns.Add(m => m.exitTimePlanctDoc, column =>
+        {
+            column.Caption = "Fecha de Salida";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = Unit.Percentage(8);
+            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+
+        });
+        //Tercero
+        settings.Columns.Add(m => m.isThird, column =>
+        {
+            column.Caption = "Es de Tercero?";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            column.Width = Unit.Percentage(3);
+        });
+        //Estado Documento
+        settings.Columns.Add(m => m.stateDoc, column =>
+        {
+            column.Caption = "Estado";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = Unit.Percentage(8);
+        });
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+    int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+    {
+        int selectedRowsOnPage = 0;
+        string[] values = new string[] { "id" };
+        foreach (var key in grid.GetCurrentPageRowValues(values))
+        {
+            if (grid.Selection.IsRowSelectedByKey(key))
+                selectedRowsOnPage++;
+        }
+        return grid.Selection.FilteredCount - selectedRowsOnPage;
+    }
+
+}

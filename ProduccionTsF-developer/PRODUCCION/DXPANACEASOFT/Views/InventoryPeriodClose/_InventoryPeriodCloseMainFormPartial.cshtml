@@ -1,0 +1,124 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InventoryPeriod
+
+@{
+    int id_InventoryPeriod = (Model != null) ? Model.id : 0;
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "FormEditInventoryPeriodClose", name = "FormEditInventoryPeriodClose" }))
+{
+    if (ViewData["EditMessage"] != null)
+    {
+        @Html.Raw(ViewData["EditMessage"]);
+    }
+
+    <div id="gridMessageErrora">
+        @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrora";
+           settings.Properties.ClientInstanceName = "gridMessageErrora";
+           settings.Text = "";
+       }).GetHtml()
+    </div>
+
+
+    @Html.Hidden("id_InventoryPeriod", id_InventoryPeriod)
+
+    @Html.DevExpress().PageControl(tabs =>
+{
+    tabs.Name = "tabControl";
+    tabs.Width = Unit.Percentage(100);
+    tabs.EnableClientSideAPI = true;
+    tabs.ClientSideEvents.Init = "TabControl_Init";
+    tabs.ClientSideEvents.ActiveTabChanged = "TabControl_ActiveTabChanged";
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabdetail";
+        
+        tab.Text = "Detalles    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+
+            Html.RenderPartial("_InventoryPeriodCloseMainFormTabDetail");
+        });
+    });
+
+
+    tabs.TabPages.Add(tab =>
+    {
+        tab.Name = "tabDeta";
+        tab.Text = "Periodo    ";
+        tab.TabStyle.Width = Unit.Percentage(100);
+
+        tab.TabImage.Width = Unit.Pixel(16);
+        tab.TabImage.Height = Unit.Pixel(16);
+        tab.TabImage.Align = ImageAlign.Right;
+        tab.TabImage.Url = "/Content/image/noimage.png";
+        tab.ActiveTabImage.Align = ImageAlign.Right;
+        tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+        tab.SetContent(() =>
+        {
+
+            List<InventoryPeriodDetail> details = (Model != null && Model.InventoryPeriodDetail != null)
+                                                    ? Model.InventoryPeriodDetail.ToList()
+                                                    : new List<InventoryPeriodDetail>();
+
+
+            Html.RenderPartial("_Details", details);
+
+
+
+        });
+    });
+
+}).GetHtml()
+
+    <table class="table table-condensed">
+        <tr style="border-top: 1px Solid #C0C0C0;">
+            <td colspan="6" style="text-align: right; margin-top: 5px;">
+                @{
+                    Html.DevExpress().Button(button =>
+                    {
+
+                        button.Name = "btnUpdate";
+                        button.Text = id_InventoryPeriod !=0? "Actualizar":"Generar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                        button.UseSubmitBehavior = false;
+                        button.ValidateInvisibleEditors = true;
+                        button.ClientSideEvents.Click = "ButtonUpdate_Click";
+                        //button.ClientEnabled = codeDocumentState == "01"; //Pendiente
+                    }).Render();
+
+                    ViewContext.Writer.Write("&nbsp;&nbsp;");
+
+                    Html.DevExpress().Button(button =>
+                    {
+                        button.Name = "btnClose";
+                        button.Text = "Cerrar";
+                        button.RenderMode = ButtonRenderMode.Button;
+                        button.ImagePosition = ImagePosition.Left;
+                        button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+                        button.UseSubmitBehavior = false;
+                        button.ClientSideEvents.Click = "ButtonCancel_Click";
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}
+
+<script src="~/Scripts/InventoryPeriodClose/editform.js"></script>
+<script src="~/Scripts/InventoryPeriodClose/validations.js"></script>

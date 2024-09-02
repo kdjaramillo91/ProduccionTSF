@@ -1,0 +1,351 @@
+﻿@using System.Drawing
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.RemissionGuideDispatchMaterial>
+
+@{
+	var grid = Html.DevExpress().GridView<RemissionGuideDispatchMaterial>(settings =>
+	{
+		settings.Name = "gvRemissionGuideDispatchMaterialEditForm" + ViewData["id_receptionDispatchMaterials"];
+		settings.CallbackRouteValues = new { Controller = "ReceptionDispatchMaterials", Action = "RemissionGuideDispatchMaterialPartial" };
+
+		settings.ClientSideEvents.BeginCallback = "ReceptionDispatchMaterialsDetails_BeginCallback";
+
+		settings.CommandColumn.Visible = false;
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";//settings.KeyFieldName = "RowId";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+
+		//Panel para cantidad de registros
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null) return;
+
+			e.Properties["cpVisibleRowCount"] = gv.VisibleRowCount;
+			e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(gv);
+
+			List<RemissionGuideDispatchMaterial> rows = (Model as List<RemissionGuideDispatchMaterial>);
+			rows = (rows != null) ? rows.ToList() : new List<RemissionGuideDispatchMaterial>();
+
+			e.Properties["cpIdReceptionDispatchMaterials"] = ViewData["id_receptionDispatchMaterials"];
+			e.Properties["cpRowsCount"] = rows.Count;
+		};
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.SettingsPager.PageSize = 15;
+		settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+		settings.Settings.VerticalScrollableHeight = 250;
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+		#region ColumnsAdd
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_warehouse";
+			column.Name = "id_warehouseRemissionGuideDispatchMaterial";
+			column.Caption = "Bodega";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(9);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+
+				Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+				string text = (warehouse != null) ? warehouse.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_warehouselocation";
+			column.Name = "id_warehouselocationRemissionGuideDispatchMaterial";
+			column.Caption = "Ubicación";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(9);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouselocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouselocation");
+
+				WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouselocation);
+
+				string text = (warehouseLocation != null) ? warehouseLocation.name : "";
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "itemRemissionGuideDispatchMaterialMasterCode";
+			column.Caption = "Código";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(9);
+		});
+
+		//itemRemissionGuideDispatchMaterialName 16
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "Item.name";
+			column.Name = "itemRemissionGuideDispatchMaterialName";
+			column.Caption = "Nombre del Producto";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+			column.Width = Unit.Percentage(16);
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "itemRemissionGuideDispatchMaterialMetricUnit";
+			column.Caption = "UM";
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.Width = Unit.Percentage(5);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				var id = (int)DataBinder.Eval(c.DataItem, "id_item");
+
+				Item item = DataProviderItem.Item(id);
+				string metricUnit = (item != null && item.ItemInventory != null && item.ItemInventory.MetricUnit != null) ? item.ItemInventory.MetricUnit.code : "";
+				ViewContext.Writer.Write(metricUnit);
+
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "sourceExitQuantity";
+			column.Name = "sourceExitQuantityRemissionGuideDispatchMaterial";
+			column.Caption = "Salida Origen";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal sourceExitQuantity = (decimal)DataBinder.Eval(c.DataItem, "sourceExitQuantity");
+				ViewContext.Writer.Write(sourceExitQuantity.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "sendedDestinationQuantity";
+			column.Name = "sendedDestinationQuantityRemissionGuideDispatchMaterial";
+			column.Caption = "Cnt. Enviada";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(6);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity");
+				ViewContext.Writer.Write(sendedDestinationQuantity.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "sendedAdjustmentQuantity";
+			column.Name = "sendedAdjustmentQuantityRemissionGuideDispatchMaterial";
+			column.Caption = "Ajuste Enviado (+/-)";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(6);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+				ViewContext.Writer.Write(sendedAdjustmentQuantity.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "sendedNetQuantity";
+			column.Caption = "Neto Enviado";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(7);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.CellStyle.BackColor = Color.LightGray;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity"); //cantidad enviada
+				decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+				decimal sendedNetQuantity = sendedDestinationQuantity + sendedAdjustmentQuantity;
+				ViewContext.Writer.Write(sendedNetQuantity.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "amountConsumed";
+			column.Name = "amountConsumedRemissionGuideDispatchMaterial";
+			column.Caption = "Cnt. Consumida";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(6);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal amountConsumed = (decimal)DataBinder.Eval(c.DataItem, "amountConsumed");
+				ViewContext.Writer.Write(amountConsumed.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "stealQuantity";
+			column.Name = "stealQuantityRemissionGuideDispatchMaterial";
+			column.Caption = "Cant. Robo";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(6);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal stealQuantity = (decimal)DataBinder.Eval(c.DataItem, "stealQuantity");
+				ViewContext.Writer.Write(stealQuantity.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "arrivalDestinationQuantity";
+			column.Name = "arrivalDestinationQuantityRemissionGuideDispatchMaterial";
+			column.Caption = "Cnt. Recibida";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(8);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+				ViewContext.Writer.Write(arrivalDestinationQuantity.ToString("N2"));
+			});
+
+		});
+
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "arrivalBadCondition";
+			column.Name = "arrivalBadConditionRemissionGuideDispatchMaterial";
+			column.Caption = "Mal Estado";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(7);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal arrivalBadCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalBadCondition");
+				ViewContext.Writer.Write(arrivalBadCondition.ToString("N2"));
+			});
+
+		});
+
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "arrivalGoodCondition";
+			column.Name = "arrivalGoodConditionRemissionGuideDispatchMaterial";
+			column.Caption = "Buen Estado";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(7);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal arrivalGoodCondition = (decimal)DataBinder.Eval(c.DataItem, "arrivalGoodCondition");
+				ViewContext.Writer.Write(arrivalGoodCondition.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "transferQuantity";
+			column.Name = "transferQuantityRemissionGuideDispatchMaterial";
+			column.Caption = "Cnt. Transferencia (+/-)";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(7);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal transferQuantity = (decimal)DataBinder.Eval(c.DataItem, "transferQuantity");
+				ViewContext.Writer.Write(transferQuantity.ToString("N2"));
+			});
+
+		});
+
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "notReceivedQuantity";
+			column.Caption = "Diferencia";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.ReadOnly = true;
+			column.Width = Unit.Percentage(7);
+			column.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal sendedDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedDestinationQuantity"); //cantidad enviada
+				decimal sendedAdjustmentQuantity = (decimal)DataBinder.Eval(c.DataItem, "sendedAdjustmentQuantity");
+				decimal arrivalDestinationQuantity = (decimal)DataBinder.Eval(c.DataItem, "arrivalDestinationQuantity");
+				decimal amountConsumed = (decimal)DataBinder.Eval(c.DataItem, "amountConsumed");
+				decimal stealQuantity = (decimal)DataBinder.Eval(c.DataItem, "stealQuantity");
+				decimal transferQuantity = (decimal)DataBinder.Eval(c.DataItem, "transferQuantity");
+				decimal sendedNetQuantity = sendedDestinationQuantity + sendedAdjustmentQuantity;
+				decimal notReceivedQuantity = sendedNetQuantity - amountConsumed - arrivalDestinationQuantity - stealQuantity - transferQuantity;
+				ViewContext.Writer.Write(notReceivedQuantity.ToString("N2"));
+			});
+
+		});
+
+	#endregion
+});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()
+
+@functions {
+	int GetFilteredRowCountWithoutPage(MVCxGridView grid)
+	{
+		int selectedRowsOnPage = 0;
+		foreach (var key in grid.GetCurrentPageRowValues("id"))
+		{
+			if (grid.Selection.IsRowSelectedByKey(key))
+				selectedRowsOnPage++;
+		}
+		return grid.Selection.FilteredCount - selectedRowsOnPage;
+	}
+
+}

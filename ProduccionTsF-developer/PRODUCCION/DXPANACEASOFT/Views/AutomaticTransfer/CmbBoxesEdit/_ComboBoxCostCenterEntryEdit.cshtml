@@ -1,0 +1,47 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string _id_CostCenterEntry = Model.id_CostCenterEntry != null ? Model.id_CostCenterEntry.ToString() : "";
+
+	var dbTmp = new DBContext();
+	var costCenters = dbTmp.CostCenter
+				.Where(e => e.isActive
+				&& e.id_higherCostCenter == null)
+				.Select(s => new SelectListItem
+				{
+					Text = s.name,
+					Value = s.id.ToString(),
+				}).ToList();
+
+	if (!(string.IsNullOrEmpty(_id_CostCenterEntry) || string.IsNullOrWhiteSpace(_id_CostCenterEntry)))
+	{
+		costCenters = costCenters.Where(w => w.Value == _id_CostCenterEntry).ToList();
+	}
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+}
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxCostCenterEntryEdit";
+	settings.Properties.ClientInstanceName = "ComboBoxCostCenterEntryEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxCostCenterEntryEdit",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxCostCenterEntryEdit_BeginCallback";
+	settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxCostCenterEntryEdit_SelIndexChanged";
+	settings.Properties.ClientSideEvents.EndCallback = "ComboBoxCostCenterEntryEdit_EndCallback";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.CustomJSProperties = (s, e) =>
+	{
+		e.Properties["cpValSelected"] = _id_CostCenterEntry;
+	};
+	settings.ReadOnly = !(this.ViewBag.Editable);
+}).BindList(costCenters).Bind(_id_CostCenterEntry).GetHtml()

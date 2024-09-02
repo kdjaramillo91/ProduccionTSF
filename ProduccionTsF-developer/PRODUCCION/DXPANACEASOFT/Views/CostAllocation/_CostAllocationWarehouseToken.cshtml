@@ -1,0 +1,56 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models.Dto
+
+@model DXPANACEASOFT.Models.Dto.CostAllocationDto
+@{
+    var bodegas = new List<WarehouseModelDto>();
+    var anioP = 0;
+    var mesP = 0;
+    if(Model != null )
+    {
+        if (Model.id_Warehousessex != null)
+        {
+            bodegas = Model.id_Warehousessex.ToList();
+        }
+
+        anioP = Model.anio;
+        mesP = Model.mes;
+    };
+
+    string codeState = (Model != null) ? Model.Document.DocumentState.code : "";
+
+}
+@Html.DevExpress().TokenBox(settings =>
+{
+    settings.Name = "warehouses";
+    settings.Properties.ClientInstanceName = "warehouses";
+    settings.CallbackRouteValues = new { Controller = "CostAllocation", Action = "CostAllocationWarehoseTokenView" };
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Descripcion";
+
+    settings.Properties.AllowCustomTokens = false;
+
+    settings.ClientEnabled = (codeState == "01");
+    settings.ReadOnly = Model.IsCalculate;
+
+    settings.Properties.Tokens.AddRange(bodegas.Select(r => r.Descripcion).ToList());
+
+    settings.ShowModelErrors = true;
+    settings.CustomJSProperties = (s, e) =>
+    {
+        e.Properties["cpMessageError"] = "Campo Obligatorio.";
+        e.Properties["cpIsRequired"] = "true";
+        e.Properties["cpHasTab"] = "false";
+    };
+    settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+    settings.Properties.ClientSideEvents.TokensChanged = "id_Warehousessex_TokensChanged";
+    settings.Properties.ClientSideEvents.BeginCallback = "OnCostAllocationBodegaTokenCallBack";
+    //settings.Properties.ClientSideEvents.EndCallback = "OnCostAllocationBodegaTokenEndCallBack";
+    //if (id_provider != 0 || id_Customer != 0)
+    //{
+    //    settings.Properties.TokenRemoveButtonStyle.Height = 0;
+    //    settings.Properties.TokenRemoveButtonStyle.Width = 0;
+    //}
+}).BindList(DataProviderWarehouse.FreezerWarehousebyCompanyParameterForCost((int)ViewData["id_company"], anioP, mesP)).GetHtml()

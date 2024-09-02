@@ -1,0 +1,478 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuide
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterRemissionGuideControlVehicle", name = "formFilterRemissionGuideControlVehicle" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+        <tr>
+            <td style="width: 20%">
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="2">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Documento</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%">
+                            @Html.DevExpress().LabelFor(m => m.Document.id_documentState, settings =>
+                        {
+                            settings.Name = "documentStateLabel";
+                            settings.Text = "Estado:";
+                            settings.AssociatedControlName = "id_documentState";
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                   {
+                       settings.Name = "id_documentState";
+                       settings.Properties.ClientInstanceName = "id_documentState";
+                       settings.Width = Unit.Percentage(100);
+
+                       settings.Properties.ValueField = "id";
+                       settings.Properties.TextField = "name";
+                       settings.Properties.ValueType = typeof(int);
+                       settings.Properties.Width = Unit.Percentage(100);
+
+                       settings.Properties.NullDisplayText = "Todos";
+                       settings.Properties.NullText = "Todos";
+
+                       settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                       settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                       settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                       settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                   }).BindList(DataProviderDocumentState.DocumentStates((int)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.number, settings =>
+                        {
+                            settings.Name = "numberLabel";
+                            settings.Text = "Número:";
+                            settings.AssociatedControlName = "number";
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBoxFor(m => m.Document.number, settings =>
+                        {
+                            settings.Name = "number";
+                            settings.Properties.ClientInstanceName = "number";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Todos";
+                            settings.Properties.NullText = "Todos";
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.reference, settings =>
+                        {
+                            settings.Name = "referenceLabel";
+                            settings.Text = "Referencia:";
+                            settings.AssociatedControlName = "reference";
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBoxFor(m => m.Document.reference, settings =>
+                        {
+                            settings.Name = "reference";
+                            settings.Properties.ClientInstanceName = "reference";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Todas";
+                            settings.Properties.NullText = "Todas";
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 35%">
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="4">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Emisi&oacute;n y Autorizaci&oacute;n</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 35%;">
+                            @Html.DevExpress().LabelFor(m => m.Document.emissionDate, settings =>
+                        {
+                            settings.Name = "startEmissionDateLabel";
+                            settings.Text = "Fecha Emisión:";
+                            settings.AssociatedControlName = "startEmissionDate";
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                        {
+                            settings.Name = "startEmissionDate";
+                            settings.Properties.ClientInstanceName = "startEmissionDate";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Desde";
+                            settings.Properties.NullText = "Desde";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                        {
+                            settings.Name = "endEmissionDate";
+                            settings.Properties.ClientInstanceName = "endEmissionDate";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Hasta";
+                            settings.Properties.NullText = "Hasta";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.StartDateEditID = "startEmissionDate";
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.emissionDate, settings =>
+                        {
+                            settings.Name = "startAuthorizationDateLabel";
+                            settings.Text = "Fecha Autorización:";
+                            settings.AssociatedControlName = "startAuthorizationDate";
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                        {
+                            settings.Name = "startAuthorizationDate";
+                            settings.Properties.ClientInstanceName = "startAuthorizationDate";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Desde";
+                            settings.Properties.NullText = "Desde";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.Document.emissionDate, settings =>
+                        {
+                            settings.Name = "endAuthorizationDate";
+                            settings.Properties.ClientInstanceName = "endAuthorizationDate";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Hasta";
+                            settings.Properties.NullText = "Hasta";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.StartDateEditID = "startAuthorizationDate";
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.accessKey, settings =>
+                        {
+                            settings.Name = "accessKeyLabel";
+                            settings.Text = "Clave de Acceso:";
+                            settings.AssociatedControlName = "accessKey";
+                        }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().TextBoxFor(m => m.Document.accessKey, settings =>
+                        {
+                            settings.Name = "accessKey";
+                            settings.Properties.ClientInstanceName = "accessKey";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Todas";
+                            settings.Properties.NullText = "Todas";
+
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.Document.authorizationNumber, settings =>
+                        {
+                            settings.Name = "authorizationNumberFilterLabel";
+                            settings.Text = "No. Autorización:";
+                            settings.AssociatedControlName = "authorizationNumber";
+                        }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().TextBoxFor(m => m.Document.authorizationNumber, settings =>
+                        {
+                            settings.Name = "authorizationNumber";
+                            settings.Properties.ClientInstanceName = "authorizationNumber";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Todos";
+                            settings.Properties.NullText = "Todos";
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 35%">
+                <table class="table table-condensed" style="border: 0px solid #ffffff">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="3">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Gu&iacute;a de Remisi&oacute;n</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%;">
+                            @Html.DevExpress().LabelFor(m => m.despachureDate, settings =>
+                        {
+                            settings.Name = "depachadureDateLabel";
+                            settings.Text = "Fecha Despacho:";
+                            settings.AssociatedControlName = "startDespachureDate";
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.despachureDate, settings =>
+                        {
+                            settings.Name = "startDespachureDate";
+                            settings.Properties.ClientInstanceName = "startDespachureDate";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Desde";
+                            settings.Properties.NullText = "Desde";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.despachureDate, settings =>
+                        {
+                            settings.Name = "endDespachureDate";
+                            settings.Properties.ClientInstanceName = "endDespachureDate";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Hasta";
+                            settings.Properties.NullText = "Hasta";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.StartDateEditID = "startDespachureDate";
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.RemissionGuideControlVehicle.exitDateProductionBuilding, settings =>
+                        {
+                            settings.Name = "exitDateProductionBuildingLabel";
+                            settings.Text = "Fecha Salida Planta:";
+                            settings.AssociatedControlName = "exitDateProductionBuildingLabel";
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.RemissionGuideControlVehicle.exitDateProductionBuilding, settings =>
+                        {
+                            settings.Name = "startexitDateProductionBuilding";
+                            settings.Properties.ClientInstanceName = "startexitDateProductionBuilding";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Desde";
+                            settings.Properties.NullText = "Desde";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                        }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEditFor(m => m.RemissionGuideControlVehicle.exitDateProductionBuilding, settings =>
+                        {
+                            settings.Name = "endexitDateProductionBuilding";
+                            settings.Properties.ClientInstanceName = "endexitDateProductionBuilding";
+                            settings.Width = Unit.Percentage(100);
+
+                            settings.Properties.NullDisplayText = "Hasta";
+                            settings.Properties.NullText = "Hasta";
+
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                            settings.Properties.EditFormat = EditFormat.Custom;
+                            settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                            settings.Properties.CalendarProperties.Columns = 2;
+                            settings.Properties.DateRangeSettings.StartDateEditID = "startexitDateProductionBuilding";
+                            settings.Properties.DateRangeSettings.MinDayCount = 1;
+                            settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.isExport, settings =>
+                        {
+                            settings.Name = "isExportationLabel";
+                            settings.Text = "Exportación:";
+                            settings.AssociatedControlName = "isExport";
+                        }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().CheckBoxFor(m => m.isExport, settings =>
+                        {
+                            settings.Name = "isExport";
+                            settings.Properties.ClientInstanceName = "isExport";
+                            settings.Width = Unit.Percentage(100);
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Text = "Producto:";
+                                settings.AssociatedControlName = "itemLabel";
+                            }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "items";
+                                settings.Properties.ClientInstanceName = "items";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                            }).BindList(DataProviderItem.PurchaseItemsByCompany((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Text = "Oportunidad:";
+                                settings.AssociatedControlName = "businessOportunityLabel";
+                            }).GetHtml()
+                        </td>
+                        <td colspan="2">
+                            @Html.DevExpress().TokenBox(settings =>
+                            {
+                                settings.Name = "businessOportunities";
+                                settings.Properties.ClientInstanceName = "businessOportunities";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todos";
+                                settings.Properties.NullText = "Todos";
+
+                                settings.Properties.ValueField = "id";
+                                settings.Properties.TextField = "name";
+                            }).BindList(DataProviderBusinessOportunity.BusinessOportunityPurchase((int?)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td>
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "btnSearch";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Buscar";
+                            settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnSearch_click";
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "Clear";
+                            settings.UseSubmitBehavior = false;
+                            settings.Text = "Limpiar";
+                            settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                            settings.Width = Unit.Percentage(100);
+                            settings.ClientSideEvents.Click = "btnClear_click";
+                        }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="btn-group" style="width: 100%;">
+                                <button type="button" class="btn-default dropdown-toggle custom-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img class="dxIcon_actions_add_16x16 dx-vam" src="/DXR.axd?r=1_35-2Z17d" alt="" style="margin-right: 4px;" id="AddNewImg"><span>Asignar Salida</span><span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li><a href="javascript:;" onclick="AssignNewExitDatetimePlanct();">Nueva</a></li>
+                                    @*<li><a href="javascript:;" onclick="AssignModifyExitDatetimePlanct();">Modificar</a></li>*@
+                                    @*<li><a href="javascript:;" onclick="AddNewGuideRemissionFromPurchaseOrder();">Desde Orden de Compra</a></li>*@
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+
+}
+

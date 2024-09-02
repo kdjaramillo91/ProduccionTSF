@@ -1,0 +1,48 @@
+﻿@using DXPANACEASOFT.Controllers;
+<table class="table table-condensed" style="border:none;margin-bottom:0;">
+	<tr>
+		<td style="width:10%;">
+			@using (Html.BeginForm("upload-file", "itemTrademarkModel", FormMethod.Post))
+			{
+				@Html.DevExpress().UploadControl(
+					uploadControl =>
+					{
+						uploadControl.Name = "ItemTrademarkModelArchivoUploadControl";
+						//uploadControl.CallbackRouteValues = new { Controller = "itemType", Action = "upload-file", };
+						uploadControl.Height = Unit.Pixel(25);
+						uploadControl.Width = Unit.Percentage(100);
+						uploadControl.UploadMode = UploadControlUploadMode.Auto;
+						uploadControl.AutoStartUpload = true;
+						uploadControl.ShowProgressPanel = true;
+						uploadControl.ShowTextBox = false;
+						uploadControl.DialogTriggerID = "ItemTrademarkModelFileExternalDropZone";
+
+						var advancedModeSettings = uploadControl.AdvancedModeSettings;
+						advancedModeSettings.ExternalDropZoneID = "ItemTrademarkModelFileExternalDropZone";
+						advancedModeSettings.EnableDragAndDrop = true;
+						advancedModeSettings.EnableFileList = false;
+						advancedModeSettings.EnableMultiSelect = false;
+						advancedModeSettings.TemporaryFolder = @"~/App_Data/UploadedFiles";
+
+						uploadControl.ValidationSettings.Assign(ItemTypeController.UploadControlSettings.ExcelUploadValidationSettings);
+
+						var clientSideEvents = uploadControl.ClientSideEvents;
+						clientSideEvents.DropZoneEnter = "function(s, e) { if(e.dropZone.id == 'ItemTrademarkModelFileExternalDropZone') { $('#itemTrademarkModelFileDropZone').show(); } }";
+						clientSideEvents.DropZoneLeave = "function(s, e) { if(e.dropZone.id == 'ItemTrademarkModelFileExternalDropZone') { $('#itemTrademarkModelFileDropZone').hide(); } }";
+						clientSideEvents.FileUploadComplete = "onItemTrademarkModelImportFileUploadComplete";
+
+					}).GetHtml()
+			}
+		</td>
+		<td style="width:90%;vertical-align:middle;">
+			@Html.DevExpress().TextBox(
+				textBox =>
+				{
+					textBox.Name = "ItemTradeMarkModelArchivoEditText";
+					textBox.Width = Unit.Percentage(100);
+					textBox.ReadOnly = true;
+					textBox.Properties.ClientSideEvents.Validation = "onItemTrademarkModelImportFileValidate";
+				}).GetHtml()
+		</td>
+	</tr>
+</table>

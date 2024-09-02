@@ -1,0 +1,54 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.AutomaticTransferDTO
+
+@{
+	string _id_WarehouseLocationExit = Model.id_WarehouseLocationExit != null ? Model.id_WarehouseLocationExit.ToString() : "";
+	var estadoPendiente = DataProviderDocumentState.GetDocumentStateByCode("01");
+	this.ViewBag.Editable = (this.Model.idState == estadoPendiente.idDocumentStateModelP);
+
+	List<SelectListItem> ls = new List<SelectListItem>();
+	using (var _db = new DBContext())
+	{
+		ls = _db.WarehouseLocation
+				.Where(e => e.isActive
+				&& e.id_warehouse == Model.id_WarehouseExit)
+				.Select(s => new SelectListItem
+				{
+					Text = s.name,
+					Value = s.id.ToString(),
+				}).ToList();
+	}
+	if (ls != null && ls.Count() == 1)
+	{
+		var tmp = ls.FirstOrDefault();
+
+		if (Model.id_WarehouseLocationExit == null)
+		{
+			_id_WarehouseLocationExit = tmp.Value;
+		}
+	}
+}
+
+
+@Html.DevExpress().ComboBox(settings =>
+{
+	settings.Name = "ComboBoxWarehouseLocationExitEdit";
+	settings.Properties.ClientInstanceName = "ComboBoxWarehouseLocationExitEdit";
+	settings.Width = Unit.Percentage(100);
+	settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "AutomaticTransfer",
+		Action = "ComboBoxWarehouseLocationExitEdit",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxWarehouseLocationExitEdit_BeginCallback";
+	settings.Properties.ClientSideEvents.EndCallback = "ComboBoxWarehouseLocationExitEdit_EndCallback";
+	settings.CustomJSProperties = (s, e) =>
+	{
+		e.Properties["cpValSelected"] = _id_WarehouseLocationExit;
+	};
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.ReadOnly = !(this.ViewBag.Editable);
+}).BindList(ls).Bind(_id_WarehouseLocationExit).GetHtml()

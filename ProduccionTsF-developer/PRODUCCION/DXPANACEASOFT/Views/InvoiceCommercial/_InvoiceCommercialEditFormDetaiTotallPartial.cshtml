@@ -1,0 +1,81 @@
+﻿@using System.Globalization
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.InvoiceCommercial
+
+<div style="float:right; margin-top:15px;" >
+    <table cellspacing="10">
+        <tr style="height:30px">
+            <td align="left">Descuento: </td>
+            <td align="right">
+                @Html.DevExpress().SpinEditFor(m => m.valueDiscount, settings =>
+           {
+               settings.Name = "valueDiscount";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ClientInstanceName = "valueDiscount";
+               settings.ReadOnly = false;
+               settings.Properties.DisplayFormatString = "C2";
+               //settings.Properties.ClientSideEvents.Validation = "";
+               settings.Properties.ClientSideEvents.ValueChanged = "ValueChangeValueDiscount";
+               settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+               settings.Properties.ValidationSettings.ErrorText = "Debe ingresar Valor de Descuento";
+               var txtProperties = settings.Properties as SpinEditProperties;
+               txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+               txtProperties.SpinButtons.ClientVisible = false;
+               txtProperties.ClientSideEvents.GotFocus = "OnSelectText";
+               settings.ClientEnabled = (Model.Document.DocumentState.code == "01");
+               
+           }).GetHtml()
+            </td>
+        </tr>
+
+        <tr style="height:30px"> 
+            <td align="left">Flete: </td>
+            <td align="right">
+                @Html.DevExpress().SpinEditFor(m => m.valueTotalFreight, settings =>
+               {
+                   settings.Name = "valueTotalFreight";
+                   settings.Width = Unit.Percentage(115);
+                   settings.Properties.ClientInstanceName = "valueTotalFreight";
+                   settings.ReadOnly = false;
+                   settings.Properties.DisplayFormatString = "C2";
+                   settings.Properties.ClientSideEvents.Validation = "ValidateTotalFreight";
+                   settings.Properties.ClientSideEvents.ValueChanged = "ValueChangeTotalFreight";
+                   settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                   settings.Properties.ValidationSettings.ErrorText = "Debe ingresar Valor de Transporte";
+                   var txtProperties = settings.Properties as  SpinEditProperties;
+                   txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                   txtProperties.SpinButtons.ClientVisible = false;
+                   txtProperties.ClientSideEvents.GotFocus = "OnSelectText";
+                   settings.ClientEnabled = false;
+                   TermsNegotiation _termsNegotiation = DataProviderTermsNegotiation.TermsNegotiationById(Model.id_termsNegotiation);
+                   if(_termsNegotiation != null)
+                   {
+                       if(_termsNegotiation.code == "FOBFLET")
+                       {
+                           settings.ClientEnabled = true;
+                       }
+                   }
+
+
+               }).GetHtml()
+            </td>
+        </tr>
+        <tr  style="padding-top:15px;">
+            <td align="left">Total Factura Comercial: </td>
+            <td align="right">
+                @Html.DevExpress().TextBoxFor(m => m.totalValue, settings =>
+                {
+                    settings.Name = "totalValue";
+                    settings.Width = Unit.Percentage(100);
+                    settings.Properties.ClientInstanceName = "totalValue";
+                    settings.ReadOnly = true;
+                    settings.Properties.DisplayFormatString = "C2";
+                    var txtProperties = settings.Properties as TextBoxProperties;
+                    txtProperties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+    
+</div>

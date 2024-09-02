@@ -1,0 +1,19 @@
+﻿@model   DXPANACEASOFT.Models.ReportModel
+@Html.DevExpress().DocumentViewer(settings =>
+{
+    settings.Name = "DocumentViewer";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "Report",
+        Action = "DocumentViewerPartial",
+        ReportName = Model.ReportName
+    };
+    settings.ExportRouteValues = new
+    {
+        Controller = "Report",
+        Action = "DocumentViewerExport",
+        ReportName = Model.ReportName
+    };
+    
+    settings.Report = Model.CreateReport();
+}).GetHtml()

@@ -1,0 +1,183 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.BusinessOportunityPlaninng
+
+@{
+    string codeState = (Model != null && Model.BusinessOportunity != null  && Model.BusinessOportunity.Document != null && Model.BusinessOportunity.Document.DocumentState != null) ? Model.BusinessOportunity.Document.DocumentState.code : "";
+    string codeBusinessOportunityResultsState = (Model != null && Model.BusinessOportunity != null && Model.BusinessOportunity.BusinessOportunityResults != null && Model.BusinessOportunity.BusinessOportunityResults.BusinessOportunityState != null) ? Model.BusinessOportunity.BusinessOportunityResults.BusinessOportunityState.code : "";
+    var codeBusinessOportunityDocumentType = (Model != null && Model.BusinessOportunity.Document != null && Model.BusinessOportunity.Document.DocumentType != null) ? Model.BusinessOportunity.Document.DocumentType.code : "";
+}
+
+<table class="table table-condensed" style="margin: 0px;">
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.estimatedEndDate, settings =>
+            {
+                settings.Text = "Cierre Estimado*:";
+                settings.AssociatedControlName = "estimatedEndDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                var countDetail = (Model != null && Model.BusinessOportunityPlanningDetail != null ) ? Model.BusinessOportunityPlanningDetail.Count() : 0;
+
+            }
+            @Html.DevExpress().DateEditFor(m => m.estimatedEndDate, settings =>
+       {
+           settings.Properties.ClientInstanceName = "estimatedEndDate";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.DisplayFormatInEditMode = true;
+           settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+           settings.Properties.EditFormat = EditFormat.Custom;
+           settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+           settings.ReadOnly = (codeState != "01" && codeState != "");//Pendiente
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnEstimatedEndDateValidation";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.amount, settings =>
+            {
+                settings.Text = "Monto*:";
+                settings.AssociatedControlName = "amount";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.amount, settings =>
+       {
+           settings.Properties.ClientInstanceName = "amount";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.DisplayFormatInEditMode = true;
+           settings.Properties.DisplayFormatString = "C2";
+           //settings.Properties.MinValue = 0.01M;
+           //settings.Properties.MaxValue = 9999999999999.99M;
+           //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre $0.01 y $9,999,999,999,999.99";
+           settings.ReadOnly = codeState != "01";//Pendiente
+           settings.ClientEnabled = countDetail == 0;
+           settings.Properties.SpinButtons.Visible = false;
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           settings.Properties.ClientSideEvents.Validation = "AmountValidation";
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_priority, settings =>
+            {
+                settings.Text = "Prioridad*:";
+                settings.AssociatedControlName = "id_priority";
+            }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_priority = (Model != null && Model.id_priority != 0) ? (int?)Model.id_priority : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_priority, settings =>
+       {
+           settings.Properties.ClientInstanceName = "id_priority";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextField = "name";
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.ReadOnly = codeState != "01";//Pendiente
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.Validation = "OnPersonValidation";
+       }).BindList(DataProviderBusinessOportunityPriority.BusinessOportunityPrioritiesByCompanyAndCurrent((int)ViewData["id_company"], id_priority)).Bind(id_priority).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.estimatedProfit, settings =>
+            {
+                settings.Text = "% Ganacia Estimada*:";
+                settings.AssociatedControlName = "estimatedProfit";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.estimatedProfit, settings =>
+       {
+           settings.Properties.ClientInstanceName = "estimatedProfit";
+           settings.Width = Unit.Percentage(100);
+
+           settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+           settings.Properties.DecimalPlaces = 2;
+           settings.Properties.DisplayFormatInEditMode = true;
+           settings.Properties.DisplayFormatString = "N2";
+           //settings.Properties.MinValue = 0.01M;
+           //settings.Properties.MaxValue = 100.00M;
+           //settings.Properties.ValidationSettings.ErrorText = "Monto debe estar entre 0.01% y 100.00%";
+           settings.ReadOnly = codeState != "01";//Pendiente
+           //settings.Properties.DisplayFormatInEditMode = false;
+           //settings.Properties.
+           settings.Properties.ClientSideEvents.ValueChanged = "Changed_EstimatedProfitOrAmount";
+           settings.Properties.ClientSideEvents.Validation = "EstimatedProfitValidation";
+           //settings.Properties.ClientSideEvents.NumberChanged = "EstimatedProfit_NumberChanged";
+           settings.Properties.SpinButtons.Visible = false;
+           settings.ShowModelErrors = true;
+       }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.grossProfit, settings =>
+            {
+                settings.Text = "Ganancia Bruta:";
+                settings.AssociatedControlName = "grossProfit";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEditFor(m => m.grossProfit, settings =>
+           {
+               settings.Properties.ClientInstanceName = "grossProfit";
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+               settings.Properties.DecimalPlaces = 2;
+               settings.Properties.DisplayFormatInEditMode = true;
+               settings.Properties.DisplayFormatString = "C2";
+               settings.ReadOnly = true;
+               settings.Properties.SpinButtons.Visible = false;
+               settings.ShowModelErrors = true;
+           }).GetHtml()
+        </td>
+        <td colspan="2"></td>
+    </tr>
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Detalles</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            @{
+                List<BusinessOportunityPlanningDetail> planinngDetails = (Model != null && Model.BusinessOportunityPlanningDetail != null)
+                                                                              ? Model.BusinessOportunityPlanningDetail.ToList()
+                                                                              : new List<BusinessOportunityPlanningDetail>();
+                ViewData["codeBusinessOportunityDocumentType"] = (ViewData["codeBusinessOportunityDocumentType"] == null || (string)ViewData["codeBusinessOportunityDocumentType"] == "") ? codeBusinessOportunityDocumentType: ViewData["codeBusinessOportunityDocumentType"];
+                if (codeBusinessOportunityResultsState == "01" && codeState != "05")//01: ABIERTA y 05: ANULADA
+                {
+                    //ViewData["codeBusinessOportunityDocumentType"] = (Model != null && Model.BusinessOportunity != null && Model.BusinessOportunity.Document != 0)
+                    //                                                 ? Model.BusinessOportunity.id
+                    //                                                 : 0;
+                    //ViewData["codeBusinessOportunityDocumentType"] = codeBusinessOportunityDocumentType;
+                    Html.RenderPartial("DetailsButtonTemplates/_DetailsButtonsTabPlanification");
+                    Html.RenderPartial("_BusinessOportunityPlanningDetailsEditPartial", planinngDetails.OrderByDescending(od => od.id).ToList());
+                }
+                else
+                {
+                    var id_businessOportunity = (Model != null && Model.BusinessOportunity != null && Model.BusinessOportunity.id != 0)
+                                                     ? Model.BusinessOportunity.id
+                                                     : 0;
+                    ViewData["id_businessOportunity"] = id_businessOportunity;
+                    Html.RenderPartial("_BusinessOportunityPlanningDetailsPartial", planinngDetails.OrderByDescending(od => od.id).ToList());
+                }
+            }
+        </td>
+    </tr>
+</table>

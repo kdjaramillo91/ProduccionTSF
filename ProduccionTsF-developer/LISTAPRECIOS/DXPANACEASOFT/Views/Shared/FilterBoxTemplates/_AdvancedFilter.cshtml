@@ -1,0 +1,384 @@
+﻿@using DXPANACEASOFT.Models
+
+@model AdvancedFilter
+
+@*<script src="~/Scripts/procpresconstruccion/comentariopospuesto.js"></script>*@
+
+@{
+    @Html.Hidden("id_typeFiltersConfiguration", null)
+    @Html.Hidden("code_typeFiltersConfiguration", null)
+    @Html.Hidden("datasource_advancedFiltersConfiguration", null)
+    @*@Html.HiddenFor(m => m.ciacodigo, new { @id = "ciacodigoPopup" })*@
+
+Html.DevExpress<AdvancedFilter>().FormLayout(settings =>
+{
+
+    settings.Name = "formLayoutEditAdvancedFilter";
+    settings.Width = Unit.Percentage(100);
+    settings.ColCount = 8;
+
+
+    settings.Items.Add(m => m.id_attribute1, item =>
+    {
+        item.Name = "attribute1";
+        item.Caption = "Atributo 1";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.ColSpan = 2;
+
+        item.NestedExtension().ComboBox(comboBox =>
+        {
+            comboBox.Width = Unit.Percentage(100);
+
+            comboBox.Properties.ValueField = "id";
+            comboBox.Properties.TextField = "alias";
+            comboBox.Properties.DataSource = ViewBag.Attributes;
+            comboBox.Properties.ValueType = typeof(string);
+
+            //comboBox.ShowModelErrors = true;
+
+            //comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //comboBox.Properties.ValidationSettings.CausesValidation = true;
+            //comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //comboBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            comboBox.Properties.DropDownStyle = DropDownStyle.DropDown;
+            comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "Attribute1ComboBox_SelectedIndexChanged";
+            comboBox.Properties.ClientInstanceName = "attribute1";
+
+        });
+    });
+
+    settings.Items.Add(m => m.id_comparisonOperator, item =>
+    {
+        item.Name = "comparisonOperator";
+        item.Caption = "Operador";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.ColSpan = 2;
+        //item.Visible = true;
+
+        item.NestedExtension().ComboBox(comboBox =>
+        {
+            comboBox.Width = Unit.Percentage(100);
+            comboBox.Properties.ClientInstanceName = "comparisonOperator";
+
+            comboBox.Properties.ValueField = "id";
+            comboBox.Properties.TextField = "name";
+            //comboBox.Properties.DataSource = ViewBag.Attributes;
+            comboBox.Properties.ValueType = typeof(string);
+            comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            //p.EnableSynchronization = DefaultBoolean.False;
+            comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+            comboBox.CallbackRouteValues = new { Controller = "ProductionLot", Action = "GetComparisonOperator" };
+            comboBox.Properties.ClientSideEvents.BeginCallback = "ComparisonOperatorComboBox_BeginCallback";
+            //comboBox.Properties.ClientSideEvents.EndCallback = "ComparisonOperatorComboBox_EndCallback";
+            //comboBox.ShowModelErrors = true;
+
+            //comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //comboBox.Properties.ValidationSettings.CausesValidation = true;
+            //comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //comboBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            comboBox.Properties.DropDownStyle = DropDownStyle.DropDown;
+
+
+        });
+    });
+
+    settings.Items.Add(m => m.conditionDate, item =>
+    {
+        item.Name = "conditionDate";
+        item.ClientVisible = false;
+        item.Caption = "Fecha";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        item.RequiredMarkDisplayMode = FieldRequiredMarkMode.Hidden;
+        //item.Width = Unit.Percentage(25);
+        //item.Width = Unit.Percentage(50);
+        //item.ColSpan = 2;
+
+        item.NestedExtension().DateEdit(dateEdit =>
+        {
+            dateEdit.Width = Unit.Percentage(100);
+
+            //dateEdit.ReadOnly = !String.IsNullOrEmpty(Model.precodigo);
+
+            dateEdit.Properties.DisplayFormatInEditMode = true;
+            dateEdit.Properties.DisplayFormatString = "dd/MM/yyyy";
+
+            //dateEdit.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //dateEdit.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //dateEdit.Properties.ValidationSettings.CausesValidation = true;
+            //dateEdit.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //dateEdit.Properties.ValidationSettings.ValidateOnLeave = true;
+            //dateEdit.Properties.ValidationSettings.SetFocusOnError = true;
+            //dateEdit.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //dateEdit.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //dateEdit.Properties.ValidationSettings.EnableCustomValidation = true;
+            //dateEdit.ShowModelErrors = true;
+            //dateEdit.Properties.ClientSideEvents.Validation = "OnPrefechaAPosponerValidation";
+        });
+    });
+
+    settings.Items.Add(m => m.condition, item =>
+    {
+        item.Name = "condition";
+        item.ClientVisible = false;
+        item.Caption = "Condición";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().TextBox(textBox =>
+        {
+            textBox.Width = Unit.Percentage(100);
+            textBox.Properties.MaxLength = 255;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            //textBox.ReadOnly = true;
+
+            //textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    settings.Items.Add(m => m.conditionNum, item =>
+    {
+        item.Name = "conditionNum";
+        item.ClientVisible = false;
+        item.Caption = "Condición";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+
+        item.NestedExtension().SpinEdit(spinedit =>
+        {
+            spinedit.Width = Unit.Percentage(100);
+            //spinedit.Properties.DisplayFormatString = "$#,##0.00";
+            spinedit.Properties.NumberType = SpinEditNumberType.Float;
+            spinedit.Properties.ClientInstanceName = "conditionNum";
+            spinedit.Properties.MaxLength = 17;
+            spinedit.Properties.MinValue = 0.01M;
+            spinedit.Properties.MaxValue = 99999999999999.99M;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+
+            //textBox.ReadOnly = true;
+
+            //textBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //textBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //textBox.Properties.ValidationSettings.CausesValidation = true;
+            //textBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //textBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //textBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //textBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //textBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //textBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            //textBox.ShowModelErrors = true;
+        });
+    });
+
+    settings.Items.Add(m => m.id_condition, item =>
+    {
+        item.Name = "conditionID";
+        item.Caption = "Condición";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.ColSpan = 2;
+
+        item.NestedExtension().ComboBox(comboBox =>
+        {
+            comboBox.Width = Unit.Percentage(100);
+            comboBox.Properties.ClientInstanceName = "conditionID";
+
+            comboBox.Properties.ValueField = "id";
+            comboBox.Properties.TextField = "name";
+            //comboBox.Properties.DataSource = ViewBag.Attributes;
+            comboBox.Properties.ValueType = typeof(string);
+
+            comboBox.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            //p.EnableSynchronization = DefaultBoolean.False;
+            comboBox.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+            comboBox.CallbackRouteValues = new { Controller = "ProductionLot", Action = "GetConditionID" };
+            comboBox.Properties.ClientSideEvents.BeginCallback = "ConditionIDComboBox_BeginCallback";
+            //comboBox.ShowModelErrors = true;
+
+            //comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //comboBox.Properties.ValidationSettings.CausesValidation = true;
+            //comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //comboBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            comboBox.Properties.DropDownStyle = DropDownStyle.DropDown;
+            //comboBox.Properties.ClientSideEvents.SelectedIndexChanged = "Attribute1ComboBox_SelectedIndexChanged";
+
+        });
+    });
+
+    settings.Items.Add(m => m.id_logical, item =>
+    {
+        item.Name = "logical";
+        item.Caption = "Lógico";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.ColSpan = 2;
+
+        item.NestedExtension().ComboBox(comboBox =>
+        {
+            comboBox.Width = Unit.Percentage(100);
+
+            comboBox.Properties.ValueField = "id";
+            comboBox.Properties.TextField = "name";
+            comboBox.Properties.DataSource = ViewBag.Logicos;
+            comboBox.Properties.ValueType = typeof(string);
+
+            //comboBox.ShowModelErrors = true;
+
+            //comboBox.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //comboBox.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //comboBox.Properties.ValidationSettings.CausesValidation = true;
+            //comboBox.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //comboBox.Properties.ValidationSettings.ValidateOnLeave = true;
+            //comboBox.Properties.ValidationSettings.SetFocusOnError = true;
+            //comboBox.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //comboBox.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //comboBox.Properties.ValidationSettings.EnableCustomValidation = true;
+            comboBox.Properties.DropDownStyle = DropDownStyle.DropDown;
+            comboBox.Properties.ClientInstanceName = "logical";
+
+        });
+    });
+
+    settings.Items.Add(item =>
+    {
+        item.Name = "btnAdd";
+        item.Caption = "";
+        item.CaptionSettings.Location = LayoutItemCaptionLocation.Top;
+        //item.Width = Unit.Percentage(35);
+        //item.ColSpan = 5;
+        //item.ShowCaption = DefaultBoolean.False;
+        //item.Paddings.PaddingTop = 5;
+
+        item.NestedExtension().Button(button =>
+        {
+            button.Name = "btnAdd";
+            button.Text = "";
+            button.Images.Image.IconID = IconID.ActionsAdd16x16office2013;
+            button.ToolTip = "Adicionar Condición";
+            //button.Width = Unit.Percentage(100);
+            button.UseSubmitBehavior = false;
+            button.EnableClientSideAPI = true;
+            button.ClientSideEvents.Click = "btnAddPopup_Click";
+        });
+    });
+
+    settings.Items.Add(m => m.query, item =>
+    {
+        item.Name = "query";
+        //item.Caption = "Observación";
+        //item.Width = Unit.Percentage(35);
+        item.ColSpan = 8;
+        item.ShowCaption = DefaultBoolean.False;
+        //item.Paddings.PaddingTop = 5;
+
+        item.NestedExtension().Memo(memo =>
+        {
+            memo.Properties.ClientInstanceName = "query";
+            memo.Width = Unit.Percentage(100);
+            memo.Properties.MaxLength = 255;
+            //textBox.Text = (ViewBag.SiacUsr != null) ? ViewBag.SiacUsr.usrnombre : "";
+            memo.Properties.Rows = 5;
+            //textBox.ReadOnly = true;
+            //memo.Properties.CleaButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+            //memo.Properties.ValidationSettings.RequiredField.IsRequired = true;
+            //memo.Properties.ValidationSettings.RequiredField.ErrorText = "Campo Obligatorio";
+            //memo.Properties.ValidationSettings.CausesValidation = true;
+            //memo.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ErrorDisplayMode.ImageWithTooltip;
+            //memo.Properties.ValidationSettings.ValidateOnLeave = true;
+            //memo.Properties.ValidationSettings.SetFocusOnError = true;
+            //memo.Properties.ValidationSettings.ErrorText = "Valor Incorrecto";
+            //memo.Properties.ValidationSettings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+
+            //memo.Properties.ValidationSettings.EnableCustomValidation = true;
+            //memo.ShowModelErrors = true;
+        });
+    });
+
+    settings.Items.Add(m => m.query, item =>
+    {
+        item.Name = "messageErrors";
+        //item.Caption = "Observación";
+        //item.Width = Unit.Percentage(35);
+        item.ColSpan = 8;
+        item.ShowCaption = DefaultBoolean.False;
+        //item.Paddings.PaddingTop = 5;
+
+        item.SetNestedContent(Html.Partial("ProductionLotGridMessageErrors/_GridMessageErrorsDetail", null).ToHtmlString());
+    });
+
+}).Render();
+}
+
+
+@{
+
+    <div class="row" style="text-align: center; padding: 13px 35px 5px 0px; margin-bottom: 20px;">
+        @Html.DevExpress().Button(settings =>
+   {
+       settings.Name = "btnSearchPopup";
+       //settings.Theme = "MaterialCompact";
+       settings.Text = "Buscar";
+       settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+       settings.UseSubmitBehavior = false;
+       //settings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+       settings.ClientSideEvents.Click = "OnBtnSearchPopup_ClickAdvancedFilter";
+   }).GetHtml()
+        @Html.DevExpress().Button(settings =>
+   {
+       settings.Name = "btnClearPopup";
+       //settings.Theme = "MaterialCompact";
+       settings.Text = "Limpiar";
+       settings.Images.Image.IconID = IconID.ActionsClear16x16;
+       settings.UseSubmitBehavior = false;
+       //settings.ValidationGroup = "formLayoutEditComentarioPospuesto";
+       settings.ClientSideEvents.Click = "OnBtnClearPopup_ClickAdvancedFilter";
+   }).GetHtml()
+        @Html.DevExpress().Button(settings =>
+   {
+       settings.Name = "btnClosePopup";
+       //settings.Theme = "MaterialCompact";
+       //settings.ControlStyle.CssClass = "btn-danger";
+       settings.Text = "Cerrar";
+       settings.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+       settings.UseSubmitBehavior = false;
+       //settings.CausesValidation = false;
+       settings.ClientSideEvents.Click = "OnBtnClosePopup_ClickAdvancedFilter";
+   }).GetHtml()
+    </div>
+
+
+}
+
+
+

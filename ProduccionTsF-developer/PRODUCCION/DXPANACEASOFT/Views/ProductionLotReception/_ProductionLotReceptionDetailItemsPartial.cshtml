@@ -1,0 +1,388 @@
+﻿
+@using System.Drawing
+@using DevExpress.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model List<DXPANACEASOFT.Models.ProductionLotDetail>
+
+
+
+
+@{
+	var grid = Html.DevExpress().GridView<ProductionLotDetail>(settings =>
+	{
+		//settings.Name = "gvProductionLotReceptionDetailItems" + ViewData["id_productionLot"];
+
+		settings.Name = "gvProductionLotReceptionDetailItemsNew";
+
+		settings.CallbackRouteValues = new { Controller = "ProductionLotReception", Action = "ProductionLotReceptionDetailItemsPartial" };
+
+		settings.ClientSideEvents.BeginCallback = "ProductionLotReceptionDetail_OnBeginCallback";//"ProductionLotReceptionDetailItems_BeginCallback";
+
+		settings.CommandColumn.Visible = false;
+		settings.Width = Unit.Percentage(100);
+
+		settings.KeyFieldName = "id";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = false;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+		settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+
+		settings.CustomJSProperties = (s, e) =>
+		{
+			MVCxGridView gv = s as MVCxGridView;
+			if (gv == null)
+			{
+				e.Properties["cpIdProductionLot"] = 0;
+			}
+			e.Properties["cpIdProductionLot"] = ViewData["id_productionLot"];
+		};
+
+		settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+		settings.Styles.Header.Font.Bold = true;
+
+		#region ColumnsAdd
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "purcharseOrderDetails";
+			column.Caption = "Orden de Compra";
+			column.Width = Unit.Percentage(10);
+			column.UnboundType = UnboundColumnType.String;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<ProductionLotDetailPurchaseDetail> purchaseDetails = null;
+
+				var purchaseDetailsObject = DataBinder.Eval(c.DataItem, "ProductionLotDetailPurchaseDetail");
+
+				if (purchaseDetailsObject is List<ProductionLotDetailPurchaseDetail>)
+				{
+					purchaseDetails = (List<ProductionLotDetailPurchaseDetail>)purchaseDetailsObject;
+				}
+				else if (purchaseDetailsObject is HashSet<ProductionLotDetailPurchaseDetail>)
+				{
+					var purchaseDetailsTemp = (HashSet<ProductionLotDetailPurchaseDetail>)purchaseDetailsObject;
+					purchaseDetails = purchaseDetailsTemp.ToList();
+				}
+
+				string text = string.Empty;
+
+				if (purchaseDetails != null && purchaseDetails.Count > 0)
+				{
+					int? id_purchaseOrderDetail = purchaseDetails[0].id_purchaseOrderDetail;
+					PurchaseOrderDetail purchaseOrderDetail = DataProviderPurchaseOrder.PurchaseOrderDetail(id_purchaseOrderDetail);
+
+					text += purchaseOrderDetail != null ? purchaseOrderDetail.PurchaseOrder.Document.number : "";
+
+					text += (purchaseDetails.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseDetails.Count - 1).ToString() + "</a>" : "";
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "remissionGuideDetails";
+			column.Caption = "Guía de Remisión";
+			column.Width = Unit.Percentage(10);
+			column.UnboundType = UnboundColumnType.String;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<ProductionLotDetailPurchaseDetail> purchaseDetails = null;
+
+				var purchaseDetailsObject = DataBinder.Eval(c.DataItem, "ProductionLotDetailPurchaseDetail");
+
+				if (purchaseDetailsObject is List<ProductionLotDetailPurchaseDetail>)
+				{
+					purchaseDetails = (List<ProductionLotDetailPurchaseDetail>)purchaseDetailsObject;
+				}
+				else if (purchaseDetailsObject is HashSet<ProductionLotDetailPurchaseDetail>)
+				{
+					var purchaseDetailsTemp = (HashSet<ProductionLotDetailPurchaseDetail>)purchaseDetailsObject;
+					purchaseDetails = purchaseDetailsTemp.ToList();
+				}
+
+				string text = string.Empty;
+
+				if (purchaseDetails != null && purchaseDetails.Count > 0)
+				{
+					int? id_remissionGuideDetail = purchaseDetails[0].id_remissionGuideDetail;
+					RemissionGuideDetail remissionGuideDetail = DataProviderRemissionGuide.RemissionGuideDetail(id_remissionGuideDetail);
+
+					text += (remissionGuideDetail != null) ? remissionGuideDetail.RemissionGuide.Document.number : "";
+
+					text += (purchaseDetails.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseDetails.Count - 1).ToString() + "</a>" : "";
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "process";
+			column.Caption = "Proceso";
+			column.Width = Unit.Percentage(10);
+			column.UnboundType = UnboundColumnType.String;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				List<ProductionLotDetailPurchaseDetail> purchaseDetails;
+				var purchaseDetailsObject = DataBinder.Eval(c.DataItem, "ProductionLotDetailPurchaseDetail");
+
+				if (purchaseDetailsObject is List<ProductionLotDetailPurchaseDetail>)
+				{
+					purchaseDetails = (List<ProductionLotDetailPurchaseDetail>)purchaseDetailsObject;
+				}
+				else if (purchaseDetailsObject is HashSet<ProductionLotDetailPurchaseDetail>)
+				{
+					purchaseDetails = ((HashSet<ProductionLotDetailPurchaseDetail>)purchaseDetailsObject).ToList();
+				}
+				else
+				{
+					purchaseDetails = null;
+				}
+
+
+				string text = string.Empty;
+
+				if (purchaseDetails != null && purchaseDetails.Count > 0)
+				{
+					int? id_remissionGuideDetail = purchaseDetails[0].id_remissionGuideDetail;
+					RemissionGuideDetail remissionGuideDetail = DataProviderRemissionGuide.RemissionGuideDetail(id_remissionGuideDetail);
+
+					text += remissionGuideDetail != null ? remissionGuideDetail.RemissionGuide.Person2.processPlant : "";
+
+					text += (purchaseDetails.Count > 1) ? @"&nbsp<a href=""#"">+" + (purchaseDetails.Count - 1).ToString() + "</a>" : "";
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_item";
+			column.Caption = "Nombre del Producto";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = string.Empty;
+
+				if (item != null)
+				{
+					text = item.name;
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.Name = "metricUnit";
+			column.PropertiesEdit.ClientInstanceName = "metricUnit";
+			column.Caption = "UM";
+			column.Width = Unit.Percentage(5);
+			column.UnboundType = UnboundColumnType.String;
+			column.ColumnType = MVCxGridViewColumnType.TextBox;
+			column.ReadOnly = true;
+
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_item = (int?)DataBinder.Eval(c.DataItem, "id_item");
+
+				Item item = DataProviderItem.Item(id_item);
+
+				string text = string.Empty;
+
+				if (item != null && item.ItemPurchaseInformation != null)
+				{
+					text = item.ItemPurchaseInformation.MetricUnit.code;
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_warehouse";
+			column.Caption = "Bodega";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouse = (int?)DataBinder.Eval(c.DataItem, "id_warehouse");
+
+				Warehouse warehouse = DataProviderWarehouse.WarehouseById(id_warehouse);
+
+				string text = string.Empty;
+
+				if (warehouse != null)
+				{
+					text = warehouse.name;
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "id_warehouseLocation";
+			column.Caption = "Ubicación";
+			column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int? id_warehouseLocation = (int?)DataBinder.Eval(c.DataItem, "id_warehouseLocation");
+
+				WarehouseLocation warehouseLocation = DataProviderWarehouseLocation.WarehouseLocationById(id_warehouseLocation);
+
+				string text = string.Empty;
+
+				if (warehouseLocation != null)
+				{
+					text = warehouseLocation.name;
+				}
+
+				ViewContext.Writer.Write(text);
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "quantityOrdered";
+			column.Name = "quantityOrdered";
+			column.Caption = "Cantidad Ordenada";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal quantityOrdered = (decimal)DataBinder.Eval(c.DataItem, "quantityOrdered");
+				ViewContext.Writer.Write(quantityOrdered.ToString("N2"));
+			});
+
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "quantityRemitted";
+			column.Name = "quantityRemitted";
+			column.Caption = "Cantidad Programada";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal quantityRemitted = (decimal)DataBinder.Eval(c.DataItem, "quantityRemitted");
+				ViewContext.Writer.Write(quantityRemitted.ToString("N2"));
+			});
+		});
+
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "quantityRecived";
+			column.Name = "quantityRecived";
+			column.Caption = "Cantidad Remitida";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal quantityRecived = (decimal)DataBinder.Eval(c.DataItem, "quantityRecived");
+				ViewContext.Writer.Write(quantityRecived.ToString("N2"));
+			});
+
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "drawersNumber";
+			column.Name = "drawersNumber";
+			column.Caption = "Número Kavetas";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				int drawersNumber = 0;
+				drawersNumber = DataBinder.Eval(c.DataItem, "drawersNumber") != null ? (int)DataBinder.Eval(c.DataItem, "drawersNumber") : 0;
+				ViewContext.Writer.Write(drawersNumber.ToString());
+			});
+
+		});
+		settings.Columns.Add(column =>
+		{
+			column.FieldName = "quantitydrained";
+			column.Name = "quantitydrained";
+			column.Caption = "Cantidad Recibida - escurrido";
+			column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+			column.Width = Unit.Percentage(10);
+
+			column.SetDataItemTemplateContent(c =>
+			{
+				decimal quantitydrained = 0;
+				quantitydrained = DataBinder.Eval(c.DataItem, "quantitydrained") != null ? (decimal)DataBinder.Eval(c.DataItem, "quantitydrained") : 0;
+				ViewContext.Writer.Write(quantitydrained.ToString("N2"));
+			});
+
+		});
+
+
+		//Botones de comandos para registros de la tabla
+		MVCxGridViewCommandColumn commandColumn = new MVCxGridViewCommandColumn
+		{
+			ShowEditButton = false,
+			ShowDeleteButton = false,
+			ShowCancelButton = false,
+			ShowUpdateButton = false,
+			Visible = true,
+			VisibleIndex = 20,
+			Caption = "Acciones"
+		};
+		commandColumn.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+		commandColumn.Width = Unit.Percentage(10);
+
+
+		commandColumn.CustomButtons.Add(
+				new GridViewCommandColumnCustomButton
+				{
+					ID = "btnQualityControlRow",
+					Text = "Calidad"
+				}
+		);
+		settings.ClientSideEvents.CustomButtonClick = "GridViewItemsCustomNewCommandButton_Click";
+
+		settings.Columns.Add(commandColumn);
+		#endregion
+	});
+
+	if (ViewData["EditError"] != null)
+	{
+		grid.SetEditErrorText((string)ViewData["EditError"]);
+	}
+}
+@grid.Bind(Model).GetHtml()

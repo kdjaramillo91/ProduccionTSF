@@ -1,0 +1,22 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.SalesOrderDTO
+@{
+	var documentType = (Model != null && Model.code_documentType != null) ? Model.code_documentType : "";
+}
+
+@Html.DevExpress().ComboBoxFor(model => model.id_provider, settings =>
+{
+	settings.Name = "ComboBoxProvider";
+	settings.Width = Unit.Percentage(100);
+	//settings.Properties.NullText = "Todos...";
+	settings.CallbackRouteValues = new
+	{
+		Controller = "SalesOrder",
+		Action = "ComboBoxProvider",
+	};
+	settings.Properties.CallbackPageSize = 15;
+	settings.Properties.TextField = "Text";
+	settings.Properties.ValueField = "Value";
+	settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+	settings.Properties.ValidationSettings.RequiredField.IsRequired = (documentType != "140") ? false : true;
+	settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["Provider"]).GetHtml()

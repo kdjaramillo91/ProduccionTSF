@@ -1,0 +1,292 @@
+﻿
+@model DXPANACEASOFT.Models.DTOModel.HeadlessDTO
+
+<div>
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="Etiqueta"><b>Datos Generales</b></div>
+        </div>
+        <div class="col-sm-2">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Width = Unit.Percentage(100);
+                settings.Text = "No. Lote: " + Model.numberLot;
+                settings.ControlStyle.Font.Bold = true;
+                settings.ControlStyle.ForeColor = System.Drawing.Color.Blue;
+            }).GetHtml()
+        </div>
+    </div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Turno: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxTurn")
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Programador: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxProgrammer")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Supervisor: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxSupervisor")
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "No. de Personas: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().SpinEditFor(model => model.noOfPeople,
+               settings =>
+               {
+                   settings.Name = "noOfPeople";
+                   settings.Properties.ClientInstanceName = "noOfPeople";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = !((bool)ViewBag.enabled);
+                   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                   settings.Properties.DisplayFormatString = "N2";
+                   settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                   settings.Properties.NumberType = SpinEditNumberType.Integer;
+                   settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               }).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Fecha - Hora Inicio: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().DateEditFor(model => model.dateStartTime,
+                  settings =>
+                  {
+                      settings.Name = "dateStartTime";
+                      settings.Properties.ClientInstanceName = "dateStartTime";
+                      settings.Width = Unit.Percentage(100);
+                      settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                      settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                      settings.ReadOnly = !((bool)ViewBag.enabled);
+
+                      settings.Properties.UseMaskBehavior = true;
+                      settings.Properties.EditFormat = EditFormat.Custom;
+                      settings.Properties.EditFormatString = "dd/MM/yyyy HH:mm";
+                      settings.Properties.TimeSectionProperties.Visible = true;
+                      settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+                      settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "HH:mm";
+                  }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Fecha - Hora Fin: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().DateEditFor(model => model.endDateTime,
+                  settings =>
+                  {
+                      settings.Name = "endDateTime";
+                      settings.Properties.ClientInstanceName = "endDateTime";
+                      settings.Width = Unit.Percentage(100);
+                      settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                      settings.Properties.CalendarProperties.FastNavProperties.DisplayMode = FastNavigationDisplayMode.Inline;
+                      settings.ReadOnly = !((bool)ViewBag.enabled);
+
+                      settings.Properties.UseMaskBehavior = true;
+                      settings.Properties.EditFormat = EditFormat.Custom;
+                      settings.Properties.EditFormatString = "dd/MM/yyyy HH:mm";
+                      settings.Properties.TimeSectionProperties.Visible = true;
+                      settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormat = EditFormat.Custom;
+                      settings.Properties.TimeSectionProperties.TimeEditProperties.EditFormatString = "HH:mm";
+                  }).GetHtml()
+            </div>
+        </div>
+    </div>
+    <div class="Etiqueta"><b>Calidad</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Gramaje: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().SpinEditFor(model => model.grammage,
+               settings =>
+               {
+                   settings.Name = "grammage";
+                   settings.Properties.ClientInstanceName = "grammage";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = !((bool)ViewBag.enabled);
+                   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                   settings.Properties.DecimalPlaces = 2;
+                   settings.Properties.DisplayFormatInEditMode = true;
+                   settings.Properties.DisplayFormatString = "N2";
+                   settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                   settings.Properties.NumberType = SpinEditNumberType.Float;
+                   settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Color: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.Partial("_ComboBoxColor")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Rendimiento Manual: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().SpinEditFor(model => model.manualPerformance,
+               settings =>
+               {
+                   settings.Name = "manualPerformance";
+                   settings.Properties.ClientInstanceName = "manualPerformance";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = !((bool)ViewBag.enabled);
+                   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                   settings.Properties.DecimalPlaces = 2;
+                   settings.Properties.DisplayFormatInEditMode = true;
+                   settings.Properties.DisplayFormatString = "N2";
+                   settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                   settings.Properties.NumberType = SpinEditNumberType.Float;
+                   settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-4">
+            </div>
+        </div>
+    </div>
+    <div class="Etiqueta"><b>Proceso</b></div>
+    <hr style="width: 100%; margin: 0px;">
+    <div class="MyContainer">
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "No. de Gavetas: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().SpinEditFor(model => model.noOfDrawers,
+               settings =>
+               {
+                   settings.Name = "noOfDrawers";
+                   settings.Properties.ClientInstanceName = "noOfDrawers";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = !((bool)ViewBag.enabled);
+                   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                   settings.Properties.DisplayFormatString = "N2";
+                   settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+                   settings.Properties.NumberType = SpinEditNumberType.Integer;
+                   settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Lbs. Sobrante Entero: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().SpinEditFor(model => model.lbsWholeSurplus,
+               settings =>
+               {
+                   settings.Name = "lbsWholeSurplus";
+                   settings.Properties.ClientInstanceName = "lbsWholeSurplus";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = !((bool)ViewBag.enabled) || !Model.isWholeShrimp;
+                   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                   settings.Properties.DecimalPlaces = 2;
+                   settings.Properties.DisplayFormatInEditMode = true;
+                   settings.Properties.DisplayFormatString = "N2";
+                   //settings.Properties.ValidationSettings.RequiredField.IsRequired = Model.isWholeShrimp;
+                   settings.ShowModelErrors = true;
+                   settings.Properties.NumberType = SpinEditNumberType.Integer;
+                   settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               }).GetHtml()
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Width = Unit.Percentage(100);
+                    settings.Text = "Lbs. Directo: ";
+                }).GetHtml()
+            </div>
+            <div class="col-sm-4">
+                @Html.DevExpress().SpinEditFor(model => model.lbsDirect,
+               settings =>
+               {
+                   settings.Name = "lbsDirect";
+                   settings.Properties.ClientInstanceName = "lbsDirect";
+                   settings.Width = Unit.Percentage(100);
+                   settings.ReadOnly = !((bool)ViewBag.enabled);// || Model.isWholeShrimp;
+                   settings.Properties.SpinButtons.ShowIncrementButtons = true;
+                   settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+                   settings.Properties.DecimalPlaces = 2;
+                   settings.Properties.DisplayFormatInEditMode = true;
+                   settings.Properties.DisplayFormatString = "N2";
+                   settings.Properties.ValidationSettings.RequiredField.IsRequired = !Model.isWholeShrimp;
+                   settings.ShowModelErrors = true;
+                   settings.Properties.NumberType = SpinEditNumberType.Integer;
+                   settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+               }).GetHtml()
+            </div>
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-4">
+            </div>
+        </div>
+    </div>
+</div>

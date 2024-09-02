@@ -1,0 +1,98 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Country_IdentificationType
+@using System.Drawing
+
+<table class="table table-condenced" style="margin: 0px;">
+	<tr style="border-bottom: 1px Solid #C0C0C0;">
+		<td colspan="6">
+			<span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+		</td>
+	</tr>
+
+	<tr>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_country, settings =>
+			{
+				settings.Name = "id_countryLabel";
+				settings.Text = "Country:";
+				settings.AssociatedControlName = "id_country";
+			}).GetHtml()
+
+
+		</td>
+		<td>
+			@{
+				int? id_country = (Model != null && Model.id_country != 0) ? (int?)Model.id_country : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_country, settings =>
+	   {
+		   settings.Name = "id_country";
+		   settings.Properties.ClientInstanceName = "id_country";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Properties.Columns.Add("name", "Nombre", 200);
+		   settings.Width = Unit.Percentage(50);
+		   settings.Height = Unit.Percentage(50);
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Properties.CallbackPageSize = 20;
+		   settings.ReadOnly = true;
+		   settings.ShowModelErrors = true;
+
+	   }).BindList(DataProviderCountry.AllContries((int?)id_country)).Bind(id_country).GetHtml()
+
+		</td>
+		<!-- FECHA FIn-->
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_identificationType, settings =>
+			{
+				settings.Name = "id_identificationType";
+				settings.Text = "Tipo de identificación:";
+				settings.AssociatedControlName = "id_identificationType";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_identificationType = (Model != null && Model.id_identificationType != 0) ? (int?)Model.id_identificationType : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_identificationType, settings =>
+	   {
+		   settings.Name = "id_identificationType";
+		   settings.Properties.ClientInstanceName = "id_identificationType";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextField = "name";
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Properties.Columns.Add("name", "Nombre", 200);
+		   settings.Width = Unit.Percentage(50);
+		   settings.Height = Unit.Percentage(50);
+		   settings.Properties.EnableClientSideAPI = true;
+		   settings.Properties.CallbackPageSize = 20;
+		   settings.ReadOnly = true;
+		   settings.ShowModelErrors = true;
+
+
+	   }).BindList(DataProviderIdentificationType.AllIdentificationType()).Bind(id_identificationType).GetHtml()
+		</td>
+
+	</tr>
+
+	<tr></tr>
+
+</table>
+
+
+
+
+
+
+
+

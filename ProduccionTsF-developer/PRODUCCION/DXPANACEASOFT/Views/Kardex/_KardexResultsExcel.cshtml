@@ -1,0 +1,27 @@
+﻿
+@model List<DXPANACEASOFT.Models.ResultKardex>
+
+@{
+	//Html.RenderPartial("KardexButtons/_KardexGridViewActionsButtons");
+	<div class="row">
+		<div class="col-md-10">
+			@Html.DevExpress().Button(
+			button =>
+			{
+				button.Name = "btnExcel";
+				button.Text = "Exportar";
+				button.Width = Unit.Percentage(10);
+				button.RenderMode = ButtonRenderMode.Button;
+				button.ImagePosition = ImagePosition.Left;
+				button.Images.Image.Url = "~/Content/image/microsoft-office-excel2.png";
+				button.Images.Image.Height = new Unit(18);
+				button.UseSubmitBehavior = false;
+				button.ClientSideEvents.Click = "onExportExcelClick";
+			}).GetHtml()
+		</div>
+
+	</div>
+	Html.RenderPartial("_KardexPartialExcel", Model);
+}
+
+<script src="~/Scripts/kardex/_kardexResults.js"></script>

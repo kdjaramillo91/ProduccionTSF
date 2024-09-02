@@ -1,0 +1,23 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.OpeningClosingPlateLyingDTO
+
+@Html.DevExpress().ComboBoxFor(model => model.id_freezerMachineForProdDestination, settings =>
+{
+    settings.Name = "ComboBoxFreezerMachineForProdDestination";
+    settings.Width = Unit.Percentage(100);
+    //settings.Properties.NullText = "Todos...";
+    settings.CallbackRouteValues = new
+    {
+        Controller = "OpeningClosingPlateLying",
+        Action = "ComboBoxFreezerMachineForProdDestination",
+    };
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboBoxFreezerMachineForProdDestination_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.BeginCallback = "ComboBoxFreezerMachineForProdDestination_BeginCallback";
+    settings.Properties.ClientSideEvents.EndCallback = "ComboBoxFreezerMachineForProdDestination_EndCallback";
+    settings.Properties.ClientSideEvents.Init = "ComboBoxFreezerMachineForProdDestination_Init";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Text";
+    settings.Properties.ValueField = "Value";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    //settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+    settings.ReadOnly = !((bool)ViewBag.enabled);
+}).BindList(ViewData["FreezerMachineForProdDestination"]).GetHtml()

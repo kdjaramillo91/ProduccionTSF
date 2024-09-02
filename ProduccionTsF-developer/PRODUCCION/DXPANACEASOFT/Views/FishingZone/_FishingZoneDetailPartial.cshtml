@@ -1,0 +1,91 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    FishingZone fishingZone = Model ?? new FishingZone();
+}
+
+@Html.Hidden("id_fishingZone", fishingZone.id)
+
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <strong>
+                Nombre:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(fishingZone.name)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                C&oacute;digo:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(fishingZone.code)
+        </td>
+    </tr>     
+    <tr>
+        <td>
+            <strong>
+                Descripci&oacute;n:
+            </strong>
+        </td>
+        <td colspan="4">
+            @Html.Raw(fishingZone.description)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Creado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(fishingZone.id_userCreate))
+        </td>
+        <td style="width: 15%;">
+            <strong>
+                Fecha de Creaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(fishingZone.dateCrete)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>
+                Modificado por:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(UsernameById(fishingZone.id_userUpdate))
+        </td>
+        <td>
+            <strong>
+                Fecha de Modificaci&oacute;n:
+            </strong>
+        </td>
+        <td>
+            @Html.Raw(fishingZone.dateUpdate)
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@Html.Partial("_FishingZoneDetailFishingSitePartial", fishingZone.FishingSite.ToList())
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

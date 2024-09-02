@@ -1,0 +1,52 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.PurchaseOrder
+
+@{
+    string codeState = (Model != null && Model.Document != null && Model.Document.DocumentState != null && Model.Document.DocumentState.code != "") ? Model.Document.DocumentState.code : "";
+    int? id_productionUnitProvider = (Model != null && Model.id_productionUnitProvider != 0) ? (int?)Model.id_productionUnitProvider : null;
+    int? id_provider = (Model != null && Model.id_provider != 0) ? (int?)Model.id_provider : null;
+}
+
+
+@Html.DevExpress().ComboBoxFor(m => m.id_productionUnitProvider, settings =>
+{
+    settings.Name = "id_productionUnitProvider";
+    settings.Properties.ClientInstanceName = "id_productionUnitProvider";
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Width = Unit.Percentage(100);
+    settings.ReadOnly = codeState != "01";
+    settings.ShowModelErrors = true;
+    settings.CallbackRouteValues = new { Controller = "PurchaseOrder", Action = "ProductionUnitProviderByProvider" };
+    settings.Properties.EnableClientSideAPI = true;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.ClientSideEvents.Validation = "OnProductionUnitProviderValidation";
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_provider'] = id_provider.GetValue(); e.customArgs['id_productionUnitProviderCurrent'] = id_productionUnitProvider.GetValue(); }";
+    settings.Properties.CallbackPageSize = 20;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboproductionUnitProvider_SelectedIndexChanged";
+
+}).BindList(DataProviderProductionUnitProvider.ProductionUnitProviderByProvider(id_productionUnitProvider, id_provider)).Bind(id_productionUnitProvider).GetHtml()
+
+@*@{
+        int? id_productionUnitProvider = (Model != null && Model.id_productionUnitProvider != 0) ? (int?)Model.id_productionUnitProvider : null;
+    }
+    @Html.DevExpress().ComboBoxFor(m => m.id_productionUnitProvider, settings =>
+    {
+        settings.Name = "id_productionUnitProvider";
+        settings.Properties.ClientInstanceName = "id_productionUnitProvider";
+        settings.Properties.ValueField = "id";
+        settings.Properties.TextField = "name";
+        settings.Properties.ValueType = typeof(int);
+        settings.Width = Unit.Percentage(100);
+        settings.ReadOnly = codeState != "01";
+        settings.ShowModelErrors = true;
+        settings.Properties.EnableClientSideAPI = true;
+        settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+        settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+        settings.Properties.ClientSideEvents.Validation = "OnProductionUnitProviderValidation";
+        settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboproductionUnitProvider_SelectedIndexChanged";
+    }).BindList(DataProviderProductionUnitProvider.ProductionUnitProviderByProvider(id_productionUnitProvider, id_provider)).Bind(id_productionUnitProvider).GetHtml()*@

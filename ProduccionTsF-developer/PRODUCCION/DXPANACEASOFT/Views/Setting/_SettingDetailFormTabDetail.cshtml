@@ -1,0 +1,247 @@
+﻿
+@using DXPANACEASOFT.DataProviders
+@using  DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Setting
+
+@{
+    
+    bool modifi =true ;
+}
+
+<table class="table table-condenced" style="margin: 0px;">
+    <tr style="border-bottom: 1px Solid #C0C0C0;">
+        <td colspan="6">
+            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información</span>
+        </td>
+    </tr>
+    <tr>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.code, settings =>
+        {
+            settings.Name = "dcodeLabel";
+            settings.Text = "Código:";
+            settings.AssociatedControlName = "code";
+        }).GetHtml()
+
+
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.code, settings =>
+       {
+           settings.Name = "dcode";
+           settings.Properties.ClientInstanceName = "code";
+           settings.Properties.NullText = "Código";
+           settings.Width = Unit.Percentage(100);
+           settings.Height = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnCodeValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 20;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ReadOnly = modifi;
+
+           //settings.Width = Unit.Percentage(50);
+           //settings.Height = Unit.Percentage(50);
+       }).GetHtml()
+
+        </td>
+
+        <td>
+            @Html.DevExpress().LabelFor(m => m.value, settings =>
+        {
+            settings.Name = "dvalueLabel";
+            settings.Text = "Valor:";
+            settings.AssociatedControlName = "code";
+        }).GetHtml()
+
+
+        </td>
+        <td>
+            @Html.DevExpress().TextBoxFor(m => m.value, settings =>
+       {
+           settings.Name = "dvalue";
+           settings.Properties.ClientInstanceName = "value";
+           settings.Properties.NullText = "Valor";
+           settings.Width = Unit.Percentage(100);
+           settings.Height = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnValueSettingValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 20;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ReadOnly = modifi;
+
+           //settings.Width = Unit.Percentage(50);
+           //settings.Height = Unit.Percentage(50);
+       }).GetHtml()
+
+        </td>
+        <td></td>
+
+    </tr>
+
+    <tr>
+        <td>
+
+            @Html.DevExpress().LabelFor(m => m.name, settings =>
+        {
+            settings.Name = "dnameLabel";
+            settings.Text = " Nombre:";
+            settings.AssociatedControlName = "name";
+
+        }).GetHtml()
+
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+       {
+           settings.Name = "dname";
+           settings.Properties.ClientInstanceName = "name";
+           settings.Properties.NullText = "Nombre";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ReadOnly = modifi;
+
+       }).GetHtml()
+
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.id_settingDataType, settings =>
+        {
+            settings.Name = "did_settingDataTypeLabel";
+            settings.Text = "Tipo de Dato:";
+            settings.AssociatedControlName = "id_settingDataType";
+        }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_settingDataType = (Model != null && Model.id_settingDataType != 0) ? (int?)Model.id_settingDataType : null;
+            }
+
+            @Html.DevExpress().ComboBoxFor(m => m.id_settingDataType, settings =>
+       {
+           settings.Name = "did_settingDataType";
+           settings.Properties.NullDisplayText = "Seleccione...";
+           settings.Properties.NullText = "Seleccione...";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.Columns.Add("code", "Codigo", 50);
+           settings.Properties.Columns.Add("name", "Nombre", 100);
+           settings.Width = Unit.Percentage(100);
+           settings.Height = Unit.Percentage(100);
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ClientSideEvents.Validation = "OnDataTypeValidation";
+           settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+       }).BindList(DataProviderSetting.getDataType((int?)id_settingDataType)).Bind(id_settingDataType).GetHtml()
+        </td>
+
+        <td>
+
+            @Html.DevExpress().LabelFor(m => m.id_module, settings =>
+        {
+            settings.Name = "did_moduleLabel";
+            settings.Text = "Modulo:";
+            settings.AssociatedControlName = "id_module";
+        }).GetHtml()
+        </td>
+        <td>
+            @{
+                int? id_module = (Model != null && Model.id_module != 0) ? (int?)Model.id_module : null;
+            }
+            @Html.DevExpress().ComboBoxFor(m => m.id_module, settings =>
+       {
+           settings.Name = "did_module";
+           settings.Properties.NullDisplayText = "Seleccione...";
+           settings.Properties.NullText = "Seleccione...";
+           settings.Properties.ValueField = "id";
+           settings.Properties.TextFormatString = "{1}";
+           settings.Properties.Columns.Add("code", "Codigo", 50);
+           settings.Properties.Columns.Add("name", "Nombre", 100);
+           settings.Width = Unit.Percentage(100);
+           settings.Height = Unit.Percentage(100);
+           settings.Properties.ValueType = typeof(int);
+           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+           settings.Properties.ClientSideEvents.Validation = "OnModuleValidation";
+           settings.ShowModelErrors = true;
+           settings.ReadOnly = true;
+       }).BindList(DataProviderSetting.getModulos((int?)id_module)).Bind(id_module).GetHtml()
+
+        </td>
+
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().LabelFor(m => m.description, settings =>
+        {
+            settings.Name = "dDescriptionLabel";
+            settings.Text = " Descripción:";
+            settings.AssociatedControlName = "Description";
+
+        }).GetHtml()
+
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBoxFor(m => m.description, settings =>
+       {
+           settings.Name = "ddescription";
+           settings.Properties.ClientInstanceName = "description";
+           settings.Properties.NullText = "Descripción";
+           settings.Width = Unit.Percentage(100);
+           settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+           settings.ShowModelErrors = true;
+           settings.Properties.MaxLength = 100;
+           settings.Properties.ValidationSettings.ValidationGroup = "tabdetail";
+           settings.ReadOnly = modifi;
+
+       }).GetHtml()
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+
+            @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+       {
+           settings.Name = "disActive";
+           settings.Properties.ClientInstanceName = "isActive";
+           settings.Text = "Activo";
+           settings.ReadOnly = modifi;
+       }).GetHtml()
+
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+
+
+    <tr></tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+    
+
+

@@ -1,0 +1,101 @@
+﻿@model ProductionLotFinalize.Detallado
+
+<div id="notification"></div>
+<div id="download-area"></div>
+@using (Html.BeginForm())
+{
+	<div class="row">
+		@Html.Hidden("id_productLotFinalize", this.Model.Id)
+		@Html.DevExpress().PageControl(
+			pageControl =>
+			{
+				pageControl.Name = "tpProductionLotFinalizeEdit";
+				pageControl.Width = Unit.Percentage(100);
+				pageControl.Height = Unit.Pixel(450);
+				
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "DocumentTabPage";
+					tabPage.Text = "Documento";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_DocumentFormEditTabPage", this.Model);
+					});
+				});
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "DetallesTabPage";
+					tabPage.Text = "Detalles";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_DetailResulKardexPartialTabPage", this.Model.DetallesKardex);
+					});
+				});
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "DetallesLoteTabPage";
+					tabPage.Text = "Detalles de Lotes";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_ProductionLotFinalizeEditTabPage", this.Model.DetallesLotes);
+					});
+				});
+
+				pageControl.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpEditMessage"] = this.ViewBag.EditMessage;
+					e.Properties["cpIdsLote"] = this.Model.IdsLote;
+					e.Properties["cpNumeroLote"] = this.Model.NumeroLote;
+				};
+
+				pageControl.ClientSideEvents.Init = "OnTabPageControlInit";
+			}).GetHtml()
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<table class="table table-condensed">
+				<tr style="border-top: 1px solid #c0c0c0;">
+					<td style="text-align: right; margin-top: 5px;">
+						@Html.DevExpress().Button(
+							button =>
+							{
+								button.Name = "btnUpdate";
+								button.Text = "Guardar";
+								button.RenderMode = ButtonRenderMode.Button;
+								button.ImagePosition = ImagePosition.Left;
+								button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+								button.UseSubmitBehavior = false;
+								button.ValidateInvisibleEditors = true;
+								button.ClientSideEvents.Click = "OnUpdateButtonClick";
+
+								button.ClientVisible = (bool)this.ViewBag.PuedeEditarDocumento;
+							}).GetHtml()
+
+						@Html.DevExpress().Button(
+							button =>
+							{
+								button.Name = "btnCancelar";
+								button.Text = "Cancelar";
+								button.RenderMode = ButtonRenderMode.Button;
+								button.ImagePosition = ImagePosition.Left;
+								button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+								button.UseSubmitBehavior = false;
+								button.ValidateInvisibleEditors = true;
+								button.ClientSideEvents.Click = "OnCancelButtonClick";
+								button.Style.Add("margin-left", "10px");
+							}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+}
+
+
+<script src="~/Scripts/productionLotFinalize/productionLotFinalize.js"></script>
+

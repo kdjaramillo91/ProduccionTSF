@@ -1,0 +1,90 @@
+﻿@using DXPANACEASOFT.Models
+
+@model ProductionCostCoefficient
+
+<h2>Coeficientes de Producción</h2>
+
+@Html.Partial("_ProductionCoefficientEditButtons", this.Model)
+
+<div id="messageAlert"></div>
+@using (Html.BeginForm())
+{
+	<div class="row">
+		@Html.Hidden("id_productionCoefficient", this.Model.id)
+		@Html.DevExpress().PageControl(
+			pageControl =>
+			{
+				pageControl.Name = "tpProductionCoefficientEdit";
+				pageControl.Width = Unit.Percentage(100);
+				pageControl.Height = Unit.Pixel(450);
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "DatosGeneralesTabPage";
+					tabPage.Text = "Generales";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_DatosGeneralesEditTabPage", this.Model);
+					});
+				});
+
+				pageControl.TabPages.Add(tabPage =>
+				{
+					tabPage.Name = "OperacionesDetallesTabPage";
+					tabPage.Text = "Operaciones";
+
+					tabPage.SetContent(() =>
+					{
+						Html.RenderPartial("_OperacionesDetallesEditTabPage", this.Model);
+					});
+				});
+
+				pageControl.CustomJSProperties = (s, e) =>
+				{
+					e.Properties["cpEditMessage"] = this.ViewBag.EditMessage;
+					e.Properties["cpUsarIntegracionContable"] = this.ViewBag.UsarIntegracionContable;
+				};
+
+				pageControl.ClientSideEvents.Init = "OnTabPageControlInit";
+			}).GetHtml()
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<table class="table table-condensed">
+				<tr style="border-top: 1px solid #c0c0c0;">
+					<td style="text-align: right; margin-top: 5px;">
+						@Html.DevExpress().Button(
+							button =>
+							{
+								button.Name = "btnUpdate";
+								button.Text = "Guardar";
+								button.RenderMode = ButtonRenderMode.Button;
+								button.ImagePosition = ImagePosition.Left;
+								button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+								button.UseSubmitBehavior = false;
+								button.ValidateInvisibleEditors = true;
+								button.ClientSideEvents.Click = "OnUpdateButtonClick";
+							}).GetHtml()
+
+						@Html.DevExpress().Button(
+							button =>
+							{
+								button.Name = "btnCancel";
+								button.Text = "Cancelar";
+								button.RenderMode = ButtonRenderMode.Button;
+								button.ImagePosition = ImagePosition.Left;
+								button.Images.Image.IconID = IconID.ActionsClose16x16office2013;
+								button.UseSubmitBehavior = false;
+								button.ValidateInvisibleEditors = true;
+								button.ClientSideEvents.Click = "OnCancelButtonClick";
+								button.Style.Add("margin-left", "10px");
+							}).GetHtml()
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+}
+
+<script src="~/Scripts/productioncoefficient/edit.js"></script>

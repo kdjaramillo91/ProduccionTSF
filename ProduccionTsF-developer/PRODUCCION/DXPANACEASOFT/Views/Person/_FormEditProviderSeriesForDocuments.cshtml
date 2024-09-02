@@ -1,0 +1,312 @@
+@using System.Web.Mvc.Html
+@using DevExpress.XtraReports.Data
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@model List<DXPANACEASOFT.Models.ProviderSeriesForDocuments>
+
+@{
+    var grid = Html.DevExpress().GridView<ProviderSeriesForDocuments>(settings => {
+        settings.Name = "ProviderSeriesForDocumentss";
+        settings.CallbackRouteValues = new { Controller = "Person", Action = "ProviderSeriesForDocuments" };
+
+        settings.ClientSideEvents.BeginCallback = "ProviderPaymentTerm_OnBeginCallback";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Person", Action = "ProviderSeriesForDocumentsAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Person", Action = "ProviderSeriesForDocumentsUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Person", Action = "ProviderSeriesForDocumentsDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+
+        settings.KeyFieldName = "id";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.CommandColumn.Width = Unit.Percentage(8);
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["isActive"] = true;
+        };
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_documentType";
+            column.Caption = "T.Dcto";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_documentType = (int)DataBinder.Eval(c.DataItem, "id_documentType");
+                DocumentType documentType = DataProviderDocumentType.DocumentTypeById(id_documentType);
+
+                if (documentType != null)
+                {
+                    ViewContext.Writer.Write(documentType.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_documentType";
+                p.DataSource = DataProviderDocumentType.AllElectronicDocumentTypes();
+                //p.TextField = "name";
+
+                p.TextFormatString = "{0}";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.Columns.Add("code", "Cod.", 50);
+                p.Columns.Add("name", "Nombre", 100);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                p.ClientSideEvents.Init = "ProviderSeriesForDocumentsDocumentTypeCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "serialNumber";
+            column.Caption = "No.Serie";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string serialNumber = (string)DataBinder.Eval(c.DataItem, "serialNumber");
+
+                ViewContext.Writer.Write(serialNumber);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "serialNumber";
+
+                p.MaskSettings.Mask = "000-000";
+                p.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+                p.MaskSettings.ErrorText = "Número de Serie no válido";
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "authorizationNumber";
+            column.Caption = "No.Autoriz.";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                string authorizationNumber = (string)DataBinder.Eval(c.DataItem, "authorizationNumber");
+
+                ViewContext.Writer.Write(authorizationNumber);
+            });
+
+            column.EditorProperties().TextBox(p =>
+            {
+                p.ClientInstanceName = "authorizationNumber";
+
+                p.MaskSettings.Mask = "0000000000000000000000000000000000000000000000000";
+                p.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+                p.MaskSettings.ErrorText = "Número de autorización no válido";
+                //p.EnableSynchronization = DefaultBoolean.False;
+
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemDivisionCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "initialNumber";
+            column.Caption = "No.Inicial";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? initialNumber = (int?)DataBinder.Eval(c.DataItem, "initialNumber");
+                ViewContext.Writer.Write(initialNumber != null ? initialNumber.Value.ToString("#") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "initialNumber";
+                p.NumberType = SpinEditNumberType.Integer;
+                //p.DecimalPlaces = 2;
+                p.AllowMouseWheel = true;
+                p.Increment = 1;
+                p.LargeIncrement = 10;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+                p.ClientSideEvents.Validation = "OnProviderInitialNumberValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "finalNumber";
+            column.Caption = "No.Final";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? finalNumber = (int?)DataBinder.Eval(c.DataItem, "finalNumber");
+                ViewContext.Writer.Write(finalNumber != null ? finalNumber.Value.ToString("#") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "finalNumber";
+                p.NumberType = SpinEditNumberType.Integer;
+                //p.DecimalPlaces = 2;
+                p.AllowMouseWheel = true;
+                p.Increment = 1;
+                p.LargeIncrement = 10;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+                p.ClientSideEvents.Validation = "OnProviderFinalNumberValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "dateOfExpiry";
+            column.Caption = "Caducidad";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                DateTime? dateOfExpiry = (DateTime?)DataBinder.Eval(c.DataItem, "dateOfExpiry");
+                ViewContext.Writer.Write(dateOfExpiry != null ? dateOfExpiry.Value.ToString("dd/MM/yyyy") : "");
+            });
+
+            column.EditorProperties().DateEdit(p =>
+            {
+                p.ClientInstanceName = "dateOfExpiry";
+                p.UseMaskBehavior = true;
+                p.EditFormat = EditFormat.Custom;
+                p.EditFormatString = "dd/MM/yyyy";
+                p.ClientSideEvents.Validation = "OnDateOfExpiryValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "currentNumber";
+            column.Caption = "No.Actual";
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? currentNumber = (int?)DataBinder.Eval(c.DataItem, "currentNumber");
+                ViewContext.Writer.Write(currentNumber != null ? currentNumber.Value.ToString("#") : "");
+            });
+
+            column.EditorProperties().SpinEdit(p =>
+            {
+                p.ClientInstanceName = "currentNumber";
+                p.NumberType = SpinEditNumberType.Integer;
+                //p.DecimalPlaces = 2;
+                p.AllowMouseWheel = true;
+                p.Increment = 1;
+                p.LargeIncrement = 10;
+                p.SpinButtons.ShowLargeIncrementButtons = true;
+                p.ClientSideEvents.Validation = "OnProviderCurrentNumberValidation";
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_retentionSeriesForDocumentsType";
+            column.Caption = "Retención";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                int? id_retentionSeriesForDocumentsType = (int)DataBinder.Eval(c.DataItem, "id_retentionSeriesForDocumentsType");
+                RetentionSeriesForDocumentsType retentionSeriesForDocumentsType = DataProviderRetention.RetentionSeriesForDocumentsTypeById(id_retentionSeriesForDocumentsType);
+
+                if (retentionSeriesForDocumentsType != null)
+                {
+                    ViewContext.Writer.Write(retentionSeriesForDocumentsType.name);
+                }
+            });
+
+            column.EditorProperties().ComboBox(p =>
+            {
+                p.ClientInstanceName = "id_retentionSeriesForDocumentsType";
+                p.DataSource = DataProviderRetention.AllRetentionSeriesForDocumentsTypes();
+                p.TextField = "name";
+                p.ValueField = "id";
+                p.ValueType = typeof(int);
+
+                p.DropDownStyle = DropDownStyle.DropDownList;
+                p.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                //p.EnableSynchronization = DefaultBoolean.False;
+                p.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                p.ClientSideEvents.Validation = "OnProviderControlComboValidation";
+                //p.ClientSideEvents.Init = "ItemCompanyCombo_Init";
+                //p.ClientSideEvents.SelectedIndexChanged = "ItemCompanyCombo_SelectedIndexChanged";
+
+                p.Width = Unit.Percentage(100);
+            });
+
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "isActive";
+            column.Name = "isActive";
+            column.Caption = "¿Activo?";
+            column.Width = Unit.Percentage(3);
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            //column.AutoFilterBy("Sí");
+            //column.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+        });
+
+    });
+
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

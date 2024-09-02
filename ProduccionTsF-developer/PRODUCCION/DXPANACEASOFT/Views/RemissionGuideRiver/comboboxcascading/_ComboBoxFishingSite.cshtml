@@ -1,0 +1,52 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.RemissionGuideRiverTransportation
+@{
+    string codeState = (Model != null && Model.RemissionGuideRiver != null && Model.RemissionGuideRiver.Document != null && Model.RemissionGuideRiver.Document.DocumentState != null && Model.RemissionGuideRiver.Document.DocumentState.code != "") ? Model.RemissionGuideRiver.Document.DocumentState.code : "";
+    int? id_FishingSiteRGR = (Model != null && Model.id_FishingSiteRGR != null && Model.id_FishingSiteRGR > 0) ? (int?)Model.id_FishingSiteRGR : null;
+    int? id_FishingZoneRGR = null;
+    if (Model.id_FishingZoneRGRNew != null)
+    {
+        if (Model.id_FishingZoneRGRNew != null)
+        {
+            id_FishingZoneRGR = Model.id_FishingZoneRGRNew;
+        }
+    }
+    else
+    {
+        var fsObj = DataProviderFishingSite.FishingSiteById(id_FishingSiteRGR);
+        if (fsObj != null) { id_FishingZoneRGR = fsObj.id_FishingZone; }
+    }
+}
+@Html.DevExpress().ComboBoxFor(m => m.id_FishingSiteRGR, settings =>
+{
+    settings.Properties.ClientInstanceName = "id_FishingSiteRGR";
+    settings.Width = Unit.Percentage(100);
+
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    settings.CallbackRouteValues = new { Controller = "RemissionGuideRiver", Action = "GetFishingSiteRGR"};
+    settings.Properties.CallbackPageSize = 10;
+
+    settings.ReadOnly = codeState != "01";
+
+    settings.Properties.ValueField = "id";
+    settings.Properties.TextField = "name";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.ShowModelErrors = true;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['id_FishingZoneRGRNew'] = id_FishingZoneRGRNew.GetValue(); }";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "FishingSiteRGR_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.Validation = "OnUpdateImagenWhenRequiredField";
+    settings.CustomJSProperties = (s, e) =>
+    {
+
+        e.Properties["cpTabContainer"] = "tabTransportation";
+        e.Properties["cpMessageError"] = "Campo Obligatorio.";
+        e.Properties["cpIsRequired"] = "true";
+        e.Properties["cpTabControl"] = "tabControl";
+
+    };
+}).BindList(DataProviderFishingSite.FishingSiteByZone(id_FishingZoneRGR)).Bind(id_FishingSiteRGR).GetHtml()

@@ -1,0 +1,143 @@
+﻿
+<div style="width: 100%;">
+
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnUpdateToolBar";
+			button.Text = "";
+			button.ToolTip = "Guardar documento";
+			button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+			button.UseSubmitBehavior = false;
+			button.EnableClientSideAPI = true;
+			button.ClientSideEvents.Click = "OnUpdateButtonClick";
+
+			button.ClientEnabled = (bool)this.ViewBag.PuedeEditarDocumento;
+		}).GetHtml()
+
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnRefreshToolBar";
+			button.Text = "";
+			button.ToolTip = "Refrescar";
+			button.Images.Image.IconID = IconID.ActionsRefresh16x16office2013;
+			button.UseSubmitBehavior = false;
+			button.EnableClientSideAPI = true;
+			button.ClientSideEvents.Click = "OnRefreshButtonClick";
+
+			button.ClientEnabled = (bool)this.ViewBag.DocumentoExistente;
+		}).GetHtml()
+
+	<div class="vertical-divider"></div>
+
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnApproveToolBar";
+			button.Text = "";
+			button.ToolTip = "Aprobar documento";
+			button.Images.Image.IconID = IconID.ContentCheckbox16x16;
+			button.UseSubmitBehavior = false;
+			button.EnableClientSideAPI = true;
+			button.ClientSideEvents.Click = "OnApproveButtonClick";
+
+			button.ClientEnabled = (bool)this.ViewBag.PuedeAprobarDocumento;
+		}).GetHtml()
+
+	<div class="vertical-divider"></div>
+
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnCancelToolBar";
+			button.Text = "";
+			button.ToolTip = "Anular documento";
+			button.Images.Image.IconID = IconID.ActionsDeletelist16x16office2013;
+			button.UseSubmitBehavior = false;
+			button.EnableClientSideAPI = true;
+			button.ClientSideEvents.Click = "OnCancelDocumentButtonClick";
+
+			button.ClientEnabled = (bool)this.ViewBag.PuedeAnularDocumento;
+		}).GetHtml()
+
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnRevertToolBar";
+			button.Text = "";
+			button.ToolTip = "Reversar documento";
+			button.Images.Image.IconID = IconID.HistoryUndo16x16office2013;
+			button.UseSubmitBehavior = false;
+			button.EnableClientSideAPI = true;
+			button.ClientSideEvents.Click = "OnRevertButtonClick";
+
+			button.ClientEnabled = (bool)this.ViewBag.PuedeReversarDocumento;
+		}).GetHtml()
+
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnPrint";
+			button.Text = "";
+			button.ToolTip = "Imprimir";
+			button.Images.Image.IconID = IconID.ActionsPrint16x16devav;
+			button.UseSubmitBehavior = false;
+			button.EnableClientSideAPI = true;
+			button.ClientSideEvents.Click = "OnReportButtonClick";
+			button.ClientEnabled = (bool)this.ViewBag.DocumentoExistente;
+		}).GetHtml()
+
+	@Html.DevExpress().Button(
+		button =>
+		{
+			button.Name = "btnGenerateExcel";
+			button.Text = "";
+			button.ToolTip = "Generar reporte Excel";
+			button.Images.Image.IconID = IconID.ExportExporttoxls16x16office2013;
+			button.UseSubmitBehavior = false;
+			button.EnableClientSideAPI = true;
+			button.ClientSideEvents.Click = "OnGenerateExcelReportButtonClick";
+			button.ClientEnabled = (bool)this.ViewBag.DocumentoExistente;
+		}).GetHtml()
+
+
+	@Html.DevExpress().Label(
+		label =>
+		{
+			label.Name = "lblEditMessage";
+			label.Properties.ClientInstanceName = "lblEditMessage";
+			label.Width = Unit.Percentage(100);
+			label.ClientVisible = false;
+		}).GetHtml()
+</div>
+
+<script type="text/javascript">
+	var ShowEditMessage = function(s, e) {
+		if (s.cpEditMessage) {
+			lblEditMessage.SetText(s.cpEditMessage);
+			lblEditMessage.SetVisible(true);
+
+			delete s.cpEditMessage;
+
+			$(".close").click(function() {
+				$(".alert").alert('close');
+
+				lblEditMessage.SetText("");
+				lblEditMessage.SetVisible(false);
+			});
+
+			var message = document.getElementById("successMessage");
+			if (message !== undefined && message !== null) {
+				setTimeout(function() {
+					$("#successMessage").alert('close');
+
+					lblEditMessage.SetText("");
+					lblEditMessage.SetVisible(false);
+				}, 2000);
+			}
+		}
+	};
+</script>
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />

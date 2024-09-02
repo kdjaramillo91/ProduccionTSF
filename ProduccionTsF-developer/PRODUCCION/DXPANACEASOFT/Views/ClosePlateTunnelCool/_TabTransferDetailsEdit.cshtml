@@ -1,0 +1,54 @@
+﻿@model DXPANACEASOFT.Models.DTOModel.ClosePlateTunnelCoolDTO
+<div>
+	<table>
+		@if (Model.TransferDetailEntry.Any())
+		{
+			<tr>
+				<td class="Etiqueta">
+					<b>Transferencias de Entrada</b>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<hr style="width: 100%; margin: 0px;">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					@using (Html.BeginForm())
+					{
+						@Html.Partial("_GridViewTransferEntryDetails", Model.TransferDetailEntry)
+					}
+				</td>
+			</tr>
+		}
+
+		@if (Model.TransferDetailExit.Any())
+		{
+			<tr>
+				<td>
+					<hr style="width: 100%; margin: 0px;">
+				</td>
+			</tr>
+			<tr>
+				<td class="Etiqueta">
+					<b>Transferencias de Salida</b>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<hr style="width: 100%; margin: 0px;">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					@using (Html.BeginForm())
+					{
+						@Html.Partial("_GridViewTransferExitDetails", Model.TransferDetailExit)
+					}
+				</td>
+			</tr>
+		}
+
+	</table>
+</div>

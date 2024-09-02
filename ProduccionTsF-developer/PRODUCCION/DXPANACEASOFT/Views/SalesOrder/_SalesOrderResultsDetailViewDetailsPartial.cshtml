@@ -1,0 +1,88 @@
+﻿@using DXPANACEASOFT.Models
+@{
+    var grid = Html.DevExpress().GridView<SalesOrderDetail>(settings =>
+    {
+        settings.Name = "gvSalesOrderDetailView"; /*+ ViewData["id_salesOrder"];*/
+        settings.SettingsDetail.MasterGridName = "gvSalesOrders";
+        settings.CallbackRouteValues = new { Controller = "SalesOrder", Action = "SalesOrderResultsDetailViewDetailsPartial" };
+
+        settings.ClientSideEvents.BeginCallback = "SalesOrderResultsDetailViewDetails_BeginCallback";
+
+        settings.Width = Unit.Percentage(100);
+
+
+        //Panel para titulo
+        settings.Settings.ShowTitlePanel = true;
+        settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(@"<span id=""lblTitle"" style=""font-size: 13px;"">Detalles Orden de Venta</span>");
+        });
+
+        settings.KeyFieldName = "id_item";
+
+        settings.SettingsPager.Visible = true;
+        //settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+
+        settings.Columns.Add(c => c.Item.masterCode ,column =>
+        {
+            column.Name = "masterCode";
+            column.Caption = "Código";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(c => c.Item.name, column =>
+        {
+            column.Name = "item";
+            column.Caption = "Producto";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(c => c.Item.ItemSaleInformation.MetricUnit.code, column =>
+        {
+            column.Name = "code";
+            column.Caption = "UM";
+            column.Width = Unit.Percentage(5);
+            column.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityRequested";
+            column.Caption = "Cantidad Solicitada";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityOrdered";
+            column.Caption = "Cantidad Pedida";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityApproved";
+            column.Caption = "Cantidad Aprobada";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "quantityDelivered";
+            column.Caption = "Cantidad Suministrada";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "price";
+            column.Caption = "Precio";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+        });
+
+    });
+}
+@grid.Bind(Model).GetHtml()

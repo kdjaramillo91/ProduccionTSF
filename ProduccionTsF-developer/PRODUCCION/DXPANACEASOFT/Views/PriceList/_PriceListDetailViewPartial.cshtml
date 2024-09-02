@@ -1,0 +1,63 @@
+﻿
+@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.PriceList
+
+@{
+    PriceList priceList = Model ?? new PriceList();
+    int id_priceList = (Model != null) ? Model.id : 0;
+    ViewData["id_priceList"] = id_priceList;
+}
+@Html.Hidden("id_priceList", id_priceList)
+
+
+<table style="width: 100%;">
+    <tr>
+        <td>Nombre:</td>
+        <td colspan="4">
+            @Html.Raw(priceList.name + " (" + priceList.Document.DocumentType.name + ") " + priceList.CalendarPriceList.CalendarPriceListType.name + " [" + priceList.CalendarPriceList.startDate.ToString("dd/MM/yyyy") +  " - " +
+            priceList.CalendarPriceList.endDate.ToString("dd/MM/yyyy") + "]")
+        </td>
+    </tr>
+    <tr>
+        <td>Descripci&oacute;n:</td>
+        <td colspan="4">
+            @Html.Raw(priceList.Document.description)
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 10%;">Creado por:</td>
+        <td style="width: 10%;">
+            @Html.Raw(UsernameById(priceList.Document.id_userCreate))
+        </td>
+        <td style="width: 15%;">Fecha de Creación:</td>
+        <td>
+            @Html.Raw(priceList.Document.dateCreate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+    <tr>
+        <td>Modificado por:</td>
+        <td>
+            @Html.Raw(UsernameById(priceList.Document.id_userUpdate))
+        </td>
+        <td>Fecha de Modificaci&oacute;n:</td>
+        <td>
+            @Html.Raw(priceList.Document.dateUpdate.ToString("dd/MM/yyyy hh:mm:ss"))
+        </td>
+    </tr>
+</table>
+
+<br />
+
+@Html.Partial("_PriceListDetailViewPartialPriceListDetails", priceList.PriceListDetailFilterShow.ToList())
+
+@functions{
+
+    string UsernameById(int id_user)
+    {
+        User user = DataProviderUser.UserById(id_user);
+        return (user != null) ? user.username : "";
+    }
+
+}

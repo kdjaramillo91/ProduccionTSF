@@ -1,0 +1,34 @@
+﻿@using DXPANACEASOFT.Models
+
+@model AdvancedFilter
+
+@Html.DevExpress().PopupControl(settings =>
+{
+    settings.Name = "popupAdvancedFilter";
+    settings.Width = Unit.Pixel(800);
+
+    settings.CallbackRouteValues = new { Controller = "ProductionLot", Action = "PopupAdvancedFilter" };
+
+    settings.ClientSideEvents.BeginCallback = "OnPopupAdvancedFilterBeginCallback";
+
+    settings.AllowResize = false;
+    settings.ShowHeader = true;
+    settings.ShowOnPageLoad = false;
+    settings.AllowDragging = true;
+    settings.ShowCloseButton = true;
+    settings.CloseAction = CloseAction.OuterMouseClick;
+    settings.CloseOnEscape = false;
+    settings.Modal = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+
+    settings.PopupElementID = "";
+
+    settings.HeaderText = "Filtro Avanzado";
+
+    settings.SetContent(() =>
+    {
+        Html.RenderPartial("FilterBoxTemplates/_AdvancedFilter", Model);
+    });
+
+}).GetHtml()

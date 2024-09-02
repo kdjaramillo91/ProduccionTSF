@@ -1,0 +1,30 @@
+﻿@model List<DXPANACEASOFT.Models.RemGuide.RGResultsQuery>
+
+<div id="GridMessageErrorRemissionGuide" style="display: none;">
+    @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = "gridMessageErrorRemissionGuide";
+           settings.Properties.ClientInstanceName = "gridMessageErrorRemissionGuide";
+           settings.Text = "";
+       }).GetHtml()
+</div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnGenerateCustodianIncome";
+    settings.Text = "Generar Ingreso de Custodio";
+    settings.Images.Image.IconID = IconID.ActionsAdditem16x16office2013;
+    settings.ClientEnabled = true;
+    settings.UseSubmitBehavior = false;
+    settings.EnableClientSideAPI = true;
+    settings.ClientSideEvents.Click = "btnGenerateCustodianIncome_Click";
+    //settings.ClientSideEvents.Click = "GenerateRemissionGuide";
+}).GetHtml()
+
+
+<hr style="margin-top: 2px; margin-bottom: 2px;" />
+
+@{
+
+    Html.RenderPartial("_RemissionGuideDetailsPartial", Model);
+}

@@ -1,0 +1,651 @@
+﻿
+@using System.Web.Mvc.Html
+@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+@model DXPANACEASOFT.Models.Item
+@{
+    var code_inventoryLine = (Model != null && Model.InventoryLine != null && Model.InventoryLine.id != 0) ? Model.InventoryLine.code : "";
+
+    var isBtnToReturn = ViewData["isBtnToReturn"] != null ? (bool)ViewData["isBtnToReturn"] : false;
+    if (isBtnToReturn)
+    {
+        <script src="~/Scripts/item/index.js"></script>
+        <script src="~/Scripts/item/validations.js"></script>
+    }
+    string valSet = DataProviderSetting.ValueSetting("CDCAP");
+}
+
+@{
+
+    @Html.Hidden("id_item", Model.id)
+    @Html.Hidden("code_inventoryLine", code_inventoryLine)
+    @Html.Hidden("valSet", valSet)
+
+    var id_Item = Model.id;
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr>
+            <td rowspan="11">
+                @Html.DevExpress().BinaryImageFor(m => m.photo, settings =>
+               {
+                   settings.Properties.ImageWidth = 170;
+                   settings.Properties.ImageHeight = 160;
+                   settings.Properties.EnableServerResize = true;
+                   settings.Properties.ImageSizeMode = ImageSizeMode.FitProportional;
+                   settings.CallbackRouteValues = new { Controller = "Item", Action = "BinaryImageColumnPhotoUpdate"};
+                   settings.Properties.EditingSettings.Enabled = true;
+                   settings.Properties.EditingSettings.UploadSettings.UploadValidationSettings.MaxFileSize = 4194304;
+               }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "isPurchasedLabel";
+               settings.Text = "Compra:";
+               settings.AssociatedControlName = "isPurchased";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isPurchased, settings =>
+           {
+               settings.Properties.ClientInstanceName = "isPurchased";
+               settings.Properties.ClientSideEvents.CheckedChanged = "PurchaseControl_CheckedChange";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "isSoldLabel";
+               settings.Text = "Venta:";
+               settings.AssociatedControlName = "isSold";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isSold, settings =>
+           {
+               settings.Properties.ClientInstanceName = "isSold";
+               settings.Properties.ClientSideEvents.CheckedChanged = "SoldControl_CheckedChange";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "inventoryControlLabel";
+               settings.Text = "Inventario";
+               settings.AssociatedControlName = "inventoryControl";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.inventoryControl, settings =>
+           {
+               settings.Properties.ClientInstanceName = "inventoryControl";
+               settings.Properties.ClientSideEvents.CheckedChanged = "InventoryControl_CheckedChange";
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "id_inventoryLineLabel";
+               settings.Text = "Linea de Inventario: *";
+               settings.AssociatedControlName = "id_inventoryLine";
+           }).GetHtml()
+            </td>
+            <td colspan="2">
+                @{
+                    var id_inventoryLine = (Model != null && Model.id_inventoryLine != 0) ? (int?) Model.id_inventoryLine : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_inventoryLine, settings =>
+           {
+               settings.Properties.ClientInstanceName = "id_inventoryLine";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueField = "id";
+               settings.ReadOnly = (Model.id != 0);
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "InventoryLinesCombo_SelectedIndexChanged";
+
+               settings.Properties.ClientSideEvents.Validation = "OnInventoryLineValidation";
+           }).BindList(DataProviderInventoryLine.InventoryLines((int) ViewData["id_company"])).Bind(id_inventoryLine).GetHtml()
+            </td>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "id_itemTypeLabel";
+               settings.Text = "Tipo de Producto: *";
+               settings.AssociatedControlName = "id_itemType";
+           }).GetHtml()
+            </td>
+            <td>
+                @{
+                    var id_itemType = (Model != null && Model.id_itemType != 0) ? (int?) Model.id_itemType : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_itemType, settings =>
+           {
+               settings.Properties.ClientInstanceName = "id_itemType";
+               settings.Properties.TextField = "name";
+               settings.Properties.ValueField = "id";
+               settings.Properties.ValueType = typeof(int);
+               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+               settings.Width = Unit.Percentage(100);
+
+               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+               settings.Properties.ClientSideEvents.SelectedIndexChanged = "ItemsTypesCombo_SelectedIndexChanged";
+
+               settings.Properties.ClientSideEvents.Validation = "OnItemTypeValidation";
+           }).BindList(DataProviderItemType.ItemTypes((int)ViewData["id_company"])).Bind(id_itemType).GetHtml()
+            </td>
+        </tr>
+        <tr>
+                <td colspan="2">
+                    @Html.DevExpress().Label(settings =>
+               {
+                   settings.Name = "id_itemTypeCategoryLabel";
+                   settings.Text = "Categoría: *";
+                   settings.AssociatedControlName = "id_itemTypeCategory";
+               }).GetHtml()
+                </td>
+                <td colspan="2">
+                    @{
+                        var id_itemTypeCategory = (Model != null && Model.id_itemTypeCategory != 0) ? (int?) Model.id_itemTypeCategory : null;
+                    }
+                    @Html.DevExpress().ComboBoxFor(m => m.id_itemTypeCategory, settings =>
+               {
+                   settings.Properties.ClientInstanceName = "id_itemTypeCategory";
+                   settings.Properties.TextField = "name";
+                   settings.Properties.ValueField = "id";
+                   settings.Properties.ValueType = typeof(int);
+                   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                   settings.Width = Unit.Percentage(100);
+
+                   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                   settings.Properties.ClientSideEvents.Validation = "OnItemTypeCategoryValidation";
+               }).BindList(DataProviderItemTypeCategory.ItemsTypesCategories((int)ViewData["id_company"])).Bind(id_itemTypeCategory).GetHtml()
+                </td>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "masterCodeLabel";
+               settings.Text = "Código Principal: *";
+               settings.AssociatedControlName = "masterCode";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.masterCode, settings =>
+           {
+               settings.Properties.ClientInstanceName = "masterCode";
+               settings.Width = Unit.Percentage(100);
+               settings.ReadOnly = (Model.id !=0); // actualizar de acuerdo al codigo
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnValidate_masterCode";
+               settings.Properties.ClientSideEvents.UserInput = "OnChangeText_masterCode";
+
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "auxCodeLabel";
+               settings.Text = "Código Auxiliar:";
+               settings.AssociatedControlName = "auxCode";
+           }).GetHtml()
+            </td>
+            <td colspan="2">
+                @Html.DevExpress().TextBoxFor(m => m.auxCode, settings =>
+           {
+               settings.Properties.ClientInstanceName = "auxCode";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Init = "OnAuxCodeInit";
+           }).GetHtml()
+            </td>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "barCodeLabel";
+               settings.Text = "Código de Barras:";
+               settings.AssociatedControlName = "barCode";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.barCode, settings =>
+           {
+               settings.Properties.ClientInstanceName = "barCode";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+               settings.Properties.ClientSideEvents.Validation = "OnBarCodeValidation";
+
+               //settings.Properties.MaskSettings.Mask = "0000000000000";
+               //settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "nameLabel";
+               settings.Text = "Nombre: *";
+               settings.AssociatedControlName = "name";
+           }).GetHtml()
+            </td>
+            <td colspan="2">
+                @Html.DevExpress().TextBoxFor(m => m.name, settings =>
+           {
+               settings.Properties.ClientInstanceName = "name";
+               settings.Width = Unit.Percentage(100);
+               settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+           }).GetHtml()
+            </td>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "foreignNameLabel";
+               settings.Text = "Nombre Extranjero:";
+               settings.AssociatedControlName = "foreignName";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => m.foreignName, settings =>
+           {
+               settings.Properties.ClientInstanceName = "foreignName";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "descriptionLabel";
+               settings.Text = "Descripción:";
+               settings.AssociatedControlName = "description";
+           }).GetHtml()
+            </td>
+            <td colspan="5">
+                @Html.DevExpress().MemoFor(m => m.description, settings =>
+           {
+               settings.Properties.ClientInstanceName = "description";
+               settings.Width = Unit.Percentage(100);
+               settings.ShowModelErrors = true;
+           }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @{
+                    string valueDescription2 = DataProviderSetting.ValueSetting("D2IG");
+                }
+                @Html.DevExpress().Label(settings =>
+               {
+                   settings.Name = "description2Label";
+               
+                   settings.Text = !string.IsNullOrEmpty(valueDescription2) ? string.Concat(valueDescription2,":") :  "Descripción 2:";
+                   settings.AssociatedControlName = "description2";
+               }).GetHtml()
+            </td>
+            <td colspan="5">
+                
+                @Html.DevExpress().MemoFor(m => m.description2, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "description2";
+                    settings.Width = Unit.Percentage(100);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "isActiveLabel";
+                    settings.Text = "¿Activo?:";
+                    settings.AssociatedControlName = "isActive";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.isActive, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "isActive";
+                }).GetHtml()
+            </td>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Name = "id_metricTypeLabel";
+                        settings.Text = "Tipo de Unidad de Medida: *";
+                        settings.AssociatedControlName = "id_metricType";
+                    }).GetHtml()
+            </td>
+            <td colspan="2">
+                @{
+                    var id_metricType = (Model != null && Model.id_metricType != 0) ? (int?)Model.id_metricType : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_metricType, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "id_metricType";
+                    settings.Properties.TextField = "name";
+                    settings.Properties.ValueField = "id";
+                    settings.Properties.ValueType = typeof(int);
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                    settings.Width = Unit.Percentage(100);
+
+                    settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                    //settings.ClientEnabled = code_inventoryLine != "PT";
+
+                    settings.Properties.ClientSideEvents.SelectedIndexChanged = "MetricTypesCombo_SelectedIndexChanged";
+                    settings.Properties.ClientSideEvents.Validation = "OnItemMetricTypeValidation";
+                }).BindList(DataProviderMetricType.MetricTypesByCompanyAndCurrent((int)ViewData["id_company"], id_metricType)).Bind(id_metricType).GetHtml()
+            </td>
+
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "hasFormulationLabel";
+                    settings.Text = "¿Tiene Formulación?:";
+                    settings.AssociatedControlName = "hasFormulation";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => m.hasFormulation, settings =>
+           {
+               settings.Properties.ClientInstanceName = "hasFormulation";
+               //settings.ClientEnabled = code_inventoryLine != "PT" && code_inventoryLine != "MI";
+               settings.Properties.ClientSideEvents.CheckedChanged = "FormulationControl_CheckedChange";
+           }).GetHtml()
+            </td>
+            <td colspan="2">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Name = "id_presentationLabel";
+               settings.Text = "Presentación: *";
+               settings.AssociatedControlName = "id_presentation";
+               settings.ClientVisible = (code_inventoryLine == "PT" || code_inventoryLine == "PP");
+           }).GetHtml()
+            </td>
+            <td colspan="2">
+                @{
+                    var id_presentation = (Model != null && Model.id_presentation != 0) ? (int?)Model.id_presentation : null;
+                }
+                @Html.DevExpress().ComboBoxFor(m => m.id_presentation, settings =>
+               {
+                   settings.Properties.ClientInstanceName = "id_presentation";
+                   settings.Properties.TextField = "name";
+                   settings.Properties.ValueField = "id";
+                   settings.Properties.ValueType = typeof(int);
+                   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                   settings.Width = Unit.Percentage(100);
+                   settings.ClientVisible = (code_inventoryLine == "PT" || code_inventoryLine =="PP");
+
+                   settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                   settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboPresentation_SelectedIndexChanged";
+                   settings.Properties.ClientSideEvents.Init = "OnPresentationInit";
+                   settings.Properties.ClientSideEvents.Validation = "OnItemPresentationValidation";
+               }).BindList(DataProviderPresentation.PresentationsByCompanyAndCurrent((int)ViewData["id_company"], id_presentation)).Bind(id_presentation).GetHtml()
+            </td>
+            
+        </tr>
+    </table>
+    <table class="table table-condensed" style="margin: 0; padding: 0">
+        <tr>
+            <td>
+                @{
+                    ViewContext.Writer.Write(@"<input id=""itemId"" type=""hidden"" value=""" + Model.id + @"""/>");
+                    //ViewContext.Writer.Write(@"<div style=""width: 1200px; overflow: auto;"">");
+                    Html.DevExpress().PageControl(tabs =>
+                    {
+                        tabs.Name = "tabControl";
+                        tabs.Width = Unit.Percentage(100);
+                        //tabs.Height = Unit.Pixel(200);
+                        tabs.EnableClientSideAPI = true;
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Name = "tabGeneral";
+                            tab.Text = "General";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.SetContent(() =>
+                            {
+                                Model.ItemGeneral = Model.ItemGeneral ?? new ItemGeneral();
+                                Html.RenderPartial("_General", Model);
+                            });
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Proveedores";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.SetContent(() =>
+                            {
+                                var providers = Model.ItemProvider ?? new List<ItemProvider>();
+                                Html.RenderPartial("_Providers", providers.ToList());
+                            });
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Name = "tabPurchase";
+                            tab.Text = "Compra    ";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                Model.ItemPurchaseInformation = Model.ItemPurchaseInformation ?? new ItemPurchaseInformation();
+                                Model.ItemPurchaseInformation.Item = Model;
+                                Html.RenderPartial("_Purchase", Model.ItemPurchaseInformation);
+                            });
+
+                            tab.ClientVisible = Model.isPurchased;
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Name = "tabSale";
+                            tab.Text = "Venta    ";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                Model.ItemSaleInformation = Model.ItemSaleInformation ?? new ItemSaleInformation();
+                                Model.ItemSaleInformation.Item = Model;
+                                Html.RenderPartial("_Sale", Model.ItemSaleInformation);
+                            });
+
+                            tab.ClientVisible = Model.isSold;
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Name = "tabWeight";
+                            tab.Text = "Pesos    ";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                Model.ItemWeightConversionFreezen = Model.ItemWeightConversionFreezen ?? new ItemWeightConversionFreezen();
+
+                                Html.RenderPartial("_ItemWeightConversionFreezen", Model.ItemWeightConversionFreezen);
+                            });
+
+                            if (Model.InventoryLine == null)
+                            {
+                                tab.ClientVisible = false;
+                            }
+                            else
+                            {
+                                tab.ClientVisible = Model.InventoryLine.code == "PT";
+                            }
+
+
+                        });
+
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Name = "tabInventory";
+                            tab.Text = "Inventario    ";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                Model.ItemInventory = Model.ItemInventory ?? new ItemInventory();
+                                Model.ItemInventory.Item = Model;
+                                Html.RenderPartial("_Inventory", Model.ItemInventory);
+                            });
+
+                            tab.ClientVisible = Model.inventoryControl;
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Name = "tabFormulation";
+                            tab.Text = "Formulación";
+                            tab.ClientVisible = code_inventoryLine != "MI";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+                            tab.SetContent(() =>
+                            {
+                                Model.ItemHeadIngredient = Model.ItemHeadIngredient ?? new ItemHeadIngredient();
+                                Model.ItemHeadIngredient.Item = Model;
+                                Html.RenderPartial("_ItemHeadIngredient", Model.ItemHeadIngredient);
+                                var ingredients = Model.ItemIngredient ?? new List<ItemIngredient>();
+                                Html.RenderPartial("_Formulation", ingredients.ToList());
+                            });
+                            tab.ClientVisible = Model.hasFormulation;
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+
+                            tab.Text = "Tributario";
+                            tab.Name = "tabTax";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.SetContent(() =>
+                            {
+                                var itemTaxation = Model.ItemTaxation ?? new List<ItemTaxation>();
+                                //Html.RenderAction("",)
+                                //TariffItem _tariffItem = Model.TariffItem == null ? new TariffItem() : (TariffItem)Model.TariffItem;
+                                Model.TariffItem = Model.TariffItem ?? new TariffItem();
+                                Html.RenderPartial("_TariffItem", Model.TariffItem);
+                                Html.RenderPartial("_Taxation", itemTaxation.ToList());
+                            });
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Name = "tabTechnicalSpecifications";
+                            tab.Text = "Esp. Técnicas";
+                            tab.TabStyle.Width = Unit.Percentage(100);
+
+                            tab.TabImage.Width = Unit.Pixel(16);
+                            tab.TabImage.Height = Unit.Pixel(16);
+                            tab.TabImage.Align = ImageAlign.Right;
+                            tab.TabImage.Url = "/Content/image/noimage.png";
+                            tab.ActiveTabImage.Align = ImageAlign.Right;
+                            tab.ActiveTabImage.Url = "/Content/image/noimage.png";
+
+                            tab.SetContent(() =>
+                            {
+                                List<ItemDocument> technicalSpecifications = (Model != null && Model.ItemDocument != null
+                                                                                                        ? Model.ItemDocument.ToList()
+                                                                                                        : new List<ItemDocument>());
+
+                                Html.RenderPartial("_TechnicalSpecifications", technicalSpecifications.OrderByDescending(od => od.id).ToList());
+                            });
+                            {
+                                if (Model.InventoryLine == null)
+                                {
+                                    tab.ClientVisible = false;
+                                }
+                                else
+                                {
+                                    tab.ClientVisible = Model.InventoryLine.code == "PT";
+                                }
+                            }
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Campos Adicionales";
+                            tab.NewLine = true;
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.SetContent(() =>
+                            {
+                                var aditionalFields = Model.ItemAditionalField ?? new List<ItemAditionalField>();
+                                Html.RenderPartial("_AditionalField", aditionalFields.ToList());
+                            });
+                        });
+                        tabs.TabPages.Add(tab =>
+                        {
+                            tab.Text = "Equivalencia de Producto";
+                            tab.Name = "tabEquivalence";
+                            tab.NewLine = true;
+                            tab.TabStyle.Width = Unit.Percentage(100);
+                            tab.SetContent(() =>
+                            {
+                                var _itemEquivalence = Model.ItemEquivalence ?? new ItemEquivalence();
+                                Html.RenderPartial("_EquivalenceItem", _itemEquivalence);
+                            });
+                            if (Model.InventoryLine == null)
+                            {
+                                tab.ClientVisible = false;
+                            }
+                            else
+                            {
+                                tab.ClientVisible = Model.InventoryLine.code == "PP" || Model.InventoryLine.code == "PT";
+                            }
+                        });
+                    }).Render();
+                }
+            </td>
+        </tr>
+    </table>
+}

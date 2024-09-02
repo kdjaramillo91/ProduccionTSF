@@ -1,0 +1,219 @@
+﻿@using DXPANACEASOFT.DataProviders
+
+@model DXPANACEASOFT.Models.ProviderTypeShrimp
+
+<table class="table table-condensed">
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_protectiveProvider, settings =>
+			{
+				settings.Name = "id_protectiveProviderLabel";
+				settings.Text = "Proveedor Amparante:";
+				settings.AssociatedControlName = "id_protectiveProviderLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_protectiveProvider = (Model != null) ? ((int?)Model.id_protectiveProvider ?? (int?)Model.id_provider) : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_protectiveProvider, settings =>
+		   {
+			   settings.Name = "id_protectiveProvider";
+			   settings.Properties.ClientInstanceName = "id_protectiveProvider";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+					settings.ShowModelErrors = true;
+		   }).BindList(DataProviderPerson.ProviderByCompanyAndCurrent((int?)ViewData["id_company"], id_protectiveProvider)).Bind(id_protectiveProvider).GetHtml()
+
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_TypeINP, settings =>
+			{
+				settings.Name = "id_inpCodeTypeLabel";
+				settings.Text = "Tipo Codigo INP:";
+				settings.AssociatedControlName = "id_inpCodeTypeLabel";
+			}).GetHtml()
+
+		</td>
+		<td>
+			@{
+
+				int? id_TypeINP = (Model != null) ? (int?)Model.id_TypeINP : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_TypeINP, settings =>
+		   {
+			   settings.Name = "id_TypeINP";
+			   settings.Properties.ClientInstanceName = "id_TypeINP";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			   settings.ShowModelErrors = true;
+		   }).BindList(DataProviderTypeINP.AllTypeINP((int?)ViewData["id_company"])).Bind(id_TypeINP).GetHtml()
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.grammageFrom, settings =>
+			{
+				settings.Name = "grammageFromLabel";
+				settings.Text = "Gramaje Desde:";
+				settings.AssociatedControlName = "grammageFromLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? grammageFrom = (Model != null) ? (int?)Model.grammageFrom : null;
+
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.grammageFrom, settings =>
+		   {
+			   settings.Name = "grammageFrom";
+			   settings.Properties.ClientInstanceName = "grammageFrom";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextFormatString = "{2}";
+			   settings.Properties.TextField = "description";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			   settings.Properties.Columns.Add("code", "Código", 70);
+			   settings.Properties.Columns.Add("value", "Valor", 70);
+			   settings.Properties.Columns.Add("description", "Gramaje", 300);
+			   settings.ShowModelErrors = true;
+			   settings.Properties.ClientSideEvents.Validation = "OnGrammageFromValidation";
+			   settings.Properties.ClientSideEvents.Validation = "OnGrammageFromToValidation_selectedIndexChanged";
+		   }).BindList(DataProviderGrammage.GrammagesByCompany((int?)ViewData["id_company"])).Bind(grammageFrom).GetHtml()
+
+		</td>
+
+		<td>
+			@Html.DevExpress().LabelFor(m => m.grammageUpto, settings =>
+			{
+				settings.Name = "grammageUptoLabel";
+				settings.Text = "Gramaje Hasta:";
+				settings.AssociatedControlName = "grammageUptoLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? grammageUpto = (Model != null) ? (int?)Model.grammageUpto : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.grammageUpto, settings =>
+	   {
+		   settings.Name = "grammageUpto";
+		   settings.Properties.ClientInstanceName = "grammageUpto";
+		   settings.Properties.ValueField = "id";
+		   settings.Properties.TextFormatString = "{2}";
+		   settings.Properties.TextField = "description";
+		   settings.Properties.ValueType = typeof(int);
+		   settings.Width = Unit.Percentage(100);
+		   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+		   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+		   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+		   settings.Properties.Columns.Add("code", "Código", 70);
+		   settings.Properties.Columns.Add("value", "Valor", 70);
+		   settings.Properties.Columns.Add("description", "Gramaje", 300);
+		   settings.ShowModelErrors = true;
+		   settings.Properties.ClientSideEvents.Validation = "OnGrammageUpToValidation";
+		   settings.Properties.ClientSideEvents.SelectedIndexChanged = "OnGrammageUpToValidation_selectedIndexChanged";
+	   }).BindList(DataProviderGrammage.GrammagesByCompany((int?)ViewData["id_company"])).Bind(grammageUpto).GetHtml()
+
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			@Html.DevExpress().Label(settings =>
+			{
+				settings.Name = "totalHectareasPoolLabel";
+				settings.Text = "Hectáreas:";
+				settings.AssociatedControlName = "totalHectareasPoolLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().SpinEditFor(m => m.totalHectareasPool, settings =>
+		   {
+			   settings.Name = "totalHectareasPool";
+			   settings.Properties.ClientInstanceName = "totalHectareasPool";
+			   settings.Width = Unit.Percentage(95);
+
+			   settings.Properties.DisplayFormatString = "N2";
+			   settings.Properties.MaxValue = 9999999;
+			   settings.Properties.MinValue = 0;
+		   }).GetHtml()
+		</td>
+		<td>
+			@Html.DevExpress().LabelFor(m => m.id_buyerProvider, settings =>
+			{
+				settings.Name = "id_buyerProviderLabel";
+				settings.Text = "Comprador:";
+				settings.AssociatedControlName = "id_buyerProviderLabel";
+			}).GetHtml()
+		</td>
+		<td>
+			@{
+				int? id_buyerProvider = (Model != null) ? (int?)Model.id_buyerProvider : null;
+			}
+			@Html.DevExpress().ComboBoxFor(m => m.id_buyerProvider, settings =>
+		   {
+			   settings.Name = "id_buyerProvider";
+			   settings.Properties.ClientInstanceName = "id_buyerProvider";
+			   settings.Properties.ValueField = "id";
+			   settings.Properties.TextField = "name";
+			   settings.Properties.ValueType = typeof(int);
+			   settings.Width = Unit.Percentage(100);
+			   settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+			   settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+			   settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+			   settings.ShowModelErrors = true;
+		   }).BindList(DataProviderPerson.AllBuyerPersonsByCompany((int?)ViewData["id_company"], id_buyerProvider)).Bind(id_buyerProvider).GetHtml()
+
+		</td>
+	</tr>
+	@if (Model.Provider != null)
+	{
+		<tr>
+			<td>
+				@Html.DevExpress().LabelFor(m => m.Provider.Person.isCopacking, settings =>
+				{
+					settings.Name = "isCopackingLabel";
+					settings.Text = "¿Copacking?:";
+					settings.AssociatedControlName = "isCopackingLabel";
+				}).GetHtml()
+			</td>
+			<td>
+				@{
+					var isCopakingData = Model.Provider.Person.isCopacking;
+					if (isCopakingData == null)
+					{
+						isCopakingData = false;
+					}
+				}
+				@Html.DevExpress().CheckBox(settings =>
+				{
+					settings.Name = "isCopacking";
+					settings.Checked = (bool)isCopakingData;
+					settings.Enabled = true;
+					settings.Properties.ClientInstanceName = "isCopacking";
+					settings.Properties.ClientSideEvents.CheckedChanged = "CambiarCopackingCheck";
+				}).GetHtml()
+			</td>
+		</tr>
+	}
+
+</table>

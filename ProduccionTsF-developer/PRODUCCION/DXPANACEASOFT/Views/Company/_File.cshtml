@@ -1,0 +1,35 @@
+﻿
+@model DXPANACEASOFT.Models.CompanyElectronicFacturation
+
+@{
+    bool hasCertificate = (Model != null && !string.IsNullOrEmpty(Model.certificate));
+}
+
+<input id="certificateFile" name="certificateFile" type="file" accept=".p12" style="display: none;" />
+
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 100%;">
+            @Html.DevExpress().TextBoxFor(m => m.certificate, settings =>
+            {
+                settings.Properties.ClientInstanceName = "certificate";
+                settings.ReadOnly = true;
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Validation = "OnCertificateValidation";
+            }).GetHtml()
+        </td>
+        <td style="text-align: left; vertical-align: top;">
+            @Html.DevExpress().Button(settings =>
+            {
+                settings.Name = "certificateAction";
+                settings.Text = "";
+                settings.ToolTip = (hasCertificate) ? "Eliminar Certificado" : "Seleccionar Certificado";
+                settings.RenderMode = ButtonRenderMode.Button;
+                settings.UseSubmitBehavior = false;
+                settings.Images.Image.IconID = (hasCertificate) ? IconID.ActionsRemove16x16 : IconID.ActionsLoadfrom16x16;
+                settings.ClientSideEvents.Click = (hasCertificate) ? "ClearCertificateClick" : "LoadCertificateClick";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

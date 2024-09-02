@@ -1,0 +1,39 @@
+﻿@model DXPANACEASOFT.Models.ProductionLot
+
+@{
+    int? id_productionUnit = (Model != null && Model.id_productionUnit != 0) ? (int?)Model.id_productionUnit : null;
+}
+
+@Html.DevExpress().ComboBoxFor(m => m.id_productionUnit, p =>
+{
+
+    p.Name = "id_productionUnit";
+    p.Properties.ClientInstanceName = "id_productionUnit";
+    p.Width = Unit.Percentage(100);
+    p.ClientEnabled = true;
+    p.Properties.ValueField = "id";
+    p.Properties.TextField = "name";
+    p.Properties.ValueType = typeof(int);
+    p.Properties.Width = Unit.Percentage(100);
+
+    p.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    p.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+    p.Properties.EnableSynchronization = DefaultBoolean.False;
+    p.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    p.ReadOnly = @Model.ProductionLotState.code != "01";
+
+    p.CallbackRouteValues = new { Controller = "ProductionLotProcess", Action = "GetUnitProduction" };
+    p.Properties.CallbackPageSize = 30;
+    p.Properties.ClientSideEvents.BeginCallback = "ComboProductionUnit_BeginCallback";
+    p.Properties.ClientSideEvents.EndCallback = "ComboProductionUnit_EndCallback";
+
+    //p.ClientSideEvents.SelectedIndexChanged = "ComboItem_SelectedIndexChanged";
+    //p.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+    p.Properties.ClientSideEvents.Validation = "OnProductionUnitValidation";
+    p.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProductionUnit_SelectedIndexChanged";
+
+
+
+
+}).BindList(DataProviderProductionUnit.ProductionUnitsByProcessReq((int?)ViewData["id_company"], (int?)Model.id_productionProcess, id_productionUnit)).Bind(id_productionUnit).GetHtml()

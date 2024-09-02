@@ -1,0 +1,354 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model DXPANACEASOFT.Models.IntegrationProcess
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "formFilterIntegrationProcess", name = "formFilterIntegrationProcess" }))
+{
+    <table class="table table-condensed" style="border: 0px solid #ffffff; margin-bottom: 0px;">
+        <tr>
+            <td >
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="2">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Información Lote Proceso de Integración</span>
+                        </td>
+                    </tr>
+
+                    <!--  Numero de Lote -->
+                    <tr>
+                        <td>@Html.DevExpress().LabelFor(m => m.id, settings =>
+                            {
+                                settings.Name = "id_LoteLabel";
+                                settings.Text = "Numero Lote:";
+                                settings.AssociatedControlName = "id_Lote";
+                            }).GetHtml() </td>
+                        <td>
+                            @Html.DevExpress().TextBox( settings =>
+                            {
+                                settings.Name = "codeLote";
+                                settings.Properties.ClientInstanceName = "codeLote";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todas";
+                                settings.Properties.NullText = "Todas";
+                            }).GetHtml()
+                             
+                        </td>
+                    </tr>
+
+                    <!--  Tipo de Documento -->
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.id_DocumentType, settings =>
+                            {
+                                settings.Name = "id_DocumentTypeLabel";
+                                settings.Text = "Tipo de Documento:";
+                                settings.AssociatedControlName = "id_DocumentType";
+                            }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBox(settings =>
+                       {
+                           settings.Name = "id_DocumentType";
+                           settings.Properties.ClientInstanceName = "id_DocumentType";
+
+                           settings.Width = Unit.Percentage(100);
+                           settings.Properties.ValueField = "id";
+                           settings.Properties.TextField = "description";
+                           settings.Properties.ValueType = typeof(int);
+
+                           settings.Properties.NullDisplayText = "Todos";
+                           settings.Properties.NullText = "Todos";
+
+                           settings.Properties.Width = Unit.Percentage(100);
+                           settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                           settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                           settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                       }).BindList( DataProviderDocumentType.DocumentTypeForIntegrationProcess((int?)ViewData["id_company"])  ).GetHtml()
+                        </td>
+                    </tr>
+
+                    <!--  Estado de Lote -->
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.id_StatusLote, settings =>
+                            {
+                                settings.Name = "id_StatusLoteLabel";
+                                settings.Text = "Estado del Lote:";
+                                settings.AssociatedControlName = "id_StatusLote";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().ComboBox(settings =>
+                           {
+                               settings.Name = "id_StatusLote";
+                               settings.Properties.ClientInstanceName = "id_StatusLote";
+
+                               settings.Width = Unit.Percentage(100);
+                               settings.Properties.ValueField = "id";
+                               settings.Properties.TextField = "name";
+                               settings.Properties.ValueType = typeof(int);
+
+                               settings.Properties.NullDisplayText = "Todos";
+                               settings.Properties.NullText = "Todos";
+
+                               settings.Properties.Width = Unit.Percentage(100);
+                               settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                               settings.Properties.EnableSynchronization = DefaultBoolean.False;
+                               settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+                           }).BindList(DataProviderIntegrationProcess.States((int)ViewData["id_company"])).GetHtml()
+                        </td>
+                    </tr>
+
+                    <!-- Descripción -->
+                    <tr>
+                        <td>
+                            @Html.DevExpress().LabelFor(m => m.description, settings =>
+                            {
+                                settings.Name = "descriptionLabel";
+                                settings.Text = "Descripcion:";
+                                settings.AssociatedControlName = "description";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().TextBox( settings =>
+                            {
+                                settings.Name = "description";
+                                settings.Properties.ClientInstanceName = "description";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Todas";
+                                settings.Properties.NullText = "Todas";
+
+                            }).GetHtml()
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+            <td>
+                <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td colspan="4">
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Emisi&oacute;n y Procesamiento</span>
+                        </td>
+                    </tr>
+                    <!-- Fecha Creacion Lote -->
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings =>
+                            {
+                                settings.Name = "dateInitCreateLabel";
+                                settings.Text = "Fecha Creación Lote:";
+                                settings.AssociatedControlName = "dateInitCreate";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEdit(settings =>
+                            {
+                                settings.Name = "dateInitCreate";
+                                settings.Properties.ClientInstanceName = "dateInitCreate";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Desde";
+                                settings.Properties.NullText = "Desde";
+
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                settings.Properties.EditFormat = EditFormat.Custom;
+                                settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                settings.Properties.CalendarProperties.Columns = 2;
+                                settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEdit(settings =>
+                            {
+                                settings.Name = "dateEndCreate";
+                                settings.Properties.ClientInstanceName = "dateEndCreate";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Hasta";
+                                settings.Properties.NullText = "Hasta";
+
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                settings.Properties.EditFormat = EditFormat.Custom;
+                                settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                settings.Properties.CalendarProperties.Columns = 2;
+                                settings.Properties.DateRangeSettings.StartDateEditID = "startEmissionDate";
+                                settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                            }).GetHtml()
+                        </td>
+                    </tr>
+
+                    <!-- Fecha Incio Procesamiento  -->
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(  settings =>
+                            {
+                                settings.Name = "dateInitExecLabel";
+                                settings.Text = "Fecha Procesamiento Lote:";
+                                settings.AssociatedControlName = "dateInitExec";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEdit(  settings =>
+                            {
+                                settings.Name = "dateInitExec";
+                                settings.Properties.ClientInstanceName = "dateInitExec";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Desde";
+                                settings.Properties.NullText = "Desde";
+
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                settings.Properties.EditFormat = EditFormat.Custom;
+                                settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                settings.Properties.CalendarProperties.Columns = 2;
+                                settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().DateEdit( settings =>
+                            {
+                                settings.Name = "dateEndExec";
+                                settings.Properties.ClientInstanceName = "dateEndExec";
+                                settings.Width = Unit.Percentage(100);
+
+                                settings.Properties.NullDisplayText = "Hasta";
+                                settings.Properties.NullText = "Hasta";
+
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                settings.Properties.EditFormat = EditFormat.Custom;
+                                settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                                settings.Properties.CalendarProperties.Columns = 2;
+                                settings.Properties.DateRangeSettings.StartDateEditID = "dateInitExec";
+                                settings.Properties.DateRangeSettings.MinDayCount = 1;
+                                settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    
+                    <!-- Fecha Final Integracion  -->
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label( settings =>
+                            {
+                                settings.Name = "dateInitFullIntegrationLabel";
+                                settings.Text = "Fecha Integración Lote:";
+                                settings.AssociatedControlName = "dateInitFullIntegration";
+                            }).GetHtml()
+                        </td>
+                        <td>
+                          @Html.DevExpress().DateEdit(settings =>
+                           {
+                               settings.Name = "dateInitFullIntegration";
+                               settings.Properties.ClientInstanceName = "dateInitFullIntegration";
+                               settings.Width = Unit.Percentage(100);
+
+                               settings.Properties.NullDisplayText = "Desde";
+                               settings.Properties.NullText = "Desde";
+
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                               settings.Properties.EditFormat = EditFormat.Custom;
+                               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                               settings.Properties.CalendarProperties.Columns = 2;
+                               settings.Properties.DateRangeSettings.MinDayCount = 1;
+                               settings.Properties.DateRangeSettings.MaxDayCount = 90;
+
+                           }).GetHtml()
+                        </td>
+                        <td>
+                          @Html.DevExpress().DateEdit(settings =>
+                           {
+                               settings.Name = "dateEndFullIntegration";
+                               settings.Properties.ClientInstanceName = "dateEndFullIntegration";
+                               settings.Width = Unit.Percentage(100);
+
+                               settings.Properties.NullDisplayText = "Hasta";
+                               settings.Properties.NullText = "Hasta";
+
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "dd/MM/yyyy";
+                               settings.Properties.EditFormat = EditFormat.Custom;
+                               settings.Properties.EditFormatString = "dd/MM/yyyy";
+
+                               settings.Properties.CalendarProperties.Columns = 2;
+                               settings.Properties.DateRangeSettings.StartDateEditID = "dateInitFullIntegration";
+                               settings.Properties.DateRangeSettings.MinDayCount = 1;
+                               settings.Properties.DateRangeSettings.MaxDayCount = 90;
+                           }).GetHtml()
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+            <td style="width: 20%">
+               <table class="table table-condensed" style="border: 0px solid #ffffff;">
+                    <tr style="border-bottom: 1px Solid #C0C0C0;">
+                        <td>
+                            <span class="dxflGroupBoxCaption_Metropolis" style="left: 0px; padding-left: 0px; top: 0px;">Acciones</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "btnSearch";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Buscar";
+                                settings.Images.Image.IconID = IconID.ActionsSearch16x16devav;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "OIntegrationProcess.FindLote";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "Clear";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Limpiar";
+                                settings.Images.Image.IconID = IconID.ActionsClear16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "OIntegrationProcess.ClearFilterLote";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "NewLote";
+                                settings.UseSubmitBehavior = false;
+                                settings.Text = "Nuevo Lote de Integración";
+                                settings.Images.Image.IconID = IconID.ActionsAdd16x16;
+                                settings.Width = Unit.Percentage(100);
+                                settings.ClientSideEvents.Click = "OIntegrationProcess.AddNewLote";
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+}

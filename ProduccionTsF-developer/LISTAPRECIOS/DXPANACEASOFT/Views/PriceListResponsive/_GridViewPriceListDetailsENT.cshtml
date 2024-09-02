@@ -1,0 +1,1229 @@
+
+@using System.Drawing
+@using DXPANACEASOFT.Models.DTOModel
+@using DXPANACEASOFT.Models
+@using DXPANACEASOFT.DataProviders
+
+@*@{
+        var settingPBLPM = DataProviderSettings.Setting("PBLPM");
+        bool aPBLPM = settingPBLPM != null && settingPBLPM.value.Equals("SI");
+    }*@
+@{
+    bool nViewAllCols = (ViewBag.viewall != null && ViewBag.viewall == 1) ? true : false;
+}
+@{
+    var grid = Html.DevExpress().GridView<PriceListDetailDTO>(settings =>
+    {
+        settings.Name = "GridViewPriceListDetailsENT";
+        settings.CallbackRouteValues = new
+        {
+            Controller = "PriceListResponsive",
+            Action = "GridViewPriceListDetailsENT",
+            id_processtype = ViewBag.id_processtype,
+            isQuotation = ViewBag.isQuotation,
+            id_priceListBase = ViewBag.id_priceListBase,
+            enabled = ViewBag.enabled,
+            IsOwner = ViewBag.IsOwner,
+            code_processtype = "ENT",
+            isClassB = false
+        };
+
+        settings.Enabled = ViewBag.enabled;
+
+        settings.KeyFieldName = "idItemSize;id_Class";
+
+        settings.ClientSideEvents.BatchEditEndEditing = "OnBatchEditEndEditingENT";
+        //settings.ClientSideEvents.EndCallback = "OnEndCallbackENT";
+        settings.Settings.HorizontalScrollBarMode = ScrollBarMode.Visible;
+
+
+        settings.Settings.ShowGroupPanel = false;
+
+        settings.PreRender = (s, e) =>
+        {
+            MVCxGridView gridView = s as MVCxGridView;
+            if (gridView != null)
+                gridView.ExpandAll();
+        };
+
+        settings.SettingsBehavior.AllowFixedGroups = true;
+
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 300;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        settings.Settings.ShowStatusBar = GridViewStatusBarMode.Hidden;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Cell;
+        settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+        settings.SettingsEditing.BatchEditSettings.ShowConfirmOnLosingChanges = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Width = Unit.Percentage(100);
+
+        settings.Styles.Header.BackColor = Color.FromArgb(255, 255, 191, 102);
+        settings.Styles.Header.Font.Bold = true;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            var listPriceLists = (Model as List<PriceListDetailDTO>) ?? new List<PriceListDetailDTO>();
+            e.Properties["cpPriceListCount"] = listPriceLists.Count;
+            e.Properties["cpOrderClassShrimp"] = ViewBag.OrderClassShrimp;
+            //e.Properties["cpCanReplicateDetailsENT"] = ViewBag.CanReplicateDetailsENT;
+        };
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "idItemSize";
+            column.Name = "idItemSize";
+            column.Caption = "idItemSize";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "id_Class";
+            column.Name = "id_Class";
+            column.Caption = "id_Class";
+            column.Width = Unit.Percentage(0);
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "nameClass";
+            column.Name = "nameClass";
+            column.Caption = "Categoría";
+            column.GroupIndex = 0;
+            column.Settings.ShowEditorInBatchEditMode = false;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "name";
+            column.Name = "name";
+            column.Caption = "Nombre";
+            column.Settings.ShowEditorInBatchEditMode = false;
+            column.FixedStyle = GridViewColumnFixedStyle.Left;
+        });
+
+        var codeLast = "";
+        int count = 0;
+        List<SelectListItem> aOrderClassShrimp = (List<SelectListItem>)ViewBag.OrderClassShrimp;
+        foreach (var item in aOrderClassShrimp)
+        {
+            switch (count)
+            {
+                case 0:
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D0.price_RF";
+                        column.Name = "D0Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+                        //column.CellStyle.ForeColor = Color.Blue;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+
+                    GridViewFormatConditionHighlight rul = new GridViewFormatConditionHighlight();
+                    rul.FieldName = "D0.price_RF";
+                    rul.Expression = "true";
+                    rul.ApplyToRow = false;
+                    rul.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D0.price";
+                        column.Name = "D0Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D0.commission";
+                        column.Name = "D0Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D0.price_PC";
+                        column.Name = "D0Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D0.difference_F_RF";
+                        column.Name = "D0Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ( (!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+
+
+                    //GridViewFormatConditionHighlight rul_D0_difference_F_RF_Mas = new GridViewFormatConditionHighlight();
+                    //rul_D0_difference_F_RF_Mas.FieldName = "D0.difference_F_RF";
+                    //rul_D0_difference_F_RF_Mas.Expression = "[D0.difference_F_RF] > 0";
+                    //rul_D0_difference_F_RF_Mas.ApplyToRow = false;
+                    //rul_D0_difference_F_RF_Mas.Format = GridConditionHighlightFormat.LightRedFillWithDarkRedText;
+                    //settings.FormatConditions.Add(rul_D0_difference_F_RF_Mas);
+
+                    //GridViewFormatConditionHighlight rul_D0_difference_F_RF_Menos = new GridViewFormatConditionHighlight();
+                    //rul_D0_difference_F_RF_Menos.FieldName = "D0.difference_F_RF";
+                    //rul_D0_difference_F_RF_Menos.Expression = "[D0.difference_F_RF] < 0";
+                    //rul_D0_difference_F_RF_Menos.ApplyToRow = false;
+                    //rul_D0_difference_F_RF_Menos.Format = GridConditionHighlightFormat.GreenFillWithDarkGreenText;
+                    //settings.FormatConditions.Add(rul_D0_difference_F_RF_Menos);
+
+                    settings.FormatConditions.AddHighlight("D0.difference_F_RF", "[D0.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D0.difference_F_RF", "[D0.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    break;
+                case 1:
+
+                    settings.Columns.Add(m => m.D1.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D0D1Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        //column.Visible = !nViewAllCols;
+                        if ( nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D1.difference", "[D1.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D1.difference", "[D1.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+
+
+                    //settings.Columns.Add(m => m.D1.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D1Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D1.price_RF";
+                        column.Name = "D1Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        //column.Visible = !nViewAllCols;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                    });
+                    GridViewFormatConditionHighlight rul1 = new GridViewFormatConditionHighlight();
+                    rul1.FieldName = "D1.price_RF";
+                    rul1.Expression = "true";
+                    rul1.ApplyToRow = false;
+                    rul1.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul1.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul1);
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D1.price";
+                        column.Name = "D1Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D1.commission";
+                        column.Name = "D1Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D1.price_PC";
+                        column.Name = "D1Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D1.difference_F_RF";
+                        column.Name = "D1Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                        //column.Visible = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D1.difference_F_RF", "[D1.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D1.difference_F_RF", "[D1.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+
+                    break;
+                case 2:
+                    settings.Columns.Add(m => m.D2.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D1D2Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        if (nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D2.difference", "[D2.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D2.difference", "[D2.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    //settings.Columns.Add(m => m.D2.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D2Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D2.price_RF";
+                        column.Name = "D2Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                        //column.Visible = !nViewAllCols;
+                    });
+                    GridViewFormatConditionHighlight rul2 = new GridViewFormatConditionHighlight();
+                    rul2.FieldName = "D2.price_RF";
+                    rul2.Expression = "true";
+                    rul2.ApplyToRow = false;
+                    rul2.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul2.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul2);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D2.price";
+                        column.Name = "D2Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D2.commission";
+                        column.Name = "D2Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D2.price_PC";
+                        column.Name = "D2Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+                    
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D2.difference_F_RF";
+                        column.Name = "D2Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                    
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                        //column.Visible = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D2.difference_F_RF", "[D2.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D2.difference_F_RF", "[D2.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    
+
+                    break;
+                case 3:
+                    settings.Columns.Add(m => m.D3.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D2D3Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        if (nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D3.difference", "[D3.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D3.difference", "[D3.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    //settings.Columns.Add(m => m.D3.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D3Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D3.price_RF";
+                        column.Name = "D3Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                        //column.Visible = !nViewAllCols;
+                    });
+                    GridViewFormatConditionHighlight rul3 = new GridViewFormatConditionHighlight();
+                    rul3.FieldName = "D3.price_RF";
+                    rul3.Expression = "true";
+                    rul3.ApplyToRow = false;
+                    rul3.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul3.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul3);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D3.price";
+                        column.Name = "D3Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+
+                    });
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D3.commission";
+                        column.Name = "D3Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D3.price_PC";
+                        column.Name = "D3Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+
+
+                   
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D3.difference_F_RF";
+                        column.Name = "D3Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                    });
+                    settings.FormatConditions.AddHighlight("D3.difference_F_RF", "[D3.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D3.difference_F_RF", "[D3.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+
+                    break;
+                case 4:
+                    settings.Columns.Add(m => m.D4.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D3D4Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        //column.Visible = !nViewAllCols;
+                        if ( nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D4.difference", "[D4.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D4.difference", "[D4.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    //settings.Columns.Add(m => m.D4.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D4Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D4.price_RF";
+                        column.Name = "D4Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                    });
+                    GridViewFormatConditionHighlight rul4 = new GridViewFormatConditionHighlight();
+                    rul4.FieldName = "D4.price_RF";
+                    rul4.Expression = "true";
+                    rul4.ApplyToRow = false;
+                    rul4.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul4.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul4);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D4.price";
+                        column.Name = "D4Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D4.commission";
+                        column.Name = "D4Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+
+                    
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D4.price_PC";
+                        column.Name = "D4Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D4.difference_F_RF";
+                        column.Name = "D4Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                    });
+                    settings.FormatConditions.AddHighlight("D4.difference_F_RF", "[D4.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D4.difference_F_RF", "[D4.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+
+                    break;
+                case 5:
+                    settings.Columns.Add(m => m.D5.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D4D5Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        if (nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D5.difference", "[D5.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D5.difference", "[D5.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    //settings.Columns.Add(m => m.D5.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D5Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D5.price_RF";
+                        column.Name = "D5Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                    });
+                    GridViewFormatConditionHighlight rul5 = new GridViewFormatConditionHighlight();
+                    rul5.FieldName = "D5.price_RF";
+                    rul5.Expression = "true";
+                    rul5.ApplyToRow = false;
+                    rul5.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul5.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul5);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D5.price";
+                        column.Name = "D5Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D5.commission";
+                        column.Name = "D5Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D5.price_PC";
+                        column.Name = "D5Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D5.difference_F_RF";
+                        column.Name = "D5Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                    });
+                    settings.FormatConditions.AddHighlight("D5.difference_F_RF", "[D5.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D5.difference_F_RF", "[D5.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    break;
+                case 6:
+                    settings.Columns.Add(m => m.D6.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D5D6Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        if (nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D6.difference", "[D6.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D6.difference", "[D6.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    //settings.Columns.Add(m => m.D6.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D6Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D6.price_RF";
+                        column.Name = "D6Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                    });
+                    GridViewFormatConditionHighlight rul6 = new GridViewFormatConditionHighlight();
+                    rul6.FieldName = "D6.price_RF";
+                    rul6.Expression = "true";
+                    rul6.ApplyToRow = false;
+                    rul6.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul6.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul6);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D6.price";
+                        column.Name = "D6Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D6.commission";
+                        column.Name = "D6Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D6.price_PC";
+                        column.Name = "D6Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                        //column.Visible = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D6.difference_F_RF";
+                        column.Name = "D6Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                    });
+                    settings.FormatConditions.AddHighlight("D6.difference_F_RF", "[D6.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D6.difference_F_RF", "[D6.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    break;
+                case 7:
+                    settings.Columns.Add(m => m.D7.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D6D7Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        if (nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D7.difference", "[D7.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D7.difference", "[D7.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    //settings.Columns.Add(m => m.D7.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D7Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D7.price_RF";
+                        column.Name = "D7Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                    });
+                    GridViewFormatConditionHighlight rul7 = new GridViewFormatConditionHighlight();
+                    rul7.FieldName = "D7.price_RF";
+                    rul7.Expression = "true";
+                    rul7.ApplyToRow = false;
+                    rul7.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul7.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul7);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D7.price";
+                        column.Name = "D7Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D7.commission";
+                        column.Name = "D7Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D7.price_PC";
+                        column.Name = "D7Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D7.difference_F_RF";
+                        column.Name = "D7Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                    });
+                    settings.FormatConditions.AddHighlight("D7.difference_F_RF", "[D7.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D7.difference_F_RF", "[D7.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    break;
+                case 8:
+                    settings.Columns.Add(m => m.D8.difference, column =>
+                    {
+                        //column.FieldName = "ListPriceListClassShrimpDTO";
+                        column.Name = "D7D8Difference";
+                        column.Caption = codeLast + "-" + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        if (nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.FormatConditions.AddHighlight("D8.difference", "[D8.difference] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D8.difference", "[D8.difference] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    //settings.Columns.Add(m => m.D8.price, column =>
+                    //{
+                    //    //column.FieldName = "ListPriceListClassShrimpDTO";
+                    //    column.Name = "D8Price";
+                    //    column.Caption = item.Text;
+                    //    column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                    //    //column.ReadOnly = !aPBLPM;
+                    //    SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                    //    prop.MinValue = 0;
+                    //    prop.MaxValue = 9999;
+                    //    prop.DisplayFormatString = "n";
+                    //    prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    //});
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D8.price_RF";
+                        column.Name = "D8Price_RF";
+                        column.Caption = "RF " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !((!(bool)ViewBag.isQuotation) && nViewAllCols);
+                    });
+                    GridViewFormatConditionHighlight rul8 = new GridViewFormatConditionHighlight();
+                    rul8.FieldName = "D8.price_RF";
+                    rul8.Expression = "true";
+                    rul8.ApplyToRow = false;
+                    rul8.CellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    rul8.Format = GridConditionHighlightFormat.Custom;
+                    settings.FormatConditions.Add(rul8);
+
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D8.price";
+                        column.Name = "D8Price";
+                        column.Caption = "PP " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D8.commission";
+                        column.Name = "D8Commission";
+                        column.Caption = "CM " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = ((!(bool)ViewBag.isQuotation) || nViewAllCols);
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D8.price_PC";
+                        column.Name = "D8Price_PC";
+                        column.Caption = "PC " + item.Text;
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        if ((!(bool)ViewBag.isQuotation) || nViewAllCols) column.Width = Unit.Percentage(0);
+                        column.ReadOnly = true;
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = !nViewAllCols;
+                    });
+                    settings.Columns.Add(column =>
+                    {
+                        column.FieldName = "D8.difference_F_RF";
+                        column.Name = "D8Difference_F_RF";
+                        column.Caption = "PP " + item.Text + " - RF";
+                        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                        column.ReadOnly = true;
+                        if (!(bool)ViewBag.isQuotation || nViewAllCols) column.Width = Unit.Percentage(0);
+
+                        SpinEditProperties prop = column.PropertiesEdit as SpinEditProperties;
+                        prop.MinValue = 0;
+                        prop.MaxValue = 9999;
+                        prop.DisplayFormatString = "n";
+                        prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.None;
+                        column.Settings.ShowEditorInBatchEditMode = false;
+                    });
+                    settings.FormatConditions.AddHighlight("D8.difference_F_RF", "[D8.difference_F_RF] > 0", GridConditionHighlightFormat.LightRedFillWithDarkRedText);
+                    settings.FormatConditions.AddHighlight("D8.difference_F_RF", "[D8.difference_F_RF] < 0", GridConditionHighlightFormat.GreenFillWithDarkGreenText);
+                    break;
+                default:
+                    break;
+            }
+            codeLast = item.Text;
+            count++;
+        }
+
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

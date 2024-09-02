@@ -1,0 +1,26 @@
+﻿@using DXPANACEASOFT.DataProviders
+@using DXPANACEASOFT.Models
+
+@{
+    Layout = null;
+}
+
+<h4>Análisis de Calidad</h4>
+
+@{
+    ViewData["Model"] = new DXPANACEASOFT.Models.QualityControl()
+    {
+        Document = new Document
+        {
+            DocumentType = DataProviderDocumentType.DocumentTypeByCode("61")//Control de Calidad
+        }
+    };
+
+    Html.RenderPartial("FilterBoxTemplates/_FilterBox", "_QualityControlFilterFormPartial");
+}
+
+<div id="results">
+
+</div>
+
+<script src="~/Scripts/qualitycontrol/index.js"></script>

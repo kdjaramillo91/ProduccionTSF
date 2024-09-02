@@ -1,0 +1,57 @@
+﻿@using DXPANACEASOFT.DataProviders
+@model IList<DXPANACEASOFT.Models.ProductionUnitProviderPool>
+
+<table class="table table-condensed">
+    <tr>
+        <td style="width: 8%;">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Text = "Proveedor:*";
+               settings.AssociatedControlName = "id_provider";
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "id_provider";
+                settings.Properties.ClientInstanceName = "id_provider";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProvider_SelectedIndexChanged";
+            }).BindList(DataProviderPerson.ProvidersShrimpPerson()).GetHtml()
+        </td>
+        <td style="width: 8%;">
+            @Html.DevExpress().Label(settings =>
+           {
+               settings.Text = "Camaronera:*";
+               settings.AssociatedControlName = "id_productionUnitProvider";
+
+           }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "id_productionUnitProvider";
+                settings.Properties.ClientInstanceName = "id_productionUnitProvider";
+                settings.Properties.ValueField = "id";
+                settings.Properties.TextField = "name";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ClientSideEvents.Init = "productionUnitProviderInit";
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = "ComboProductionUnitProvider_SelectedIndexChanged";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            @Html.Partial("_ProductionUnitProviderPoolPartial", this.Model)
+        </td>
+    </tr>
+</table>
+
+<script src="~/Scripts/productionUnitProviderPool/editform.js"></script>
+<script src="~/Scripts/productionUnitProviderPool/validation.js"></script>
